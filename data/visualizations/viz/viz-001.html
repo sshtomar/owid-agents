@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Great Convergence</h1>
+<p class="subtitle">Life expectancy at birth, 1960 vs 2023. Sixty years ago, a child born in Japan could expect 34 more years of life than one born in Afghanistan. Today that gap has narrowed to 18 years.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SP.DYN.LE00.IN</p>
+<script>
+const data = [{"n":"Japan","a":67.7,"b":84.0},{"n":"Australia","a":70.8,"b":83.1},{"n":"France","a":69.9,"b":82.9},{"n":"Chile","a":57.2,"b":81.2},{"n":"Germany","a":69.1,"b":80.5},{"n":"Cuba","a":63.3,"b":78.1},{"n":"China","a":33.4,"b":78.0},{"n":"Iran","a":43.3,"b":77.7},{"n":"Brazil","a":53.2,"b":75.8},{"n":"Bangladesh","a":44.0,"b":74.7},{"n":"India","a":45.6,"b":72.0},{"n":"Egypt","a":44.4,"b":71.6},{"n":"Indonesia","a":46.8,"b":71.1},{"n":"Botswana","a":51.2,"b":69.2},{"n":"Ethiopia","a":39.6,"b":67.3},{"n":"Afghanistan","a":32.8,"b":66.0},{"n":"Ghana","a":46.9,"b":65.5},{"n":"Kenya","a":48.5,"b":63.6},{"n":"DR Congo","a":40.8,"b":61.9},{"n":"C. African Rep.","a":39.6,"b":57.4},{"n":"Chad","a":39.2,"b":55.1}];
+
+const W = 700, H = 560;
+const pad = { left: 120, right: 130, top: 40, bottom: 20 };
+const minV = 30, maxV = 86;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+const hdr = (x, txt) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", 20);
+  t.setAttribute("text-anchor", "middle");
+  t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.setAttribute("font-size", "10"); t.setAttribute("fill", "#7A786F");
+  t.setAttribute("letter-spacing", "0.5");
+  t.textContent = txt;
+  svg.appendChild(t);
+};
+hdr(pad.left, "1960");
+hdr(W - pad.right, "2023");
+
+const colorForChange = d => {
+  if (d.b - d.a > 30) return "#EA5E33";
+  if (d.b - d.a > 20) return "#F29A44";
+  if (d.b - d.a > 15) return "#F5D38A";
+  return "#A6C4A2";
+};
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 20; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.a), v: d.a, d }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b), v: d.b, d }));
+resolveCollisions(leftLabels, 14);
+resolveCollisions(rightLabels, 14);
+
+// Store references per row for interactivity
+const rows = [];
+
+data.forEach((d, i) => {
+  const x1 = pad.left + 4, x2 = W - pad.right - 4;
+  const y1 = scale(d.a), y2 = scale(d.b);
+  const col = colorForChange(d);
+  const els = [];
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.setAttribute("data-idx", i);
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+  line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+  line.setAttribute("stroke", col); line.setAttribute("stroke-width", "1.5");
+  line.setAttribute("opacity", "0.7");
+  g.appendChild(line); els.push(line);
+
+  [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", p.x); c.setAttribute("cy", p.y); c.setAttribute("r", "2.5");
+    c.setAttribute("fill", col);
+    g.appendChild(c); els.push(c);
+  });
+
+  const ll = leftLabels.find(l => l.n === d.n);
+  const lt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  lt.setAttribute("x", x1 - 8); lt.setAttribute("y", ll.y + 3.5);
+  lt.setAttribute("text-anchor", "end"); lt.setAttribute("font-size", "10");
+  lt.setAttribute("fill", "#2B2A27");
+  lt.textContent = `${d.n} ${d.a.toFixed(0)}`;
+  g.appendChild(lt); els.push(lt);
+
+  const rl = rightLabels.find(l => l.n === d.n);
+  const rt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  rt.setAttribute("x", x2 + 8); rt.setAttribute("y", rl.y + 3.5);
+  rt.setAttribute("text-anchor", "start"); rt.setAttribute("font-size", "10");
+  rt.setAttribute("fill", "#2B2A27");
+  rt.textContent = `${d.b.toFixed(0)} ${d.n}`;
+  g.appendChild(rt); els.push(rt);
+
+  // Invisible wide hit area
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  hit.setAttribute("x1", x1); hit.setAttribute("y1", y1);
+  hit.setAttribute("x2", x2); hit.setAttribute("y2", y2);
+  hit.setAttribute("stroke", "transparent"); hit.setAttribute("stroke-width", "14");
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, els, line, d, col, y1, y2 });
+});
+
+// Legend
+const legend = [
+  { col: "#EA5E33", label: "> 30 years gained" },
+  { col: "#F29A44", label: "20-30 years" },
+  { col: "#F5D38A", label: "15-20 years" },
+  { col: "#A6C4A2", label: "< 15 years" },
+];
+legend.forEach((l, i) => {
+  const y = H - 8;
+  const x = i * 140;
+  const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r.setAttribute("x", x); r.setAttribute("y", y - 6);
+  r.setAttribute("width", 12); r.setAttribute("height", 3);
+  r.setAttribute("fill", l.col); r.setAttribute("rx", 1);
+  svg.appendChild(r);
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x + 16); t.setAttribute("y", y);
+  t.setAttribute("font-size", "9"); t.setAttribute("fill", "#7A786F");
+  t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "1.5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "3");
+    } else {
+      row.g.style.opacity = "0.15";
+      row.line.setAttribute("stroke-width", "1");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+
+  // Find closest row
+  let best = -1, bestDist = 20;
+  rows.forEach((row, i) => {
+    const t = Math.max(0, Math.min(1, (sx - pad.left) / (W - pad.left - pad.right)));
+    const lineY = row.y1 + (row.y2 - row.y1) * t;
+    const dist = Math.abs(sy - lineY);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  highlight(best);
+
+  if (best >= 0) {
+    const d = rows[best].d;
+    const change = (d.b - d.a).toFixed(1);
+    tip.textContent = `${d.n}: ${d.a.toFixed(1)} -> ${d.b.toFixed(1)} (+${change} yr)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  highlight(-1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>

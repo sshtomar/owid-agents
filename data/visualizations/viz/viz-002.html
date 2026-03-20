@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 28px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; }
+  .spark-cell { padding: 10px 12px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; position: relative; transition: background 0.15s; cursor: crosshair; }
+  .spark-cell:nth-child(6n) { border-right: none; }
+  .spark-cell:hover { background: rgba(234,94,51,0.04); }
+  .spark-name { font-size: 10px; font-weight: 500; color: #2B2A27; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .spark-meta { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; display: flex; justify-content: space-between; margin-top: 2px; }
+  .spark-val { color: #EA5E33; font-weight: 500; }
+  .spark-canvas-wrap { position: relative; }
+  canvas { display: block; width: 100%; height: 28px; }
+  .spark-marker { position: absolute; top: 0; width: 1px; height: 28px; background: #2B2A27; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+  .spark-tip { position: absolute; top: -18px; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 6px; border-radius: 2px; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); }
+</style></head><body>
+<h1>Sixty Years of Saved Children</h1>
+<p class="subtitle">Under-5 mortality rate per 1,000 live births, ~1960-2023. Each sparkline traces one country's trajectory. Hover to inspect values along the timeline.</p>
+<div class="grid" id="grid"></div>
+<p class="source">Source: World Bank SH.DYN.MORT</p>
+<script>
+const data = [
+  {"n":"Afghanistan","s":[353,327,312,297,281,264,246,274,253,187,169,153,140,127,114,101,88,78,70,63,57,56],"e":353,"l":56,"y0":1960},
+  {"n":"Egypt","s":[320,299,272,254,243,226,198,168,139,110,90,77,65,53,44,38,33,28,25,22,20,18,18],"e":320,"l":18,"y0":1960},
+  {"n":"Ethiopia","s":[278,248,247,283,245,240,320,297,206,191,172,153,134,115,97,83,72,62,54,48,47],"e":278,"l":47,"y0":1966},
+  {"n":"Bangladesh","s":[262,249,233,227,367,227,219,206,190,172,152,134,115,97,80,67,57,49,43,37,32,31,31],"e":262,"l":31,"y0":1960},
+  {"n":"DR Congo","s":[251,243,234,223,212,203,195,188,181,175,155,141,127,114,103,92,84,76,73],"e":251,"l":73,"y0":1969},
+  {"n":"India","s":[241,235,227,220,212,201,186,169,155,142,130,120,110,99,88,78,68,58,49,41,34,29,28],"e":241,"l":28,"y0":1960},
+  {"n":"Indonesia","s":[224,212,229,177,161,146,132,121,110,99,88,76,66,57,50,49,38,34,30,26,24,21,21],"e":224,"l":21,"y0":1960},
+  {"n":"Ghana","s":[209,205,203,203,201,192,177,167,162,150,133,120,115,108,96,85,76,67,57,50,44,39,37],"e":209,"l":37,"y0":1960},
+  {"n":"Kenya","s":[196,181,166,157,147,135,122,110,100,95,99,107,110,104,92,77,63,54,50,46,43,41,40],"e":196,"l":40,"y0":1960},
+  {"n":"Iran","s":[189,189,162,135,108,87,72,60,52,46,40,34,28,23,19,17,15,14,12,12],"e":189,"l":12,"y0":1969},
+  {"n":"Brazil","s":[169,160,149,139,119,108,96,83,74,66,57,48,39,32,26,22,19,17,17,15,15,14],"e":169,"l":14,"y0":1960},
+  {"n":"Chile","s":[153,143,116,87,79,71,49,33,25,22,20,16,13,12,10,9,9,9,8,8,7,7,7],"e":153,"l":7,"y0":1960},
+  {"n":"China","s":[119,107,91,75,63,56,54,54,52,48,41,34,26,20,16,13,10,8,7,6],"e":119,"l":6,"y0":1969},
+  {"n":"Korea","s":[61,57,48,42,36,29,23,17,13,11,9,7,6,5,4,4,3,3,3],"e":61,"l":3,"y0":1969},
+  {"n":"Cuba","s":[44,44,44,41,37,31,26,22,19,16,14,12,11,9,8,7,7,6,6,7,8,8],"e":44,"l":8,"y0":1960},
+  {"n":"Japan","s":[40,33,25,20,16,14,12,10,8,7,6,6,6,5,4,4,4,3,3,3,2,2,2],"e":40,"l":2,"y0":1960},
+  {"n":"Germany","s":[27,25,22,18,15,13,11,9,8,7,6,5,5,5,5,4,4,4,4,4],"e":27,"l":4,"y0":1966},
+  {"n":"Australia","s":[25,22,22,21,18,15,13,12,11,10,8,7,6,6,6,5,5,4,4,4,4],"e":25,"l":4,"y0":1960}
+];
+
+const grid = document.getElementById("grid");
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "spark-cell";
+
+  const name = document.createElement("div");
+  name.className = "spark-name";
+  name.textContent = d.n;
+  cell.appendChild(name);
+
+  const wrap = document.createElement("div");
+  wrap.className = "spark-canvas-wrap";
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 200;
+  canvas.height = 28;
+  wrap.appendChild(canvas);
+
+  const marker = document.createElement("div");
+  marker.className = "spark-marker";
+  wrap.appendChild(marker);
+
+  const sparkTip = document.createElement("div");
+  sparkTip.className = "spark-tip";
+  wrap.appendChild(sparkTip);
+
+  cell.appendChild(wrap);
+
+  const meta = document.createElement("div");
+  meta.className = "spark-meta";
+  meta.innerHTML = `<span>${d.e}</span><span class="spark-val">${d.l}</span>`;
+  cell.appendChild(meta);
+
+  grid.appendChild(cell);
+
+  const ctx = canvas.getContext("2d");
+  const series = d.s;
+  const maxVal = Math.max(...series);
+  const w = canvas.width;
+  const h = canvas.height;
+  const step = w / (series.length - 1);
+
+  function draw(highlightIdx) {
+    ctx.clearRect(0, 0, w, h);
+
+    // Area fill
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    series.forEach((v, i) => {
+      ctx.lineTo(i * step, h - (v / maxVal) * (h - 2));
+    });
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(234, 94, 51, 0.08)';
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = i * step, y = h - (v / maxVal) * (h - 2);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = '#EA5E33';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // End dot
+    const lastX = (series.length - 1) * step;
+    const lastY = h - (series[series.length - 1] / maxVal) * (h - 2);
+    ctx.beginPath();
+    ctx.arc(lastX, lastY, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#EA5E33';
+    ctx.fill();
+
+    // Highlight dot
+    if (highlightIdx >= 0 && highlightIdx < series.length) {
+      const hx = highlightIdx * step;
+      const hy = h - (series[highlightIdx] / maxVal) * (h - 2);
+      ctx.beginPath();
+      ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#EA5E33';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(hx, hy, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#F6F5EE';
+      ctx.fill();
+    }
+  }
+
+  draw(-1);
+
+  // Sparkline hover
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = mx / rect.width;
+    const idx = Math.round(ratio * (series.length - 1));
+    const clamped = Math.max(0, Math.min(series.length - 1, idx));
+
+    const px = (clamped / (series.length - 1)) * rect.width;
+    marker.style.left = px + "px";
+    marker.style.opacity = "1";
+
+    const yearStep = 3;
+    const year = d.y0 + clamped * yearStep;
+    sparkTip.textContent = `${year}: ${series[clamped]}`;
+    sparkTip.style.left = px + "px";
+    sparkTip.style.opacity = "1";
+
+    draw(clamped);
+  });
+
+  cell.addEventListener("mouseleave", () => {
+    marker.style.opacity = "0";
+    sparkTip.style.opacity = "0";
+    draw(-1);
+  });
+});
+</script>
+</body></html>

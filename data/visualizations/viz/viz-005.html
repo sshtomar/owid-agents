@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  canvas { display: block; margin-top: 4px; cursor: crosshair; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>Development at a Glance</h1>
+<p class="subtitle">Six indicators across 19 countries. Each column is normalized within its range. Dot size encodes magnitude; color encodes relative standing. Hover to inspect values.</p>
+<div style="position:relative;">
+  <canvas id="canvas"></canvas>
+  <div class="tooltip" id="tip"></div>
+</div>
+<p class="source">Source: World Bank (multiple indicators)</p>
+<script>
+const data = [
+  {"c":"JP","life_exp":84.0,"gdp_pc":32487,"mortality":2.4,"urban":92.2,"internet":87.0,"renewable":21.1},
+  {"c":"AU","life_exp":83.1,"gdp_pc":64604,"mortality":3.7,"urban":87.6,"internet":97.1,"renewable":26.7},
+  {"c":"KR","life_exp":83.4,"gdp_pc":36239,"mortality":2.8,"urban":81.2,"internet":97.9,"renewable":6.6},
+  {"c":"FR","life_exp":82.9,"gdp_pc":46103,"mortality":4.3,"urban":78.8,"internet":88.7,"renewable":22.8},
+  {"c":"DE","life_exp":80.5,"gdp_pc":56104,"mortality":3.7,"urban":82.0,"internet":93.5,"renewable":39.8},
+  {"c":"CA","life_exp":81.6,"gdp_pc":54340,"mortality":5.1,"urban":82.7,"internet":94.0,"renewable":67.0},
+  {"c":"CL","life_exp":81.2,"gdp_pc":16710,"mortality":7.2,"urban":89.0,"internet":94.5,"renewable":48.1},
+  {"c":"CN","life_exp":78.0,"gdp_pc":13303,"mortality":6.2,"urban":65.9,"internet":92.0,"renewable":28.4},
+  {"c":"IR","life_exp":77.7,"gdp_pc":5190,"mortality":11.8,"urban":77.0,"internet":79.6,"renewable":4.2},
+  {"c":"AR","life_exp":77.4,"gdp_pc":13970,"mortality":9.6,"urban":92.3,"internet":89.7,"renewable":25.5},
+  {"c":"CO","life_exp":77.7,"gdp_pc":7919,"mortality":12.0,"urban":78.5,"internet":77.3,"renewable":75.1},
+  {"c":"BR","life_exp":75.8,"gdp_pc":10311,"mortality":14.4,"urban":87.9,"internet":84.5,"renewable":77.4},
+  {"c":"BD","life_exp":74.7,"gdp_pc":2593,"mortality":30.6,"urban":32.7,"internet":44.5,"renewable":1.5},
+  {"c":"IN","life_exp":72.0,"gdp_pc":2695,"mortality":27.7,"urban":35.4,"internet":55.9,"renewable":19.1},
+  {"c":"EG","life_exp":71.6,"gdp_pc":3339,"mortality":17.5,"urban":42.8,"internet":72.7,"renewable":12.2},
+  {"c":"ID","life_exp":71.1,"gdp_pc":4925,"mortality":20.6,"urban":58.8,"internet":72.8,"renewable":15.5},
+  {"c":"ET","life_exp":67.3,"gdp_pc":1134,"mortality":46.5,"urban":23.6,"internet":16.7,"renewable":95.4},
+  {"c":"GH","life_exp":65.5,"gdp_pc":2391,"mortality":37.1,"urban":58.4,"internet":69.9,"renewable":34.9},
+  {"c":"KE","life_exp":63.6,"gdp_pc":2132,"mortality":39.9,"urban":31.9,"internet":35.0,"renewable":78.1}
+];
+
+const names = {"JP":"Japan","AU":"Australia","KR":"S. Korea","FR":"France","DE":"Germany","CA":"Canada","CL":"Chile","CN":"China","IR":"Iran","AR":"Argentina","CO":"Colombia","BR":"Brazil","BD":"Bangladesh","IN":"India","EG":"Egypt","ID":"Indonesia","ET":"Ethiopia","GH":"Ghana","KE":"Kenya"};
+
+const cols = [
+  { key: "life_exp", label: "LIFE EXP.", unit: "yr", invert: false },
+  { key: "gdp_pc", label: "GDP/CAP", unit: "$", invert: false },
+  { key: "mortality", label: "U5 MORT.", unit: "/1k", invert: true },
+  { key: "urban", label: "URBAN", unit: "%", invert: false },
+  { key: "internet", label: "INTERNET", unit: "%", invert: false },
+  { key: "renewable", label: "RENEW.", unit: "%", invert: false }
+];
+
+const canvas = document.getElementById("canvas");
+const dpr = window.devicePixelRatio || 1;
+const rowH = 28;
+const colW = 90;
+const labelW = 80;
+const headerH = 40;
+const W = labelW + cols.length * colW + 20;
+const H = headerH + data.length * rowH + 10;
+
+canvas.width = W * dpr;
+canvas.height = H * dpr;
+canvas.style.width = W + "px";
+canvas.style.height = H + "px";
+
+const ctx = canvas.getContext("2d");
+ctx.scale(dpr, dpr);
+
+const earth = {
+  high: [234, 94, 51],
+  med: [242, 154, 68],
+  low: [245, 211, 138],
+  cool: [166, 196, 162],
+  muted: [200, 200, 190]
+};
+
+const ranges = {};
+cols.forEach(col => {
+  const vals = data.map(d => d[col.key]);
+  ranges[col.key] = { min: Math.min(...vals), max: Math.max(...vals) };
+});
+
+function normalize(val, key, invert) {
+  const { min, max } = ranges[key];
+  let n = (val - min) / (max - min);
+  if (invert) n = 1 - n;
+  return n;
+}
+
+function interpolateColor(n) {
+  let r, g, b;
+  if (n > 0.7) {
+    const t = (n - 0.7) / 0.3;
+    r = earth.med[0] + (earth.high[0] - earth.med[0]) * t;
+    g = earth.med[1] + (earth.high[1] - earth.med[1]) * t;
+    b = earth.med[2] + (earth.high[2] - earth.med[2]) * t;
+  } else if (n > 0.4) {
+    const t = (n - 0.4) / 0.3;
+    r = earth.low[0] + (earth.med[0] - earth.low[0]) * t;
+    g = earth.low[1] + (earth.med[1] - earth.low[1]) * t;
+    b = earth.low[2] + (earth.med[2] - earth.low[2]) * t;
+  } else if (n > 0.15) {
+    const t = (n - 0.15) / 0.25;
+    r = earth.cool[0] + (earth.low[0] - earth.cool[0]) * t;
+    g = earth.cool[1] + (earth.low[1] - earth.cool[1]) * t;
+    b = earth.cool[2] + (earth.low[2] - earth.cool[2]) * t;
+  } else {
+    r = earth.muted[0]; g = earth.muted[1]; b = earth.muted[2];
+  }
+  return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+}
+
+function formatVal(col, val) {
+  if (col.key === "gdp_pc") {
+    return val >= 10000 ? `$${(val/1000).toFixed(0)}k` : `$${(val/1000).toFixed(1)}k`;
+  } else if (col.key === "life_exp") {
+    return val.toFixed(1) + " yr";
+  } else if (col.key === "mortality") {
+    return val.toFixed(1) + "/1k";
+  } else {
+    return val.toFixed(1) + "%";
+  }
+}
+
+function draw(hoverRow, hoverCol) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = "#F6F5EE";
+  ctx.fillRect(0, 0, W, H);
+
+  // Column highlight
+  if (hoverCol >= 0) {
+    const cx = labelW + hoverCol * colW;
+    ctx.fillStyle = "rgba(234, 94, 51, 0.04)";
+    ctx.fillRect(cx, 0, colW, H);
+  }
+
+  // Row highlight
+  if (hoverRow >= 0) {
+    const ry = headerH + hoverRow * rowH;
+    ctx.fillStyle = "rgba(234, 94, 51, 0.06)";
+    ctx.fillRect(0, ry, W, rowH);
+  }
+
+  // Column headers
+  ctx.textAlign = "center";
+  cols.forEach((col, i) => {
+    const x = labelW + i * colW + colW / 2;
+    const isActive = hoverCol === i;
+    ctx.font = "500 9px 'JetBrains Mono', monospace";
+    ctx.fillStyle = isActive ? "#2B2A27" : "#7A786F";
+    ctx.fillText(col.label, x, 16);
+    ctx.font = "400 8px 'JetBrains Mono', monospace";
+    ctx.fillText(col.unit, x, 28);
+  });
+
+  // Row separator lines
+  data.forEach((d, i) => {
+    const y = headerH + i * rowH;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.strokeStyle = "#E2E0D5";
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+
+  // Data rows
+  data.forEach((d, i) => {
+    const y = headerH + i * rowH + rowH / 2;
+    const rowActive = hoverRow === i;
+    const dimRow = hoverRow >= 0 && !rowActive;
+
+    // Country name
+    ctx.font = rowActive ? "600 10px 'Inter', sans-serif" : "500 10px 'Inter', sans-serif";
+    ctx.fillStyle = dimRow ? "rgba(43,42,39,0.2)" : "#2B2A27";
+    ctx.textAlign = "right";
+    ctx.fillText(names[d.c] || d.c, labelW - 12, y + 4);
+
+    // Data dots
+    cols.forEach((col, j) => {
+      const x = labelW + j * colW + colW / 2;
+      const val = d[col.key];
+      const n = normalize(val, col.key, col.invert);
+      const isFocused = rowActive && hoverCol === j;
+      const radius = isFocused ? (4 + n * 8) : (3 + n * 7);
+      const color = interpolateColor(n);
+
+      ctx.globalAlpha = dimRow ? 0.2 : 1;
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // Focus ring on hovered cell
+      if (isFocused) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
+        ctx.strokeStyle = "#2B2A27";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Value label inside dot
+      ctx.font = "400 8px 'JetBrains Mono', monospace";
+      ctx.fillStyle = n > 0.5 ? "#FFFFFF" : "#2B2A27";
+      ctx.textAlign = "center";
+
+      let label;
+      if (col.key === "gdp_pc") {
+        label = val >= 10000 ? `${(val/1000).toFixed(0)}k` : `${(val/1000).toFixed(1)}k`;
+      } else {
+        label = val.toFixed(0);
+      }
+      ctx.fillText(label, x, y + 3);
+
+      ctx.globalAlpha = 1;
+    });
+  });
+}
+
+draw(-1, -1);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeRow = -1, activeCol = -1;
+
+canvas.addEventListener("mousemove", e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width * W;
+  const my = (e.clientY - rect.top) / rect.height * H;
+
+  let row = -1, col = -1;
+
+  // Detect row
+  if (my >= headerH && my < headerH + data.length * rowH) {
+    row = Math.floor((my - headerH) / rowH);
+    if (row >= data.length) row = -1;
+  }
+
+  // Detect column
+  if (mx >= labelW && mx < labelW + cols.length * colW) {
+    col = Math.floor((mx - labelW) / colW);
+    if (col >= cols.length) col = -1;
+  }
+
+  if (row !== activeRow || col !== activeCol) {
+    activeRow = row;
+    activeCol = col;
+    draw(row, col);
+  }
+
+  if (row >= 0 && col >= 0) {
+    const d = data[row];
+    const c = cols[col];
+    const val = d[c.key];
+    const n = normalize(val, c.key, c.invert);
+    const rank = data.slice().sort((a, b) => {
+      const na = normalize(a[c.key], c.key, c.invert);
+      const nb = normalize(b[c.key], c.key, c.invert);
+      return nb - na;
+    }).findIndex(x => x.c === d.c) + 1;
+
+    tip.innerHTML = `<b>${names[d.c]}</b><br>${c.label}: ${formatVal(c, val)}<br>Rank: ${rank}/${data.length}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX - canvas.getBoundingClientRect().left + 14) + "px";
+    tip.style.top = (e.clientY - canvas.getBoundingClientRect().top - 36) + "px";
+  } else if (row >= 0) {
+    const d = data[row];
+    tip.innerHTML = `<b>${names[d.c]}</b>`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX - canvas.getBoundingClientRect().left + 14) + "px";
+    tip.style.top = (e.clientY - canvas.getBoundingClientRect().top - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+canvas.addEventListener("mouseleave", () => {
+  activeRow = -1;
+  activeCol = -1;
+  draw(-1, -1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>

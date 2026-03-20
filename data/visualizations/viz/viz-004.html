@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 28px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>The Digital Divide, Closing</h1>
+<p class="subtitle">Internet users as percentage of population, circa 2000 vs latest available year. Hover to compare values.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank IT.NET.USER.ZS</p>
+<script>
+const data = [
+  {"n":"Bahrain","a":6.2,"b":100.0},{"n":"Denmark","a":39.2,"b":99.8},{"n":"Korea","a":44.7,"b":97.9},
+  {"n":"Australia","a":46.8,"b":97.1},{"n":"Ireland","a":17.9,"b":96.5},{"n":"Belgium","a":29.4,"b":95.8},
+  {"n":"Chile","a":16.6,"b":94.5},{"n":"Canada","a":51.3,"b":94.0},{"n":"Germany","a":30.2,"b":93.5},
+  {"n":"Kazakhstan","a":0.7,"b":93.4},{"n":"China","a":1.8,"b":92.0},{"n":"Argentina","a":7.0,"b":89.7},
+  {"n":"Italy","a":23.1,"b":89.2},{"n":"France","a":14.3,"b":88.7},{"n":"Israel","a":20.9,"b":88.2},
+  {"n":"Japan","a":30.0,"b":87.0},{"n":"Greece","a":9.1,"b":86.3},{"n":"Brazil","a":2.9,"b":84.5},
+  {"n":"Croatia","a":6.6,"b":83.6},{"n":"Albania","a":0.1,"b":83.1},{"n":"Georgia","a":0.5,"b":81.9},
+  {"n":"Iraq","a":0.1,"b":81.7},{"n":"Botswana","a":2.9,"b":81.4},{"n":"Iran","a":0.9,"b":79.6},
+  {"n":"Colombia","a":2.2,"b":77.3},{"n":"Algeria","a":0.5,"b":76.9},{"n":"Ecuador","a":1.5,"b":77.2},
+  {"n":"Indonesia","a":0.9,"b":72.8},{"n":"Egypt","a":0.6,"b":72.7},{"n":"Ghana","a":0.2,"b":69.9},
+  {"n":"India","a":0.5,"b":55.9},{"n":"Bangladesh","a":0.1,"b":44.5},{"n":"Kenya","a":0.3,"b":35.0}
+];
+
+const W = 700, H = data.length * 18 + 60;
+const margin = { top: 36, right: 50, bottom: 30, left: 100 };
+const iw = W - margin.left - margin.right;
+const rowH = 18;
+const xScale = v => margin.left + (v / 100) * iw;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+const mkText = (x, y, txt, opts = {}) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "9");
+  t.setAttribute("fill", opts.fill || "#7A786F");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.textContent = txt;
+  svg.appendChild(t);
+  return t;
+};
+
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x); line.setAttribute("y1", margin.top - 10);
+  line.setAttribute("x2", x); line.setAttribute("y2", H - margin.bottom);
+  line.setAttribute("stroke", "#E2E0D5"); line.setAttribute("stroke-width", "0.5");
+  svg.appendChild(line);
+  mkText(x, margin.top - 16, `${v}%`, { anchor: "middle", mono: true, size: "9" });
+});
+
+mkText(margin.left - 8, 14, "COUNTRY", { anchor: "end", size: "9", mono: true });
+mkText(xScale(50), 10, "INTERNET USERS (% OF POPULATION)", { anchor: "middle", size: "9", mono: true });
+
+const rowGroups = [];
+
+data.forEach((d, i) => {
+  const y = margin.top + i * rowH + rowH / 2;
+  const x1 = xScale(d.a);
+  const x2 = xScale(d.b);
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+  // Row highlight background
+  const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bg.setAttribute("x", 0); bg.setAttribute("y", y - rowH / 2);
+  bg.setAttribute("width", W); bg.setAttribute("height", rowH);
+  bg.setAttribute("fill", "transparent");
+  g.appendChild(bg);
+
+  const label = mkText(margin.left - 8, y + 3.5, d.n, { anchor: "end", size: "10", fill: "#2B2A27" });
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x1); line.setAttribute("y1", y);
+  line.setAttribute("x2", x2); line.setAttribute("y2", y);
+  line.setAttribute("stroke", "#E2E0D5"); line.setAttribute("stroke-width", "1");
+  g.appendChild(line);
+
+  const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c1.setAttribute("cx", x1); c1.setAttribute("cy", y); c1.setAttribute("r", "3");
+  c1.setAttribute("fill", "#F5D38A"); c1.setAttribute("stroke", "#E2E0D5"); c1.setAttribute("stroke-width", "0.5");
+  g.appendChild(c1);
+
+  const endCol = d.b > 80 ? "#EA5E33" : d.b > 50 ? "#F29A44" : "#A6C4A2";
+  const c2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c2.setAttribute("cx", x2); c2.setAttribute("cy", y); c2.setAttribute("r", "3.5");
+  c2.setAttribute("fill", endCol);
+  g.appendChild(c2);
+
+  const valLabel = mkText(x2 + 8, y + 3.5, `${d.b.toFixed(0)}%`, { size: "9", mono: true, fill: "#2B2A27" });
+
+  // Hit area for the whole row
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hit.setAttribute("x", 0); hit.setAttribute("y", y - rowH / 2);
+  hit.setAttribute("width", W); hit.setAttribute("height", rowH);
+  hit.setAttribute("fill", "transparent"); hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rowGroups.push({ g, bg, d, y, label, c1, c2, line, valLabel });
+});
+
+// Legend
+const ly = H - 10;
+[
+  { col: "#F5D38A", label: "~2000" },
+  { col: "#EA5E33", label: "Latest (>80%)" },
+  { col: "#F29A44", label: "Latest (50-80%)" },
+  { col: "#A6C4A2", label: "Latest (<50%)" },
+].forEach((l, i) => {
+  const x = margin.left + i * 140;
+  const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c.setAttribute("cx", x); c.setAttribute("cy", ly - 3); c.setAttribute("r", "3.5");
+  c.setAttribute("fill", l.col);
+  svg.appendChild(c);
+  mkText(x + 8, ly, l.label, { size: "9", mono: true });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeRow = -1;
+
+function highlightRow(idx) {
+  if (idx === activeRow) return;
+  activeRow = idx;
+  rowGroups.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.bg.setAttribute("fill", "transparent");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.bg.setAttribute("fill", "rgba(234, 94, 51, 0.06)");
+      row.c1.setAttribute("r", "4");
+      row.c2.setAttribute("r", "5");
+      row.line.setAttribute("stroke-width", "2");
+      row.line.setAttribute("stroke", "#C2C0B5");
+    } else {
+      row.g.style.opacity = "0.2";
+      row.bg.setAttribute("fill", "transparent");
+      row.c1.setAttribute("r", "3");
+      row.c2.setAttribute("r", "3.5");
+      row.line.setAttribute("stroke-width", "1");
+      row.line.setAttribute("stroke", "#E2E0D5");
+    }
+  });
+  // Reset sizes when clearing
+  if (idx === -1) {
+    rowGroups.forEach(row => {
+      row.c1.setAttribute("r", "3");
+      row.c2.setAttribute("r", "3.5");
+      row.line.setAttribute("stroke-width", "1");
+      row.line.setAttribute("stroke", "#E2E0D5");
+    });
+  }
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const my = (e.clientY - rect.top) / rect.height * H;
+
+  let best = -1;
+  rowGroups.forEach((row, i) => {
+    if (Math.abs(my - row.y) < rowH / 2) best = i;
+  });
+
+  highlightRow(best);
+
+  if (best >= 0) {
+    const d = rowGroups[best].d;
+    const gain = (d.b - d.a).toFixed(1);
+    const mult = d.a > 0.05 ? (d.b / d.a).toFixed(0) : ">500";
+    tip.innerHTML = `<b>${d.n}</b><br>~2000: ${d.a.toFixed(1)}%<br>Latest: ${d.b.toFixed(1)}%<br>Gain: +${gain}pp (${mult}x)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 36) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  highlightRow(-1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>
