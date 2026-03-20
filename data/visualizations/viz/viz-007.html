@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 28px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>The Price of a Year of Life</h1>
+<p class="subtitle">Health spending per capita vs life expectancy. The US spends far more than any other country for middling longevity. Cuba achieves nearly the same life expectancy as the US at a fraction of the cost. Hover to compare.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SH.XPD.CHEX.PC.CD, SP.DYN.LE00.IN</p>
+<script>
+const data = [{"c":"JP","n":"Japan","spend":3638,"le":84.0},{"c":"KR","n":"S. Korea","spend":3137,"le":83.4},{"c":"BR","n":"Brazil","spend":1010,"le":75.8},{"c":"IN","n":"India","spend":85,"le":72.0},{"c":"BD","n":"Bangladesh","spend":53,"le":74.7},{"c":"IR","n":"Iran","spend":267,"le":77.7},{"c":"FR","n":"France","spend":5327,"le":82.9},{"c":"DE","n":"Germany","spend":6849,"le":80.5},{"c":"CN","n":"China","spend":763,"le":78.0},{"c":"ID","n":"Indonesia","spend":132,"le":71.1},{"c":"EG","n":"Egypt","spend":141,"le":71.6},{"c":"KE","n":"Kenya","spend":85,"le":63.6},{"c":"CL","n":"Chile","spend":1760,"le":81.2},{"c":"AR","n":"Argentina","spend":1457,"le":77.4},{"c":"CO","n":"Colombia","spend":644,"le":77.7},{"c":"GH","n":"Ghana","spend":70,"le":65.5},{"c":"AU","n":"Australia","spend":6980,"le":83.1},{"c":"IT","n":"Italy","spend":3398,"le":83.7},{"c":"CU","n":"Cuba","spend":1199,"le":78.1},{"c":"ET","n":"Ethiopia","spend":35,"le":67.3}];
+
+const W = 700, H = 440;
+const margin = { top: 30, right: 30, bottom: 50, left: 55 };
+const iw = W - margin.left - margin.right;
+const ih = H - margin.top - margin.bottom;
+
+// Log scale for spending
+const spendMin = 25, spendMax = 10000;
+const leMin = 60, leMax = 86;
+const xScale = v => margin.left + (Math.log10(v) - Math.log10(spendMin)) / (Math.log10(spendMax) - Math.log10(spendMin)) * iw;
+const yScale = v => margin.top + (leMax - v) / (leMax - leMin) * ih;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+const mkEl = (tag, attrs) => {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  svg.appendChild(el);
+  return el;
+};
+
+const mkText = (x, y, txt, opts = {}) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "9");
+  t.setAttribute("fill", opts.fill || "#7A786F");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.textContent = txt;
+  svg.appendChild(t);
+  return t;
+};
+
+// Grid lines
+[50, 100, 500, 1000, 5000].forEach(v => {
+  mkEl("line", { x1: xScale(v), y1: margin.top, x2: xScale(v), y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": 0.5 });
+  const label = v >= 1000 ? `$${v/1000}k` : `$${v}`;
+  mkText(xScale(v), H - margin.bottom + 16, label, { anchor: "middle", mono: true });
+});
+[65, 70, 75, 80, 85].forEach(v => {
+  mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": 0.5 });
+  mkText(margin.left - 8, yScale(v) + 3, `${v}`, { anchor: "end", mono: true });
+});
+
+mkText(W / 2, H - 6, "Health spending per capita (log scale, current US$)", { anchor: "middle", size: "10" });
+const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+yLabel.setAttribute("transform", `rotate(-90) translate(${-(H/2)}, 14)`);
+yLabel.setAttribute("font-size", "10"); yLabel.setAttribute("fill", "#7A786F");
+yLabel.setAttribute("text-anchor", "middle"); yLabel.textContent = "Life expectancy (years)";
+svg.appendChild(yLabel);
+
+// Label offsets to avoid overlap
+const offsets = {
+  "JP":[6,-8],"KR":[6,4],"BR":[6,4],"IN":[-4,12],"BD":[6,-8],"IR":[6,4],
+  "FR":[6,-6],"DE":[6,4],"CN":[6,-8],"ID":[6,4],"EG":[-40,4],"KE":[6,4],
+  "CL":[-40,-4],"AR":[6,12],"CO":[-50,4],"GH":[6,4],"AU":[6,-6],
+  "IT":[-30,-8],"CU":[-35,4],"ET":[6,4]
+};
+
+const dots = [];
+
+data.forEach(d => {
+  const cx = xScale(d.spend), cy = yScale(d.le);
+  const isHighSpend = d.spend > 5000;
+  const isEfficient = d.le > 77 && d.spend < 1500;
+  const col = isHighSpend ? "#EA5E33" : isEfficient ? "#A6C4A2" : "#F29A44";
+
+  const circle = mkEl("circle", { cx, cy, r: 4, fill: col, opacity: 0.85 });
+
+  const [ox, oy] = offsets[d.c] || [6, 4];
+  mkText(cx + ox, cy + oy, d.n, { size: "9", fill: "#2B2A27" });
+
+  dots.push({ cx, cy, d, col, circle });
+});
+
+// Hover ring
+const hoverRing = mkEl("circle", { r: 7, fill: "none", stroke: "#2B2A27", "stroke-width": 1.5 });
+hoverRing.style.opacity = "0";
+hoverRing.style.pointerEvents = "none";
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width * W;
+  const my = (e.clientY - rect.top) / rect.height * H;
+
+  let best = -1, bestDist = 600;
+  dots.forEach((dot, i) => {
+    const dx = dot.cx - mx, dy = dot.cy - my;
+    const dist = dx * dx + dy * dy;
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  if (best >= 0 && best !== activeIdx) {
+    activeIdx = best;
+    dots.forEach((dot, i) => {
+      dot.circle.setAttribute("opacity", i === best ? "1" : "0.2");
+    });
+  }
+
+  if (best >= 0) {
+    const d = dots[best].d;
+    const spendFmt = d.spend >= 1000 ? `$${(d.spend/1000).toFixed(1)}k` : `$${d.spend}`;
+    tip.innerHTML = `<b>${d.n}</b><br>Spending: ${spendFmt}/person<br>Life exp: ${d.le} years`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 36) + "px";
+    hoverRing.setAttribute("cx", dots[best].cx);
+    hoverRing.setAttribute("cy", dots[best].cy);
+    hoverRing.style.opacity = "1";
+  } else {
+    tip.style.opacity = "0";
+    hoverRing.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  activeIdx = -1;
+  dots.forEach(dot => dot.circle.setAttribute("opacity", "0.85"));
+  tip.style.opacity = "0";
+  hoverRing.style.opacity = "0";
+});
+</script>
+</body></html>

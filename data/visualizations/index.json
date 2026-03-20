@@ -81,6 +81,55 @@
       ],
       "createdAt": "2026-03-20T03:00:00.000Z"
     }
+    ,
+    {
+      "id": "viz-006",
+      "title": "The Demographic Transition",
+      "description": "Fertility rate (births per woman) from 1960 to 2023 for 10 countries. Every country shown has fallen toward or below the replacement level of 2.1.",
+      "datasetIds": ["wb--SP-DYN-TFRT-IN"],
+      "chartType": "trends over time",
+      "codeFilePath": "viz/viz-006.html",
+      "generatedCode": "",
+      "highlights": [
+        "South Korea fell from 4.5 births per woman in 1970 to 0.72 in 2023 -- the lowest in the world",
+        "Iran's drop was the fastest: from 7.5 to 1.7, mostly in a single decade (1985-1995)",
+        "China's one-child policy shows as a sharp cliff from 6.6 in 1965 to 3.6 in 1975",
+        "Ethiopia remains the only country shown still above 3, but is falling rapidly"
+      ],
+      "createdAt": "2026-03-20T06:00:00.000Z"
+    },
+    {
+      "id": "viz-007",
+      "title": "The Price of a Year of Life",
+      "description": "Health spending per capita vs life expectancy across 20 countries. Some achieve long lives cheaply. Others spend enormously for modest returns.",
+      "datasetIds": ["wb--SH-XPD-CHEX-PC-CD", "wb--SP-DYN-LE00-IN"],
+      "chartType": "spending vs outcomes",
+      "codeFilePath": "viz/viz-007.html",
+      "generatedCode": "",
+      "highlights": [
+        "Cuba achieves 78.1 years of life expectancy spending just $1,199 per person -- rivaling countries that spend 5x more",
+        "Germany and Australia spend $6,800-7,000 per person but trail Japan and Italy in life expectancy",
+        "Bangladesh reaches 74.7 years on just $53 per person -- the highest efficiency in the dataset",
+        "Ethiopia spends $35 per person, the least of any country shown, and has the shortest life expectancy at 67.3 years"
+      ],
+      "createdAt": "2026-03-20T06:00:00.000Z"
+    },
+    {
+      "id": "viz-008",
+      "title": "Women at Work",
+      "description": "Female labor force participation (% of women 15+), 1990 vs latest, for 18 countries. Some leapt forward, others barely moved, a few went backward.",
+      "datasetIds": ["wb--SL-TLF-CACT-FE-ZS"],
+      "chartType": "before and after",
+      "codeFilePath": "viz/viz-008.html",
+      "generatedCode": "",
+      "highlights": [
+        "Chile saw the largest gain: from 31% to 52.8%, a 21.8 percentage point increase",
+        "China and Ethiopia both declined -- from over 73% to under 60% -- as economies restructured",
+        "Iran started at 9.6% in 1990 and rose only to 14.1% by 2024",
+        "South Korea, Japan, and Germany all converged near 55-57%, from very different starting points"
+      ],
+      "createdAt": "2026-03-20T06:00:00.000Z"
+    }
   ],
-  "lastUpdated": "2026-03-20T03:00:00.000Z"
+  "lastUpdated": "2026-03-20T06:00:00.000Z"
 }

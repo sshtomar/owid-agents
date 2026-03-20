@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 28px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>Women at Work</h1>
+<p class="subtitle">Female labor force participation rate (% of women 15+), 1990 vs latest. Some countries leapt forward. Others barely moved. A few went backward. Hover to compare.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SL.TLF.CACT.FE.ZS (ILO modeled estimates)</p>
+<script>
+const data = [{"c":"KE","n":"Kenya","a":69.7,"b":63.0},{"c":"CN","n":"China","a":73.1,"b":59.4},{"c":"ET","n":"Ethiopia","a":74.9,"b":58.4},{"c":"KR","n":"S. Korea","a":47.2,"b":56.8},{"c":"GH","n":"Ghana","a":70.1,"b":55.7},{"c":"JP","n":"Japan","a":50.1,"b":55.6},{"c":"DE","n":"Germany","a":45.2,"b":55.6},{"c":"BR","n":"Brazil","a":44.4,"b":53.6},{"c":"ID","n":"Indonesia","a":50.5,"b":53.6},{"c":"CL","n":"Chile","a":31.0,"b":52.8},{"c":"AR","n":"Argentina","a":43.1,"b":52.3},{"c":"FR","n":"France","a":46.4,"b":51.8},{"c":"CO","n":"Colombia","a":53.4,"b":51.7},{"c":"BD","n":"Bangladesh","a":24.2,"b":38.7},{"c":"IN","n":"India","a":30.3,"b":32.4},{"c":"EG","n":"Egypt","a":22.2,"b":18.5},{"c":"DZ","n":"Algeria","a":11.7,"b":14.3},{"c":"IR","n":"Iran","a":9.6,"b":14.1}];
+
+const W = 700, H = data.length * 22 + 70;
+const margin = { top: 40, right: 50, bottom: 30, left: 100 };
+const iw = W - margin.left - margin.right;
+const rowH = 22;
+const xScale = v => margin.left + (v / 100) * iw;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+const mkText = (x, y, txt, opts = {}) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "9");
+  t.setAttribute("fill", opts.fill || "#7A786F");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.textContent = txt;
+  svg.appendChild(t);
+  return t;
+};
+
+// Grid
+[0, 20, 40, 60, 80].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x); line.setAttribute("y1", margin.top - 10);
+  line.setAttribute("x2", x); line.setAttribute("y2", H - margin.bottom);
+  line.setAttribute("stroke", "#E2E0D5"); line.setAttribute("stroke-width", "0.5");
+  svg.appendChild(line);
+  mkText(x, margin.top - 16, `${v}%`, { anchor: "middle", mono: true, size: "9" });
+});
+
+mkText(xScale(40), 10, "FEMALE LABOR FORCE PARTICIPATION (%)", { anchor: "middle", size: "9", mono: true });
+
+const rowGroups = [];
+
+data.forEach((d, i) => {
+  const y = margin.top + i * rowH + rowH / 2;
+  const x1 = xScale(d.a);
+  const x2 = xScale(d.b);
+  const grew = d.b > d.a;
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+  const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bg.setAttribute("x", 0); bg.setAttribute("y", y - rowH / 2);
+  bg.setAttribute("width", W); bg.setAttribute("height", rowH);
+  bg.setAttribute("fill", "transparent");
+  g.appendChild(bg);
+
+  const label = mkText(margin.left - 8, y + 3.5, d.n, { anchor: "end", size: "10", fill: "#2B2A27" });
+
+  // Connecting line
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", Math.min(x1, x2)); line.setAttribute("y1", y);
+  line.setAttribute("x2", Math.max(x1, x2)); line.setAttribute("y2", y);
+  line.setAttribute("stroke", "#E2E0D5"); line.setAttribute("stroke-width", "1");
+  g.appendChild(line);
+
+  // 1990 dot
+  const c1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c1.setAttribute("cx", x1); c1.setAttribute("cy", y); c1.setAttribute("r", "3");
+  c1.setAttribute("fill", "#F5D38A"); c1.setAttribute("stroke", "#E2E0D5"); c1.setAttribute("stroke-width", "0.5");
+  g.appendChild(c1);
+
+  // Latest dot
+  const endCol = grew ? "#A6C4A2" : "#EA5E33";
+  const c2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c2.setAttribute("cx", x2); c2.setAttribute("cy", y); c2.setAttribute("r", "3.5");
+  c2.setAttribute("fill", endCol);
+  g.appendChild(c2);
+
+  // Direction arrow
+  const arrowX = grew ? Math.max(x1, x2) + 6 : Math.min(x1, x2) - 6;
+  const change = (d.b - d.a).toFixed(0);
+  const changeLabel = grew ? `+${change}` : change;
+  const valLabel = mkText(arrowX, y + 3.5, changeLabel, { size: "8", mono: true, fill: endCol, anchor: grew ? "start" : "end" });
+
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hit.setAttribute("x", 0); hit.setAttribute("y", y - rowH / 2);
+  hit.setAttribute("width", W); hit.setAttribute("height", rowH);
+  hit.setAttribute("fill", "transparent"); hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rowGroups.push({ g, bg, d, y, label, c1, c2, line, valLabel });
+});
+
+// Legend
+const ly = H - 10;
+[
+  { col: "#F5D38A", label: "1990" },
+  { col: "#A6C4A2", label: "Latest (grew)" },
+  { col: "#EA5E33", label: "Latest (declined)" },
+].forEach((l, i) => {
+  const x = margin.left + i * 150;
+  const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c.setAttribute("cx", x); c.setAttribute("cy", ly - 3); c.setAttribute("r", "3.5");
+  c.setAttribute("fill", l.col);
+  svg.appendChild(c);
+  mkText(x + 8, ly, l.label, { size: "9", mono: true });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeRow = -1;
+
+function highlightRow(idx) {
+  if (idx === activeRow) return;
+  activeRow = idx;
+  rowGroups.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.bg.setAttribute("fill", "transparent");
+      row.c1.setAttribute("r", "3"); row.c2.setAttribute("r", "3.5");
+      row.line.setAttribute("stroke-width", "1"); row.line.setAttribute("stroke", "#E2E0D5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.bg.setAttribute("fill", "rgba(234, 94, 51, 0.06)");
+      row.c1.setAttribute("r", "4"); row.c2.setAttribute("r", "5");
+      row.line.setAttribute("stroke-width", "2"); row.line.setAttribute("stroke", "#C2C0B5");
+    } else {
+      row.g.style.opacity = "0.2";
+      row.bg.setAttribute("fill", "transparent");
+      row.c1.setAttribute("r", "3"); row.c2.setAttribute("r", "3.5");
+      row.line.setAttribute("stroke-width", "1"); row.line.setAttribute("stroke", "#E2E0D5");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const my = (e.clientY - rect.top) / rect.height * H;
+
+  let best = -1;
+  rowGroups.forEach((row, i) => {
+    if (Math.abs(my - row.y) < rowH / 2) best = i;
+  });
+
+  highlightRow(best);
+
+  if (best >= 0) {
+    const d = rowGroups[best].d;
+    const change = (d.b - d.a).toFixed(1);
+    const dir = d.b > d.a ? "+" : "";
+    tip.innerHTML = `<b>${d.n}</b><br>1990: ${d.a.toFixed(1)}%<br>Latest: ${d.b.toFixed(1)}%<br>Change: ${dir}${change}pp`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 36) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  highlightRow(-1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>
