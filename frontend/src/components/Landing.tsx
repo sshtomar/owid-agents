@@ -767,16 +767,41 @@ export default function Landing() {
         gap: mobile ? 24 : 40,
       }}>
         <div style={{ flex: 1, width: mobile ? "100%" : undefined }}>
-          <h1 style={{
-            fontSize: 26,
-            fontWeight: 700,
-            letterSpacing: "-0.5px",
-            lineHeight: 1.2,
-            color: "#2B2A27",
+          <div style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: 20,
             margin: "0 0 10px",
           }}>
-            Fieldnotes
-          </h1>
+            <h1 style={{
+              fontSize: 26,
+              fontWeight: 700,
+              letterSpacing: "-0.5px",
+              lineHeight: 1.2,
+              color: "#2B2A27",
+              margin: 0,
+            }}>
+              Fieldnotes
+            </h1>
+            <Link to="/gallery" style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              color: "#EA5E33",
+              textDecoration: "none",
+              letterSpacing: "0.3px",
+            }}>
+              Gallery {"->"}
+            </Link>
+            <Link to="/datasets" style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              color: "#EA5E33",
+              textDecoration: "none",
+              letterSpacing: "0.3px",
+            }}>
+              Datasets {"->"}
+            </Link>
+          </div>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -890,31 +915,6 @@ export default function Landing() {
 
           <DatasetRequestSection delay={TIMING.sidebarStart + TIMING.sidebarStagger * 4} />
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: (TIMING.sidebarStart + TIMING.sidebarStagger * 5) / 1000 }}
-            style={{ display: "flex", gap: 20 }}
-          >
-            <Link to="/gallery" style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
-              color: "#EA5E33",
-              textDecoration: "none",
-              letterSpacing: "0.3px",
-            }}>
-              Gallery {"->"}
-            </Link>
-            <Link to="/datasets" style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
-              color: "#EA5E33",
-              textDecoration: "none",
-              letterSpacing: "0.3px",
-            }}>
-              Datasets {"->"}
-            </Link>
-          </motion.div>
         </aside>
 
         {/* Charts */}
