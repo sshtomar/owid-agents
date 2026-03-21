@@ -16,7 +16,7 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import createGlobe from "cobe";
-import { useApi } from "../hooks/useApi";
+import { useApi, postApi } from "../hooks/useApi";
 import { useIsMobile } from "../hooks/useIsMobile";
 import ChartRenderer from "./ChartRenderer";
 import SearchBar from "./SearchBar";
@@ -362,6 +362,155 @@ function AgentEntry({
         </div>
       )}
     </div>
+  );
+}
+
+/* ── Dataset request form ──────────────────────────────── */
+
+interface DatasetRequest {
+  id: string;
+  topic: string;
+  description?: string;
+  name?: string;
+  createdAt: string;
+}
+
+function DatasetRequestSection({ delay }: { delay: number }) {
+  const [topic, setTopic] = useState("");
+  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
+  const [sent, setSent] = useState(false);
+  const [recentRequests, setRecentRequests] = useState<DatasetRequest[]>([]);
+
+  useEffect(() => {
+    fetch("/api/requests")
+      .then((r) => r.json())
+      .then((data: { requests: DatasetRequest[] }) =>
+        setRecentRequests(data.requests.slice(-5).reverse()),
+      )
+      .catch(() => {});
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!topic.trim()) return;
+    const entry = await postApi<DatasetRequest>("/requests", {
+      topic: topic.trim(),
+      description: description.trim() || undefined,
+      name: name.trim() || undefined,
+    });
+    setTopic("");
+    setDescription("");
+    setName("");
+    setSent(true);
+    setRecentRequests((prev) => [entry, ...prev].slice(0, 5));
+    setTimeout(() => setSent(false), 2000);
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: 10,
+    padding: "6px 8px",
+    border: "1px solid #C2C0B5",
+    borderRadius: 2,
+    backgroundColor: "#fff",
+    color: "#2B2A27",
+    outline: "none",
+    boxSizing: "border-box",
+  };
+
+  return (
+    <SidebarSection label="Request a dataset" delay={delay}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <input
+          type="text"
+          placeholder="Topic (e.g. deforestation)"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          style={inputStyle}
+        />
+        <textarea
+          placeholder="Details (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={2}
+          style={{ ...inputStyle, resize: "vertical" }}
+        />
+        <input
+          type="text"
+          placeholder="Your name (optional)"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={inputStyle}
+        />
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            onClick={handleSubmit}
+            style={{
+              display: "inline-block",
+              padding: "6px 12px",
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              fontWeight: 500,
+              letterSpacing: "0.3px",
+              color: "#fff",
+              backgroundColor: "#EA5E33",
+              border: "1px solid #EA5E33",
+              borderRadius: 2,
+              cursor: "pointer",
+              textTransform: "uppercase" as const,
+            }}
+          >
+            Submit
+          </button>
+          {sent && (
+            <span
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 10,
+                color: "#7A786F",
+              }}
+            >
+              Sent!
+            </span>
+          )}
+        </div>
+      </div>
+      {recentRequests.length > 0 && (
+        <div style={{ marginTop: 14 }}>
+          <div
+            style={{
+              fontSize: 9,
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              color: "#A8A69E",
+              marginBottom: 6,
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            Recent requests
+          </div>
+          {recentRequests.map((r) => (
+            <div
+              key={r.id}
+              style={{
+                fontSize: 11,
+                color: "#5A5850",
+                lineHeight: 1.5,
+                paddingLeft: 10,
+                borderLeft: "2px solid #E2E0D5",
+                marginBottom: 6,
+              }}
+            >
+              {r.topic}
+              {r.name && (
+                <span style={{ color: "#A8A69E" }}> -- {r.name}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </SidebarSection>
   );
 }
 
@@ -739,10 +888,12 @@ export default function Landing() {
             </div>
           </SidebarSection>
 
+          <DatasetRequestSection delay={TIMING.sidebarStart + TIMING.sidebarStagger * 4} />
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: (TIMING.sidebarStart + TIMING.sidebarStagger * 4) / 1000 }}
+            transition={{ duration: 0.4, delay: (TIMING.sidebarStart + TIMING.sidebarStagger * 5) / 1000 }}
             style={{ display: "flex", gap: 20 }}
           >
             <Link to="/gallery" style={{

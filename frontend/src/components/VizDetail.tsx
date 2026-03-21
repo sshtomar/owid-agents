@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
+import { postApi } from "../hooks/useApi";
 import { useIsMobile } from "../hooks/useIsMobile";
 import ChartRenderer from "./ChartRenderer";
 
@@ -185,6 +186,202 @@ function Crosshair({ style }: { style: React.CSSProperties }) {
   );
 }
 
+type Reaction = "useful" | "interesting" | "surprising" | "needs-work";
+
+const REACTIONS: { key: Reaction; label: string }[] = [
+  { key: "useful", label: "Useful" },
+  { key: "interesting", label: "Interesting" },
+  { key: "surprising", label: "Surprising" },
+  { key: "needs-work", label: "Needs work" },
+];
+
+interface FeedbackResponse {
+  counts: Record<Reaction, number>;
+}
+
+function ReactionBar({ vizId }: { vizId: string }) {
+  const [counts, setCounts] = useState<Record<Reaction, number>>({
+    useful: 0,
+    interesting: 0,
+    surprising: 0,
+    "needs-work": 0,
+  });
+  const [selected, setSelected] = useState<Reaction | null>(() => {
+    try {
+      return localStorage.getItem(`feedback-${vizId}`) as Reaction | null;
+    } catch {
+      return null;
+    }
+  });
+  const [commentOpen, setCommentOpen] = useState(false);
+  const [comment, setComment] = useState("");
+  const [commentSent, setCommentSent] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/feedback/${vizId}`)
+      .then((r) => r.json())
+      .then((data: FeedbackResponse) => setCounts(data.counts))
+      .catch(() => {});
+  }, [vizId]);
+
+  const handleReaction = useCallback(
+    async (reaction: Reaction) => {
+      if (selected) return;
+      setSelected(reaction);
+      try {
+        localStorage.setItem(`feedback-${vizId}`, reaction);
+      } catch {}
+      setCounts((prev) => ({ ...prev, [reaction]: prev[reaction] + 1 }));
+      await postApi("/feedback", { vizId, reaction }).catch(() => {});
+    },
+    [vizId, selected],
+  );
+
+  const handleComment = useCallback(async () => {
+    if (!comment.trim()) return;
+    await postApi("/feedback", {
+      vizId,
+      reaction: selected ?? "useful",
+      comment: comment.trim(),
+    }).catch(() => {});
+    setComment("");
+    setCommentSent(true);
+    setTimeout(() => setCommentSent(false), 2000);
+  }, [vizId, selected, comment]);
+
+  return (
+    <div style={{ marginTop: 28, marginBottom: 24 }}>
+      <span
+        style={{
+          fontSize: 9,
+          textTransform: "uppercase",
+          fontWeight: 500,
+          fontFamily: "'JetBrains Mono', monospace",
+          letterSpacing: "0.3px",
+          color: "#7A786F",
+          marginBottom: 10,
+          display: "block",
+        }}
+      >
+        Reactions
+      </span>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {REACTIONS.map(({ key, label }) => {
+          const isSelected = selected === key;
+          return (
+            <button
+              key={key}
+              onClick={() => handleReaction(key)}
+              disabled={!!selected && !isSelected}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 12px",
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 10,
+                fontWeight: 500,
+                letterSpacing: "0.3px",
+                color: isSelected ? "#fff" : "#7A786F",
+                backgroundColor: isSelected ? "#EA5E33" : "transparent",
+                border: `1px solid ${isSelected ? "#EA5E33" : "#C2C0B5"}`,
+                borderRadius: 2,
+                cursor: selected && !isSelected ? "default" : "pointer",
+                opacity: selected && !isSelected ? 0.5 : 1,
+                textTransform: "uppercase",
+              }}
+            >
+              {label}
+              {counts[key] > 0 && (
+                <span
+                  style={{
+                    fontSize: 9,
+                    opacity: 0.8,
+                    fontWeight: 400,
+                  }}
+                >
+                  {counts[key]}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 12 }}>
+        {!commentOpen ? (
+          <button
+            onClick={() => setCommentOpen(true)}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              color: "#7A786F",
+              cursor: "pointer",
+              letterSpacing: "0.3px",
+            }}
+          >
+            + Leave a comment
+          </button>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="What did you think?"
+              rows={3}
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11,
+                padding: "8px 10px",
+                border: "1px solid #C2C0B5",
+                borderRadius: 2,
+                backgroundColor: "#fff",
+                color: "#2B2A27",
+                resize: "vertical",
+                outline: "none",
+              }}
+            />
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button
+                onClick={handleComment}
+                style={{
+                  display: "inline-block",
+                  padding: "6px 12px",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 10,
+                  fontWeight: 500,
+                  letterSpacing: "0.3px",
+                  color: "#fff",
+                  backgroundColor: "#EA5E33",
+                  border: "1px solid #EA5E33",
+                  borderRadius: 2,
+                  cursor: "pointer",
+                  textTransform: "uppercase",
+                }}
+              >
+                Send
+              </button>
+              {commentSent && (
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 10,
+                    color: "#7A786F",
+                  }}
+                >
+                  Sent!
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function downloadHtml(html: string, filename: string) {
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
@@ -258,6 +455,8 @@ export default function VizDetail() {
           ))}
         </div>
       )}
+
+      <ReactionBar vizId={data.id} />
 
       <div style={{
         ...styles.notebookRow,
