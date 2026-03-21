@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 660px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; line-height: 1.6; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>The Long Climb</h1>
+  <p class="subtitle">Life expectancy at birth (years), 2000 to 2021. Rwanda and Botswana gained nearly 20 years, recovering from the HIV/AIDS crisis. Bangladesh and India steadily converged toward upper-middle-income levels. High-income countries plateaued near 80, while Sub-Saharan Africa still lags behind by a wide margin.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: WHO Global Health Observatory -- WHOSIS_000001 (Life expectancy at birth, years)</p>
+<script>
+const series = [
+  {name:"Rwanda",code:"RWA",region:"ssa",data:[{y:2000,v:46.9},{y:2004,v:53.3},{y:2009,v:61.9},{y:2014,v:68.5},{y:2017,v:65.4},{y:2021,v:67.4}]},
+  {name:"Nigeria",code:"NGA",region:"ssa",data:[{y:2001,v:55.8},{y:2004,v:57.5},{y:2006,v:57.6},{y:2007,v:56.9},{y:2011,v:59.5},{y:2018,v:61.3},{y:2019,v:61.7},{y:2020,v:64.4}]},
+  {name:"Botswana",code:"BWA",region:"ssa",data:[{y:2000,v:47.2},{y:2004,v:51.7},{y:2005,v:50.8},{y:2006,v:56.5},{y:2010,v:59.4},{y:2012,v:57.7},{y:2013,v:62.5},{y:2017,v:64.0},{y:2018,v:66.6},{y:2019,v:64.9}]},
+  {name:"Ethiopia",code:"ETH",region:"ssa",data:[{y:2001,v:53.4},{y:2009,v:63.6},{y:2016,v:65.9},{y:2019,v:68.8}]},
+  {name:"Senegal",code:"SEN",region:"ssa",data:[{y:2000,v:58.6},{y:2001,v:59.3},{y:2005,v:60.9},{y:2009,v:63.4},{y:2011,v:64.3},{y:2014,v:68.4},{y:2021,v:68.6}]},
+  {name:"India",code:"IND",region:"sa",data:[{y:2000,v:64.3},{y:2003,v:63.4},{y:2006,v:66.6},{y:2009,v:67.9},{y:2014,v:67.4},{y:2018,v:68.9},{y:2020,v:70.2}]},
+  {name:"Bangladesh",code:"BGD",region:"sa",data:[{y:2000,v:65.6},{y:2006,v:69.2},{y:2008,v:69.0},{y:2014,v:74.0},{y:2017,v:72.1},{y:2021,v:73.1}]},
+  {name:"Thailand",code:"THA",region:"ea",data:[{y:2004,v:75.5},{y:2005,v:76.3},{y:2009,v:75.1},{y:2012,v:72.9},{y:2020,v:76.5}]},
+  {name:"Ecuador",code:"ECU",region:"la",data:[{y:2001,v:70.0},{y:2005,v:73.8},{y:2006,v:72.5},{y:2009,v:71.9},{y:2013,v:73.8},{y:2017,v:77.3},{y:2019,v:80.2}]},
+  {name:"Jordan",code:"JOR",region:"me",data:[{y:2005,v:74.6},{y:2007,v:74.8},{y:2009,v:75.1},{y:2011,v:75.9},{y:2013,v:76.3},{y:2014,v:76.5},{y:2016,v:76.8},{y:2017,v:77.0},{y:2019,v:77.0},{y:2021,v:77.0}]},
+  {name:"Spain",code:"ESP",region:"eu",data:[{y:2000,v:79.1},{y:2006,v:77.5},{y:2012,v:83.3},{y:2016,v:80.0},{y:2018,v:80.2},{y:2019,v:80.5},{y:2020,v:81.9},{y:2021,v:80.0}]},
+  {name:"United States",code:"USA",region:"hi",data:[{y:2000,v:76.7},{y:2006,v:77.7},{y:2008,v:80.3},{y:2010,v:78.6},{y:2012,v:78.8},{y:2016,v:76.4},{y:2020,v:79.5}]},
+  {name:"Sweden",code:"SWE",region:"eu",data:[{y:2002,v:77.6},{y:2005,v:78.3},{y:2006,v:78.6},{y:2007,v:78.8},{y:2016,v:80.4}]},
+  {name:"Denmark",code:"DNK",region:"eu",data:[{y:2005,v:78.1},{y:2009,v:78.9},{y:2013,v:80.2},{y:2014,v:78.6},{y:2018,v:79.0},{y:2020,v:81.4}]}
+];
+
+const palette = {
+  RWA: "#D06B5C",
+  NGA: "#B55A4A",
+  BWA: "#C47DB5",
+  ETH: "#E88C5A",
+  SEN: "#D4A017",
+  IND: "#3A9E8F",
+  BGD: "#2D8578",
+  THA: "#5B8FA8",
+  ECU: "#7B68A8",
+  JOR: "#8B7355",
+  ESP: "#4A7FC1",
+  USA: "#6BAF8D",
+  SWE: "#8AB065",
+  DNK: "#5A7A5A"
+};
+
+const W = 800;
+const H = 480;
+const pad = { left: 50, right: 130, top: 20, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const minYear = 2000;
+const maxYear = 2021;
+const minVal = 40;
+const maxVal = 85;
+
+const xScale = yr => pad.left + ((yr - minYear) / (maxYear - minYear)) * chartW;
+const yScale = v => pad.top + ((maxVal - v) / (maxVal - minVal)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Y-axis gridlines
+const yTicks = [40, 50, 60, 70, 80];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 40 ? "#B8B4A8" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 40 ? 0.5 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v;
+  svg.appendChild(label);
+});
+
+// Y-axis label
+const yLabel = document.createElementNS(ns, "text");
+yLabel.setAttribute("x", -(pad.top + chartH / 2));
+yLabel.setAttribute("y", 14);
+yLabel.setAttribute("text-anchor", "middle");
+yLabel.setAttribute("transform", "rotate(-90)");
+yLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+yLabel.setAttribute("font-size", "9");
+yLabel.setAttribute("fill", "#7A786F");
+yLabel.textContent = "years";
+svg.appendChild(yLabel);
+
+// X-axis ticks
+for (let yr = 2000; yr <= 2020; yr += 5) {
+  const x = xScale(yr);
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(minVal));
+  tick.setAttribute("y2", yScale(minVal) + 5);
+  tick.setAttribute("stroke", "#B8B4A8");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", yScale(minVal) + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+}
+
+// Hover line (dashed crosshair)
+const tip = document.getElementById("tip");
+const hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("x1", 0);
+hoverLine.setAttribute("x2", 0);
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", yScale(minVal));
+hoverLine.setAttribute("stroke", "#B8B4A8");
+hoverLine.setAttribute("stroke-width", 0.5);
+hoverLine.setAttribute("stroke-dasharray", "3,3");
+hoverLine.style.opacity = "0";
+svg.appendChild(hoverLine);
+
+// Draw lines for each country with slight hand-drawn jitter
+function jitter(val, amount) {
+  return val + (Math.random() - 0.5) * amount;
+}
+
+// Seed a deterministic pseudo-random for consistent jitter
+let seed = 42;
+function seededRandom() {
+  seed = (seed * 16807 + 0) % 2147483647;
+  return (seed - 1) / 2147483646;
+}
+
+function seededJitter(val, amount) {
+  return val + (seededRandom() - 0.5) * amount;
+}
+
+const hoverDots = [];
+
+series.forEach(s => {
+  const color = palette[s.code];
+  const pts = s.data;
+
+  if (pts.length > 1) {
+    // Build a slightly wobbly path for hand-drawn feel
+    const path = document.createElementNS(ns, "path");
+    let d = "";
+    pts.forEach((p, i) => {
+      const x = xScale(p.y);
+      const y = yScale(p.v);
+      if (i === 0) {
+        d += "M" + x.toFixed(1) + "," + y.toFixed(1);
+      } else {
+        // Add a subtle curve using quadratic bezier for hand-drawn feel
+        const prevPt = pts[i - 1];
+        const px = xScale(prevPt.y);
+        const py = yScale(prevPt.v);
+        const midX = (px + x) / 2;
+        const cpY = seededJitter((py + y) / 2, 1.5);
+        d += " Q" + midX.toFixed(1) + "," + cpY.toFixed(1) + " " + x.toFixed(1) + "," + y.toFixed(1);
+      }
+    });
+    path.setAttribute("d", d);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", 2);
+    path.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("stroke-linecap", "round");
+    svg.appendChild(path);
+  }
+
+  // Small data-point dots
+  pts.forEach(p => {
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", xScale(p.y));
+    dot.setAttribute("cy", yScale(p.v));
+    dot.setAttribute("r", 2.5);
+    dot.setAttribute("fill", color);
+    dot.setAttribute("stroke", "#F6F5EE");
+    dot.setAttribute("stroke-width", 1);
+    svg.appendChild(dot);
+  });
+
+  // End-of-line label at the last data point
+  const lastPt = pts[pts.length - 1];
+  const endLabel = document.createElementNS(ns, "text");
+  endLabel.setAttribute("x", xScale(lastPt.y) + 6);
+  endLabel.setAttribute("y", yScale(lastPt.v) + 3);
+  endLabel.setAttribute("font-size", "9");
+  endLabel.setAttribute("font-weight", "500");
+  endLabel.setAttribute("fill", color);
+  endLabel.textContent = s.name;
+  svg.appendChild(endLabel);
+
+  // Track dots for hover interaction
+  pts.forEach(p => {
+    hoverDots.push({ name: s.name, code: s.code, year: p.y, value: p.v, color: color });
+  });
+});
+
+// Resolve overlapping end-of-line labels
+// After all labels are placed, we adjust vertical positions to prevent overlap
+(function resolveOverlaps() {
+  const labels = svg.querySelectorAll("text");
+  const endLabels = [];
+  labels.forEach(l => {
+    const x = parseFloat(l.getAttribute("x"));
+    // End labels are those positioned to the right of the chart area
+    if (x > W - pad.right) {
+      endLabels.push(l);
+    }
+  });
+
+  // Sort by y position
+  endLabels.sort((a, b) => parseFloat(a.getAttribute("y")) - parseFloat(b.getAttribute("y")));
+
+  // Push labels apart if they are too close vertically
+  const minGap = 10;
+  for (let i = 1; i < endLabels.length; i++) {
+    const prev = parseFloat(endLabels[i - 1].getAttribute("y"));
+    const curr = parseFloat(endLabels[i].getAttribute("y"));
+    if (curr - prev < minGap) {
+      endLabels[i].setAttribute("y", prev + minGap);
+    }
+  }
+})();
+
+// Invisible overlay for mouse tracking
+const overlay = document.createElementNS(ns, "rect");
+overlay.setAttribute("x", pad.left);
+overlay.setAttribute("y", pad.top);
+overlay.setAttribute("width", chartW);
+overlay.setAttribute("height", chartH);
+overlay.setAttribute("fill", "transparent");
+overlay.style.cursor = "crosshair";
+svg.appendChild(overlay);
+
+// Hover dots layer (drawn on top)
+const hoverDotsGroup = document.createElementNS(ns, "g");
+svg.appendChild(hoverDotsGroup);
+
+overlay.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const mouseX = (e.clientX - rect.left) * scaleX;
+  const mouseY = (e.clientY - rect.top) * (H / rect.height);
+
+  // Convert to year
+  const yearRaw = minYear + ((mouseX - pad.left) / chartW) * (maxYear - minYear);
+  const year = Math.round(yearRaw);
+
+  if (year < minYear || year > maxYear) {
+    hoverLine.style.opacity = "0";
+    tip.style.opacity = "0";
+    hoverDotsGroup.innerHTML = "";
+    return;
+  }
+
+  const x = xScale(year);
+  hoverLine.setAttribute("x1", x);
+  hoverLine.setAttribute("x2", x);
+  hoverLine.style.opacity = "1";
+
+  // For each series, find closest data point within 2 years of hover year
+  // and interpolate if between two points
+  const entries = [];
+  series.forEach(s => {
+    const pts = s.data;
+    // Find bracketing points
+    let before = null, after = null;
+    for (let i = 0; i < pts.length; i++) {
+      if (pts[i].y <= year) before = pts[i];
+      if (pts[i].y >= year && after === null) after = pts[i];
+    }
+
+    let val = null;
+    if (before && after && before.y === year) {
+      val = before.v;
+    } else if (before && after) {
+      // Linear interpolation
+      const range = after.y - before.y;
+      if (range <= 6) {
+        const t = (year - before.y) / range;
+        val = before.v + t * (after.v - before.v);
+      }
+    } else if (before && year - before.y <= 2) {
+      val = before.v;
+    } else if (after && after.y - year <= 2) {
+      val = after.v;
+    }
+
+    if (val !== null) {
+      entries.push({ name: s.name, code: s.code, value: Math.round(val * 10) / 10, color: palette[s.code] });
+    }
+  });
+
+  // Draw hover dots
+  hoverDotsGroup.innerHTML = "";
+  entries.forEach(ent => {
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", x);
+    dot.setAttribute("cy", yScale(ent.value));
+    dot.setAttribute("r", 3.5);
+    dot.setAttribute("fill", ent.color);
+    dot.setAttribute("stroke", "#F6F5EE");
+    dot.setAttribute("stroke-width", 1.5);
+    hoverDotsGroup.appendChild(dot);
+  });
+
+  if (entries.length === 0) {
+    tip.style.opacity = "0";
+    return;
+  }
+
+  // Sort by value descending
+  entries.sort((a, b) => b.value - a.value);
+
+  let html = "<strong>" + year + "</strong><br>";
+  entries.forEach(ent => {
+    html += '<span style="color:' + ent.color + ';">\u25CF</span> ' + ent.name + ": " + ent.value.toFixed(1) + " yr<br>";
+  });
+
+  tip.innerHTML = html;
+  tip.style.opacity = "1";
+
+  // Position tooltip
+  const chartDiv = document.getElementById("chart");
+  const chartRect = chartDiv.getBoundingClientRect();
+  const tipX = (x / W) * rect.width;
+  const tipY = mouseY / (H / rect.height);
+
+  // Flip tooltip to left side if near right edge
+  if (tipX > rect.width * 0.6) {
+    tip.style.left = (tipX - tip.offsetWidth - 16) + "px";
+  } else {
+    tip.style.left = (tipX + 16) + "px";
+  }
+  tip.style.top = Math.max(0, tipY - tip.offsetHeight / 2) + "px";
+});
+
+overlay.addEventListener("mouseleave", function() {
+  hoverLine.style.opacity = "0";
+  tip.style.opacity = "0";
+  hoverDotsGroup.innerHTML = "";
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

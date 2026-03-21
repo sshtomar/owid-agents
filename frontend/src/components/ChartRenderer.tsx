@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 
+const HIDE_CHROME_CSS = `<style>h1,.subtitle,.source{display:none!important}body{padding-top:16px!important}</style>`;
+
 interface Props {
   html: string;
   height?: number;
+  hideChrome?: boolean;
 }
 
-export default function ChartRenderer({ html, height = 420 }: Props) {
+export default function ChartRenderer({ html, height = 420, hideChrome = false }: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [autoHeight, setAutoHeight] = useState(height);
 
@@ -34,10 +37,12 @@ export default function ChartRenderer({ html, height = 420 }: Props) {
     return () => iframe.removeEventListener("load", onLoad);
   }, [html]);
 
+  const srcHtml = hideChrome ? html.replace("</head>", HIDE_CHROME_CSS + "</head>") : html;
+
   return (
     <iframe
       ref={iframeRef}
-      srcDoc={html}
+      srcDoc={srcHtml}
       sandbox="allow-scripts allow-same-origin"
       style={{
         width: "100%",

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Half the Sky, Half the Seats?</h1>
+<p class="subtitle">Women's share of seats in national parliaments, earliest available year (~1997) vs latest (~2024). Lines show how each country changed over roughly 27 years. Green lines indicate improvement; coral lines indicate decline or stagnation.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- SG.GEN.PARL.ZS (Proportion of seats held by women in national parliaments, %)</p>
+<script>
+const data = [
+  { name: "Cuba", early: 22.8, late: 55.7, earlyYear: 1997, lateYear: 2024 },
+  { name: "Costa Rica", early: 15.8, late: 49.1, earlyYear: 1997, lateYear: 2024 },
+  { name: "Bolivia", early: 11.5, late: 46.2, earlyYear: 1999, lateYear: 2024 },
+  { name: "Finland", early: 33.5, late: 46.0, earlyYear: 1997, lateYear: 2024 },
+  { name: "Iceland", early: 25.4, late: 46.0, earlyYear: 1997, lateYear: 2024 },
+  { name: "Denmark", early: 33.0, late: 45.3, earlyYear: 1997, lateYear: 2024 },
+  { name: "Ecuador", early: 3.7, late: 43.1, earlyYear: 1997, lateYear: 2024 },
+  { name: "Argentina", early: 27.6, late: 42.4, earlyYear: 1997, lateYear: 2024 },
+  { name: "Belgium", early: 12.7, late: 41.3, earlyYear: 1997, lateYear: 2024 },
+  { name: "Ethiopia", early: 2.0, late: 41.3, earlyYear: 1997, lateYear: 2024 },
+  { name: "Angola", early: 9.5, late: 39.5, earlyYear: 1997, lateYear: 2024 },
+  { name: "Australia", early: 15.5, late: 38.0, earlyYear: 1997, lateYear: 2024 },
+  { name: "France", early: 10.9, late: 36.0, earlyYear: 1997, lateYear: 2024 },
+  { name: "Albania", early: 5.2, late: 35.7, earlyYear: 1999, lateYear: 2024 },
+  { name: "Germany", early: 26.2, late: 35.3, earlyYear: 1997, lateYear: 2024 },
+  { name: "Chile", early: 7.5, late: 35.5, earlyYear: 1997, lateYear: 2024 },
+  { name: "Canada", early: 20.6, late: 30.7, earlyYear: 1997, lateYear: 2024 },
+  { name: "Egypt", early: 2.0, late: 27.7, earlyYear: 1997, lateYear: 2024 },
+  { name: "China", early: 21.8, late: 26.5, earlyYear: 1998, lateYear: 2024 },
+  { name: "Djibouti", early: 0.0, late: 26.2, earlyYear: 1998, lateYear: 2024 },
+  { name: "S. Korea", early: 3.0, late: 20.0, earlyYear: 1997, lateYear: 2024 },
+  { name: "Jordan", early: 0.0, late: 19.6, earlyYear: 1997, lateYear: 2024 },
+  { name: "Brazil", early: 6.6, late: 17.5, earlyYear: 1997, lateYear: 2024 },
+  { name: "Japan", early: 4.6, late: 15.7, earlyYear: 1997, lateYear: 2024 },
+  { name: "India", early: 7.2, late: 13.7, earlyYear: 1997, lateYear: 2024 },
+];
+
+data.sort((a, b) => b.late - a.late);
+
+const W = 720;
+const rowH = 26;
+const gap = 3;
+const pad = { left: 100, right: 50, top: 44, bottom: 30 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = 65;
+const xScale = v => pad.left + (v / maxVal) * (W - pad.left - pad.right);
+const yScale = i => pad.top + i * (rowH + gap) + rowH / 2;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+
+// Parity reference line at 50%
+const parityX = xScale(50);
+const dashLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+dashLine.setAttribute("x1", parityX);
+dashLine.setAttribute("x2", parityX);
+dashLine.setAttribute("y1", pad.top - 16);
+dashLine.setAttribute("y2", pad.top + chartH + 4);
+dashLine.setAttribute("stroke", "#C4C1B7");
+dashLine.setAttribute("stroke-dasharray", "3,3");
+dashLine.setAttribute("stroke-width", 1);
+svg.appendChild(dashLine);
+
+const parityLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+parityLabel.setAttribute("x", parityX);
+parityLabel.setAttribute("y", pad.top - 22);
+parityLabel.setAttribute("text-anchor", "middle");
+parityLabel.setAttribute("font-size", "9px");
+parityLabel.setAttribute("fill", "#9E9B92");
+parityLabel.textContent = "50% parity";
+svg.appendChild(parityLabel);
+
+// X-axis ticks
+[0, 10, 20, 30, 40, 50, 60].forEach(v => {
+  const x = xScale(v);
+  const tick = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  tick.setAttribute("x", x);
+  tick.setAttribute("y", pad.top - 6);
+  tick.setAttribute("text-anchor", "middle");
+  tick.setAttribute("font-size", "9px");
+  tick.setAttribute("fill", "#9E9B92");
+  tick.setAttribute("font-family", "JetBrains Mono, monospace");
+  tick.textContent = v + "%";
+  svg.appendChild(tick);
+
+  if (v > 0 && v < 60) {
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    gridLine.setAttribute("x1", x);
+    gridLine.setAttribute("x2", x);
+    gridLine.setAttribute("y1", pad.top - 2);
+    gridLine.setAttribute("y2", pad.top + chartH + 4);
+    gridLine.setAttribute("stroke", "#E8E6DF");
+    gridLine.setAttribute("stroke-width", 0.5);
+    svg.appendChild(gridLine);
+  }
+});
+
+// Column headers
+const headerEarly = document.createElementNS("http://www.w3.org/2000/svg", "text");
+headerEarly.setAttribute("x", pad.left - 8);
+headerEarly.setAttribute("y", pad.top - 28);
+headerEarly.setAttribute("text-anchor", "end");
+headerEarly.setAttribute("font-size", "9px");
+headerEarly.setAttribute("fill", "#9E9B92");
+headerEarly.setAttribute("font-family", "JetBrains Mono, monospace");
+headerEarly.textContent = "COUNTRY";
+svg.appendChild(headerEarly);
+
+// Draw slope lines and dots
+const improved = "#4A8C6F";
+const declined = "#D4735E";
+const stagnant = "#B0AD9F";
+
+data.forEach((d, i) => {
+  const y = yScale(i);
+  const x1 = xScale(d.early);
+  const x2 = xScale(d.late);
+  const change = d.late - d.early;
+  const color = change > 2 ? improved : change < -0.5 ? declined : stagnant;
+
+  // Background row stripe
+  if (i % 2 === 0) {
+    const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    bg.setAttribute("x", pad.left);
+    bg.setAttribute("y", y - rowH / 2);
+    bg.setAttribute("width", W - pad.left - pad.right);
+    bg.setAttribute("height", rowH);
+    bg.setAttribute("fill", "#EEEDEA");
+    bg.setAttribute("opacity", 0.4);
+    svg.appendChild(bg);
+  }
+
+  // Country label
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 4);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "11px");
+  label.setAttribute("fill", "#2B2A27");
+  label.setAttribute("font-weight", "500");
+  label.textContent = d.name;
+  svg.appendChild(label);
+
+  // Slope line
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x1);
+  line.setAttribute("x2", x2);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", color);
+  line.setAttribute("stroke-width", 2.5);
+  line.setAttribute("stroke-linecap", "round");
+  line.setAttribute("opacity", 0.65);
+  svg.appendChild(line);
+
+  // Arrow head pointing right (or left if declined)
+  if (Math.abs(x2 - x1) > 6) {
+    const arrowDir = x2 > x1 ? 1 : -1;
+    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    const ax = x2;
+    const ay = y;
+    const arrowSize = 4;
+    arrow.setAttribute("points",
+      `${ax},${ay} ${ax - arrowDir * arrowSize},${ay - arrowSize} ${ax - arrowDir * arrowSize},${ay + arrowSize}`
+    );
+    arrow.setAttribute("fill", color);
+    arrow.setAttribute("opacity", 0.8);
+    svg.appendChild(arrow);
+  }
+
+  // Early year dot
+  const dot1 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  dot1.setAttribute("cx", x1);
+  dot1.setAttribute("cy", y);
+  dot1.setAttribute("r", 4);
+  dot1.setAttribute("fill", "#F6F5EE");
+  dot1.setAttribute("stroke", color);
+  dot1.setAttribute("stroke-width", 2);
+  svg.appendChild(dot1);
+
+  // Late year dot (filled)
+  const dot2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  dot2.setAttribute("cx", x2);
+  dot2.setAttribute("cy", y);
+  dot2.setAttribute("r", 4);
+  dot2.setAttribute("fill", color);
+  dot2.setAttribute("stroke", color);
+  dot2.setAttribute("stroke-width", 2);
+  svg.appendChild(dot2);
+
+  // Value labels
+  const valEarly = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  valEarly.setAttribute("x", x1 - 8);
+  valEarly.setAttribute("y", y + 3.5);
+  valEarly.setAttribute("text-anchor", "end");
+  valEarly.setAttribute("font-size", "8.5px");
+  valEarly.setAttribute("fill", "#9E9B92");
+  valEarly.setAttribute("font-family", "JetBrains Mono, monospace");
+  valEarly.textContent = d.early.toFixed(1);
+  // Only show if there's space
+  if (x1 > pad.left + 30) svg.appendChild(valEarly);
+
+  const valLate = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  valLate.setAttribute("x", x2 + 8);
+  valLate.setAttribute("y", y + 3.5);
+  valLate.setAttribute("text-anchor", "start");
+  valLate.setAttribute("font-size", "8.5px");
+  valLate.setAttribute("fill", "#2B2A27");
+  valLate.setAttribute("font-weight", "500");
+  valLate.setAttribute("font-family", "JetBrains Mono, monospace");
+  valLate.textContent = d.late.toFixed(1) + "%";
+  svg.appendChild(valLate);
+
+  // Hover target (invisible wide rect)
+  const hitArea = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hitArea.setAttribute("x", pad.left);
+  hitArea.setAttribute("y", y - rowH / 2);
+  hitArea.setAttribute("width", W - pad.left - pad.right);
+  hitArea.setAttribute("height", rowH);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+  hitArea.addEventListener("mouseenter", e => {
+    const sign = change >= 0 ? "+" : "";
+    tip.innerHTML = `<b>${d.name}</b>  ${d.earlyYear}: ${d.early.toFixed(1)}%  &rarr;  ${d.lateYear}: ${d.late.toFixed(1)}%  (${sign}${change.toFixed(1)}pp)`;
+    tip.style.opacity = 1;
+  });
+  hitArea.addEventListener("mousemove", e => {
+    tip.style.left = (e.pageX + 14) + "px";
+    tip.style.top = (e.pageY - 20) + "px";
+  });
+  hitArea.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+  svg.appendChild(hitArea);
+});
+
+// Legend
+const legendY = pad.top + chartH + 18;
+const legendItems = [
+  { color: improved, label: "Improved (open = earliest, filled = latest)" },
+  { color: stagnant, label: "Stagnant / minimal change" },
+];
+let legendX = pad.left;
+legendItems.forEach(item => {
+  // Open circle
+  const openDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  openDot.setAttribute("cx", legendX);
+  openDot.setAttribute("cy", legendY);
+  openDot.setAttribute("r", 3.5);
+  openDot.setAttribute("fill", "#F6F5EE");
+  openDot.setAttribute("stroke", item.color);
+  openDot.setAttribute("stroke-width", 1.5);
+  svg.appendChild(openDot);
+
+  // Line
+  const legLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  legLine.setAttribute("x1", legendX + 5);
+  legLine.setAttribute("x2", legendX + 20);
+  legLine.setAttribute("y1", legendY);
+  legLine.setAttribute("y2", legendY);
+  legLine.setAttribute("stroke", item.color);
+  legLine.setAttribute("stroke-width", 2);
+  svg.appendChild(legLine);
+
+  // Filled circle
+  const filledDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  filledDot.setAttribute("cx", legendX + 24);
+  filledDot.setAttribute("cy", legendY);
+  filledDot.setAttribute("r", 3.5);
+  filledDot.setAttribute("fill", item.color);
+  svg.appendChild(filledDot);
+
+  const legText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  legText.setAttribute("x", legendX + 32);
+  legText.setAttribute("y", legendY + 3.5);
+  legText.setAttribute("font-size", "9px");
+  legText.setAttribute("fill", "#7A786F");
+  legText.textContent = item.label;
+  svg.appendChild(legText);
+
+  legendX += 320;
+});
+</script>
+</body></html>

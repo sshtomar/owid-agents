@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  canvas { display: block; margin-top: 4px; cursor: crosshair; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+  .legend { display: flex; gap: 20px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .legend-nd { width: 10px; height: 10px; border-radius: 50%; background: #D4D2C8; display: inline-block; }
+</style></head><body>
+<h1>The Health Divide</h1>
+<p class="subtitle">Global health scorecard for 15 countries in Sub-Saharan Africa and South Asia across four indicators. Dot size and color encode severity: green = good performance, amber = moderate, red = poor. Hover to inspect values.</p>
+<div style="position:relative;">
+  <canvas id="canvas"></canvas>
+  <div class="tooltip" id="tip"></div>
+</div>
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot" style="background:#5A9E6F;"></span> Low burden / good</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#E8A94A;"></span> Moderate burden</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#C94030;"></span> High burden / poor</div>
+  <div class="legend-item"><span class="legend-nd"></span> No data</div>
+</div>
+<p class="source">Source: WHO GHO, World Bank &mdash; most recent available year per country</p>
+<script>
+const data = [
+  {"c":"NGA","name":"Nigeria",      "malaria":299.0,"malaria_year":2023,"dtp3":55,"dtp3_year":2017,"maternal":1016,"maternal_year":2022,"hiv":null,"hiv_year":null},
+  {"c":"ETH","name":"Ethiopia",     "malaria":45.6, "malaria_year":2021,"dtp3":61,"dtp3_year":2019,"maternal":195, "maternal_year":2023,"hiv":0.7, "hiv_year":2024},
+  {"c":"COD","name":"DR Congo",     "malaria":327.9,"malaria_year":2022,"dtp3":70,"dtp3_year":2020,"maternal":427, "maternal_year":2023,"hiv":0.7, "hiv_year":2024},
+  {"c":"CMR","name":"Cameroon",     "malaria":259.1,"malaria_year":2023,"dtp3":71,"dtp3_year":2021,"maternal":417, "maternal_year":2015,"hiv":2.5, "hiv_year":2024},
+  {"c":"GHA","name":"Ghana",        "malaria":194.9,"malaria_year":2023,"dtp3":95,"dtp3_year":2024,"maternal":239, "maternal_year":2022,"hiv":1.5, "hiv_year":2024},
+  {"c":"KEN","name":"Kenya",        "malaria":74.2, "malaria_year":2024,"dtp3":94,"dtp3_year":2022,"maternal":428, "maternal_year":2017,"hiv":3.0, "hiv_year":2024},
+  {"c":"GIN","name":"Guinea",       "malaria":285.7,"malaria_year":2022,"dtp3":60,"dtp3_year":2023,"maternal":528, "maternal_year":2020,"hiv":1.3, "hiv_year":2024},
+  {"c":"BFA","name":"Burkina Faso", "malaria":356.3,"malaria_year":2022,"dtp3":91,"dtp3_year":2024,"maternal":344, "maternal_year":2014,"hiv":0.5, "hiv_year":2024},
+  {"c":"BDI","name":"Burundi",      "malaria":323.2,"malaria_year":2023,"dtp3":87,"dtp3_year":2005,"maternal":575, "maternal_year":2012,"hiv":0.8, "hiv_year":2024},
+  {"c":"MOZ","name":"Mozambique",   "malaria":304.5,"malaria_year":2022,"dtp3":56,"dtp3_year":2021,"maternal":111, "maternal_year":2019,"hiv":null,"hiv_year":null},
+  {"c":"TZA","name":"Tanzania",     "malaria":138.5,"malaria_year":2023,"dtp3":83,"dtp3_year":2024,"maternal":502, "maternal_year":2009,"hiv":null,"hiv_year":null},
+  {"c":"UGA","name":"Uganda",       "malaria":266.6,"malaria_year":2022,"dtp3":89,"dtp3_year":2020,"maternal":295, "maternal_year":2011,"hiv":null,"hiv_year":null},
+  {"c":"BGD","name":"Bangladesh",   "malaria":1.1,  "malaria_year":2023,"dtp3":97,"dtp3_year":2020,"maternal":275, "maternal_year":2010,"hiv":0.1, "hiv_year":2024},
+  {"c":"IND","name":"India",        "malaria":1.5,  "malaria_year":2024,"dtp3":91,"dtp3_year":2023,"maternal":90,  "maternal_year":2022,"hiv":0.2, "hiv_year":2024},
+  {"c":"PAK","name":"Pakistan",     "malaria":17.6, "malaria_year":2023,"dtp3":86,"dtp3_year":2023,"maternal":160, "maternal_year":2022,"hiv":null,"hiv_year":null}
+];
+
+// Column definitions
+// invert: true means higher value = worse (red), false means higher = better (green)
+const cols = [
+  { key: "malaria",  label: "MALARIA",  unit: "per 1k at risk", invert: true,  fmt: v => v.toFixed(0) + "/1k" },
+  { key: "dtp3",     label: "DTP3 VAX", unit: "% of infants",   invert: false, fmt: v => v.toFixed(0) + "%" },
+  { key: "maternal", label: "MATERNAL", unit: "per 100k births", invert: true, fmt: v => v.toFixed(0) + "/100k" },
+  { key: "hiv",      label: "HIV",      unit: "% ages 15-49",   invert: true,  fmt: v => v.toFixed(1) + "%" }
+];
+
+// Compute per-column min/max ignoring nulls
+const ranges = {};
+cols.forEach(col => {
+  const vals = data.map(d => d[col.key]).filter(v => v !== null && v !== undefined);
+  ranges[col.key] = { min: Math.min(...vals), max: Math.max(...vals) };
+});
+
+function normalize(val, key, invert) {
+  if (val === null || val === undefined) return null;
+  const { min, max } = ranges[key];
+  if (max === min) return 0.5;
+  let n = (val - min) / (max - min);
+  // n=1 = highest raw value
+  // For inverted cols (bad = high), n=1 means worst, so score = 1 - n (score=0 means worst)
+  // For non-inverted cols (good = high), n=1 means best, score = n
+  let score = invert ? (1 - n) : n;
+  return score; // 0 = worst (red), 1 = best (green)
+}
+
+// Color scale: 0=red, 0.5=amber, 1=green
+// Using muted earth tones like viz-005
+function scoreToColor(score) {
+  if (score === null) return null;
+  // Red: #C94030, Amber: #E8A94A, Green: #5A9E6F
+  let r, g, b;
+  const red   = [201, 64,  48];
+  const amber = [232, 169, 74];
+  const green = [90, 158, 111];
+
+  if (score >= 0.5) {
+    const t = (score - 0.5) / 0.5;
+    r = amber[0] + (green[0] - amber[0]) * t;
+    g = amber[1] + (green[1] - amber[1]) * t;
+    b = amber[2] + (green[2] - amber[2]) * t;
+  } else {
+    const t = score / 0.5;
+    r = red[0] + (amber[0] - red[0]) * t;
+    g = red[1] + (amber[1] - red[1]) * t;
+    b = red[2] + (amber[2] - red[2]) * t;
+  }
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+const canvas = document.getElementById("canvas");
+const dpr = window.devicePixelRatio || 1;
+const rowH = 30;
+const colW = 110;
+const labelW = 110;
+const headerH = 52;
+const PAD_R = 20;
+const W = labelW + cols.length * colW + PAD_R;
+const H = headerH + data.length * rowH + 14;
+
+canvas.width = W * dpr;
+canvas.height = H * dpr;
+canvas.style.width = W + "px";
+canvas.style.height = H + "px";
+
+const ctx = canvas.getContext("2d");
+ctx.scale(dpr, dpr);
+
+function draw(hoverRow, hoverCol) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = "#F6F5EE";
+  ctx.fillRect(0, 0, W, H);
+
+  // Column highlight band
+  if (hoverCol >= 0) {
+    const cx = labelW + hoverCol * colW;
+    ctx.fillStyle = "rgba(201,64,48,0.04)";
+    ctx.fillRect(cx, 0, colW, H);
+  }
+
+  // Row highlight band
+  if (hoverRow >= 0) {
+    const ry = headerH + hoverRow * rowH;
+    ctx.fillStyle = "rgba(201,64,48,0.06)";
+    ctx.fillRect(0, ry, W, rowH);
+  }
+
+  // Column headers
+  cols.forEach((col, i) => {
+    const x = labelW + i * colW + colW / 2;
+    const isActive = hoverCol === i;
+    ctx.textAlign = "center";
+    ctx.font = "500 9px 'JetBrains Mono', monospace";
+    ctx.fillStyle = isActive ? "#2B2A27" : "#5A5850";
+    ctx.fillText(col.label, x, 18);
+    ctx.font = "400 8px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "#9A9890";
+    ctx.fillText(col.unit, x, 32);
+  });
+
+  // Divider below header
+  ctx.beginPath();
+  ctx.moveTo(0, headerH - 6);
+  ctx.lineTo(W, headerH - 6);
+  ctx.strokeStyle = "#D8D6CA";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Row separator lines and data
+  data.forEach((d, i) => {
+    const y = headerH + i * rowH;
+    const yMid = y + rowH / 2;
+    const rowActive = hoverRow === i;
+    const dimRow = hoverRow >= 0 && !rowActive;
+
+    // Row separator
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.strokeStyle = "#E8E6DC";
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    // Country label
+    ctx.font = rowActive ? "600 11px 'Inter', sans-serif" : "500 11px 'Inter', sans-serif";
+    ctx.fillStyle = dimRow ? "rgba(43,42,39,0.22)" : "#2B2A27";
+    ctx.textAlign = "right";
+    ctx.globalAlpha = dimRow ? 0.35 : 1;
+    ctx.fillText(d.name, labelW - 14, yMid + 4);
+    ctx.globalAlpha = 1;
+
+    // Data dots
+    cols.forEach((col, j) => {
+      const x = labelW + j * colW + colW / 2;
+      const val = d[col.key];
+      const score = normalize(val, col.key, col.invert);
+      const isFocused = rowActive && hoverCol === j;
+
+      if (score === null) {
+        // No data: small muted circle with dash
+        ctx.globalAlpha = dimRow ? 0.18 : 0.55;
+        ctx.beginPath();
+        ctx.arc(x, yMid, 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#D4D2C8";
+        ctx.fill();
+        ctx.globalAlpha = dimRow ? 0.18 : 0.7;
+        ctx.font = "400 7px 'JetBrains Mono', monospace";
+        ctx.fillStyle = "#7A786F";
+        ctx.textAlign = "center";
+        ctx.fillText("n/a", x, yMid + 2.5);
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      // Dot radius: min 5, max 14, scaled by score (but still show something for worst)
+      // Use absolute size so worst isn't invisible
+      const minR = 4;
+      const maxR = 13;
+      const radius = isFocused
+        ? (minR + score * (maxR - minR)) + 1.5
+        : (minR + score * (maxR - minR));
+
+      const color = scoreToColor(score);
+
+      ctx.globalAlpha = dimRow ? 0.18 : 1;
+
+      ctx.beginPath();
+      ctx.arc(x, yMid, radius, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // Focus ring
+      if (isFocused) {
+        ctx.beginPath();
+        ctx.arc(x, yMid, radius + 2.5, 0, Math.PI * 2);
+        ctx.strokeStyle = "#2B2A27";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Value label inside dot (only if radius large enough)
+      if (radius >= 7) {
+        ctx.font = "400 7.5px 'JetBrains Mono', monospace";
+        ctx.fillStyle = score > 0.55 ? "#1A3D26" : (score < 0.25 ? "#FFFFFF" : "#3A2010");
+        ctx.textAlign = "center";
+        const label = col.key === "dtp3"
+          ? val.toFixed(0)
+          : col.key === "hiv"
+            ? val.toFixed(1)
+            : val >= 100
+              ? val.toFixed(0)
+              : val.toFixed(1);
+        ctx.fillText(label, x, yMid + 2.5);
+      }
+
+      ctx.globalAlpha = 1;
+    });
+  });
+
+  // Bottom separator
+  const yBottom = headerH + data.length * rowH;
+  ctx.beginPath();
+  ctx.moveTo(0, yBottom);
+  ctx.lineTo(W, yBottom);
+  ctx.strokeStyle = "#D8D6CA";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+draw(-1, -1);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeRow = -1, activeCol = -1;
+
+function getYearLabel(d, colKey) {
+  const yKey = colKey + "_year";
+  return d[yKey] ? " (" + d[yKey] + ")" : "";
+}
+
+canvas.addEventListener("mousemove", e => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const scaleY = H / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  let row = -1, col = -1;
+
+  if (my >= headerH && my < headerH + data.length * rowH) {
+    row = Math.floor((my - headerH) / rowH);
+    if (row >= data.length) row = -1;
+  }
+
+  if (mx >= labelW && mx < labelW + cols.length * colW) {
+    col = Math.floor((mx - labelW) / colW);
+    if (col >= cols.length) col = -1;
+  }
+
+  if (row !== activeRow || col !== activeCol) {
+    activeRow = row;
+    activeCol = col;
+    draw(row, col);
+  }
+
+  if (row >= 0 && col >= 0) {
+    const d = data[row];
+    const c = cols[col];
+    const val = d[c.key];
+    const score = normalize(val, c.key, c.invert);
+
+    let valStr = val === null ? "No data" : c.fmt(val);
+    let yearStr = getYearLabel(d, c.key);
+
+    let rankStr = "";
+    if (score !== null) {
+      const ranked = data
+        .filter(x => x[c.key] !== null)
+        .slice()
+        .sort((a, b) => normalize(b[c.key], c.key, c.invert) - normalize(a[c.key], c.key, c.invert));
+      const rank = ranked.findIndex(x => x.c === d.c) + 1;
+      rankStr = `<br>Rank: ${rank}/${ranked.length}`;
+    }
+
+    tip.innerHTML = `<b>${d.name}</b><br>${c.label}: ${valStr}${yearStr}${rankStr}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX - rect.left + 14) + "px";
+    tip.style.top = (e.clientY - rect.top - 46) + "px";
+  } else if (row >= 0) {
+    tip.innerHTML = `<b>${data[row].name}</b>`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX - canvas.getBoundingClientRect().left + 14) + "px";
+    tip.style.top = (e.clientY - canvas.getBoundingClientRect().top - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+canvas.addEventListener("mouseleave", () => {
+  activeRow = -1;
+  activeCol = -1;
+  draw(-1, -1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>

@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "7bf3b42ce882bd865db5c5848d9fbb36",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"the-global-fattening\">The Global Fattening</h1>\n<span class=\"paragraph\">Obesity prevalence (BMI &gt;= 30) among adults, 1990-2022. Pacific islands lead at 50-70%, while East Asia remains low but rising. Almost every country is getting heavier.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "3e4e8333e107f1a46ad3aab969ba1c79",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Prevalence of obesity among adults, BMI &amp;GreaterEqual; 30 (age-standardized estimate) (%)** (WHO Global Health Observatory)\n</code></pre></div>\n<span class=\"paragraph\">Prevalence of obesity among adults, BMI &GreaterEqual; 30 (age-standardized estimate) (%) from who-gho\nSource: <a href=\"https://www.who.int/data/gho/data/indicators/indicator-details/GHO/NCD_BMI_30A\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.who.int/data/gho/data/indicators/indicator-details/GHO/NCD_BMI_30A</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "82cbe6639578ff15e0954d4d02c0259a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='05ca279b-bf4b-4fc9-2425-8c231c82aae8'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;NZL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;NZL&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:14.298415},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;MAR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;MAR&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:4.224021},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;PRK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;PRK&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:2.8873658},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;TKL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;TKL&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:53.490645},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;COK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;COK&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:47.341052},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;STP&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;STP&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:1.5602966},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;CHE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;CHE&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:8.4321789},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;BEL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BEL&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:12.102687},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;ERI&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;ERI&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:0.43923822},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;BGR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BGR&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:11.595149}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "d39d0db5cc236f017a97e4af08fbff18",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a time-series view we filter to the top countries by data completeness, then plot each country as a separate line over time.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "e815583f1a8fa136e0571e4501ed4371",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='25379de6-693d-918f-2648-bfd568b08040'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:24,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:6.2277585},{&#92;&quot;&#92;&quot;:143,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:1994,&#92;&quot;value&#92;&quot;:8.0064088},{&#92;&quot;&#92;&quot;:244,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:1997,&#92;&quot;value&#92;&quot;:13.880455},{&#92;&quot;&#92;&quot;:322,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:1999,&#92;&quot;value&#92;&quot;:12.924713},{&#92;&quot;&#92;&quot;:457,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:2003,&#92;&quot;value&#92;&quot;:15.878026},{&#92;&quot;&#92;&quot;:507,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:2006,&#92;&quot;value&#92;&quot;:18.341002},{&#92;&quot;&#92;&quot;:598,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:2009,&#92;&quot;value&#92;&quot;:22.376193},{&#92;&quot;&#92;&quot;:745,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:2013,&#92;&quot;value&#92;&quot;:25.686076},{&#92;&quot;&#92;&quot;:813,&#92;&quot;country&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BRN&#92;&quot;,&#92;&quot;year&#92;&quot;:2016,&#92;&quot;value&#92;&quot;:26.565963},{&#92;&quot;&#92;&quot;:26,&#92;&quot;country&#92;&quot;:&#92;&quot;COG&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;COG&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:1.2231703}]&quot;' data-total-rows='78' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "9562426e0ccc31c7b6523158c81106cc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='2f191312-5ea5-aecd-a402-5325de329af1'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////2AQAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAAhAMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAAFwDAAAEAAAATQMAAHsiaW5kZXhfY29sdW1ucyI6IFsiX19pbmRleF9sZXZlbF8wX18iXSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnkiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5IiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInZhbHVlIiwgImZpZWxkX25hbWUiOiAidmFsdWUiLCAicGFuZGFzX3R5cGUiOiAiZmxvYXQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiBudWxsLCAiZmllbGRfbmFtZSI6ICJfX2luZGV4X2xldmVsXzBfXyIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogImludDY0IiwgIm1ldGFkYXRhIjogbnVsbH1dLCAiY3JlYXRvciI6IHsibGlicmFyeSI6ICJweWFycm93IiwgInZl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bmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogIl9faW5kZXhfbGV2ZWxfMF9fIiwgInBhbmRhc190eXBlIjogImludDY0IiwgIm51bXB5X3R5cGUiOiAiaW50NjQiLCAibWV0YWRhdGEiOiBudWxsfV0sICJjcmVhdG9yIjogeyJsaWJyYXJ5IjogInB5YXJyb3ciLCAidmVyc2lvbiI6ICIyMS4wLjAifSwgInBhbmRhc192ZXJzaW9uIjogIjIuMi4zIn0AAAAGAAAAcGFuZGFzAAAFAAAA9AAAALQAAAB4AAAARAAAAAQAAAAw////AAABAhAAAAAkAAAABAAAAAAAAAARAAAAX19pbmRleF9sZXZlbF8wX18AAACg////AAAAAUAAAABs////AAABAxAAAAAcAAAABAAAAAAAAAAFAAAAdmFsdWUABgAIAAYABgAAAAAAAgCc////AAABAhAAAAAgAAAABAAAAAAAAAAEAAAAeWVhcgAAAAAIAAwACAAHAAgAAAAAAAABQAAAANT///8AAAEFEAAAABwAAAAEAAAAAAAAAAsAAABjb3VudHJ5TmFtZQDI////EAAUAAgABgAHAAwAAAAQABAAAAAAAAEFEAAAABwAAAAEAAAAAAAAAAcAAABjb3VudHJ5AAQABAAEAAAAAAUAAEFSUk9XMQ==&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;point&quot;:true},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;year&quot;,&quot;title&quot;:&quot;Year&quot;,&quot;type&quot;:&quot;ordinal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;}},&quot;height&quot;:400,&quot;width&quot;:700,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "6f0fb36de2210e63d6b42fb4c3c8d59a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Nauru obesity rate exceeds 60%</li>\n<li>Gulf states cluster at 30-48%</li>\n<li>Japan and South Korea remain under 7% but rising</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

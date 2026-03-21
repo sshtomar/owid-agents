@@ -1,4 +1,12 @@
-export type Provider = "world-bank" | "who-gho";
+export type Provider =
+  | "world-bank"
+  | "who-gho"
+  | "un-sdg"
+  | "eurostat"
+  | "unhcr"
+  | "imf"
+  | "owid"
+  | "unesco";
 
 export interface DataPoint {
   country: string;
@@ -40,6 +48,7 @@ export interface VizEntry {
   generatedCode: string;
   highlights: string[];
   createdAt: string;
+  notebookPath?: string;
 }
 
 export interface CatalogIndex {

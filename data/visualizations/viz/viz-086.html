@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Innovation Divide</h1>
+<p class="subtitle">Research and development expenditure as a share of GDP, 1996-2022. Israel and South Korea invest more than 5% of GDP in R&D, while China quadrupled its spending in two decades. India and Brazil remain below 1.5%, highlighting a persistent gap between ambition and investment in the developing world.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- GB.XPD.RSDV.GD.ZS (Research and development expenditure, % of GDP)</p>
+<script>
+const data = [{"country":"Austria","year":1996,"value":1.581},{"country":"China","year":1996,"value":0.563},{"country":"Denmark","year":1996,"value":1.807},{"country":"Finland","year":1996,"value":2.453},{"country":"France","year":1996,"value":2.223},{"country":"Germany","year":1996,"value":2.145},{"country":"India","year":1996,"value":0.639},{"country":"Israel","year":1996,"value":2.489},{"country":"Italy","year":1996,"value":0.946},{"country":"Japan","year":1996,"value":2.643},{"country":"South Korea","year":1996,"value":2.216},{"country":"Austria","year":1997,"value":1.655},{"country":"China","year":1997,"value":0.639},{"country":"Denmark","year":1997,"value":1.889},{"country":"Finland","year":1997,"value":2.622},{"country":"France","year":1997,"value":2.147},{"country":"Germany","year":1997,"value":2.188},{"country":"India","year":1997,"value":0.687},{"country":"Israel","year":1997,"value":2.709},{"country":"Italy","year":1997,"value":0.988},{"country":"Japan","year":1997,"value":2.722},{"country":"South Korea","year":1997,"value":2.248},{"country":"Austria","year":1998,"value":1.732},{"country":"China","year":1998,"value":0.647},{"country":"Denmark","year":1998,"value":2.006},{"country":"Finland","year":1998,"value":2.784},{"country":"France","year":1998,"value":2.095},{"country":"Germany","year":1998,"value":2.216},{"country":"India","year":1998,"value":0.704},{"country":"Israel","year":1998,"value":2.819},{"country":"Italy","year":1998,"value":1.005},{"country":"Japan","year":1998,"value":2.827},{"country":"South Korea","year":1998,"value":2.11},{"country":"Austria","year":1999,"value":1.845},{"country":"China","year":1999,"value":0.75},{"country":"Denmark","year":1999,"value":2.128},{"country":"Finland","year":1999,"value":3.056},{"country":"France","year":1999,"value":2.108},{"country":"Germany","year":1999,"value":2.348},{"country":"India","year":1999,"value":0.724},{"country":"Israel","year":1999,"value":3.225},{"country":"Italy","year":1999,"value":0.981},{"country":"Japan","year":1999,"value":2.847},{"country":"South Korea","year":1999,"value":2.016},{"country":"Austria","year":2000,"value":1.886},{"country":"Brazil","year":2000,"value":1.048},{"country":"China","year":2000,"value":0.893},{"country":"Denmark","year":2000,"value":2.186},{"country":"Finland","year":2000,"value":3.241},{"country":"France","year":2000,"value":2.093},{"country":"Germany","year":2000,"value":2.41},{"country":"India","year":2000,"value":0.757},{"country":"Israel","year":2000,"value":3.827},{"country":"Italy","year":2000,"value":1.004},{"country":"Japan","year":2000,"value":2.858},{"country":"South Korea","year":2000,"value":2.125},{"country":"Austria","year":2001,"value":1.992},{"country":"Brazil","year":2001,"value":1.062},{"country":"China","year":2001,"value":0.94},{"country":"Denmark","year":2001,"value":2.325},{"country":"Finland","year":2001,"value":3.194},{"country":"France","year":2001,"value":2.138},{"country":"Germany","year":2001,"value":2.404},{"country":"India","year":2001,"value":0.736},{"country":"Israel","year":2001,"value":4.064},{"country":"Italy","year":2001,"value":1.041},{"country":"Japan","year":2001,"value":2.923},{"country":"South Korea","year":2001,"value":2.279},{"country":"Austria","year":2002,"value":2.066},{"country":"Brazil","year":2002,"value":1.01},{"country":"China","year":2002,"value":1.058},{"country":"Denmark","year":2002,"value":2.441},{"country":"Finland","year":2002,"value":3.253},{"country":"France","year":2002,"value":2.174},{"country":"Germany","year":2002,"value":2.436},{"country":"India","year":2002,"value":0.726},{"country":"Israel","year":2002,"value":4.001},{"country":"Italy","year":2002,"value":1.081},{"country":"Japan","year":2002,"value":2.965},{"country":"South Korea","year":2002,"value":2.208},{"country":"Austria","year":2003,"value":2.175},{"country":"Brazil","year":2003,"value":0.999},{"country":"China","year":2003,"value":1.12},{"country":"Denmark","year":2003,"value":2.511},{"country":"Finland","year":2003,"value":3.298},{"country":"France","year":2003,"value":2.12},{"country":"Germany","year":2003,"value":2.475},{"country":"India","year":2003,"value":0.719},{"country":"Israel","year":2003,"value":3.765},{"country":"Italy","year":2003,"value":1.059},{"country":"Japan","year":2003,"value":2.993},{"country":"South Korea","year":2003,"value":2.277},{"country":"Austria","year":2004,"value":2.166},{"country":"Brazil","year":2004,"value":0.963},{"country":"China","year":2004,"value":1.215},{"country":"Denmark","year":2004,"value":2.419},{"country":"Finland","year":2004,"value":3.309},{"country":"France","year":2004,"value":2.095},{"country":"Germany","year":2004,"value":2.435},{"country":"India","year":2004,"value":0.757},{"country":"Israel","year":2004,"value":3.749},{"country":"Italy","year":2004,"value":1.05},{"country":"Japan","year":2004,"value":2.981},{"country":"South Korea","year":2004,"value":2.442},{"country":"Austria","year":2005,"value":2.373},{"country":"Brazil","year":2005,"value":1.002},{"country":"China","year":2005,"value":1.308},{"country":"Denmark","year":2005,"value":2.393},{"country":"Finland","year":2005,"value":3.324},{"country":"France","year":2005,"value":2.052},{"country":"Germany","year":2005,"value":2.442},{"country":"India","year":2005,"value":0.824},{"country":"Israel","year":2005,"value":3.923},{"country":"Italy","year":2005,"value":1.044},{"country":"Japan","year":2005,"value":3.131},{"country":"South Korea","year":2005,"value":2.523},{"country":"Austria","year":2006,"value":2.359},{"country":"Brazil","year":2006,"value":0.988},{"country":"China","year":2006,"value":1.369},{"country":"Denmark","year":2006,"value":2.403},{"country":"Finland","year":2006,"value":3.332},{"country":"France","year":2006,"value":2.051},{"country":"Germany","year":2006,"value":2.472},{"country":"India","year":2006,"value":0.805},{"country":"Israel","year":2006,"value":4.02},{"country":"Italy","year":2006,"value":1.084},{"country":"Japan","year":2006,"value":3.228},{"country":"South Korea","year":2006,"value":2.719},{"country":"Austria","year":2007,"value":2.418},{"country":"Brazil","year":2007,"value":1.081},{"country":"China","year":2007,"value":1.374},{"country":"Denmark","year":2007,"value":2.515},{"country":"Finland","year":2007,"value":3.337},{"country":"France","year":2007,"value":2.025},{"country":"Germany","year":2007,"value":2.46},{"country":"India","year":2007,"value":0.805},{"country":"Israel","year":2007,"value":4.3},{"country":"Italy","year":2007,"value":1.129},{"country":"Japan","year":2007,"value":3.293},{"country":"South Korea","year":2007,"value":2.873},{"country":"Austria","year":2008,"value":2.569},{"country":"Brazil","year":2008,"value":1.129},{"country":"China","year":2008,"value":1.446},{"country":"Denmark","year":2008,"value":2.773},{"country":"Finland","year":2008,"value":3.537},{"country":"France","year":2008,"value":2.061},{"country":"Germany","year":2008,"value":2.615},{"country":"India","year":2008,"value":0.859},{"country":"Israel","year":2008,"value":4.255},{"country":"Italy","year":2008,"value":1.16},{"country":"Japan","year":2008,"value":3.292},{"country":"South Korea","year":2008,"value":2.989},{"country":"Austria","year":2009,"value":2.597},{"country":"Brazil","year":2009,"value":1.119},{"country":"China","year":2009,"value":1.665},{"country":"Denmark","year":2009,"value":3.055},{"country":"Finland","year":2009,"value":3.734},{"country":"France","year":2009,"value":2.212},{"country":"Germany","year":2009,"value":2.743},{"country":"India","year":2009,"value":0.833},{"country":"Israel","year":2009,"value":4.045},{"country":"Italy","year":2009,"value":1.218},{"country":"Japan","year":2009,"value":3.196},{"country":"South Korea","year":2009,"value":3.147},{"country":"Austria","year":2010,"value":2.726},{"country":"Brazil","year":2010,"value":1.16},{"country":"China","year":2010,"value":1.714},{"country":"Denmark","year":2010,"value":2.917},{"country":"Finland","year":2010,"value":3.705},{"country":"France","year":2010,"value":2.179},{"country":"Germany","year":2010,"value":2.73},{"country":"India","year":2010,"value":0.788},{"country":"Israel","year":2010,"value":3.863},{"country":"Italy","year":2010,"value":1.218},{"country":"Japan","year":2010,"value":3.105},{"country":"South Korea","year":2010,"value":3.316},{"country":"Austria","year":2011,"value":2.669},{"country":"Brazil","year":2011,"value":1.14},{"country":"China","year":2011,"value":1.78},{"country":"Denmark","year":2011,"value":2.945},{"country":"Finland","year":2011,"value":3.618},{"country":"France","year":2011,"value":2.192},{"country":"Germany","year":2011,"value":2.806},{"country":"India","year":2011,"value":0.755},{"country":"Israel","year":2011,"value":3.935},{"country":"Italy","year":2011,"value":1.202},{"country":"Japan","year":2011,"value":3.205},{"country":"South Korea","year":2011,"value":3.592},{"country":"Austria","year":2012,"value":2.915},{"country":"Brazil","year":2012,"value":1.127},{"country":"China","year":2012,"value":1.912},{"country":"Denmark","year":2012,"value":2.981},{"country":"Finland","year":2012,"value":3.398},{"country":"France","year":2012,"value":2.227},{"country":"Germany","year":2012,"value":2.882},{"country":"India","year":2012,"value":0.744},{"country":"Israel","year":2012,"value":4.081},{"country":"Italy","year":2012,"value":1.262},{"country":"Japan","year":2012,"value":3.174},{"country":"South Korea","year":2012,"value":3.85},{"country":"Austria","year":2013,"value":2.955},{"country":"Brazil","year":2013,"value":1.196},{"country":"China","year":2013,"value":1.998},{"country":"Denmark","year":2013,"value":2.97},{"country":"Finland","year":2013,"value":3.271},{"country":"France","year":2013,"value":2.237},{"country":"Germany","year":2013,"value":2.836},{"country":"India","year":2013,"value":0.706},{"country":"Israel","year":2013,"value":4.117},{"country":"Italy","year":2013,"value":1.301},{"country":"Japan","year":2013,"value":3.279},{"country":"South Korea","year":2013,"value":3.951},{"country":"Austria","year":2014,"value":3.084},{"country":"Brazil","year":2014,"value":1.27},{"country":"China","year":2014,"value":2.022},{"country":"Denmark","year":2014,"value":2.914},{"country":"Finland","year":2014,"value":3.148},{"country":"France","year":2014,"value":2.276},{"country":"Germany","year":2014,"value":2.878},{"country":"India","year":2014,"value":0.702},{"country":"Israel","year":2014,"value":4.205},{"country":"Italy","year":2014,"value":1.338},{"country":"Japan","year":2014,"value":3.368},{"country":"South Korea","year":2014,"value":4.078},{"country":"Austria","year":2015,"value":3.05},{"country":"Brazil","year":2015,"value":1.371},{"country":"China","year":2015,"value":2.057},{"country":"Denmark","year":2015,"value":3.055},{"country":"Finland","year":2015,"value":2.872},{"country":"France","year":2015,"value":2.227},{"country":"Germany","year":2015,"value":2.934},{"country":"India","year":2015,"value":0.693},{"country":"Israel","year":2015,"value":4.298},{"country":"Italy","year":2015,"value":1.339},{"country":"Japan","year":2015,"value":3.241},{"country":"South Korea","year":2015,"value":3.978},{"country":"Austria","year":2016,"value":3.117},{"country":"Brazil","year":2016,"value":1.286},{"country":"China","year":2016,"value":2.1},{"country":"Denmark","year":2016,"value":3.093},{"country":"Finland","year":2016,"value":2.724},{"country":"France","year":2016,"value":2.222},{"country":"Germany","year":2016,"value":2.94},{"country":"India","year":2016,"value":0.67},{"country":"Israel","year":2016,"value":4.588},{"country":"Italy","year":2016,"value":1.366},{"country":"Japan","year":2016,"value":3.107},{"country":"South Korea","year":2016,"value":3.987},{"country":"Austria","year":2017,"value":3.057},{"country":"Brazil","year":2017,"value":1.118},{"country":"China","year":2017,"value":2.116},{"country":"Denmark","year":2017,"value":2.931},{"country":"Finland","year":2017,"value":2.728},{"country":"France","year":2017,"value":2.199},{"country":"Germany","year":2017,"value":3.047},{"country":"India","year":2017,"value":0.666},{"country":"Israel","year":2017,"value":4.743},{"country":"Italy","year":2017,"value":1.37},{"country":"Japan","year":2017,"value":3.166},{"country":"South Korea","year":2017,"value":4.292},{"country":"Austria","year":2018,"value":3.092},{"country":"Brazil","year":2018,"value":1.168},{"country":"China","year":2018,"value":2.141},{"country":"Denmark","year":2018,"value":2.966},{"country":"Finland","year":2018,"value":2.757},{"country":"France","year":2018,"value":2.197},{"country":"Germany","year":2018,"value":3.11},{"country":"India","year":2018,"value":0.66},{"country":"Israel","year":2018,"value":4.915},{"country":"Italy","year":2018,"value":1.424},{"country":"Japan","year":2018,"value":3.219},{"country":"South Korea","year":2018,"value":4.516},{"country":"Austria","year":2019,"value":3.133},{"country":"Brazil","year":2019,"value":1.211},{"country":"China","year":2019,"value":2.245},{"country":"Denmark","year":2019,"value":2.897},{"country":"Finland","year":2019,"value":2.8},{"country":"France","year":2019,"value":2.192},{"country":"Germany","year":2019,"value":3.167},{"country":"India","year":2019,"value":0.659},{"country":"Israel","year":2019,"value":5.331},{"country":"Italy","year":2019,"value":1.462},{"country":"Japan","year":2019,"value":3.218},{"country":"South Korea","year":2019,"value":4.627},{"country":"Austria","year":2020,"value":3.203},{"country":"Brazil","year":2020,"value":1.145},{"country":"China","year":2020,"value":2.407},{"country":"Denmark","year":2020,"value":2.973},{"country":"Finland","year":2020,"value":2.912},{"country":"France","year":2020,"value":2.275},{"country":"Germany","year":2020,"value":3.131},{"country":"India","year":2020,"value":0.646},{"country":"Israel","year":2020,"value":5.797},{"country":"Italy","year":2020,"value":1.507},{"country":"Japan","year":2020,"value":3.265},{"country":"South Korea","year":2020,"value":4.796},{"country":"Austria","year":2021,"value":3.264},{"country":"China","year":2021,"value":2.433},{"country":"Denmark","year":2021,"value":2.761},{"country":"Finland","year":2021,"value":2.989},{"country":"France","year":2021,"value":2.218},{"country":"Germany","year":2021,"value":3.129},{"country":"Israel","year":2021,"value":5.783},{"country":"Italy","year":2021,"value":1.427},{"country":"Japan","year":2021,"value":3.277},{"country":"South Korea","year":2021,"value":4.91},{"country":"Austria","year":2022,"value":3.2},{"country":"China","year":2022,"value":2.555},{"country":"Denmark","year":2022,"value":2.891},{"country":"Finland","year":2022,"value":2.965},{"country":"France","year":2022,"value":2.233},{"country":"Germany","year":2022,"value":3.132},{"country":"Israel","year":2022,"value":6.019},{"country":"Italy","year":2022,"value":1.39},{"country":"Japan","year":2022,"value":3.405},{"country":"South Korea","year":2022,"value":5.211}];
+
+// Group data by country
+const countries = [...new Set(data.map(d => d.country))];
+const byCountry = {};
+countries.forEach(c => {
+  byCountry[c] = data.filter(d => d.country === c).sort((a, b) => a.year - b.year);
+});
+
+// Color palette: distinct, muted, readable on #F6F5EE
+const palette = {
+  "Israel": "#D45B3F",
+  "South Korea": "#E8842A",
+  "Japan": "#5B8CB8",
+  "Finland": "#6AA68E",
+  "Germany": "#3D7A99",
+  "Austria": "#8B6DB0",
+  "Denmark": "#4A9B8F",
+  "France": "#C48A5A",
+  "China": "#CF3E3E",
+  "Italy": "#8A8A6F",
+  "Brazil": "#7B6B5A",
+  "India": "#B07040"
+};
+
+// Chart dimensions
+const W = 780, H = 480;
+const pad = { left: 48, right: 100, top: 24, bottom: 40 };
+
+const minYear = 1996, maxYear = 2022;
+const minVal = 0, maxVal = 6.5;
+
+const xScale = yr => pad.left + (yr - minYear) / (maxYear - minYear) * (W - pad.left - pad.right);
+const yScale = v => pad.top + (maxVal - v) / (maxVal - minVal) * (H - pad.top - pad.bottom);
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+svg.style.cursor = "crosshair";
+
+// Y-axis grid lines and labels
+const yTicks = [0, 1, 2, 3, 4, 5, 6];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", "#D5D3CA");
+  line.setAttribute("stroke-width", "0.5");
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3.5);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// X-axis labels
+const xTicks = [1996, 2000, 2004, 2008, 2012, 2016, 2020, 2022];
+xTicks.forEach(yr => {
+  const x = xScale(yr);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", H - pad.bottom + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", H - pad.bottom);
+  tick.setAttribute("y2", H - pad.bottom + 4);
+  tick.setAttribute("stroke", "#D5D3CA");
+  tick.setAttribute("stroke-width", "0.5");
+  svg.appendChild(tick);
+});
+
+// Draw lines and store references
+const lines = {};
+const dots = {};
+const endLabels = {};
+
+// Ordering for right-side labels (by last value, descending)
+const endValues = countries.map(c => {
+  const pts = byCountry[c];
+  return { country: c, value: pts[pts.length - 1].value };
+}).sort((a, b) => b.value - a.value);
+
+// Resolve label collisions on the right side
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const labelPositions = endValues.map(d => ({
+  country: d.country,
+  y: yScale(d.value)
+}));
+resolveCollisions(labelPositions, 12);
+
+countries.forEach(c => {
+  const pts = byCountry[c];
+  const col = palette[c] || "#999";
+
+  // Build path
+  let pathD = "";
+  pts.forEach((p, i) => {
+    const x = xScale(p.year);
+    const y = yScale(p.value);
+    pathD += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+  });
+
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", col);
+  path.setAttribute("stroke-width", "1.8");
+  path.setAttribute("opacity", "0.85");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-linecap", "round");
+  svg.appendChild(path);
+  lines[c] = path;
+
+  // End dot
+  const lastPt = pts[pts.length - 1];
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(lastPt.year));
+  dot.setAttribute("cy", yScale(lastPt.value));
+  dot.setAttribute("r", "3");
+  dot.setAttribute("fill", col);
+  svg.appendChild(dot);
+  dots[c] = dot;
+
+  // End label
+  const lp = labelPositions.find(l => l.country === c);
+  const lbl = document.createElementNS(ns, "text");
+  lbl.setAttribute("x", W - pad.right + 8);
+  lbl.setAttribute("y", lp.y + 3.5);
+  lbl.setAttribute("text-anchor", "start");
+  lbl.setAttribute("font-size", "9.5");
+  lbl.setAttribute("font-weight", "500");
+  lbl.setAttribute("fill", col);
+  lbl.textContent = c;
+  svg.appendChild(lbl);
+  endLabels[c] = lbl;
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Vertical hover line and tooltip
+const hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", H - pad.bottom);
+hoverLine.setAttribute("stroke", "#2B2A27");
+hoverLine.setAttribute("stroke-width", "0.5");
+hoverLine.setAttribute("stroke-dasharray", "3,3");
+hoverLine.setAttribute("opacity", "0");
+svg.appendChild(hoverLine);
+
+const hoverDots = {};
+countries.forEach(c => {
+  const d = document.createElementNS(ns, "circle");
+  d.setAttribute("r", "3.5");
+  d.setAttribute("fill", palette[c] || "#999");
+  d.setAttribute("stroke", "#F6F5EE");
+  d.setAttribute("stroke-width", "1.5");
+  d.setAttribute("opacity", "0");
+  svg.appendChild(d);
+  hoverDots[c] = d;
+});
+
+const tip = document.getElementById("tip");
+
+svg.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width * W;
+
+  // Map to year
+  const yearFloat = minYear + (mx - pad.left) / (W - pad.left - pad.right) * (maxYear - minYear);
+  const year = Math.max(minYear, Math.min(maxYear, Math.round(yearFloat)));
+
+  if (mx < pad.left - 10 || mx > W - pad.right + 10) {
+    hoverLine.setAttribute("opacity", "0");
+    Object.values(hoverDots).forEach(d => d.setAttribute("opacity", "0"));
+    tip.style.opacity = "0";
+    // Reset line opacities
+    countries.forEach(c => {
+      lines[c].setAttribute("opacity", "0.85");
+      lines[c].setAttribute("stroke-width", "1.8");
+      endLabels[c].setAttribute("opacity", "1");
+    });
+    return;
+  }
+
+  const hx = xScale(year);
+  hoverLine.setAttribute("x1", hx);
+  hoverLine.setAttribute("x2", hx);
+  hoverLine.setAttribute("opacity", "0.4");
+
+  // Build tooltip rows sorted by value
+  const rows = [];
+  countries.forEach(c => {
+    const pt = byCountry[c].find(d => d.year === year);
+    if (pt) {
+      const cy = yScale(pt.value);
+      hoverDots[c].setAttribute("cx", hx);
+      hoverDots[c].setAttribute("cy", cy);
+      hoverDots[c].setAttribute("opacity", "1");
+      rows.push({ country: c, value: pt.value });
+    } else {
+      hoverDots[c].setAttribute("opacity", "0");
+    }
+  });
+
+  rows.sort((a, b) => b.value - a.value);
+
+  // Find closest country to cursor
+  const my = (e.clientY - rect.top) / rect.height * H;
+  let closestCountry = null;
+  let closestDist = Infinity;
+  rows.forEach(r => {
+    const cy = yScale(r.value);
+    const dist = Math.abs(my - cy);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestCountry = r.country;
+    }
+  });
+
+  // Highlight closest line
+  countries.forEach(c => {
+    if (closestCountry && closestDist < 60) {
+      if (c === closestCountry) {
+        lines[c].setAttribute("opacity", "1");
+        lines[c].setAttribute("stroke-width", "3");
+        endLabels[c].setAttribute("opacity", "1");
+        endLabels[c].setAttribute("font-weight", "600");
+      } else {
+        lines[c].setAttribute("opacity", "0.15");
+        lines[c].setAttribute("stroke-width", "1.2");
+        endLabels[c].setAttribute("opacity", "0.3");
+        endLabels[c].setAttribute("font-weight", "500");
+      }
+    } else {
+      lines[c].setAttribute("opacity", "0.85");
+      lines[c].setAttribute("stroke-width", "1.8");
+      endLabels[c].setAttribute("opacity", "1");
+      endLabels[c].setAttribute("font-weight", "500");
+    }
+  });
+
+  // Tooltip content
+  let html = "<div style='margin-bottom:4px;font-weight:500;font-size:11px;border-bottom:1px solid #555;padding-bottom:3px;'>" + year + "</div>";
+  rows.forEach(r => {
+    const marker = closestCountry === r.country ? " <<" : "";
+    const weight = closestCountry === r.country ? "font-weight:600;" : "";
+    html += "<div style='display:flex;justify-content:space-between;gap:16px;" + weight + "'>";
+    html += "<span style='color:" + palette[r.country] + ";'>" + r.country + "</span>";
+    html += "<span>" + r.value.toFixed(2) + "%</span>";
+    html += "</div>";
+  });
+
+  tip.innerHTML = html;
+  tip.style.opacity = "1";
+
+  // Position tooltip
+  const tipX = e.clientX + 16;
+  const tipY = e.clientY - 30;
+  tip.style.left = tipX + "px";
+  tip.style.top = tipY + "px";
+
+  // Flip if too far right
+  if (tipX + 180 > window.innerWidth) {
+    tip.style.left = (e.clientX - 190) + "px";
+  }
+});
+
+svg.addEventListener("mouseleave", function() {
+  hoverLine.setAttribute("opacity", "0");
+  Object.values(hoverDots).forEach(d => d.setAttribute("opacity", "0"));
+  tip.style.opacity = "0";
+  countries.forEach(c => {
+    lines[c].setAttribute("opacity", "0.85");
+    lines[c].setAttribute("stroke-width", "1.8");
+    endLabels[c].setAttribute("opacity", "1");
+    endLabels[c].setAttribute("font-weight", "500");
+  });
+});
+</script>
+</body></html>

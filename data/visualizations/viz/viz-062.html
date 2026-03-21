@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11.5px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.55; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 7px 11px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: pointer; transition: opacity 0.2s; }
+  .legend-item:hover { opacity: 0.7; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>Guarding the Blue</h1>
+<p class="subtitle">Average proportion of marine Key Biodiversity Areas (KBAs) covered by protected areas, 2000-2024. Gabon and Estonia reached near-total coverage through landmark designations, while India's marine KBAs remain almost entirely unprotected.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG Indicator 14.5.1 -- ER_MRN_MPA (Marine KBAs covered by protected areas, %)</p>
+<script>
+const raw = [{"c":"Australia","y":2000,"v":42.4},{"c":"Australia","y":2001,"v":43.2},{"c":"Australia","y":2002,"v":44.7},{"c":"Australia","y":2003,"v":45},{"c":"Australia","y":2004,"v":45.2},{"c":"Australia","y":2005,"v":45.8},{"c":"Australia","y":2006,"v":46.9},{"c":"Australia","y":2007,"v":48.3},{"c":"Australia","y":2008,"v":48.6},{"c":"Australia","y":2009,"v":53.1},{"c":"Australia","y":2010,"v":53.5},{"c":"Australia","y":2011,"v":56.3},{"c":"Australia","y":2012,"v":58.4},{"c":"Australia","y":2013,"v":61.1},{"c":"Australia","y":2014,"v":61.2},{"c":"Australia","y":2015,"v":61.4},{"c":"Australia","y":2016,"v":63.2},{"c":"Australia","y":2017,"v":63.6},{"c":"Australia","y":2018,"v":63.8},{"c":"Australia","y":2019,"v":64.5},{"c":"Australia","y":2020,"v":64.7},{"c":"Australia","y":2021,"v":65.5},{"c":"Australia","y":2022,"v":66.2},{"c":"Australia","y":2023,"v":66.2},{"c":"Australia","y":2024,"v":66.2},{"c":"Brazil","y":2000,"v":49},{"c":"Brazil","y":2001,"v":49},{"c":"Brazil","y":2002,"v":49.1},{"c":"Brazil","y":2003,"v":49.1},{"c":"Brazil","y":2004,"v":49.1},{"c":"Brazil","y":2005,"v":49.8},{"c":"Brazil","y":2006,"v":49.8},{"c":"Brazil","y":2007,"v":53.3},{"c":"Brazil","y":2008,"v":61.9},{"c":"Brazil","y":2009,"v":61.9},{"c":"Brazil","y":2010,"v":61.9},{"c":"Brazil","y":2011,"v":62.4},{"c":"Brazil","y":2012,"v":62.4},{"c":"Brazil","y":2013,"v":67.7},{"c":"Brazil","y":2014,"v":68.7},{"c":"Brazil","y":2015,"v":68.7},{"c":"Brazil","y":2016,"v":71},{"c":"Brazil","y":2017,"v":71},{"c":"Brazil","y":2018,"v":71.8},{"c":"Brazil","y":2019,"v":72.3},{"c":"Brazil","y":2020,"v":72.3},{"c":"Brazil","y":2021,"v":72.3},{"c":"Brazil","y":2022,"v":72.3},{"c":"Brazil","y":2023,"v":72.3},{"c":"Brazil","y":2024,"v":72.4},{"c":"China","y":2000,"v":2.2},{"c":"China","y":2001,"v":2.8},{"c":"China","y":2002,"v":4.6},{"c":"China","y":2003,"v":4.6},{"c":"China","y":2004,"v":6.1},{"c":"China","y":2005,"v":6.1},{"c":"China","y":2006,"v":6.1},{"c":"China","y":2007,"v":6.1},{"c":"China","y":2008,"v":6.1},{"c":"China","y":2009,"v":6.7},{"c":"China","y":2010,"v":6.7},{"c":"China","y":2011,"v":6.7},{"c":"China","y":2012,"v":6.7},{"c":"China","y":2013,"v":7},{"c":"China","y":2014,"v":7},{"c":"China","y":2015,"v":7},{"c":"China","y":2016,"v":7},{"c":"China","y":2017,"v":7},{"c":"China","y":2018,"v":7},{"c":"China","y":2019,"v":7},{"c":"China","y":2020,"v":7},{"c":"China","y":2021,"v":7},{"c":"China","y":2022,"v":7},{"c":"China","y":2023,"v":7},{"c":"China","y":2024,"v":7},{"c":"Ecuador","y":2000,"v":10.1},{"c":"Ecuador","y":2001,"v":10.1},{"c":"Ecuador","y":2002,"v":10.1},{"c":"Ecuador","y":2003,"v":19.4},{"c":"Ecuador","y":2004,"v":20.1},{"c":"Ecuador","y":2005,"v":20.1},{"c":"Ecuador","y":2006,"v":20.1},{"c":"Ecuador","y":2007,"v":20.1},{"c":"Ecuador","y":2008,"v":20.2},{"c":"Ecuador","y":2009,"v":20.3},{"c":"Ecuador","y":2010,"v":20.3},{"c":"Ecuador","y":2011,"v":20.3},{"c":"Ecuador","y":2012,"v":30.6},{"c":"Ecuador","y":2013,"v":30.6},{"c":"Ecuador","y":2014,"v":30.6},{"c":"Ecuador","y":2015,"v":30.8},{"c":"Ecuador","y":2016,"v":31},{"c":"Ecuador","y":2017,"v":31.1},{"c":"Ecuador","y":2018,"v":31.1},{"c":"Ecuador","y":2019,"v":31.1},{"c":"Ecuador","y":2020,"v":31.1},{"c":"Ecuador","y":2021,"v":40.9},{"c":"Ecuador","y":2022,"v":50.7},{"c":"Ecuador","y":2023,"v":50.7},{"c":"Ecuador","y":2024,"v":50.7},{"c":"Estonia","y":2000,"v":5.8},{"c":"Estonia","y":2001,"v":5.9},{"c":"Estonia","y":2002,"v":5.9},{"c":"Estonia","y":2003,"v":6.2},{"c":"Estonia","y":2004,"v":97.6},{"c":"Estonia","y":2005,"v":97.6},{"c":"Estonia","y":2006,"v":97.6},{"c":"Estonia","y":2007,"v":97.6},{"c":"Estonia","y":2008,"v":97.6},{"c":"Estonia","y":2009,"v":97.6},{"c":"Estonia","y":2010,"v":97.6},{"c":"Estonia","y":2011,"v":97.6},{"c":"Estonia","y":2012,"v":97.6},{"c":"Estonia","y":2013,"v":97.6},{"c":"Estonia","y":2014,"v":97.6},{"c":"Estonia","y":2015,"v":97.6},{"c":"Estonia","y":2016,"v":97.6},{"c":"Estonia","y":2017,"v":97.6},{"c":"Estonia","y":2018,"v":97.6},{"c":"Estonia","y":2019,"v":97.6},{"c":"Estonia","y":2020,"v":97.6},{"c":"Estonia","y":2021,"v":97.7},{"c":"Estonia","y":2022,"v":97.7},{"c":"Estonia","y":2023,"v":97.7},{"c":"Estonia","y":2024,"v":97.7},{"c":"France","y":2000,"v":35.3},{"c":"France","y":2001,"v":42.4},{"c":"France","y":2002,"v":43},{"c":"France","y":2003,"v":44.6},{"c":"France","y":2004,"v":54.4},{"c":"France","y":2005,"v":54.5},{"c":"France","y":2006,"v":56.1},{"c":"France","y":2007,"v":61.1},{"c":"France","y":2008,"v":62.5},{"c":"France","y":2009,"v":66.2},{"c":"France","y":2010,"v":67},{"c":"France","y":2011,"v":69.5},{"c":"France","y":2012,"v":72.8},{"c":"France","y":2013,"v":72.9},{"c":"France","y":2014,"v":74.3},{"c":"France","y":2015,"v":75.4},{"c":"France","y":2016,"v":76.6},{"c":"France","y":2017,"v":77.1},{"c":"France","y":2018,"v":77.7},{"c":"France","y":2019,"v":79.4},{"c":"France","y":2020,"v":79.8},{"c":"France","y":2021,"v":80.9},{"c":"France","y":2022,"v":80.9},{"c":"France","y":2023,"v":80.9},{"c":"France","y":2024,"v":80.9},{"c":"Gabon","y":2000,"v":5.4},{"c":"Gabon","y":2001,"v":5.4},{"c":"Gabon","y":2002,"v":38.5},{"c":"Gabon","y":2003,"v":38.5},{"c":"Gabon","y":2004,"v":38.5},{"c":"Gabon","y":2005,"v":38.5},{"c":"Gabon","y":2006,"v":38.5},{"c":"Gabon","y":2007,"v":38.6},{"c":"Gabon","y":2008,"v":38.6},{"c":"Gabon","y":2009,"v":38.6},{"c":"Gabon","y":2010,"v":38.6},{"c":"Gabon","y":2011,"v":38.6},{"c":"Gabon","y":2012,"v":38.6},{"c":"Gabon","y":2013,"v":38.6},{"c":"Gabon","y":2014,"v":38.6},{"c":"Gabon","y":2015,"v":38.6},{"c":"Gabon","y":2016,"v":38.6},{"c":"Gabon","y":2017,"v":99.9},{"c":"Gabon","y":2018,"v":99.9},{"c":"Gabon","y":2019,"v":99.9},{"c":"Gabon","y":2020,"v":99.9},{"c":"Gabon","y":2021,"v":99.9},{"c":"Gabon","y":2022,"v":99.9},{"c":"Gabon","y":2023,"v":99.9},{"c":"Gabon","y":2024,"v":99.9},{"c":"Germany","y":2000,"v":33.5},{"c":"Germany","y":2001,"v":40.2},{"c":"Germany","y":2002,"v":40.3},{"c":"Germany","y":2003,"v":40.5},{"c":"Germany","y":2004,"v":63.4},{"c":"Germany","y":2005,"v":63.4},{"c":"Germany","y":2006,"v":63.5},{"c":"Germany","y":2007,"v":64.7},{"c":"Germany","y":2008,"v":70.7},{"c":"Germany","y":2009,"v":71.3},{"c":"Germany","y":2010,"v":72},{"c":"Germany","y":2011,"v":74},{"c":"Germany","y":2012,"v":74.1},{"c":"Germany","y":2013,"v":74.1},{"c":"Germany","y":2014,"v":74.1},{"c":"Germany","y":2015,"v":74.4},{"c":"Germany","y":2016,"v":74.5},{"c":"Germany","y":2017,"v":77},{"c":"Germany","y":2018,"v":78.8},{"c":"Germany","y":2019,"v":79.1},{"c":"Germany","y":2020,"v":79.1},{"c":"Germany","y":2021,"v":79.7},{"c":"Germany","y":2022,"v":79.7},{"c":"Germany","y":2023,"v":79.7},{"c":"Germany","y":2024,"v":79.7},{"c":"India","y":2000,"v":4.2},{"c":"India","y":2001,"v":4.2},{"c":"India","y":2002,"v":4.2},{"c":"India","y":2003,"v":4.2},{"c":"India","y":2004,"v":4.2},{"c":"India","y":2005,"v":4.2},{"c":"India","y":2006,"v":4.2},{"c":"India","y":2007,"v":4.2},{"c":"India","y":2008,"v":4.2},{"c":"India","y":2009,"v":4.2},{"c":"India","y":2010,"v":4.2},{"c":"India","y":2011,"v":4.2},{"c":"India","y":2012,"v":4.2},{"c":"India","y":2013,"v":4.2},{"c":"India","y":2014,"v":4.2},{"c":"India","y":2015,"v":4.2},{"c":"India","y":2016,"v":4.2},{"c":"India","y":2017,"v":4.2},{"c":"India","y":2018,"v":4.2},{"c":"India","y":2019,"v":4.2},{"c":"India","y":2020,"v":4.2},{"c":"India","y":2021,"v":4.2},{"c":"India","y":2022,"v":4.2},{"c":"India","y":2023,"v":4.2},{"c":"India","y":2024,"v":4.2},{"c":"Indonesia","y":2000,"v":7.4},{"c":"Indonesia","y":2001,"v":7.4},{"c":"Indonesia","y":2002,"v":7.4},{"c":"Indonesia","y":2003,"v":7.4},{"c":"Indonesia","y":2004,"v":7.4},{"c":"Indonesia","y":2005,"v":7.4},{"c":"Indonesia","y":2006,"v":7.7},{"c":"Indonesia","y":2007,"v":8.2},{"c":"Indonesia","y":2008,"v":8.2},{"c":"Indonesia","y":2009,"v":15.6},{"c":"Indonesia","y":2010,"v":15.9},{"c":"Indonesia","y":2011,"v":16.3},{"c":"Indonesia","y":2012,"v":18.3},{"c":"Indonesia","y":2013,"v":19.2},{"c":"Indonesia","y":2014,"v":20.5},{"c":"Indonesia","y":2015,"v":22.9},{"c":"Indonesia","y":2016,"v":23.4},{"c":"Indonesia","y":2017,"v":24.1},{"c":"Indonesia","y":2018,"v":25.9},{"c":"Indonesia","y":2019,"v":25.9},{"c":"Indonesia","y":2020,"v":25.9},{"c":"Indonesia","y":2021,"v":25.9},{"c":"Indonesia","y":2022,"v":25.9},{"c":"Indonesia","y":2023,"v":25.9},{"c":"Indonesia","y":2024,"v":25.9},{"c":"Japan","y":2000,"v":24.6},{"c":"Japan","y":2001,"v":25.9},{"c":"Japan","y":2002,"v":26.3},{"c":"Japan","y":2003,"v":27.8},{"c":"Japan","y":2004,"v":27.9},{"c":"Japan","y":2005,"v":29},{"c":"Japan","y":2006,"v":30},{"c":"Japan","y":2007,"v":31.6},{"c":"Japan","y":2008,"v":32.7},{"c":"Japan","y":2009,"v":33.6},{"c":"Japan","y":2010,"v":34.1},{"c":"Japan","y":2011,"v":36.1},{"c":"Japan","y":2012,"v":41.3},{"c":"Japan","y":2013,"v":53.2},{"c":"Japan","y":2014,"v":57.1},{"c":"Japan","y":2015,"v":58.8},{"c":"Japan","y":2016,"v":58.9},{"c":"Japan","y":2017,"v":59.2},{"c":"Japan","y":2018,"v":60.1},{"c":"Japan","y":2019,"v":61},{"c":"Japan","y":2020,"v":61.6},{"c":"Japan","y":2021,"v":62.5},{"c":"Japan","y":2022,"v":66.4},{"c":"Japan","y":2023,"v":66.4},{"c":"Japan","y":2024,"v":66.4},{"c":"Mexico","y":2000,"v":26.6},{"c":"Mexico","y":2001,"v":26.6},{"c":"Mexico","y":2002,"v":27.8},{"c":"Mexico","y":2003,"v":27.9},{"c":"Mexico","y":2004,"v":34.2},{"c":"Mexico","y":2005,"v":42.8},{"c":"Mexico","y":2006,"v":43.4},{"c":"Mexico","y":2007,"v":45.4},{"c":"Mexico","y":2008,"v":52.7},{"c":"Mexico","y":2009,"v":53.7},{"c":"Mexico","y":2010,"v":54.8},{"c":"Mexico","y":2011,"v":56},{"c":"Mexico","y":2012,"v":56.4},{"c":"Mexico","y":2013,"v":57.7},{"c":"Mexico","y":2014,"v":57.7},{"c":"Mexico","y":2015,"v":57.7},{"c":"Mexico","y":2016,"v":62.9},{"c":"Mexico","y":2017,"v":62.9},{"c":"Mexico","y":2018,"v":62.9},{"c":"Mexico","y":2019,"v":62.9},{"c":"Mexico","y":2020,"v":62.9},{"c":"Mexico","y":2021,"v":62.9},{"c":"Mexico","y":2022,"v":62.9},{"c":"Mexico","y":2023,"v":63},{"c":"Mexico","y":2024,"v":64.3},{"c":"Philippines","y":2000,"v":25.5},{"c":"Philippines","y":2001,"v":30.6},{"c":"Philippines","y":2002,"v":30.6},{"c":"Philippines","y":2003,"v":30.6},{"c":"Philippines","y":2004,"v":30.6},{"c":"Philippines","y":2005,"v":30.6},{"c":"Philippines","y":2006,"v":33.3},{"c":"Philippines","y":2007,"v":33.3},{"c":"Philippines","y":2008,"v":33.3},{"c":"Philippines","y":2009,"v":33.3},{"c":"Philippines","y":2010,"v":33.3},{"c":"Philippines","y":2011,"v":33.3},{"c":"Philippines","y":2012,"v":33.3},{"c":"Philippines","y":2013,"v":33.3},{"c":"Philippines","y":2014,"v":33.3},{"c":"Philippines","y":2015,"v":33.3},{"c":"Philippines","y":2016,"v":33.3},{"c":"Philippines","y":2017,"v":33.3},{"c":"Philippines","y":2018,"v":46.6},{"c":"Philippines","y":2019,"v":46.6},{"c":"Philippines","y":2020,"v":46.6},{"c":"Philippines","y":2021,"v":46.6},{"c":"Philippines","y":2022,"v":46.6},{"c":"Philippines","y":2023,"v":46.6},{"c":"Philippines","y":2024,"v":46.6},{"c":"South Africa","y":2000,"v":34.7},{"c":"South Africa","y":2001,"v":34.7},{"c":"South Africa","y":2002,"v":35.1},{"c":"South Africa","y":2003,"v":35.1},{"c":"South Africa","y":2004,"v":44.5},{"c":"South Africa","y":2005,"v":44.5},{"c":"South Africa","y":2006,"v":44.5},{"c":"South Africa","y":2007,"v":44.5},{"c":"South Africa","y":2008,"v":44.5},{"c":"South Africa","y":2009,"v":44.5},{"c":"South Africa","y":2010,"v":44.5},{"c":"South Africa","y":2011,"v":44.5},{"c":"South Africa","y":2012,"v":44.5},{"c":"South Africa","y":2013,"v":44.5},{"c":"South Africa","y":2014,"v":44.5},{"c":"South Africa","y":2015,"v":44.6},{"c":"South Africa","y":2016,"v":44.6},{"c":"South Africa","y":2017,"v":46.1},{"c":"South Africa","y":2018,"v":46.1},{"c":"South Africa","y":2019,"v":63},{"c":"South Africa","y":2020,"v":63},{"c":"South Africa","y":2021,"v":63},{"c":"South Africa","y":2022,"v":63},{"c":"South Africa","y":2023,"v":63},{"c":"South Africa","y":2024,"v":63}];
+
+// Group by country
+const byCountry = {};
+raw.forEach(d => {
+  if (!byCountry[d.c]) byCountry[d.c] = [];
+  byCountry[d.c].push(d);
+});
+
+const countries = Object.keys(byCountry).sort((a, b) => {
+  const lastA = byCountry[a][byCountry[a].length - 1].v;
+  const lastB = byCountry[b][byCountry[b].length - 1].v;
+  return lastB - lastA;
+});
+
+// Color palette -- 14 distinct hues ordered by 2024 value (high to low)
+const palette = [
+  "#1B6B4A", // Estonia (dark green -- top)
+  "#D97706", // Gabon (amber)
+  "#2563EB", // France (blue)
+  "#7C3AED", // Germany (purple)
+  "#0891B2", // Brazil (cyan)
+  "#059669", // Australia (emerald)
+  "#DC2626", // Japan (red)
+  "#6366F1", // Mexico (indigo)
+  "#B45309", // South Africa (brown)
+  "#EC4899", // Ecuador (pink)
+  "#8B5CF6", // Philippines (violet)
+  "#F59E0B", // Indonesia (yellow)
+  "#EF4444", // China (scarlet)
+  "#94A3B8", // India (slate)
+];
+
+const colorMap = {};
+countries.forEach((c, i) => { colorMap[c] = palette[i]; });
+
+// Chart dimensions
+const W = 760;
+const H = 480;
+const pad = { left: 44, right: 90, top: 20, bottom: 36 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const xMin = 2000, xMax = 2024;
+const yMin = 0, yMax = 105;
+
+const xScale = year => pad.left + ((year - xMin) / (xMax - xMin)) * chartW;
+const yScale = val => pad.top + chartH - ((val - yMin) / (yMax - yMin)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  return e;
+}
+
+const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:${W}px;overflow:visible;` });
+
+// Grid lines -- y axis
+[0, 25, 50, 75, 100].forEach(v => {
+  svg.appendChild(el("line", {
+    x1: pad.left, x2: W - pad.right, y1: yScale(v), y2: yScale(v),
+    stroke: v === 0 ? "#C4C1B6" : "#E0DED6", "stroke-width": v === 0 ? 1 : 0.5
+  }));
+  const label = el("text", {
+    x: pad.left - 8, y: yScale(v) + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F"
+  });
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// Grid lines -- x axis
+for (let yr = 2000; yr <= 2024; yr += 4) {
+  svg.appendChild(el("line", {
+    x1: xScale(yr), x2: xScale(yr), y1: pad.top, y2: pad.top + chartH,
+    stroke: "#E0DED6", "stroke-width": 0.5
+  }));
+  const label = el("text", {
+    x: xScale(yr), y: pad.top + chartH + 16, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F"
+  });
+  label.textContent = yr;
+  svg.appendChild(label);
+}
+
+// Lines group
+const linesGroup = el("g");
+svg.appendChild(linesGroup);
+
+// End labels group (on top)
+const labelsGroup = el("g");
+svg.appendChild(labelsGroup);
+
+// Draw lines for each country
+const lineEls = {};
+const dotEls = {};
+const endLabelEls = {};
+
+countries.forEach(country => {
+  const pts = byCountry[country].sort((a, b) => a.y - b.y);
+  const color = colorMap[country];
+
+  // Build path
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"}${xScale(p.y).toFixed(1)},${yScale(p.v).toFixed(1)}`).join("");
+  const path = el("path", {
+    d: pathD, fill: "none", stroke: color, "stroke-width": 2,
+    "stroke-linejoin": "round", "stroke-linecap": "round", opacity: 0.85
+  });
+  linesGroup.appendChild(path);
+  lineEls[country] = path;
+
+  // End dot
+  const lastPt = pts[pts.length - 1];
+  const dot = el("circle", {
+    cx: xScale(lastPt.y), cy: yScale(lastPt.v), r: 3,
+    fill: color, stroke: "#F6F5EE", "stroke-width": 1.5
+  });
+  labelsGroup.appendChild(dot);
+  dotEls[country] = dot;
+
+  // End label
+  const endLabel = el("text", {
+    x: xScale(lastPt.y) + 7, y: yScale(lastPt.v) + 3.5,
+    "font-size": "9", "font-weight": "500", fill: color
+  });
+  endLabel.textContent = country;
+  labelsGroup.appendChild(endLabel);
+  endLabelEls[country] = endLabel;
+});
+
+// Nudge overlapping end labels
+function resolveOverlaps() {
+  const positions = countries.map(c => {
+    const lastV = byCountry[c][byCountry[c].length - 1].v;
+    return { country: c, baseY: yScale(lastV), y: yScale(lastV) };
+  }).sort((a, b) => a.baseY - b.baseY);
+
+  const minGap = 10;
+  for (let i = 1; i < positions.length; i++) {
+    const diff = positions[i].y - positions[i - 1].y;
+    if (diff < minGap) {
+      positions[i].y = positions[i - 1].y + minGap;
+    }
+  }
+
+  positions.forEach(p => {
+    endLabelEls[p.country].setAttribute("y", p.y + 3.5);
+    dotEls[p.country].setAttribute("cy", p.y);
+    // Draw a thin connector if label moved
+    if (Math.abs(p.y - p.baseY) > 2) {
+      dotEls[p.country].setAttribute("cy", p.baseY);
+      const conn = el("line", {
+        x1: xScale(2024) + 4, y1: p.baseY, x2: xScale(2024) + 4, y2: p.y,
+        stroke: colorMap[p.country], "stroke-width": 0.5, opacity: 0.4
+      });
+      labelsGroup.insertBefore(conn, labelsGroup.firstChild);
+    }
+  });
+}
+resolveOverlaps();
+
+// Hover crosshair
+const crosshair = el("line", {
+  x1: 0, x2: 0, y1: pad.top, y2: pad.top + chartH,
+  stroke: "#2B2A27", "stroke-width": 0.5, "stroke-dasharray": "2,2", opacity: 0
+});
+svg.appendChild(crosshair);
+
+// Hover dots
+const hoverDots = {};
+countries.forEach(c => {
+  const d = el("circle", { r: 3.5, fill: colorMap[c], stroke: "#F6F5EE", "stroke-width": 1.5, opacity: 0 });
+  svg.appendChild(d);
+  hoverDots[c] = d;
+});
+
+// Interactive overlay
+const overlay = el("rect", {
+  x: pad.left, y: pad.top, width: chartW, height: chartH,
+  fill: "transparent", style: "cursor:crosshair;"
+});
+svg.appendChild(overlay);
+
+const tip = document.getElementById("tip");
+
+overlay.addEventListener("mousemove", e => {
+  const svgRect = svg.getBoundingClientRect();
+  const mx = (e.clientX - svgRect.left) / svgRect.width * W;
+  const yearRaw = xMin + ((mx - pad.left) / chartW) * (xMax - xMin);
+  const year = Math.round(Math.max(xMin, Math.min(xMax, yearRaw)));
+
+  crosshair.setAttribute("x1", xScale(year));
+  crosshair.setAttribute("x2", xScale(year));
+  crosshair.setAttribute("opacity", 0.5);
+
+  // Build tooltip
+  const entries = countries.map(c => {
+    const pt = byCountry[c].find(p => p.y === year);
+    return pt ? { country: c, value: pt.v, color: colorMap[c] } : null;
+  }).filter(Boolean).sort((a, b) => b.value - a.value);
+
+  let html = `<strong>${year}</strong><br>`;
+  entries.forEach(e => {
+    html += `<span style="color:${e.color};">&mdash;</span> ${e.country}: ${e.value.toFixed(1)}%<br>`;
+  });
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+
+  const chartEl = document.getElementById("chart");
+  const chartRect = chartEl.getBoundingClientRect();
+  let tipLeft = e.clientX - chartRect.left + 16;
+  if (tipLeft + 180 > chartRect.width) tipLeft = e.clientX - chartRect.left - 190;
+  tip.style.left = tipLeft + "px";
+  tip.style.top = (e.clientY - chartRect.top - 20) + "px";
+
+  // Show hover dots
+  countries.forEach(c => {
+    const pt = byCountry[c].find(p => p.y === year);
+    if (pt) {
+      hoverDots[c].setAttribute("cx", xScale(year));
+      hoverDots[c].setAttribute("cy", yScale(pt.v));
+      hoverDots[c].setAttribute("opacity", 1);
+    }
+  });
+});
+
+overlay.addEventListener("mouseleave", () => {
+  crosshair.setAttribute("opacity", 0);
+  tip.style.opacity = 0;
+  countries.forEach(c => { hoverDots[c].setAttribute("opacity", 0); });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Legend
+const legendEl = document.getElementById("legend");
+countries.forEach(country => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = `<span class="legend-swatch" style="background:${colorMap[country]}"></span>${country}`;
+
+  let dimmed = false;
+  item.addEventListener("click", () => {
+    dimmed = !dimmed;
+    if (dimmed) {
+      lineEls[country].setAttribute("opacity", "0.1");
+      dotEls[country].setAttribute("opacity", "0.2");
+      endLabelEls[country].setAttribute("opacity", "0.2");
+      item.style.opacity = "0.35";
+    } else {
+      lineEls[country].setAttribute("opacity", "0.85");
+      dotEls[country].setAttribute("opacity", "1");
+      endLabelEls[country].setAttribute("opacity", "1");
+      item.style.opacity = "1";
+    }
+  });
+
+  item.addEventListener("mouseenter", () => {
+    if (!dimmed) lineEls[country].setAttribute("stroke-width", "3.5");
+  });
+  item.addEventListener("mouseleave", () => {
+    if (!dimmed) lineEls[country].setAttribute("stroke-width", "2");
+  });
+
+  legendEl.appendChild(item);
+});
+</script>
+</body></html>

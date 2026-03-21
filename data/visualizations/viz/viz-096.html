@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart-wrap { position: relative; }
+  svg { display: block; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    white-space: nowrap;
+    z-index: 10;
+    line-height: 1.5;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 20px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #5A584F; cursor: pointer; user-select: none; }
+  .legend-item.dimmed { opacity: 0.3; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 1px; flex-shrink: 0; }
+</style>
+</head><body>
+<h1>Europe's Innovation Divide: Patent Applications to the EPO per Million Inhabitants</h1>
+<p class="subtitle">Patent applications filed at the European Patent Office (2004-2024) by country of residence, per million inhabitants. The Nordic countries -- Sweden, Denmark, Finland -- have overtaken the Netherlands and Germany in patent intensity, while Southern and Eastern European countries remain far behind despite gradual gains.</p>
+<div class="legend" id="legend"></div>
+<div id="chart-wrap">
+  <div class="tooltip" id="tooltip"></div>
+</div>
+<p class="source">Source: Eurostat &mdash; sdg_09_40 (Patent applications to the European Patent Office by applicants' country of residence, per million inhabitants)</p>
+
+<script>
+const SERIES = [
+  {id:"SE",name:"Sweden",d:[{y:2004,v:270.09},{y:2005,v:275.32},{y:2006,v:280.61},{y:2007,v:298.43},{y:2008,v:339.93},{y:2009,v:338.45},{y:2010,v:382.81},{y:2011,v:385.01},{y:2012,v:369.57},{y:2013,v:382.7},{y:2014,v:399.44},{y:2015,v:391.77},{y:2016,v:357.45},{y:2017,v:376.13},{y:2018,v:398.52},{y:2019,v:427.58},{y:2020,v:427.11},{y:2021,v:474.96},{y:2022,v:480.6},{y:2023,v:486.4},{y:2024,v:467.8}]},
+  {id:"DK",name:"Denmark",d:[{y:2004,v:182.07},{y:2005,v:216.63},{y:2006,v:229.16},{y:2007,v:256.35},{y:2008,v:288.34},{y:2009,v:267.43},{y:2010,v:327.53},{y:2011,v:319.9},{y:2012,v:287.04},{y:2013,v:345.87},{y:2014,v:351.38},{y:2015,v:337.83},{y:2016,v:323.85},{y:2017,v:362.37},{y:2018,v:411.66},{y:2019,v:415.35},{y:2020,v:393.05},{y:2021,v:451.79},{y:2022,v:454.86},{y:2023,v:436.7},{y:2024,v:425.92}]},
+  {id:"FI",name:"Finland",d:[{y:2004,v:307.57},{y:2005,v:288.6},{y:2006,v:317.88},{y:2007,v:384.98},{y:2008,v:339.15},{y:2009,v:264.67},{y:2010,v:301.5},{y:2011,v:287.3},{y:2012,v:341.9},{y:2013,v:348.23},{y:2014,v:399.53},{y:2015,v:363.72},{y:2016,v:326.83},{y:2017,v:326.25},{y:2018,v:313.3},{y:2019,v:308.79},{y:2020,v:343.43},{y:2021,v:380.44},{y:2022,v:385.17},{y:2023,v:418.35},{y:2024,v:428.28}]},
+  {id:"NL",name:"Netherlands",d:[{y:2004,v:428.34},{y:2005,v:477.89},{y:2006,v:450.27},{y:2007,v:434.51},{y:2008,v:447.54},{y:2009,v:404.96},{y:2010,v:359.01},{y:2011,v:337.09},{y:2012,v:302.42},{y:2013,v:348.25},{y:2014,v:407.59},{y:2015,v:421.91},{y:2016,v:402.82},{y:2017,v:411.12},{y:2018,v:414.48},{y:2019,v:400.24},{y:2020,v:366.14},{y:2021,v:375.18},{y:2022,v:383.94},{y:2023,v:394.76},{y:2024,v:393.14}]},
+  {id:"DE",name:"Germany",d:[{y:2004,v:279.27},{y:2005,v:288.46},{y:2006,v:301.13},{y:2007,v:306.21},{y:2008,v:324.78},{y:2009,v:306.69},{y:2010,v:334.18},{y:2011,v:326.41},{y:2012,v:338.81},{y:2013,v:328.73},{y:2014,v:316.53},{y:2015,v:303.69},{y:2016,v:302.77},{y:2017,v:308.98},{y:2018,v:321.61},{y:2019,v:322.08},{y:2020,v:311.23},{y:2021,v:311.21},{y:2022,v:293.71},{y:2023,v:297.28},{y:2024,v:299.96}]},
+  {id:"AT",name:"Austria",d:[{y:2004,v:122.37},{y:2005,v:127.99},{y:2006,v:138.6},{y:2007,v:166.6},{y:2008,v:180.62},{y:2009,v:179.31},{y:2010,v:208.53},{y:2011,v:206.64},{y:2012,v:222.31},{y:2013,v:235.03},{y:2014,v:229.81},{y:2015,v:230.14},{y:2016,v:231.67},{y:2017,v:251.1},{y:2018,v:258.02},{y:2019,v:264.2},{y:2020,v:258.62},{y:2021,v:257.83},{y:2022,v:263.34},{y:2023,v:255.38},{y:2024,v:234.32}]},
+  {id:"BE",name:"Belgium",d:[{y:2004,v:143.27},{y:2005,v:158.23},{y:2006,v:174.64},{y:2007,v:178.63},{y:2008,v:177.32},{y:2009,v:150.89},{y:2010,v:187.7},{y:2011,v:182.46},{y:2012,v:169.81},{y:2013,v:168.65},{y:2014,v:171.92},{y:2015,v:181.04},{y:2016,v:195.13},{y:2017,v:189.19},{y:2018,v:205.48},{y:2019,v:210.82},{y:2020,v:208.52},{y:2021,v:214.05},{y:2022,v:222.86},{y:2023,v:219.48},{y:2024,v:221.29}]},
+  {id:"FR",name:"France",d:[{y:2004,v:129.2},{y:2005,v:127.53},{y:2006,v:126.92},{y:2007,v:130.97},{y:2008,v:141.69},{y:2009,v:139.13},{y:2010,v:147.72},{y:2011,v:147.67},{y:2012,v:151.25},{y:2013,v:149.54},{y:2014,v:160.07},{y:2015,v:161.69},{y:2016,v:157.13},{y:2017,v:158.69},{y:2018,v:155.88},{y:2019,v:151.87},{y:2020,v:157.01},{y:2021,v:157.62},{y:2022,v:161.37},{y:2023,v:159.1},{y:2024,v:160.37}]},
+  {id:"IE",name:"Ireland",d:[{y:2004,v:80.1},{y:2005,v:74.77},{y:2006,v:81.66},{y:2007,v:96.16},{y:2008,v:107.81},{y:2009,v:137.15},{y:2010,v:139.69},{y:2011,v:142.58},{y:2012,v:132.41},{y:2013,v:122.41},{y:2014,v:133.55},{y:2015,v:130.59},{y:2016,v:152.65},{y:2017,v:136.72},{y:2018,v:168.64},{y:2019,v:177.24},{y:2020,v:194.46},{y:2021,v:198.61},{y:2022,v:226.37},{y:2023,v:201.79},{y:2024,v:208.91}]},
+  {id:"IT",name:"Italy",d:[{y:2004,v:69.14},{y:2005,v:72.19},{y:2006,v:71.46},{y:2007,v:75.03},{y:2008,v:73.59},{y:2009,v:65.14},{y:2010,v:68.18},{y:2011,v:66.14},{y:2012,v:62.21},{y:2013,v:61.45},{y:2014,v:60.5},{y:2015,v:66.19},{y:2016,v:69.11},{y:2017,v:72.67},{y:2018,v:73.22},{y:2019,v:74.83},{y:2020,v:77.72},{y:2021,v:83.21},{y:2022,v:82.48},{y:2023,v:86.15},{y:2024,v:82.3}]},
+  {id:"ES",name:"Spain",d:[{y:2004,v:19.72},{y:2005,v:22.27},{y:2006,v:24.8},{y:2007,v:28.37},{y:2008,v:28.88},{y:2009,v:27.07},{y:2010,v:30.71},{y:2011,v:30.04},{y:2012,v:33.02},{y:2013,v:32.28},{y:2014,v:31.67},{y:2015,v:32.7},{y:2016,v:33.88},{y:2017,v:35.89},{y:2018,v:38.08},{y:2019,v:40.01},{y:2020,v:37.89},{y:2021,v:45.01},{y:2022,v:41.31},{y:2023,v:44.04},{y:2024,v:45.09}]},
+  {id:"PL",name:"Poland",d:[{y:2004,v:2.44},{y:2005,v:2.91},{y:2006,v:3.33},{y:2007,v:2.73},{y:2008,v:4.44},{y:2009,v:4.57},{y:2010,v:5.39},{y:2011,v:6.47},{y:2012,v:10.07},{y:2013,v:9.78},{y:2014,v:12.69},{y:2015,v:14.91},{y:2016,v:10.36},{y:2017,v:11.75},{y:2018,v:13.67},{y:2019,v:12.2},{y:2020,v:12.75},{y:2021,v:14.12},{y:2022,v:16.49},{y:2023,v:18.24},{y:2024,v:18.9}]}
+];
+
+const COLORS = [
+  "#3A6EA5", "#D45B3F", "#3A9E8F", "#D4A843",
+  "#2B2A27", "#8B6BB5", "#E08963", "#6B9E4A",
+  "#C47BA0", "#5AAFAF", "#B57A3A", "#9B8B3A"
+];
+
+const W = 820, H = 500;
+const ML = 48, MR = 90, MT = 16, MB = 36;
+const PW = W - ML - MR;
+const PH = H - MT - MB;
+
+const Y0 = 2004, Y1 = 2024;
+const V0 = 0, V1 = 520;
+
+function xScale(yr) { return ML + ((yr - Y0) / (Y1 - Y0)) * PW; }
+function yScale(val) { return MT + PH - ((val - V0) / (V1 - V0)) * PH; }
+
+const ns = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+const wrap = document.getElementById("chart-wrap");
+const tip = document.getElementById("tooltip");
+const svg = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H });
+wrap.insertBefore(svg, wrap.firstChild);
+
+// y-axis grid
+[0, 100, 200, 300, 400, 500].forEach(v => {
+  const y = yScale(v);
+  el("line", {
+    x1: ML, x2: ML + PW,
+    y1: y, y2: y,
+    stroke: v === 0 ? "#C8C6BA" : "#ECEADF",
+    "stroke-width": 1
+  }, svg);
+  const t = el("text", {
+    x: ML - 8, y: y + 3.5,
+    "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9",
+    fill: "#9A9890"
+  }, svg);
+  t.textContent = v;
+});
+
+// y-axis label
+const yLabel = el("text", {
+  x: 0, y: 0,
+  "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace",
+  "font-size": "8",
+  fill: "#9A9890",
+  transform: "translate(13," + (MT + PH / 2) + ") rotate(-90)"
+}, svg);
+yLabel.textContent = "patents per million inhabitants";
+
+// x-axis labels
+for (let yr = 2004; yr <= 2024; yr += 2) {
+  const x = xScale(yr);
+  const t = el("text", {
+    x: x, y: MT + PH + 18,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9",
+    fill: "#9A9890"
+  }, svg);
+  t.textContent = yr;
+  el("line", {
+    x1: x, x2: x,
+    y1: MT + PH, y2: MT + PH + 4,
+    stroke: "#C8C6BA",
+    "stroke-width": 1
+  }, svg);
+}
+
+// Track visibility for legend toggling
+const visible = SERIES.map(() => true);
+
+// Build paths and dots per series
+const seriesEls = SERIES.map((s, i) => {
+  const color = COLORS[i];
+  const g = el("g", {}, svg);
+
+  // Line path
+  const path = el("path", {
+    fill: "none",
+    stroke: color,
+    "stroke-width": 2,
+    "stroke-linejoin": "round",
+    "stroke-linecap": "round"
+  }, g);
+
+  // Dots
+  const dots = s.d.map(pt => {
+    const c = el("circle", {
+      cx: xScale(pt.y),
+      cy: yScale(pt.v),
+      r: 2.5,
+      fill: color,
+      stroke: "#F6F5EE",
+      "stroke-width": 1.2,
+      style: "cursor:pointer"
+    }, g);
+    return { el: c, pt };
+  });
+
+  // End label
+  const last = s.d[s.d.length - 1];
+  const label = el("text", {
+    x: xScale(last.y) + 6,
+    y: yScale(last.v) + 3.5,
+    "font-family": "Inter, sans-serif",
+    "font-size": "9",
+    "font-weight": "500",
+    fill: color
+  }, g);
+  label.textContent = s.name;
+
+  // Build the path d attribute
+  let pathD = "";
+  s.d.forEach((pt, j) => {
+    pathD += (j === 0 ? "M" : "L") + xScale(pt.y).toFixed(1) + "," + yScale(pt.v).toFixed(1);
+  });
+  path.setAttribute("d", pathD);
+
+  return { g, path, dots, label, color };
+});
+
+// Resolve overlapping end labels
+function resolveLabels() {
+  const labels = [];
+  SERIES.forEach((s, i) => {
+    if (!visible[i]) return;
+    const last = s.d[s.d.length - 1];
+    labels.push({ i, y: yScale(last.v), name: s.name });
+  });
+  labels.sort((a, b) => a.y - b.y);
+  const minGap = 11;
+  for (let pass = 0; pass < 8; pass++) {
+    for (let j = 1; j < labels.length; j++) {
+      const diff = labels[j].y - labels[j - 1].y;
+      if (diff < minGap) {
+        const shift = (minGap - diff) / 2;
+        labels[j - 1].y -= shift;
+        labels[j].y += shift;
+      }
+    }
+  }
+  labels.forEach(l => {
+    seriesEls[l.i].label.setAttribute("y", l.y + 3.5);
+  });
+}
+resolveLabels();
+
+// Hover overlay for vertical crosshair
+const overlay = el("rect", {
+  x: ML, y: MT,
+  width: PW, height: PH,
+  fill: "transparent",
+  style: "cursor:crosshair"
+}, svg);
+
+const crosshair = el("line", {
+  x1: 0, x2: 0,
+  y1: MT, y2: MT + PH,
+  stroke: "#C8C6BA",
+  "stroke-width": 1,
+  "stroke-dasharray": "3,2",
+  opacity: 0,
+  "pointer-events": "none"
+}, svg);
+
+// Find nearest year for a given x
+function nearestYear(mx) {
+  const yr = Math.round(Y0 + ((mx - ML) / PW) * (Y1 - Y0));
+  return Math.max(Y0, Math.min(Y1, yr));
+}
+
+// Find exact data point for a series given a year
+function exactPoint(series, year) {
+  for (const pt of series.d) {
+    if (pt.y === year) return pt;
+  }
+  return null;
+}
+
+overlay.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (W / rect.width);
+  const my = (e.clientY - rect.top) * (H / rect.height);
+  const yr = nearestYear(mx);
+  const cx = xScale(yr);
+
+  crosshair.setAttribute("x1", cx);
+  crosshair.setAttribute("x2", cx);
+  crosshair.setAttribute("opacity", 1);
+
+  let rows = [];
+  SERIES.forEach((s, i) => {
+    if (!visible[i]) return;
+    const pt = exactPoint(s, yr);
+    if (pt) {
+      rows.push({name: s.name, value: pt.v, year: pt.y, color: COLORS[i]});
+    }
+  });
+
+  if (rows.length === 0) {
+    tip.style.opacity = 0;
+    return;
+  }
+
+  rows.sort((a, b) => b.value - a.value);
+  let html = '<div style="font-family:Inter,sans-serif;font-weight:600;font-size:11px;margin-bottom:4px">' + yr + '</div>';
+  rows.forEach(r => {
+    html += '<div style="display:flex;align-items:center;gap:6px;margin:2px 0">';
+    html += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + r.color + '"></span>';
+    html += '<span>' + r.name + '</span>';
+    html += '<span style="margin-left:auto;padding-left:12px;font-weight:500;color:#D4A843">' + r.value.toFixed(1) + '</span>';
+    html += '</div>';
+  });
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+
+  const tipRect = tip.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  let tx = (cx / W) * rect.width + rect.left - wrapRect.left + 14;
+  let ty = my / H * rect.height - 20;
+  if (tx + tipRect.width > wrapRect.width - 10) {
+    tx = (cx / W) * rect.width + rect.left - wrapRect.left - tipRect.width - 14;
+  }
+  if (ty < 0) ty = 4;
+  tip.style.left = tx + "px";
+  tip.style.top = ty + "px";
+});
+
+overlay.addEventListener("mouseleave", function() {
+  crosshair.setAttribute("opacity", 0);
+  tip.style.opacity = 0;
+});
+
+// Individual dot hover
+SERIES.forEach((s, si) => {
+  seriesEls[si].dots.forEach(({ el: dot, pt }) => {
+    dot.addEventListener("mouseenter", function(e) {
+      dot.setAttribute("r", 5);
+      const rect = svg.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      const dx = parseFloat(dot.getAttribute("cx"));
+      const dy = parseFloat(dot.getAttribute("cy"));
+      tip.innerHTML = '<div style="font-family:Inter,sans-serif;font-weight:600;font-size:11px;margin-bottom:2px">' +
+        s.name + '</div>' +
+        '<div><span style="color:#9A9890">' + pt.y + ':</span> <span style="color:#D4A843;font-weight:500">' + pt.v.toFixed(1) + ' per M</span></div>';
+      tip.style.opacity = 1;
+      const tipR = tip.getBoundingClientRect();
+      let tx = (dx / W) * rect.width + rect.left - wrapRect.left + 12;
+      let ty = (dy / H) * rect.height - tipR.height / 2;
+      if (tx + tipR.width > wrapRect.width - 10) {
+        tx = (dx / W) * rect.width + rect.left - wrapRect.left - tipR.width - 12;
+      }
+      if (ty < 0) ty = 4;
+      tip.style.left = tx + "px";
+      tip.style.top = ty + "px";
+    });
+    dot.addEventListener("mouseleave", function() {
+      dot.setAttribute("r", 2.5);
+      tip.style.opacity = 0;
+    });
+  });
+});
+
+// Legend
+const legendEl = document.getElementById("legend");
+SERIES.forEach((s, i) => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = '<span class="legend-swatch" style="background:' + COLORS[i] + '"></span>' + s.name;
+  item.addEventListener("click", function() {
+    visible[i] = !visible[i];
+    item.classList.toggle("dimmed", !visible[i]);
+    seriesEls[i].g.style.opacity = visible[i] ? 1 : 0.08;
+    resolveLabels();
+  });
+  legendEl.appendChild(item);
+});
+</script>
+</body></html>

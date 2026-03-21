@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; letter-spacing: 0.5px; text-transform: uppercase; margin: 28px 0 10px; }
+</style></head><body>
+<h1>Under the Surface</h1>
+<p class="subtitle">Average nitrate concentration in groundwater across European countries, 2007-2023 (mg NO3/L). Values above 50 mg/L exceed the EU drinking water standard. Agricultural runoff remains the primary source, with Mediterranean countries showing persistently elevated levels.</p>
+<div class="section-label">Trends over time -- selected countries</div>
+<div id="line-chart" style="position:relative;"></div>
+<div class="tooltip" id="tip-line"></div>
+<div class="section-label" style="margin-top:36px;">Latest values (2023) -- all countries</div>
+<div id="bar-chart" style="position:relative;"></div>
+<div class="tooltip" id="tip-bar"></div>
+<p class="source">Source: Eurostat -- SDG 06_40 (Nitrate in groundwater)</p>
+<script>
+const DATA = [
+  {"c":"BE","n":"Belgium","y":2007,"v":32.61},{"c":"BG","n":"Bulgaria","y":2007,"v":23.84},{"c":"CZ","n":"Czechia","y":2007,"v":20.62},{"c":"DK","n":"Denmark","y":2007,"v":23.39},{"c":"DE","n":"Germany","y":2007,"v":24.23},{"c":"EE","n":"Estonia","y":2007,"v":7.43},{"c":"IE","n":"Ireland","y":2007,"v":13.12},{"c":"ES","n":"Spain","y":2007,"v":38.55},{"c":"FR","n":"France","y":2007,"v":17.85},{"c":"IT","n":"Italy","y":2007,"v":23.59},{"c":"CY","n":"Cyprus","y":2007,"v":28.81},{"c":"LV","n":"Latvia","y":2007,"v":1.28},{"c":"LT","n":"Lithuania","y":2007,"v":7.31},{"c":"NL","n":"Netherlands","y":2007,"v":7.77},{"c":"AT","n":"Austria","y":2007,"v":26.12},{"c":"PL","n":"Poland","y":2007,"v":8.81},{"c":"PT","n":"Portugal","y":2007,"v":17.65},{"c":"RO","n":"Romania","y":2007,"v":13.79},{"c":"SI","n":"Slovenia","y":2007,"v":15.13},{"c":"SK","n":"Slovakia","y":2007,"v":16.11},{"c":"FI","n":"Finland","y":2007,"v":7.59},{"c":"SE","n":"Sweden","y":2007,"v":3.03},{"c":"CH","n":"Switzerland","y":2007,"v":15.97},{"c":"RS","n":"Serbia","y":2007,"v":4.05},
+  {"c":"BE","n":"Belgium","y":2008,"v":32.98},{"c":"BG","n":"Bulgaria","y":2008,"v":23.75},{"c":"CZ","n":"Czechia","y":2008,"v":20.32},{"c":"DK","n":"Denmark","y":2008,"v":22.96},{"c":"DE","n":"Germany","y":2008,"v":24.26},{"c":"EE","n":"Estonia","y":2008,"v":7.51},{"c":"IE","n":"Ireland","y":2008,"v":12.72},{"c":"ES","n":"Spain","y":2008,"v":37.98},{"c":"FR","n":"France","y":2008,"v":17.76},{"c":"IT","n":"Italy","y":2008,"v":23.29},{"c":"CY","n":"Cyprus","y":2008,"v":29.09},{"c":"LV","n":"Latvia","y":2008,"v":1.6},{"c":"LT","n":"Lithuania","y":2008,"v":5.78},{"c":"NL","n":"Netherlands","y":2008,"v":7.68},{"c":"AT","n":"Austria","y":2008,"v":26.14},{"c":"PL","n":"Poland","y":2008,"v":8.88},{"c":"PT","n":"Portugal","y":2008,"v":17.21},{"c":"RO","n":"Romania","y":2008,"v":13.57},{"c":"SI","n":"Slovenia","y":2008,"v":14.94},{"c":"SK","n":"Slovakia","y":2008,"v":16.34},{"c":"FI","n":"Finland","y":2008,"v":7.59},{"c":"SE","n":"Sweden","y":2008,"v":3.02},{"c":"CH","n":"Switzerland","y":2008,"v":15.93},{"c":"RS","n":"Serbia","y":2008,"v":4},
+  {"c":"BE","n":"Belgium","y":2009,"v":32.99},{"c":"BG","n":"Bulgaria","y":2009,"v":23.7},{"c":"CZ","n":"Czechia","y":2009,"v":20.3},{"c":"DK","n":"Denmark","y":2009,"v":22.61},{"c":"DE","n":"Germany","y":2009,"v":24.31},{"c":"EE","n":"Estonia","y":2009,"v":7.56},{"c":"IE","n":"Ireland","y":2009,"v":12.37},{"c":"ES","n":"Spain","y":2009,"v":37.32},{"c":"FR","n":"France","y":2009,"v":17.7},{"c":"IT","n":"Italy","y":2009,"v":23.18},{"c":"CY","n":"Cyprus","y":2009,"v":29.14},{"c":"LV","n":"Latvia","y":2009,"v":2.04},{"c":"LT","n":"Lithuania","y":2009,"v":4.92},{"c":"NL","n":"Netherlands","y":2009,"v":7.75},{"c":"AT","n":"Austria","y":2009,"v":26.12},{"c":"PL","n":"Poland","y":2009,"v":8.79},{"c":"PT","n":"Portugal","y":2009,"v":16.82},{"c":"RO","n":"Romania","y":2009,"v":13.45},{"c":"SI","n":"Slovenia","y":2009,"v":14.77},{"c":"SK","n":"Slovakia","y":2009,"v":16.53},{"c":"FI","n":"Finland","y":2009,"v":7.6},{"c":"SE","n":"Sweden","y":2009,"v":3.01},{"c":"CH","n":"Switzerland","y":2009,"v":15.87},{"c":"RS","n":"Serbia","y":2009,"v":3.98},
+  {"c":"BE","n":"Belgium","y":2010,"v":32.67},{"c":"BG","n":"Bulgaria","y":2010,"v":23.85},{"c":"CZ","n":"Czechia","y":2010,"v":20.25},{"c":"DK","n":"Denmark","y":2010,"v":22.39},{"c":"DE","n":"Germany","y":2010,"v":24.26},{"c":"EE","n":"Estonia","y":2010,"v":7.57},{"c":"IE","n":"Ireland","y":2010,"v":12.06},{"c":"ES","n":"Spain","y":2010,"v":36.67},{"c":"FR","n":"France","y":2010,"v":17.64},{"c":"IT","n":"Italy","y":2010,"v":23.02},{"c":"CY","n":"Cyprus","y":2010,"v":30.33},{"c":"LV","n":"Latvia","y":2010,"v":2.63},{"c":"LT","n":"Lithuania","y":2010,"v":4.39},{"c":"NL","n":"Netherlands","y":2010,"v":8},{"c":"AT","n":"Austria","y":2010,"v":26.05},{"c":"PL","n":"Poland","y":2010,"v":8.78},{"c":"PT","n":"Portugal","y":2010,"v":16.46},{"c":"RO","n":"Romania","y":2010,"v":13.4},{"c":"SI","n":"Slovenia","y":2010,"v":14.62},{"c":"SK","n":"Slovakia","y":2010,"v":16.54},{"c":"FI","n":"Finland","y":2010,"v":7.6},{"c":"SE","n":"Sweden","y":2010,"v":3},{"c":"CH","n":"Switzerland","y":2010,"v":15.78},{"c":"RS","n":"Serbia","y":2010,"v":4.06},
+  {"c":"BE","n":"Belgium","y":2011,"v":32.15},{"c":"BG","n":"Bulgaria","y":2011,"v":24.28},{"c":"CZ","n":"Czechia","y":2011,"v":20.34},{"c":"DK","n":"Denmark","y":2011,"v":22.29},{"c":"DE","n":"Germany","y":2011,"v":24.12},{"c":"EE","n":"Estonia","y":2011,"v":7.6},{"c":"IE","n":"Ireland","y":2011,"v":11.92},{"c":"ES","n":"Spain","y":2011,"v":36.1},{"c":"FR","n":"France","y":2011,"v":17.56},{"c":"IT","n":"Italy","y":2011,"v":22.67},{"c":"CY","n":"Cyprus","y":2011,"v":33.22},{"c":"LV","n":"Latvia","y":2011,"v":3.33},{"c":"LT","n":"Lithuania","y":2011,"v":4.07},{"c":"NL","n":"Netherlands","y":2011,"v":8.48},{"c":"AT","n":"Austria","y":2011,"v":25.92},{"c":"PL","n":"Poland","y":2011,"v":8.91},{"c":"PT","n":"Portugal","y":2011,"v":16.13},{"c":"RO","n":"Romania","y":2011,"v":13.38},{"c":"SI","n":"Slovenia","y":2011,"v":14.5},{"c":"SK","n":"Slovakia","y":2011,"v":16.33},{"c":"FI","n":"Finland","y":2011,"v":7},{"c":"SE","n":"Sweden","y":2011,"v":3.03},{"c":"CH","n":"Switzerland","y":2011,"v":15.66},{"c":"RS","n":"Serbia","y":2011,"v":4.29},
+  {"c":"BE","n":"Belgium","y":2012,"v":31.57},{"c":"BG","n":"Bulgaria","y":2012,"v":24.79},{"c":"CZ","n":"Czechia","y":2012,"v":20.56},{"c":"DK","n":"Denmark","y":2012,"v":22.31},{"c":"DE","n":"Germany","y":2012,"v":23.94},{"c":"EE","n":"Estonia","y":2012,"v":7.6},{"c":"IE","n":"Ireland","y":2012,"v":11.85},{"c":"ES","n":"Spain","y":2012,"v":35.62},{"c":"FR","n":"France","y":2012,"v":17.49},{"c":"IT","n":"Italy","y":2012,"v":22.39},{"c":"CY","n":"Cyprus","y":2012,"v":38.61},{"c":"LV","n":"Latvia","y":2012,"v":4.04},{"c":"LT","n":"Lithuania","y":2012,"v":3.89},{"c":"NL","n":"Netherlands","y":2012,"v":9.24},{"c":"AT","n":"Austria","y":2012,"v":25.54},{"c":"PL","n":"Poland","y":2012,"v":9.24},{"c":"PT","n":"Portugal","y":2012,"v":15.83},{"c":"RO","n":"Romania","y":2012,"v":13.39},{"c":"SI","n":"Slovenia","y":2012,"v":14.42},{"c":"SK","n":"Slovakia","y":2012,"v":16.01},{"c":"FI","n":"Finland","y":2012,"v":6.4},{"c":"SE","n":"Sweden","y":2012,"v":3.02},{"c":"CH","n":"Switzerland","y":2012,"v":15.48},{"c":"RS","n":"Serbia","y":2012,"v":4.76},
+  {"c":"BE","n":"Belgium","y":2013,"v":31.05},{"c":"BG","n":"Bulgaria","y":2013,"v":25.29},{"c":"CZ","n":"Czechia","y":2013,"v":20.84},{"c":"DK","n":"Denmark","y":2013,"v":22.44},{"c":"DE","n":"Germany","y":2013,"v":23.76},{"c":"EE","n":"Estonia","y":2013,"v":7.52},{"c":"IE","n":"Ireland","y":2013,"v":11.78},{"c":"ES","n":"Spain","y":2013,"v":35.23},{"c":"FR","n":"France","y":2013,"v":17.43},{"c":"IT","n":"Italy","y":2013,"v":22.07},{"c":"CY","n":"Cyprus","y":2013,"v":46.88},{"c":"LV","n":"Latvia","y":2013,"v":4.52},{"c":"LT","n":"Lithuania","y":2013,"v":3.84},{"c":"NL","n":"Netherlands","y":2013,"v":10.27},{"c":"AT","n":"Austria","y":2013,"v":25.1},{"c":"PL","n":"Poland","y":2013,"v":9.75},{"c":"PT","n":"Portugal","y":2013,"v":15.54},{"c":"RO","n":"Romania","y":2013,"v":13.47},{"c":"SI","n":"Slovenia","y":2013,"v":14.37},{"c":"SK","n":"Slovakia","y":2013,"v":15.7},{"c":"FI","n":"Finland","y":2013,"v":5.86},{"c":"SE","n":"Sweden","y":2013,"v":2.92},{"c":"CH","n":"Switzerland","y":2013,"v":15.26},{"c":"RS","n":"Serbia","y":2013,"v":5.45},
+  {"c":"BE","n":"Belgium","y":2014,"v":30.65},{"c":"BG","n":"Bulgaria","y":2014,"v":25.74},{"c":"CZ","n":"Czechia","y":2014,"v":21.05},{"c":"DK","n":"Denmark","y":2014,"v":22.66},{"c":"DE","n":"Germany","y":2014,"v":23.57},{"c":"EE","n":"Estonia","y":2014,"v":7.37},{"c":"IE","n":"Ireland","y":2014,"v":11.69},{"c":"ES","n":"Spain","y":2014,"v":34.93},{"c":"FR","n":"France","y":2014,"v":17.38},{"c":"IT","n":"Italy","y":2014,"v":21.56},{"c":"CY","n":"Cyprus","y":2014,"v":57.4},{"c":"LV","n":"Latvia","y":2014,"v":4.5},{"c":"LT","n":"Lithuania","y":2014,"v":3.92},{"c":"NL","n":"Netherlands","y":2014,"v":11.44},{"c":"AT","n":"Austria","y":2014,"v":24.6},{"c":"PL","n":"Poland","y":2014,"v":10.46},{"c":"PT","n":"Portugal","y":2014,"v":15.29},{"c":"RO","n":"Romania","y":2014,"v":13.63},{"c":"SI","n":"Slovenia","y":2014,"v":14.35},{"c":"SK","n":"Slovakia","y":2014,"v":15.49},{"c":"FI","n":"Finland","y":2014,"v":5.47},{"c":"SE","n":"Sweden","y":2014,"v":2.76},{"c":"CH","n":"Switzerland","y":2014,"v":15.02},{"c":"RS","n":"Serbia","y":2014,"v":6.26},
+  {"c":"BE","n":"Belgium","y":2015,"v":30.41},{"c":"BG","n":"Bulgaria","y":2015,"v":26.19},{"c":"CZ","n":"Czechia","y":2015,"v":21.01},{"c":"DK","n":"Denmark","y":2015,"v":22.93},{"c":"DE","n":"Germany","y":2015,"v":23.38},{"c":"EE","n":"Estonia","y":2015,"v":7.19},{"c":"IE","n":"Ireland","y":2015,"v":11.63},{"c":"ES","n":"Spain","y":2015,"v":34.69},{"c":"FR","n":"France","y":2015,"v":17.33},{"c":"IT","n":"Italy","y":2015,"v":20.87},{"c":"CY","n":"Cyprus","y":2015,"v":67.46},{"c":"LV","n":"Latvia","y":2015,"v":4},{"c":"LT","n":"Lithuania","y":2015,"v":4.12},{"c":"NL","n":"Netherlands","y":2015,"v":12.47},{"c":"AT","n":"Austria","y":2015,"v":24.05},{"c":"PL","n":"Poland","y":2015,"v":11.31},{"c":"PT","n":"Portugal","y":2015,"v":15.07},{"c":"RO","n":"Romania","y":2015,"v":13.81},{"c":"SI","n":"Slovenia","y":2015,"v":14.37},{"c":"SK","n":"Slovakia","y":2015,"v":15.37},{"c":"FI","n":"Finland","y":2015,"v":5.24},{"c":"SE","n":"Sweden","y":2015,"v":2.59},{"c":"CH","n":"Switzerland","y":2015,"v":14.78},{"c":"RS","n":"Serbia","y":2015,"v":7.09},
+  {"c":"BE","n":"Belgium","y":2016,"v":30.33},{"c":"BG","n":"Bulgaria","y":2016,"v":26.65},{"c":"CZ","n":"Czechia","y":2016,"v":20.67},{"c":"DK","n":"Denmark","y":2016,"v":23.22},{"c":"DE","n":"Germany","y":2016,"v":23.2},{"c":"EE","n":"Estonia","y":2016,"v":7.02},{"c":"IE","n":"Ireland","y":2016,"v":11.65},{"c":"ES","n":"Spain","y":2016,"v":34.5},{"c":"FR","n":"France","y":2016,"v":17.29},{"c":"IT","n":"Italy","y":2016,"v":20.19},{"c":"CY","n":"Cyprus","y":2016,"v":71.19},{"c":"LV","n":"Latvia","y":2016,"v":3.28},{"c":"LT","n":"Lithuania","y":2016,"v":4.44},{"c":"NL","n":"Netherlands","y":2016,"v":13.03},{"c":"AT","n":"Austria","y":2016,"v":23.47},{"c":"PL","n":"Poland","y":2016,"v":12.17},{"c":"PT","n":"Portugal","y":2016,"v":14.93},{"c":"RO","n":"Romania","y":2016,"v":13.9},{"c":"SI","n":"Slovenia","y":2016,"v":14.43},{"c":"SK","n":"Slovakia","y":2016,"v":15.36},{"c":"FI","n":"Finland","y":2016,"v":5.11},{"c":"SE","n":"Sweden","y":2016,"v":2.48},{"c":"CH","n":"Switzerland","y":2016,"v":14.55},{"c":"RS","n":"Serbia","y":2016,"v":8.09},
+  {"c":"BE","n":"Belgium","y":2017,"v":30.36},{"c":"BG","n":"Bulgaria","y":2017,"v":27.1},{"c":"CZ","n":"Czechia","y":2017,"v":20.22},{"c":"DK","n":"Denmark","y":2017,"v":23.49},{"c":"DE","n":"Germany","y":2017,"v":23.02},{"c":"EE","n":"Estonia","y":2017,"v":6.89},{"c":"IE","n":"Ireland","y":2017,"v":11.75},{"c":"ES","n":"Spain","y":2017,"v":34.32},{"c":"FR","n":"France","y":2017,"v":17.27},{"c":"IT","n":"Italy","y":2017,"v":19.74},{"c":"CY","n":"Cyprus","y":2017,"v":63.32},{"c":"LV","n":"Latvia","y":2017,"v":2.61},{"c":"LT","n":"Lithuania","y":2017,"v":4.86},{"c":"NL","n":"Netherlands","y":2017,"v":12.9},{"c":"AT","n":"Austria","y":2017,"v":22.9},{"c":"PL","n":"Poland","y":2017,"v":12.83},{"c":"PT","n":"Portugal","y":2017,"v":14.87},{"c":"RO","n":"Romania","y":2017,"v":13.89},{"c":"SI","n":"Slovenia","y":2017,"v":14.51},{"c":"SK","n":"Slovakia","y":2017,"v":15.44},{"c":"FI","n":"Finland","y":2017,"v":5.02},{"c":"SE","n":"Sweden","y":2017,"v":2.46},{"c":"CH","n":"Switzerland","y":2017,"v":14.37},{"c":"RS","n":"Serbia","y":2017,"v":9.5},
+  {"c":"BE","n":"Belgium","y":2018,"v":30.43},{"c":"BG","n":"Bulgaria","y":2018,"v":27.5},{"c":"CZ","n":"Czechia","y":2018,"v":19.82},{"c":"DK","n":"Denmark","y":2018,"v":23.7},{"c":"DE","n":"Germany","y":2018,"v":22.85},{"c":"EE","n":"Estonia","y":2018,"v":6.81},{"c":"IE","n":"Ireland","y":2018,"v":11.91},{"c":"ES","n":"Spain","y":2018,"v":34.12},{"c":"FR","n":"France","y":2018,"v":17.26},{"c":"IT","n":"Italy","y":2018,"v":19.62},{"c":"CY","n":"Cyprus","y":2018,"v":46.65},{"c":"LV","n":"Latvia","y":2018,"v":2.11},{"c":"LT","n":"Lithuania","y":2018,"v":5.32},{"c":"NL","n":"Netherlands","y":2018,"v":12.11},{"c":"AT","n":"Austria","y":2018,"v":22.37},{"c":"PL","n":"Poland","y":2018,"v":13.06},{"c":"PT","n":"Portugal","y":2018,"v":14.89},{"c":"RO","n":"Romania","y":2018,"v":13.9},{"c":"SI","n":"Slovenia","y":2018,"v":14.63},{"c":"SK","n":"Slovakia","y":2018,"v":15.61},{"c":"FI","n":"Finland","y":2018,"v":4.9},{"c":"SE","n":"Sweden","y":2018,"v":2.53},{"c":"CH","n":"Switzerland","y":2018,"v":14.24},{"c":"RS","n":"Serbia","y":2018,"v":10.92},
+  {"c":"BE","n":"Belgium","y":2019,"v":30.48},{"c":"BG","n":"Bulgaria","y":2019,"v":27.82},{"c":"CZ","n":"Czechia","y":2019,"v":19.52},{"c":"DK","n":"Denmark","y":2019,"v":23.85},{"c":"DE","n":"Germany","y":2019,"v":22.7},{"c":"EE","n":"Estonia","y":2019,"v":6.77},{"c":"IE","n":"Ireland","y":2019,"v":12.09},{"c":"ES","n":"Spain","y":2019,"v":33.87},{"c":"FR","n":"France","y":2019,"v":17.28},{"c":"IT","n":"Italy","y":2019,"v":19.99},{"c":"CY","n":"Cyprus","y":2019,"v":30.3},{"c":"LV","n":"Latvia","y":2019,"v":1.79},{"c":"LT","n":"Lithuania","y":2019,"v":5.71},{"c":"NL","n":"Netherlands","y":2019,"v":10.89},{"c":"AT","n":"Austria","y":2019,"v":21.91},{"c":"PL","n":"Poland","y":2019,"v":12.63},{"c":"PT","n":"Portugal","y":2019,"v":14.98},{"c":"RO","n":"Romania","y":2019,"v":13.99},{"c":"SI","n":"Slovenia","y":2019,"v":14.77},{"c":"SK","n":"Slovakia","y":2019,"v":15.79},{"c":"FI","n":"Finland","y":2019,"v":4.77},{"c":"SE","n":"Sweden","y":2019,"v":2.69},{"c":"CH","n":"Switzerland","y":2019,"v":14.17},{"c":"RS","n":"Serbia","y":2019,"v":11.33},
+  {"c":"BE","n":"Belgium","y":2020,"v":30.46},{"c":"BG","n":"Bulgaria","y":2020,"v":28.08},{"c":"CZ","n":"Czechia","y":2020,"v":19.38},{"c":"DK","n":"Denmark","y":2020,"v":23.91},{"c":"DE","n":"Germany","y":2020,"v":22.5},{"c":"EE","n":"Estonia","y":2020,"v":6.78},{"c":"IE","n":"Ireland","y":2020,"v":12.27},{"c":"ES","n":"Spain","y":2020,"v":33.45},{"c":"FR","n":"France","y":2020,"v":17.33},{"c":"IT","n":"Italy","y":2020,"v":20.61},{"c":"CY","n":"Cyprus","y":2020,"v":19.31},{"c":"LV","n":"Latvia","y":2020,"v":1.63},{"c":"LT","n":"Lithuania","y":2020,"v":5.9},{"c":"NL","n":"Netherlands","y":2020,"v":9.55},{"c":"AT","n":"Austria","y":2020,"v":21.53},{"c":"PL","n":"Poland","y":2020,"v":11.56},{"c":"PT","n":"Portugal","y":2020,"v":15.12},{"c":"RO","n":"Romania","y":2020,"v":14.19},{"c":"SI","n":"Slovenia","y":2020,"v":14.93},{"c":"SK","n":"Slovakia","y":2020,"v":15.9},{"c":"FI","n":"Finland","y":2020,"v":4.7},{"c":"SE","n":"Sweden","y":2020,"v":2.83},{"c":"CH","n":"Switzerland","y":2020,"v":14.16},{"c":"RS","n":"Serbia","y":2020,"v":10.63},
+  {"c":"BE","n":"Belgium","y":2021,"v":30.34},{"c":"BG","n":"Bulgaria","y":2021,"v":28.35},{"c":"CZ","n":"Czechia","y":2021,"v":19.42},{"c":"DK","n":"Denmark","y":2021,"v":23.92},{"c":"DE","n":"Germany","y":2021,"v":22.31},{"c":"EE","n":"Estonia","y":2021,"v":6.81},{"c":"IE","n":"Ireland","y":2021,"v":12.42},{"c":"ES","n":"Spain","y":2021,"v":32.88},{"c":"FR","n":"France","y":2021,"v":17.38},{"c":"IT","n":"Italy","y":2021,"v":20.49},{"c":"CY","n":"Cyprus","y":2021,"v":19.31},{"c":"LV","n":"Latvia","y":2021,"v":1.59},{"c":"LT","n":"Lithuania","y":2021,"v":5.89},{"c":"NL","n":"Netherlands","y":2021,"v":8.34},{"c":"AT","n":"Austria","y":2021,"v":21.25},{"c":"PL","n":"Poland","y":2021,"v":10.26},{"c":"PT","n":"Portugal","y":2021,"v":15.28},{"c":"RO","n":"Romania","y":2021,"v":14.51},{"c":"SI","n":"Slovenia","y":2021,"v":15.1},{"c":"SK","n":"Slovakia","y":2021,"v":15.91},{"c":"FI","n":"Finland","y":2021,"v":4.88},{"c":"SE","n":"Sweden","y":2021,"v":2.75},{"c":"CH","n":"Switzerland","y":2021,"v":14.2},{"c":"RS","n":"Serbia","y":2021,"v":9.79},
+  {"c":"BE","n":"Belgium","y":2022,"v":30.15},{"c":"BG","n":"Bulgaria","y":2022,"v":28.7},{"c":"CZ","n":"Czechia","y":2022,"v":19.6},{"c":"DK","n":"Denmark","y":2022,"v":23.91},{"c":"DE","n":"Germany","y":2022,"v":22.23},{"c":"EE","n":"Estonia","y":2022,"v":6.9},{"c":"IE","n":"Ireland","y":2022,"v":12.54},{"c":"ES","n":"Spain","y":2022,"v":32.26},{"c":"FR","n":"France","y":2022,"v":17.42},{"c":"IT","n":"Italy","y":2022,"v":19.53},{"c":"CY","n":"Cyprus","y":2022,"v":19.31},{"c":"LV","n":"Latvia","y":2022,"v":1.66},{"c":"LT","n":"Lithuania","y":2022,"v":5.79},{"c":"NL","n":"Netherlands","y":2022,"v":8.34},{"c":"AT","n":"Austria","y":2022,"v":21.05},{"c":"PL","n":"Poland","y":2022,"v":9.1},{"c":"PT","n":"Portugal","y":2022,"v":15.46},{"c":"RO","n":"Romania","y":2022,"v":14.94},{"c":"SI","n":"Slovenia","y":2022,"v":15.28},{"c":"SK","n":"Slovakia","y":2022,"v":15.93},{"c":"FI","n":"Finland","y":2022,"v":4.88},{"c":"SE","n":"Sweden","y":2022,"v":2.56},{"c":"CH","n":"Switzerland","y":2022,"v":14.29},{"c":"RS","n":"Serbia","y":2022,"v":9.3},
+  {"c":"BE","n":"Belgium","y":2023,"v":29.96},{"c":"BG","n":"Bulgaria","y":2023,"v":29.18},{"c":"CZ","n":"Czechia","y":2023,"v":19.6},{"c":"DK","n":"Denmark","y":2023,"v":23.89},{"c":"DE","n":"Germany","y":2023,"v":22.19},{"c":"EE","n":"Estonia","y":2023,"v":7},{"c":"IE","n":"Ireland","y":2023,"v":12.69},{"c":"ES","n":"Spain","y":2023,"v":31.74},{"c":"FR","n":"France","y":2023,"v":17.49},{"c":"IT","n":"Italy","y":2023,"v":18.8},{"c":"CY","n":"Cyprus","y":2023,"v":19.31},{"c":"LV","n":"Latvia","y":2023,"v":1.82},{"c":"LT","n":"Lithuania","y":2023,"v":5.74},{"c":"NL","n":"Netherlands","y":2023,"v":8.34},{"c":"AT","n":"Austria","y":2023,"v":20.91},{"c":"PL","n":"Poland","y":2023,"v":8.59},{"c":"PT","n":"Portugal","y":2023,"v":15.7},{"c":"RO","n":"Romania","y":2023,"v":15.51},{"c":"SI","n":"Slovenia","y":2023,"v":15.48},{"c":"SK","n":"Slovakia","y":2023,"v":16.09},{"c":"FI","n":"Finland","y":2023,"v":4.88},{"c":"SE","n":"Sweden","y":2023,"v":2.4},{"c":"CH","n":"Switzerland","y":2023,"v":14.42},{"c":"RS","n":"Serbia","y":2023,"v":9.12}
+];
+
+// ---- LINE CHART: selected countries over time ----
+
+const highlighted = ["ES","BE","BG","DE","CY","IT","DK","FR","AT","CZ","LV","SE","FI"];
+const palette = {
+  "ES":"#C4453C","BE":"#E8915A","BG":"#A8752A","DE":"#5B8C5A","CY":"#9E5AB0",
+  "IT":"#3A7CA5","DK":"#6AAECC","FR":"#8C8C3A","AT":"#CC7A9F",
+  "CZ":"#7A8F5A","LV":"#3A9E8F","SE":"#5A6A8C","FI":"#8A6A5A"
+};
+
+const years = [...new Set(DATA.map(d => d.y))].sort((a,b) => a - b);
+const ns = "http://www.w3.org/2000/svg";
+
+const LW = 720, lineChartPad = {left: 50, right: 95, top: 15, bottom: 35};
+const lineChartInnerW = LW - lineChartPad.left - lineChartPad.right;
+const lineChartInnerH = 320;
+const LH = lineChartInnerH + lineChartPad.top + lineChartPad.bottom;
+
+const lineMaxVal = 45;
+const lineXScale = y => lineChartPad.left + ((y - years[0]) / (years[years.length-1] - years[0])) * lineChartInnerW;
+const lineYScale = v => lineChartPad.top + lineChartInnerH - (v / lineMaxVal) * lineChartInnerH;
+
+const svgLine = document.createElementNS(ns, "svg");
+svgLine.setAttribute("viewBox", `0 0 ${LW} ${LH}`);
+svgLine.setAttribute("width", "100%");
+svgLine.style.maxWidth = LW + "px";
+svgLine.style.overflow = "visible";
+
+// Y-axis gridlines
+[0, 10, 20, 30, 40].forEach(v => {
+  const y = lineYScale(v);
+  const gl = document.createElementNS(ns, "line");
+  gl.setAttribute("x1", lineChartPad.left);
+  gl.setAttribute("x2", LW - lineChartPad.right);
+  gl.setAttribute("y1", y); gl.setAttribute("y2", y);
+  gl.setAttribute("stroke", "#DDD9CE"); gl.setAttribute("stroke-width", 0.5);
+  svgLine.appendChild(gl);
+  const lbl = document.createElementNS(ns, "text");
+  lbl.setAttribute("x", lineChartPad.left - 8); lbl.setAttribute("y", y + 3);
+  lbl.setAttribute("text-anchor", "end");
+  lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "9"); lbl.setAttribute("fill", "#7A786F");
+  lbl.textContent = v;
+  svgLine.appendChild(lbl);
+});
+
+// X-axis labels
+years.filter(y => y % 2 === 1 || y === 2007 || y === 2023).forEach(y => {
+  const x = lineXScale(y);
+  const lbl = document.createElementNS(ns, "text");
+  lbl.setAttribute("x", x);
+  lbl.setAttribute("y", lineChartPad.top + lineChartInnerH + 20);
+  lbl.setAttribute("text-anchor", "middle");
+  lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "9"); lbl.setAttribute("fill", "#7A786F");
+  lbl.textContent = y;
+  svgLine.appendChild(lbl);
+});
+
+// Draw lines
+highlighted.forEach(code => {
+  const series = DATA.filter(d => d.c === code).sort((a,b) => a.y - b.y);
+  const pts = series.map(d => `${lineXScale(d.y)},${lineYScale(d.v)}`).join(" ");
+  const polyline = document.createElementNS(ns, "polyline");
+  polyline.setAttribute("points", pts);
+  polyline.setAttribute("fill", "none");
+  polyline.setAttribute("stroke", palette[code]);
+  polyline.setAttribute("stroke-width", ["ES","BE","BG","LV","SE"].includes(code) ? 2 : 1.2);
+  polyline.setAttribute("stroke-opacity", ["ES","BE","BG","LV","SE"].includes(code) ? 1 : 0.55);
+  svgLine.appendChild(polyline);
+
+  // End label
+  const last = series[series.length - 1];
+  const endLbl = document.createElementNS(ns, "text");
+  endLbl.setAttribute("x", lineXScale(last.y) + 6);
+  endLbl.setAttribute("y", lineYScale(last.v) + 3);
+  endLbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  endLbl.setAttribute("font-size", "8");
+  endLbl.setAttribute("fill", palette[code]);
+  endLbl.textContent = last.n;
+  svgLine.appendChild(endLbl);
+});
+
+// Hover circles + vertical reference line for line chart
+const tipLine = document.getElementById("tip-line");
+const hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("y1", lineChartPad.top);
+hoverLine.setAttribute("y2", lineChartPad.top + lineChartInnerH);
+hoverLine.setAttribute("stroke", "#2B2A27"); hoverLine.setAttribute("stroke-width", 0.5);
+hoverLine.setAttribute("stroke-dasharray", "3,2"); hoverLine.style.opacity = "0";
+svgLine.appendChild(hoverLine);
+
+const hoverCircles = highlighted.map(code => {
+  const circ = document.createElementNS(ns, "circle");
+  circ.setAttribute("r", 3); circ.setAttribute("fill", palette[code]);
+  circ.setAttribute("stroke", "#F6F5EE"); circ.setAttribute("stroke-width", 1.5);
+  circ.style.opacity = "0";
+  svgLine.appendChild(circ);
+  return { code, circ };
+});
+
+// Invisible rect for mouse tracking
+const hoverRect = document.createElementNS(ns, "rect");
+hoverRect.setAttribute("x", lineChartPad.left);
+hoverRect.setAttribute("y", lineChartPad.top);
+hoverRect.setAttribute("width", lineChartInnerW);
+hoverRect.setAttribute("height", lineChartInnerH);
+hoverRect.setAttribute("fill", "transparent");
+svgLine.appendChild(hoverRect);
+
+hoverRect.addEventListener("mousemove", e => {
+  const rect = svgLine.getBoundingClientRect();
+  const svgX = (e.clientX - rect.left) / rect.width * LW;
+  const yearFrac = (svgX - lineChartPad.left) / lineChartInnerW * (years[years.length-1] - years[0]) + years[0];
+  const nearestYear = years.reduce((best, y) => Math.abs(y - yearFrac) < Math.abs(best - yearFrac) ? y : best, years[0]);
+  const x = lineXScale(nearestYear);
+  hoverLine.setAttribute("x1", x); hoverLine.setAttribute("x2", x);
+  hoverLine.style.opacity = "1";
+
+  let tooltipRows = [`<strong>${nearestYear}</strong>`];
+  const yearData = DATA.filter(d => d.y === nearestYear && highlighted.includes(d.c))
+    .sort((a,b) => b.v - a.v);
+
+  yearData.forEach(d => {
+    const hc = hoverCircles.find(h => h.code === d.c);
+    if (hc) {
+      hc.circ.setAttribute("cx", x);
+      hc.circ.setAttribute("cy", lineYScale(d.v));
+      hc.circ.style.opacity = "1";
+    }
+    tooltipRows.push(`${d.n}: ${d.v} mg/L`);
+  });
+
+  tipLine.innerHTML = tooltipRows.join("<br>");
+  tipLine.style.opacity = "1";
+  const tipX = e.pageX + 14;
+  const tipY = e.pageY - 10;
+  tipLine.style.left = tipX + "px";
+  tipLine.style.top = tipY + "px";
+});
+
+hoverRect.addEventListener("mouseleave", () => {
+  hoverLine.style.opacity = "0";
+  hoverCircles.forEach(h => h.circ.style.opacity = "0");
+  tipLine.style.opacity = "0";
+});
+
+document.getElementById("line-chart").appendChild(svgLine);
+
+// ---- BAR CHART: latest year (2023) sorted ----
+
+const latest = DATA.filter(d => d.y === 2023).sort((a,b) => b.v - a.v);
+
+const BW = 720;
+const barH = 20;
+const barGap = 4;
+const barPad = { left: 110, right: 50, top: 10, bottom: 10 };
+const barsHeight = latest.length * (barH + barGap) - barGap;
+const BH = barsHeight + barPad.top + barPad.bottom;
+
+const barMaxVal = 35;
+const barChartW = BW - barPad.left - barPad.right;
+const barXScale = v => barPad.left + (Math.min(v, barMaxVal) / barMaxVal) * barChartW;
+
+const svgBar = document.createElementNS(ns, "svg");
+svgBar.setAttribute("viewBox", `0 0 ${BW} ${BH}`);
+svgBar.setAttribute("width", "100%");
+svgBar.style.maxWidth = BW + "px";
+svgBar.style.overflow = "visible";
+
+// X-axis gridlines
+[0, 10, 20, 30].forEach(v => {
+  const x = barXScale(v);
+  const gl = document.createElementNS(ns, "line");
+  gl.setAttribute("x1", x); gl.setAttribute("x2", x);
+  gl.setAttribute("y1", barPad.top);
+  gl.setAttribute("y2", barPad.top + barsHeight);
+  gl.setAttribute("stroke", "#DDD9CE"); gl.setAttribute("stroke-width", 0.5);
+  svgBar.appendChild(gl);
+
+  const lbl = document.createElementNS(ns, "text");
+  lbl.setAttribute("x", x); lbl.setAttribute("y", barPad.top - 4);
+  lbl.setAttribute("text-anchor", "middle");
+  lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "9"); lbl.setAttribute("fill", "#7A786F");
+  lbl.textContent = v;
+  svgBar.appendChild(lbl);
+});
+
+const tipBar = document.getElementById("tip-bar");
+
+// Severity color scale
+function barColor(v) {
+  if (v >= 30) return "#C4453C";
+  if (v >= 25) return "#E0835A";
+  if (v >= 20) return "#D4A84A";
+  if (v >= 15) return "#8C9E5A";
+  if (v >= 10) return "#5B8C5A";
+  return "#3A9E8F";
+}
+
+latest.forEach((d, i) => {
+  const yPos = barPad.top + i * (barH + barGap);
+
+  // Country label
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", barPad.left - 8);
+  label.setAttribute("y", yPos + barH / 2 + 4);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "10"); label.setAttribute("fill", "#2B2A27");
+  label.textContent = d.n;
+  svgBar.appendChild(label);
+
+  // Bar
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", barPad.left);
+  rect.setAttribute("y", yPos);
+  rect.setAttribute("width", barXScale(d.v) - barPad.left);
+  rect.setAttribute("height", barH);
+  rect.setAttribute("fill", barColor(d.v));
+  rect.setAttribute("rx", 2);
+  svgBar.appendChild(rect);
+
+  // Value label
+  const valLbl = document.createElementNS(ns, "text");
+  const valX = barXScale(d.v) + 5;
+  valLbl.setAttribute("x", valX);
+  valLbl.setAttribute("y", yPos + barH / 2 + 4);
+  valLbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLbl.setAttribute("font-size", "9"); valLbl.setAttribute("fill", "#7A786F");
+  valLbl.textContent = d.v.toFixed(1);
+  svgBar.appendChild(valLbl);
+
+  // Hover hit area
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0); hitArea.setAttribute("y", yPos);
+  hitArea.setAttribute("width", BW); hitArea.setAttribute("height", barH + barGap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+  svgBar.appendChild(hitArea);
+
+  hitArea.addEventListener("mouseenter", e => {
+    rect.setAttribute("fill-opacity", "0.8");
+    const earliest = DATA.find(r => r.c === d.c && r.y === 2007);
+    const change = earliest ? (d.v - earliest.v).toFixed(1) : "N/A";
+    const sign = earliest && d.v >= earliest.v ? "+" : "";
+    tipBar.innerHTML = `<strong>${d.n}</strong><br>2023: ${d.v} mg/L<br>Change since 2007: ${sign}${change} mg/L`;
+    tipBar.style.opacity = "1";
+  });
+  hitArea.addEventListener("mousemove", e => {
+    tipBar.style.left = (e.pageX + 14) + "px";
+    tipBar.style.top = (e.pageY - 10) + "px";
+  });
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("fill-opacity", "1");
+    tipBar.style.opacity = "0";
+  });
+});
+
+document.getElementById("bar-chart").appendChild(svgBar);
+</script>
+</body></html>

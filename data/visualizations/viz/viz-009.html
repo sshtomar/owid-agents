@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>Who Burns, Who Breathes</h1>
+<p class="subtitle">CO2 emissions from fuel combustion (millions of tonnes), 2000-2022. Top 10 emitting countries. China's trajectory overtook the United States around 2006 and continues to widen. Hover to trace a country's path.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 9.4.1 / EN_ATM_CO2</p>
+<script>
+const data = [{"code":"156","name":"China","pts":[{"y":2001,"v":3234},{"y":2003,"v":4048},{"y":2005,"v":5379},{"y":2007,"v":6440},{"y":2009,"v":7101},{"y":2011,"v":8541},{"y":2013,"v":9197},{"y":2015,"v":9109},{"y":2017,"v":9297},{"y":2019,"v":9916},{"y":2021,"v":10575}]},{"code":"840","name":"United States","pts":[{"y":2001,"v":5702},{"y":2003,"v":5611},{"y":2005,"v":5703},{"y":2007,"v":5687},{"y":2009,"v":5121},{"y":2011,"v":5128},{"y":2013,"v":5039},{"y":2015,"v":4929},{"y":2017,"v":4761},{"y":2019,"v":4745},{"y":2021,"v":4549}]},{"code":"356","name":"India","pts":[{"y":2004,"v":1030},{"y":2006,"v":1150},{"y":2008,"v":1366},{"y":2010,"v":1558},{"y":2012,"v":1797},{"y":2014,"v":2022},{"y":2016,"v":2076},{"y":2018,"v":2300},{"y":2020,"v":2110},{"y":2022,"v":2517}]},{"code":"643","name":"Russia","pts":[{"y":2001,"v":1475},{"y":2003,"v":1494},{"y":2005,"v":1482},{"y":2007,"v":1534},{"y":2009,"v":1441},{"y":2011,"v":1605},{"y":2013,"v":1569},{"y":2015,"v":1533},{"y":2017,"v":1537},{"y":2019,"v":1592},{"y":2021,"v":1659}]},{"code":"392","name":"Japan","pts":[{"y":2000,"v":1144},{"y":2002,"v":1169},{"y":2004,"v":1171},{"y":2006,"v":1157},{"y":2008,"v":1126},{"y":2010,"v":1129},{"y":2012,"v":1226},{"y":2014,"v":1188},{"y":2016,"v":1135},{"y":2018,"v":1081},{"y":2020,"v":987},{"y":2022,"v":974}]},{"code":"364","name":"Iran","pts":[{"y":2000,"v":312},{"y":2002,"v":343},{"y":2004,"v":386},{"y":2006,"v":449},{"y":2008,"v":487},{"y":2010,"v":499},{"y":2012,"v":514},{"y":2014,"v":559},{"y":2016,"v":557},{"y":2018,"v":569},{"y":2020,"v":646},{"y":2022,"v":696}]},{"code":"276","name":"Germany","pts":[{"y":2000,"v":812},{"y":2002,"v":818},{"y":2004,"v":805},{"y":2006,"v":799},{"y":2008,"v":774},{"y":2010,"v":759},{"y":2012,"v":745},{"y":2014,"v":723},{"y":2016,"v":734},{"y":2018,"v":695},{"y":2020,"v":593},{"y":2022,"v":612}]},{"code":"360","name":"Indonesia","pts":[{"y":2001,"v":274},{"y":2003,"v":309},{"y":2005,"v":318},{"y":2007,"v":355},{"y":2009,"v":366},{"y":2011,"v":450},{"y":2013,"v":423},{"y":2015,"v":459},{"y":2017,"v":475},{"y":2019,"v":569},{"y":2021,"v":554}]},{"code":"410","name":"South Korea","pts":[{"y":2000,"v":417},{"y":2002,"v":443},{"y":2004,"v":468},{"y":2006,"v":472},{"y":2008,"v":501},{"y":2010,"v":567},{"y":2012,"v":594},{"y":2014,"v":577},{"y":2016,"v":590},{"y":2018,"v":628},{"y":2020,"v":558},{"y":2022,"v":549}]},{"code":"124","name":"Canada","pts":[{"y":2000,"v":504},{"y":2002,"v":515},{"y":2004,"v":520},{"y":2006,"v":524},{"y":2008,"v":534},{"y":2010,"v":521},{"y":2012,"v":530},{"y":2014,"v":543},{"y":2016,"v":537},{"y":2018,"v":558},{"y":2020,"v":502},{"y":2022,"v":523}]}];
+
+// Warm muted palette
+const palette = {
+  "156": "#C75E3A",  // China - terracotta red
+  "840": "#5B7FA6",  // US - slate blue
+  "356": "#E8A74B",  // India - amber
+  "643": "#7A786F",  // Russia - warm grey
+  "392": "#A6C4A2",  // Japan - sage green
+  "364": "#C2A87A",  // Iran - sand
+  "276": "#8BA89A",  // Germany - muted teal
+  "360": "#D4956B",  // Indonesia - clay
+  "410": "#B8A8C8",  // S Korea - lavender
+  "124": "#9DB8C0",  // Canada - steel blue
+};
+
+const W = 720, H = 440;
+const margin = { top: 20, right: 110, bottom: 44, left: 54 };
+const iw = W - margin.left - margin.right;
+const ih = H - margin.top - margin.bottom;
+
+const xMin = 1999, xMax = 2023;
+const yMin = 0, yMax = 11500;
+const xScale = v => margin.left + (v - xMin) / (xMax - xMin) * iw;
+const yScale = v => margin.top + (yMax - v) / (yMax - yMin) * ih;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+const mkEl = (tag, attrs, parent) => {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  (parent || svg).appendChild(el);
+  return el;
+};
+
+const mkText = (x, y, txt, opts, parent) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "9");
+  t.setAttribute("fill", opts.fill || "#7A786F");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  if (opts.weight) t.setAttribute("font-weight", opts.weight);
+  t.textContent = txt;
+  (parent || svg).appendChild(t);
+  return t;
+};
+
+// Grid lines
+const yTicks = [0, 2000, 4000, 6000, 8000, 10000];
+yTicks.forEach(v => {
+  mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": 0.5 });
+  const label = v === 0 ? "0" : (v / 1000) + "k";
+  mkText(margin.left - 6, yScale(v) + 3, label, { anchor: "end", mono: true });
+});
+
+const xTicks = [2000, 2004, 2008, 2012, 2016, 2020];
+xTicks.forEach(v => {
+  mkEl("line", { x1: xScale(v), y1: margin.top, x2: xScale(v), y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": 0.5 });
+  mkText(xScale(v), H - margin.bottom + 14, String(v), { anchor: "middle", mono: true });
+});
+
+// Y axis label
+const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+yLabel.setAttribute("transform", `rotate(-90) translate(${-(H / 2)}, 13)`);
+yLabel.setAttribute("font-size", "9"); yLabel.setAttribute("fill", "#7A786F");
+yLabel.setAttribute("text-anchor", "middle");
+yLabel.textContent = "Million tonnes CO\u2082";
+svg.appendChild(yLabel);
+
+// Axis border
+mkEl("line", { x1: margin.left, y1: margin.top, x2: margin.left, y2: H - margin.bottom, stroke: "#C8C6BB", "stroke-width": 0.75 });
+mkEl("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#C8C6BB", "stroke-width": 0.75 });
+
+const trails = {};
+const allDots = [];
+
+// Label offset adjustments to prevent overlap
+const labelOffsets = {
+  "156": { dy: 0, dx: 0 },     // China - top
+  "840": { dy: 0, dx: 0 },     // United States
+  "356": { dy: 0, dx: 0 },     // India
+  "643": { dy: 8, dx: 0 },     // Russia
+  "392": { dy: 8, dx: 0 },     // Japan
+  "276": { dy: 0, dx: 0 },     // Germany
+  "364": { dy: 8, dx: 0 },     // Iran
+  "360": { dy: 16, dx: 0 },    // Indonesia
+  "410": { dy: 0, dx: 0 },     // South Korea
+  "124": { dy: 8, dx: 0 },     // Canada
+};
+
+// Compute label positions to avoid overlap
+const labelYPositions = {};
+data.forEach(d => {
+  const last = d.pts[d.pts.length - 1];
+  labelYPositions[d.code] = yScale(last.v);
+});
+
+// Simple collision avoidance: sort by y position and spread out
+const labelEntries = data.map(d => {
+  const last = d.pts[d.pts.length - 1];
+  return { code: d.code, name: d.name, rawY: yScale(last.v), lastX: xScale(last.y), lastV: last.v };
+}).sort((a, b) => a.rawY - b.rawY);
+
+// Spread labels that are too close (min 11px apart)
+const minGap = 11;
+for (let i = 1; i < labelEntries.length; i++) {
+  if (labelEntries[i].rawY - labelEntries[i-1].rawY < minGap) {
+    labelEntries[i].rawY = labelEntries[i-1].rawY + minGap;
+  }
+}
+const labelMap = {};
+labelEntries.forEach(e => { labelMap[e.code] = e.rawY; });
+
+data.forEach(d => {
+  const col = palette[d.code] || "#7A786F";
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  let pathD = "";
+  d.pts.forEach((p, i) => { pathD += (i === 0 ? "M" : "L") + ` ${xScale(p.y)} ${yScale(p.v)}`; });
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", col);
+  path.setAttribute("stroke-width", "1.75");
+  path.setAttribute("opacity", "0.85");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  g.appendChild(path);
+
+  d.pts.forEach(p => {
+    const cx = xScale(p.y), cy = yScale(p.v);
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("cx", cx); dot.setAttribute("cy", cy);
+    dot.setAttribute("r", "2"); dot.setAttribute("fill", col);
+    g.appendChild(dot);
+    allDots.push({ x: cx, y: cy, p, name: d.name, code: d.code, col, circle: dot });
+  });
+
+  // End label with adjusted y position
+  const last = d.pts[d.pts.length - 1];
+  const lx = xScale(last.y) + 5;
+  const ly = labelMap[d.code] + 3;
+
+  // Connector line if label is offset from actual point
+  const actualY = yScale(last.v);
+  if (Math.abs(ly - 3 - actualY) > 2) {
+    const conn = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    conn.setAttribute("x1", lx - 2); conn.setAttribute("y1", actualY);
+    conn.setAttribute("x2", lx - 2); conn.setAttribute("y2", ly - 3);
+    conn.setAttribute("stroke", col); conn.setAttribute("stroke-width", "0.5");
+    conn.setAttribute("opacity", "0.4");
+    g.appendChild(conn);
+  }
+
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", lx); label.setAttribute("y", ly);
+  label.setAttribute("font-size", "9"); label.setAttribute("fill", "#2B2A27");
+  label.textContent = d.name;
+  g.appendChild(label);
+
+  svg.appendChild(g);
+  trails[d.code] = g;
+});
+
+// Hover dot
+const hoverDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+hoverDot.setAttribute("r", "4"); hoverDot.setAttribute("fill", "none");
+hoverDot.setAttribute("stroke", "#2B2A27"); hoverDot.setAttribute("stroke-width", "1.5");
+hoverDot.style.opacity = "0"; hoverDot.style.pointerEvents = "none";
+svg.appendChild(hoverDot);
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeName = null;
+
+function setActive(code) {
+  if (code === activeName) return;
+  activeName = code;
+  Object.entries(trails).forEach(([c, g]) => {
+    if (!code) { g.style.opacity = "1"; }
+    else if (c === code) { g.style.opacity = "1"; }
+    else { g.style.opacity = "0.08"; }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const scaleY = H / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  let best = null, bestDist = 900;
+  allDots.forEach(dot => {
+    const dx = dot.x - mx, dy = dot.y - my;
+    const dist = dx * dx + dy * dy;
+    if (dist < bestDist) { bestDist = dist; best = dot; }
+  });
+
+  if (best) {
+    setActive(best.code);
+    hoverDot.setAttribute("cx", best.x); hoverDot.setAttribute("cy", best.y);
+    hoverDot.setAttribute("stroke", best.col);
+    hoverDot.style.opacity = "1";
+    tip.innerHTML = `<b>${best.name}, ${best.p.y}</b><br>${best.p.v.toLocaleString()} Mt CO\u2082`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 30) + "px";
+  } else {
+    setActive(null);
+    hoverDot.style.opacity = "0";
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  setActive(null);
+  hoverDot.style.opacity = "0";
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>

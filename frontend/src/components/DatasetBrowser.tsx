@@ -1,5 +1,6 @@
 import React from "react";
 import { useApi } from "../hooks/useApi";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 interface DatasetEntry {
   id: string;
@@ -22,29 +23,45 @@ interface DatasetsResponse {
   count: number;
 }
 
+const PROVIDER_LABELS: Record<string, string> = {
+  "world-bank": "World Bank",
+  "who-gho": "WHO",
+  "un-sdg": "UN SDG",
+  eurostat: "Eurostat",
+  unhcr: "UNHCR",
+  imf: "IMF",
+  owid: "OWID",
+  unesco: "UNESCO",
+};
+
 const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: 32,
+    backgroundColor: "#F6F5EE",
+    minHeight: "100%",
   },
   header: {
     marginBottom: 32,
   },
   breadcrumb: {
-    color: "#2563eb",
+    color: "#EA5E33",
     marginBottom: 8,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.02em",
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.3px",
+    fontFamily: "'JetBrains Mono', monospace",
+    textTransform: "uppercase" as const,
   },
   title: {
     fontSize: 24,
     fontWeight: 700,
     letterSpacing: "-0.03em",
     marginBottom: 8,
+    color: "#2B2A27",
   },
   subtitle: {
     fontSize: 13,
-    color: "#64748b",
+    color: "#7A786F",
   },
   table: {
     width: "100%",
@@ -54,17 +71,19 @@ const styles: Record<string, React.CSSProperties> = {
   th: {
     textAlign: "left" as const,
     padding: "10px 16px",
-    borderBottom: "2px solid #0f172a",
+    borderBottom: "2px solid #94918A",
     fontSize: 11,
     fontWeight: 700,
     textTransform: "uppercase" as const,
     letterSpacing: "0.04em",
-    color: "#64748b",
+    color: "#7A786F",
+    fontFamily: "'JetBrains Mono', monospace",
   },
   td: {
     padding: "12px 16px",
-    borderBottom: "1px solid #e2e8f0",
+    borderBottom: "1px solid #E2E0D5",
     verticalAlign: "top" as const,
+    color: "#2B2A27",
   },
   providerBadge: {
     display: "inline-block",
@@ -72,8 +91,8 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     padding: "2px 8px",
     borderRadius: 4,
-    background: "#f1f5f9",
-    color: "#475569",
+    background: "#EEEDE6",
+    color: "#5A5850",
   },
   topicChip: {
     display: "inline-block",
@@ -81,24 +100,27 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     padding: "1px 6px",
     borderRadius: 3,
-    background: "#eff6ff",
-    color: "#2563eb",
+    background: "#EEEDE6",
+    color: "#8B7355",
     marginRight: 4,
     marginBottom: 2,
   },
   link: {
-    color: "#2563eb",
+    color: "#EA5E33",
     textDecoration: "none",
     fontSize: 11,
   },
   empty: {
     textAlign: "center" as const,
     padding: 64,
-    color: "#94a3b8",
+    color: "#7A786F",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: 11,
   },
 };
 
 export default function DatasetBrowser() {
+  const mobile = useIsMobile();
   const { data, loading, error } = useApi<DatasetsResponse>("/datasets");
 
   if (loading) return <div style={styles.empty}>Loading datasets...</div>;
@@ -107,13 +129,16 @@ export default function DatasetBrowser() {
   const datasets = data?.datasets ?? [];
 
   return (
-    <div style={styles.container}>
+    <div style={{
+      ...styles.container,
+      padding: mobile ? 16 : 32,
+    }}>
       <div style={styles.header}>
         <div style={styles.breadcrumb}>Data Catalog</div>
         <h1 style={styles.title}>Discovered Datasets</h1>
         <p style={styles.subtitle}>
-          {datasets.length} dataset{datasets.length !== 1 ? "s" : ""} from World
-          Bank and WHO
+          {datasets.length} dataset{datasets.length !== 1 ? "s" : ""} from 8
+          providers
         </p>
       </div>
 
@@ -122,7 +147,8 @@ export default function DatasetBrowser() {
           No datasets yet. Run the discovery agent to find some.
         </div>
       ) : (
-        <table style={styles.table}>
+        <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+        <table style={{ ...styles.table, minWidth: 700 }}>
           <thead>
             <tr>
               <th style={styles.th}>Dataset</th>
@@ -137,14 +163,14 @@ export default function DatasetBrowser() {
             {datasets.map((ds) => (
               <tr key={ds.id}>
                 <td style={styles.td}>
-                  <div style={{ fontWeight: 600 }}>{ds.title}</div>
-                  <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
+                  <div style={{ fontWeight: 600, color: "#2B2A27" }}>{ds.title}</div>
+                  <div style={{ fontSize: 11, color: "#94918A", marginTop: 2, fontFamily: "'JetBrains Mono', monospace" }}>
                     {ds.id}
                   </div>
                 </td>
                 <td style={styles.td}>
                   <span style={styles.providerBadge}>
-                    {ds.source.provider === "world-bank" ? "World Bank" : "WHO"}
+                    {PROVIDER_LABELS[ds.source.provider] ?? ds.source.provider}
                   </span>
                 </td>
                 <td style={styles.td}>
@@ -174,6 +200,7 @@ export default function DatasetBrowser() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

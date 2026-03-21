@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bottoms Up: Alcohol Consumption per Capita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #F6F5EE;
+    color: #2B2A27;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 40px 32px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: #7A786F;
+    line-height: 1.55;
+    max-width: 600px;
+    margin-bottom: 28px;
+  }
+
+  .chart-container {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7A786F;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+  }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 7px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+    line-height: 1.5;
+  }
+
+  .tooltip.visible {
+    opacity: 1;
+  }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    font-size: 10px;
+    color: #7A786F;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 10px;
+    border-radius: 1px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Bottoms Up: Alcohol Consumption per Capita</h1>
+<p class="subtitle">
+  Recorded alcohol consumption in litres of pure alcohol per year among adults aged 15 and older.
+  Most recent available year per country from WHO Global Health Observatory data.
+  Heavy-drinking nations cluster in Europe, while many Muslim-majority countries report near-zero consumption.
+</p>
+
+<div class="legend" id="legend"></div>
+
+<div class="chart-container" id="chart-container">
+  <svg id="chart"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<p class="source">
+  Source: WHO Global Health Observatory -- Alcohol, recorded per capita (15+) consumption (in litres of pure alcohol)<br>
+  Indicator: SA_0000001400 -- Most recent year available per country
+</p>
+
+<script>
+(function() {
+  var data = [
+    { country: "Czech Republic", iso: "CZE", value: 12.85, year: 2014 },
+    { country: "France", iso: "FRA", value: 12.6, year: 2009 },
+    { country: "Ireland", iso: "IRL", value: 12.51, year: 1992 },
+    { country: "Portugal", iso: "PRT", value: 11.92, year: 2022 },
+    { country: "Germany", iso: "DEU", value: 11.22, year: 2016 },
+    { country: "Austria", iso: "AUT", value: 11.09, year: 2015 },
+    { country: "Australia", iso: "AUS", value: 9.74, year: 1963 },
+    { country: "Finland", iso: "FIN", value: 8.88, year: 1992 },
+    { country: "Brazil", iso: "BRA", value: 8.88, year: 2009 },
+    { country: "Poland", iso: "POL", value: 8.63, year: 1991 },
+    { country: "Greece", iso: "GRC", value: 8.17, year: 2004 },
+    { country: "South Korea", iso: "KOR", value: 7.37, year: 1989 },
+    { country: "Russia", iso: "RUS", value: 7.03, year: 1994 },
+    { country: "Japan", iso: "JPN", value: 6.97, year: 2004 },
+    { country: "United Kingdom", iso: "GBR", value: 6.62, year: 1969 },
+    { country: "China", iso: "CHN", value: 6.02, year: 2012 },
+    { country: "United States", iso: "USA", value: 5.26, year: 1981 },
+    { country: "Norway", iso: "NOR", value: 5.67, year: 2000 },
+    { country: "Mexico", iso: "MEX", value: 3.97, year: 2014 },
+    { country: "Nigeria", iso: "NGA", value: 1.39, year: 2013 },
+    { country: "Turkey", iso: "TUR", value: 0.72, year: 2016 },
+    { country: "Indonesia", iso: "IDN", value: 0.08, year: 1980 },
+    { country: "India", iso: "IND", value: 0.002, year: 2018 },
+    { country: "Iran", iso: "IRN", value: 0.0, year: 2020 },
+    { country: "Pakistan", iso: "PAK", value: 0.04, year: 2019 }
+  ];
+
+  data.sort(function(a, b) { return b.value - a.value; });
+
+  var margin = { top: 8, right: 50, bottom: 4, left: 110 };
+  var barHeight = 24;
+  var barGap = 5;
+  var chartWidth = 760;
+  var innerWidth = chartWidth - margin.left - margin.right;
+  var innerHeight = data.length * (barHeight + barGap) - barGap;
+  var svgHeight = innerHeight + margin.top + margin.bottom;
+
+  var maxValue = 14;
+
+  function getColor(value) {
+    if (value >= 10) return "#7A4419";
+    if (value >= 7) return "#9B5B2D";
+    if (value >= 5) return "#B87333";
+    if (value >= 3) return "#CB9A5F";
+    if (value >= 1) return "#DEBA82";
+    if (value >= 0.1) return "#E8D0A4";
+    return "#F0E3C8";
+  }
+
+  function getLegendLabel(value) {
+    if (value >= 10) return "Heavy (10+L)";
+    if (value >= 5) return "Moderate (5-10L)";
+    if (value >= 1) return "Light (1-5L)";
+    return "Minimal (<1L)";
+  }
+
+  var legendColors = [
+    { color: "#7A4419", label: "Heavy (10+ L)" },
+    { color: "#B87333", label: "Moderate (5-10 L)" },
+    { color: "#DEBA82", label: "Light (1-5 L)" },
+    { color: "#F0E3C8", label: "Minimal (<1 L)" }
+  ];
+
+  var legendEl = document.getElementById("legend");
+  legendColors.forEach(function(item) {
+    var div = document.createElement("div");
+    div.className = "legend-item";
+    var swatch = document.createElement("div");
+    swatch.className = "legend-swatch";
+    swatch.style.background = item.color;
+    var label = document.createElement("span");
+    label.textContent = item.label;
+    div.appendChild(swatch);
+    div.appendChild(label);
+    legendEl.appendChild(div);
+  });
+
+  var svg = document.getElementById("chart");
+  svg.setAttribute("width", chartWidth);
+  svg.setAttribute("height", svgHeight);
+  svg.setAttribute("viewBox", "0 0 " + chartWidth + " " + svgHeight);
+
+  var ns = "http://www.w3.org/2000/svg";
+
+  function xScale(v) {
+    return (v / maxValue) * innerWidth;
+  }
+
+  // Grid lines
+  var gridValues = [0, 2, 4, 6, 8, 10, 12, 14];
+  gridValues.forEach(function(v) {
+    var x = margin.left + xScale(v);
+    var line = document.createElementNS(ns, "line");
+    line.setAttribute("x1", x);
+    line.setAttribute("y1", margin.top);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", margin.top + innerHeight);
+    line.setAttribute("stroke", "#DEDCD4");
+    line.setAttribute("stroke-width", "0.5");
+    svg.appendChild(line);
+
+    var text = document.createElementNS(ns, "text");
+    text.setAttribute("x", x);
+    text.setAttribute("y", margin.top - 1);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("fill", "#7A786F");
+    text.setAttribute("font-family", "JetBrains Mono, monospace");
+    text.setAttribute("font-size", "8px");
+    text.textContent = v + "L";
+    svg.appendChild(text);
+  });
+
+  var tooltip = document.getElementById("tooltip");
+  var chartContainer = document.getElementById("chart-container");
+
+  data.forEach(function(d, i) {
+    var y = margin.top + i * (barHeight + barGap);
+    var barW = Math.max(xScale(d.value), 1);
+    var color = getColor(d.value);
+
+    // Country label
+    var label = document.createElementNS(ns, "text");
+    label.setAttribute("x", margin.left - 8);
+    label.setAttribute("y", y + barHeight / 2 + 1);
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("dominant-baseline", "middle");
+    label.setAttribute("fill", "#2B2A27");
+    label.setAttribute("font-family", "Inter, system-ui, sans-serif");
+    label.setAttribute("font-size", "10px");
+    label.setAttribute("font-weight", "500");
+    label.textContent = d.country;
+    svg.appendChild(label);
+
+    // Bar
+    var rect = document.createElementNS(ns, "rect");
+    rect.setAttribute("x", margin.left);
+    rect.setAttribute("y", y);
+    rect.setAttribute("width", barW);
+    rect.setAttribute("height", barHeight);
+    rect.setAttribute("fill", color);
+    rect.setAttribute("rx", "2");
+    rect.setAttribute("ry", "2");
+    rect.style.transition = "opacity 0.15s ease";
+    svg.appendChild(rect);
+
+    // Value label at end of bar
+    var valLabel = document.createElementNS(ns, "text");
+    valLabel.setAttribute("x", margin.left + barW + 6);
+    valLabel.setAttribute("y", y + barHeight / 2 + 1);
+    valLabel.setAttribute("text-anchor", "start");
+    valLabel.setAttribute("dominant-baseline", "middle");
+    valLabel.setAttribute("fill", "#7A786F");
+    valLabel.setAttribute("font-family", "JetBrains Mono, monospace");
+    valLabel.setAttribute("font-size", "9px");
+    valLabel.textContent = d.value < 0.01 ? d.value.toFixed(3) : d.value < 1 ? d.value.toFixed(2) : d.value.toFixed(1);
+    svg.appendChild(valLabel);
+
+    // Invisible hover target (full width)
+    var hoverRect = document.createElementNS(ns, "rect");
+    hoverRect.setAttribute("x", 0);
+    hoverRect.setAttribute("y", y);
+    hoverRect.setAttribute("width", chartWidth);
+    hoverRect.setAttribute("height", barHeight + barGap);
+    hoverRect.setAttribute("fill", "transparent");
+    hoverRect.style.cursor = "pointer";
+
+    hoverRect.addEventListener("mouseenter", function(e) {
+      rect.setAttribute("opacity", "0.8");
+      tooltip.classList.add("visible");
+      var displayVal = d.value < 0.01 ? d.value.toFixed(3) : d.value < 1 ? d.value.toFixed(2) : d.value.toFixed(1);
+      tooltip.innerHTML = "<strong>" + d.country + "</strong> (" + d.iso + ")<br>" +
+        displayVal + " litres pure alcohol/year<br>" +
+        "Year: " + d.year;
+    });
+
+    hoverRect.addEventListener("mousemove", function(e) {
+      var containerRect = chartContainer.getBoundingClientRect();
+      var tx = e.clientX - containerRect.left + 14;
+      var ty = e.clientY - containerRect.top - 10;
+      if (tx + 200 > containerRect.width) {
+        tx = e.clientX - containerRect.left - 180;
+      }
+      tooltip.style.left = tx + "px";
+      tooltip.style.top = ty + "px";
+    });
+
+    hoverRect.addEventListener("mouseleave", function() {
+      rect.setAttribute("opacity", "1");
+      tooltip.classList.remove("visible");
+    });
+
+    svg.appendChild(hoverRect);
+  });
+})();
+</script>
+</body>
+</html>

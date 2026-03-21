@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: pointer; user-select: none; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 1px; }
+  .legend-item.dimmed { opacity: 0.3; }
+</style></head><body>
+<h1>Lighting Up the Countryside</h1>
+<p class="subtitle">Rural electrification rates from the early 1990s to 2023. Bangladesh and India achieved near-universal rural access in a single generation. Southeast Asian nations followed suit. Much of Sub-Saharan Africa remains below 50%, with Chad and Burundi barely above zero.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- EG.ELC.ACCS.RU.ZS (Access to electricity, rural, % of rural population)</p>
+<script>
+const countries = [
+  { name: "Bangladesh", group: "success",
+    data: [{y:1991,v:3.2},{y:1994,v:2.2},{y:1996,v:6.7},{y:1998,v:12.7},{y:2000,v:16.8},{y:2002,v:24.3},{y:2004,v:27.9},{y:2006,v:40.2},{y:2008,v:41.7},{y:2010,v:40.0},{y:2012,v:53.8},{y:2014,v:48.1},{y:2015,v:63.8},{y:2017,v:81.6},{y:2019,v:88.9},{y:2020,v:95.2},{y:2021,v:98.5},{y:2022,v:99.2},{y:2023,v:99.6}] },
+  { name: "India", group: "success",
+    data: [{y:1993,v:39.6},{y:1996,v:40.7},{y:1998,v:44.4},{y:2000,v:49.2},{y:2002,v:51.3},{y:2004,v:53.4},{y:2006,v:57.3},{y:2008,v:65.7},{y:2010,v:68.4},{y:2012,v:72.4},{y:2014,v:79.4},{y:2016,v:85.3},{y:2017,v:88.3},{y:2018,v:93.9},{y:2020,v:95.2},{y:2021,v:99.3},{y:2022,v:99.3},{y:2023,v:99.2}] },
+  { name: "Cambodia", group: "success",
+    data: [{y:2000,v:6.6},{y:2003,v:7.6},{y:2006,v:16.1},{y:2008,v:11.7},{y:2010,v:15.8},{y:2012,v:28.5},{y:2013,v:38.9},{y:2014,v:44.7},{y:2015,v:53.3},{y:2016,v:60.7},{y:2017,v:86.1},{y:2019,v:80.0},{y:2020,v:82.9},{y:2022,v:88.0},{y:2023,v:93.4}] },
+  { name: "Indonesia", group: "success",
+    data: [{y:1991,v:31.0},{y:1994,v:45.7},{y:1996,v:59.4},{y:1998,v:71.8},{y:2000,v:79.6},{y:2002,v:81.1},{y:2004,v:82.9},{y:2006,v:85.1},{y:2008,v:88.2},{y:2010,v:89.4},{y:2012,v:92.6},{y:2014,v:94.0},{y:2016,v:95.1},{y:2018,v:96.8},{y:2020,v:93.5},{y:2021,v:98.2},{y:2023,v:98.6}] },
+  { name: "Bolivia", group: "success",
+    data: [{y:1992,v:13.2},{y:1996,v:33.0},{y:2000,v:28.2},{y:2004,v:40.3},{y:2006,v:41.6},{y:2008,v:57.0},{y:2010,v:66.4},{y:2012,v:72.2},{y:2014,v:70.3},{y:2016,v:74.9},{y:2018,v:77.6},{y:2019,v:84.9},{y:2020,v:90.9},{y:2021,v:95.1},{y:2023,v:99.6}] },
+  { name: "Brazil", group: "progress",
+    data: [{y:1990,v:58.9},{y:1994,v:69.5},{y:1996,v:71.0},{y:1998,v:74.7},{y:2000,v:74.6},{y:2002,v:84.1},{y:2004,v:83.5},{y:2006,v:87.2},{y:2008,v:91.9},{y:2010,v:92.1},{y:2012,v:97.2},{y:2014,v:97.9},{y:2016,v:98.5},{y:2018,v:98.4},{y:2020,v:98.7},{y:2022,v:97.3},{y:2023,v:99.0}] },
+  { name: "Ghana", group: "progress",
+    data: [{y:1993,v:2.9},{y:1996,v:5.8},{y:1998,v:13.3},{y:2000,v:14.9},{y:2002,v:19.8},{y:2004,v:24.7},{y:2006,v:31.4},{y:2008,v:36.8},{y:2010,v:55.4},{y:2013,v:50.8},{y:2014,v:64.0},{y:2016,v:66.6},{y:2018,v:68.3},{y:2020,v:73.1},{y:2022,v:71.6},{y:2023,v:77.8}] },
+  { name: "Kenya", group: "progress",
+    data: [{y:1993,v:4.1},{y:1998,v:6.6},{y:2000,v:6.6},{y:2002,v:10.0},{y:2004,v:13.4},{y:2006,v:16.9},{y:2008,v:20.4},{y:2011,v:25.7},{y:2013,v:29.3},{y:2015,v:29.0},{y:2016,v:42.1},{y:2017,v:45.8},{y:2018,v:51.6},{y:2019,v:61.7},{y:2020,v:62.7},{y:2021,v:68.2},{y:2023,v:67.9}] },
+  { name: "Ethiopia", group: "progress",
+    data: [{y:2000,v:1.7},{y:2004,v:3.1},{y:2006,v:6.5},{y:2008,v:9.7},{y:2010,v:12.9},{y:2012,v:16.1},{y:2014,v:12.0},{y:2016,v:32.4},{y:2018,v:32.5},{y:2019,v:36.0},{y:2020,v:39.4},{y:2021,v:42.8},{y:2023,v:43.6}] },
+  { name: "Eswatini", group: "progress",
+    data: [{y:2000,v:10.4},{y:2002,v:14.9},{y:2004,v:19.5},{y:2006,v:24.1},{y:2007,v:35.9},{y:2008,v:37.2},{y:2010,v:38.5},{y:2012,v:39.8},{y:2014,v:49.2},{y:2016,v:62.0},{y:2017,v:70.3},{y:2018,v:73.4},{y:2019,v:77.1},{y:2020,v:79.1},{y:2021,v:80.4},{y:2022,v:83.3},{y:2023,v:84.9}] },
+  { name: "Benin", group: "behind",
+    data: [{y:1996,v:2.8},{y:2000,v:5.4},{y:2002,v:6.8},{y:2004,v:7.9},{y:2006,v:7.9},{y:2008,v:10.3},{y:2010,v:10.6},{y:2012,v:14.6},{y:2014,v:16.2},{y:2016,v:15.2},{y:2018,v:16.3},{y:2020,v:17.4},{y:2022,v:45.5},{y:2023,v:43.7}] },
+  { name: "Burkina Faso", group: "behind",
+    data: [{y:1993,v:2.1},{y:1996,v:1.9},{y:1998,v:2.2},{y:2000,v:2.3},{y:2002,v:2.1},{y:2004,v:1.8},{y:2006,v:1.4},{y:2008,v:1.2},{y:2010,v:1.5},{y:2012,v:1.5},{y:2014,v:4.7},{y:2022,v:3.4},{y:2023,v:2.0}] },
+  { name: "Chad", group: "behind",
+    data: [{y:1998,v:1.0},{y:2000,v:1.2},{y:2002,v:1.4},{y:2004,v:1.5},{y:2006,v:1.8},{y:2008,v:2.0},{y:2010,v:3.0},{y:2012,v:3.0},{y:2014,v:3.0},{y:2016,v:2.8},{y:2018,v:2.3},{y:2020,v:1.6},{y:2022,v:1.3},{y:2023,v:0.4}] },
+  { name: "Burundi", group: "behind",
+    data: [{y:2008,v:0.9},{y:2013,v:1.0},{y:2015,v:1.2},{y:2016,v:1.5},{y:2017,v:1.7},{y:2018,v:2.0},{y:2019,v:2.0},{y:2020,v:0.9},{y:2021,v:1.6},{y:2022,v:1.6},{y:2023,v:2.3}] },
+  { name: "Congo, Dem. Rep.", group: "behind",
+    data: [{y:2007,v:1.8},{y:2015,v:1.0},{y:2016,v:1.0},{y:2017,v:1.0},{y:2018,v:1.0},{y:2019,v:1.0},{y:2020,v:1.0},{y:2021,v:1.0},{y:2022,v:1.0},{y:2023,v:1.0}] }
+];
+
+const groupColors = {
+  success: "#2D8B75",
+  progress: "#C48B2C",
+  behind: "#C45B4A"
+};
+const groupLabels = {
+  success: "Near-universal access achieved",
+  progress: "Steady gains, still climbing",
+  behind: "Sub-Saharan Africa: still far behind"
+};
+
+const W = 780, H = 440;
+const pad = { left: 50, right: 130, top: 24, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const yearMin = 1990, yearMax = 2023;
+const xScale = yr => pad.left + ((yr - yearMin) / (yearMax - yearMin)) * chartW;
+const yScale = v => pad.top + ((100 - v) / 100) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines and y-axis labels
+[0, 25, 50, 75, 100].forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#C8C4B8" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  if (v > 0 && v < 100) line.setAttribute("stroke-dasharray", "2,3");
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// X-axis year labels
+[1990, 1995, 2000, 2005, 2010, 2015, 2020].forEach(yr => {
+  const x = xScale(yr);
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 5);
+  tick.setAttribute("stroke", "#C8C4B8");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", yScale(0) + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+});
+
+// State for highlighting
+let activeCountry = null;
+const pathElements = [];
+const dotGroups = [];
+const endLabels = [];
+
+// Draw lines
+countries.forEach((c, ci) => {
+  const color = groupColors[c.group];
+  const pts = c.data.map(d => `${xScale(d.y)},${yScale(d.v)}`).join(" ");
+
+  const path = document.createElementNS(ns, "polyline");
+  path.setAttribute("points", pts);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", color);
+  path.setAttribute("stroke-width", 1.8);
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("opacity", 0.7);
+  path.dataset.index = ci;
+  svg.appendChild(path);
+  pathElements.push(path);
+
+  // Dots for each data point (hidden until hover)
+  const dots = [];
+  c.data.forEach(d => {
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", xScale(d.y));
+    dot.setAttribute("cy", yScale(d.v));
+    dot.setAttribute("r", 0);
+    dot.setAttribute("fill", color);
+    dot.setAttribute("stroke", "#F6F5EE");
+    dot.setAttribute("stroke-width", 1.5);
+    svg.appendChild(dot);
+    dots.push(dot);
+  });
+  dotGroups.push(dots);
+
+  // End label
+  const last = c.data[c.data.length - 1];
+  const endLabel = document.createElementNS(ns, "text");
+  endLabel.setAttribute("x", xScale(last.y) + 6);
+  endLabel.setAttribute("y", yScale(last.v) + 3);
+  endLabel.setAttribute("font-size", "9");
+  endLabel.setAttribute("font-weight", "500");
+  endLabel.setAttribute("fill", color);
+  endLabel.textContent = c.name === "Congo, Dem. Rep." ? "DR Congo" : c.name;
+  endLabel.dataset.index = ci;
+  svg.appendChild(endLabel);
+  endLabels.push(endLabel);
+});
+
+// Resolve label overlaps on the right side
+function resolveOverlaps() {
+  const labels = endLabels.map((el, i) => {
+    const last = countries[i].data[countries[i].data.length - 1];
+    return { el, i, baseY: yScale(last.v), y: yScale(last.v) };
+  });
+  labels.sort((a, b) => a.baseY - b.baseY);
+  const minGap = 10;
+  for (let pass = 0; pass < 20; pass++) {
+    let moved = false;
+    for (let j = 1; j < labels.length; j++) {
+      const gap = labels[j].y - labels[j - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        labels[j - 1].y -= shift;
+        labels[j].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  labels.forEach(l => {
+    l.el.setAttribute("y", l.y + 3);
+  });
+}
+resolveOverlaps();
+
+// Hit areas for each line (wide invisible path for easy hover)
+const tip = document.getElementById("tip");
+const chartEl = document.getElementById("chart");
+
+countries.forEach((c, ci) => {
+  c.data.forEach((d, di) => {
+    const hitDot = document.createElementNS(ns, "circle");
+    hitDot.setAttribute("cx", xScale(d.y));
+    hitDot.setAttribute("cy", yScale(d.v));
+    hitDot.setAttribute("r", 8);
+    hitDot.setAttribute("fill", "transparent");
+    hitDot.style.cursor = "pointer";
+
+    hitDot.addEventListener("mouseenter", e => {
+      highlight(ci);
+      const displayName = c.name === "Congo, Dem. Rep." ? "DR Congo" : c.name;
+      tip.innerHTML = `<strong>${displayName}</strong>  ${d.y}: ${d.v.toFixed(1)}%`;
+      tip.style.opacity = 1;
+
+      dotGroups[ci][di].setAttribute("r", 4);
+    });
+
+    hitDot.addEventListener("mousemove", e => {
+      const rect = chartEl.getBoundingClientRect();
+      tip.style.left = (e.clientX - rect.left + 14) + "px";
+      tip.style.top = (e.clientY - rect.top - 24) + "px";
+    });
+
+    hitDot.addEventListener("mouseleave", () => {
+      resetHighlight();
+      tip.style.opacity = 0;
+      dotGroups[ci][di].setAttribute("r", 0);
+    });
+
+    svg.appendChild(hitDot);
+  });
+});
+
+// Also allow hovering end labels
+endLabels.forEach((el, ci) => {
+  const hitRect = document.createElementNS(ns, "rect");
+  const bbox = { x: parseFloat(el.getAttribute("x")), y: parseFloat(el.getAttribute("y")) - 9, w: 100, h: 14 };
+  hitRect.setAttribute("x", bbox.x);
+  hitRect.setAttribute("y", bbox.y);
+  hitRect.setAttribute("width", bbox.w);
+  hitRect.setAttribute("height", bbox.h);
+  hitRect.setAttribute("fill", "transparent");
+  hitRect.style.cursor = "pointer";
+
+  hitRect.addEventListener("mouseenter", () => highlight(ci));
+  hitRect.addEventListener("mouseleave", () => resetHighlight());
+  svg.appendChild(hitRect);
+});
+
+function highlight(ci) {
+  pathElements.forEach((p, i) => {
+    if (i === ci) {
+      p.setAttribute("stroke-width", 3);
+      p.setAttribute("opacity", 1);
+    } else {
+      p.setAttribute("stroke-width", 1.2);
+      p.setAttribute("opacity", 0.15);
+    }
+  });
+  endLabels.forEach((l, i) => {
+    l.setAttribute("opacity", i === ci ? 1 : 0.2);
+    l.setAttribute("font-weight", i === ci ? "600" : "500");
+  });
+  dotGroups[ci].forEach(dot => dot.setAttribute("r", 3));
+}
+
+function resetHighlight() {
+  pathElements.forEach(p => {
+    p.setAttribute("stroke-width", 1.8);
+    p.setAttribute("opacity", 0.7);
+  });
+  endLabels.forEach(l => {
+    l.setAttribute("opacity", 1);
+    l.setAttribute("font-weight", "500");
+  });
+  dotGroups.forEach(dots => dots.forEach(dot => dot.setAttribute("r", 0)));
+}
+
+document.getElementById("chart").appendChild(svg);
+
+// Build legend
+const legendEl = document.getElementById("legend");
+Object.entries(groupLabels).forEach(([key, label]) => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = `<span class="legend-swatch" style="background:${groupColors[key]}"></span>${label}`;
+  let dimmed = false;
+  item.addEventListener("click", () => {
+    dimmed = !dimmed;
+    item.classList.toggle("dimmed", dimmed);
+    countries.forEach((c, ci) => {
+      if (c.group === key) {
+        pathElements[ci].style.display = dimmed ? "none" : "";
+        endLabels[ci].style.display = dimmed ? "none" : "";
+        dotGroups[ci].forEach(d => d.style.display = dimmed ? "none" : "");
+      }
+    });
+  });
+  legendEl.appendChild(item);
+});
+</script>
+</body></html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>Europe's Poverty Divide</h1>
+<p class="subtitle">Population at risk of poverty or social exclusion (%), 2015 vs 2023. Most countries improved, but a few saw their rates rise. Lines slope downward for countries where poverty risk fell, and upward where it grew.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat -- sdg_01_10 (Persons at risk of poverty or social exclusion)</p>
+<script>
+const data = [
+  { code: "RO", name: "Romania", y2015: 44.5, y2023: 32.0 },
+  { code: "BG", name: "Bulgaria", y2015: 43.3, y2023: 30.0 },
+  { code: "MK", name: "N. Macedonia", y2015: 41.2, y2023: 30.0 },
+  { code: "RS", name: "Serbia", y2015: 41.0, y2023: 27.2 },
+  { code: "EL", name: "Greece", y2015: 32.4, y2023: 26.1 },
+  { code: "HU", name: "Hungary", y2015: 30.6, y2023: 19.7 },
+  { code: "LV", name: "Latvia", y2015: 30.0, y2023: 25.6 },
+  { code: "LT", name: "Lithuania", y2015: 29.4, y2023: 24.3 },
+  { code: "ES", name: "Spain", y2015: 28.7, y2023: 26.5 },
+  { code: "IT", name: "Italy", y2015: 28.4, y2023: 22.8 },
+  { code: "TR", name: "Turkiye", y2015: 26.7, y2023: 30.7 },
+  { code: "PT", name: "Portugal", y2015: 26.4, y2023: 20.1 },
+  { code: "IE", name: "Ireland", y2015: 25.4, y2023: 19.2 },
+  { code: "HR", name: "Croatia", y2015: 24.4, y2023: 20.7 },
+  { code: "EE", name: "Estonia", y2015: 23.6, y2023: 24.2 },
+  { code: "CY", name: "Cyprus", y2015: 22.8, y2023: 17.4 },
+  { code: "PL", name: "Poland", y2015: 22.5, y2023: 16.3 },
+  { code: "MT", name: "Malta", y2015: 22.2, y2023: 19.8 },
+  { code: "BE", name: "Belgium", y2015: 21.6, y2023: 18.8 },
+  { code: "DE", name: "Germany", y2015: 20.0, y2023: 21.3 },
+  { code: "DK", name: "Denmark", y2015: 18.6, y2023: 17.9 },
+  { code: "FR", name: "France", y2015: 18.4, y2023: 20.4 },
+  { code: "LU", name: "Luxembourg", y2015: 18.4, y2023: 21.4 },
+  { code: "SE", name: "Sweden", y2015: 18.2, y2023: 18.4 },
+  { code: "CH", name: "Switzerland", y2015: 18.2, y2023: 19.5 },
+  { code: "SI", name: "Slovenia", y2015: 17.7, y2023: 13.7 },
+  { code: "SK", name: "Slovakia", y2015: 17.3, y2023: 17.6 },
+  { code: "AT", name: "Austria", y2015: 16.9, y2023: 17.7 },
+  { code: "FI", name: "Finland", y2015: 16.9, y2023: 15.8 },
+  { code: "NL", name: "Netherlands", y2015: 16.4, y2023: 15.8 },
+  { code: "NO", name: "Norway", y2015: 14.7, y2023: 15.8 },
+  { code: "CZ", name: "Czechia", y2015: 13.0, y2023: 12.0 }
+];
+
+data.forEach(d => { d.change = Math.round((d.y2023 - d.y2015) * 10) / 10; });
+data.sort((a, b) => b.y2015 - a.y2015);
+
+const W = 780;
+const rowH = 22;
+const gap = 3;
+const pad = { left: 110, right: 110, top: 45, bottom: 20 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const allVals = data.flatMap(d => [d.y2015, d.y2023]);
+const vMin = Math.floor(Math.min(...allVals) / 5) * 5;
+const vMax = Math.ceil(Math.max(...allVals) / 5) * 5;
+
+const colLeft = pad.left;
+const colRight = W - pad.right;
+const colW = colRight - colLeft;
+
+const xScale = v => colLeft + ((v - vMin) / (vMax - vMin)) * colW;
+
+const improvedColor = "#3A7D6A";
+const worsenedColor = "#C4553A";
+const neutralColor = "#8A8780";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines
+for (let v = vMin; v <= vMax; v += 5) {
+  const x = xScale(v);
+  const gl = document.createElementNS(ns, "line");
+  gl.setAttribute("x1", x);
+  gl.setAttribute("x2", x);
+  gl.setAttribute("y1", pad.top);
+  gl.setAttribute("y2", pad.top + chartH);
+  gl.setAttribute("stroke", "#DDD9CE");
+  gl.setAttribute("stroke-width", 0.5);
+  svg.appendChild(gl);
+
+  const gt = document.createElementNS(ns, "text");
+  gt.setAttribute("x", x);
+  gt.setAttribute("y", pad.top - 10);
+  gt.setAttribute("text-anchor", "middle");
+  gt.setAttribute("font-family", "'JetBrains Mono', monospace");
+  gt.setAttribute("font-size", "9");
+  gt.setAttribute("fill", "#7A786F");
+  gt.textContent = v + "%";
+  svg.appendChild(gt);
+}
+
+// Column headers
+const hdr2015 = document.createElementNS(ns, "text");
+hdr2015.setAttribute("x", colLeft);
+hdr2015.setAttribute("y", pad.top - 26);
+hdr2015.setAttribute("text-anchor", "start");
+hdr2015.setAttribute("font-size", "10");
+hdr2015.setAttribute("font-weight", "600");
+hdr2015.setAttribute("fill", "#7A786F");
+hdr2015.textContent = "2015";
+svg.appendChild(hdr2015);
+
+const hdr2023 = document.createElementNS(ns, "text");
+hdr2023.setAttribute("x", colRight);
+hdr2023.setAttribute("y", pad.top - 26);
+hdr2023.setAttribute("text-anchor", "end");
+hdr2023.setAttribute("font-size", "10");
+hdr2023.setAttribute("font-weight", "600");
+hdr2023.setAttribute("fill", "#7A786F");
+hdr2023.textContent = "2023";
+svg.appendChild(hdr2023);
+
+// Seed for hand-drawn jitter
+function jitter(seed) {
+  const s = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+  return (s - Math.floor(s)) * 2 - 1;
+}
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap) + rowH / 2;
+  const x1 = xScale(d.y2015);
+  const x2 = xScale(d.y2023);
+  const improved = d.change < -0.5;
+  const worsened = d.change > 0.5;
+  const color = improved ? improvedColor : (worsened ? worsenedColor : neutralColor);
+
+  // Hand-drawn line: slightly wavy path
+  const midX = (x1 + x2) / 2;
+  const j1 = jitter(i * 3) * 1.5;
+  const j2 = jitter(i * 7 + 5) * 1.5;
+  const pathD = `M ${x1} ${y} C ${midX * 0.6 + x1 * 0.4} ${y + j1}, ${midX * 0.4 + x2 * 0.6} ${y + j2}, ${x2} ${y}`;
+  const line = document.createElementNS(ns, "path");
+  line.setAttribute("d", pathD);
+  line.setAttribute("fill", "none");
+  line.setAttribute("stroke", color);
+  line.setAttribute("stroke-width", 1.8);
+  line.setAttribute("stroke-opacity", 0.6);
+  line.setAttribute("stroke-linecap", "round");
+  svg.appendChild(line);
+
+  // Dot for 2015
+  const c1 = document.createElementNS(ns, "circle");
+  c1.setAttribute("cx", x1);
+  c1.setAttribute("cy", y);
+  c1.setAttribute("r", 3.5);
+  c1.setAttribute("fill", color);
+  c1.setAttribute("fill-opacity", 0.45);
+  c1.setAttribute("stroke", color);
+  c1.setAttribute("stroke-width", 1.2);
+  svg.appendChild(c1);
+
+  // Dot for 2023
+  const c2 = document.createElementNS(ns, "circle");
+  c2.setAttribute("cx", x2);
+  c2.setAttribute("cy", y);
+  c2.setAttribute("r", 3.5);
+  c2.setAttribute("fill", color);
+  c2.setAttribute("stroke", color);
+  c2.setAttribute("stroke-width", 1.2);
+  svg.appendChild(c2);
+
+  // Country label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "10");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Change label on the right
+  const changeStr = (d.change > 0 ? "+" : "") + d.change.toFixed(1) + " pp";
+  const changeLabel = document.createElementNS(ns, "text");
+  changeLabel.setAttribute("x", W - pad.right + 12);
+  changeLabel.setAttribute("y", y + 1);
+  changeLabel.setAttribute("text-anchor", "start");
+  changeLabel.setAttribute("dominant-baseline", "middle");
+  changeLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  changeLabel.setAttribute("font-size", "9");
+  changeLabel.setAttribute("fill", color);
+  changeLabel.textContent = changeStr;
+  svg.appendChild(changeLabel);
+
+  // Arrow indicator
+  if (Math.abs(d.change) > 0.5) {
+    const arrowY = y;
+    const arrowX = W - pad.right + 72;
+    const arrowDir = d.change > 0 ? -4 : 4;
+    const arrow = document.createElementNS(ns, "path");
+    arrow.setAttribute("d", `M ${arrowX - 3} ${arrowY - arrowDir} L ${arrowX} ${arrowY + arrowDir} L ${arrowX + 3} ${arrowY - arrowDir}`);
+    arrow.setAttribute("fill", "none");
+    arrow.setAttribute("stroke", color);
+    arrow.setAttribute("stroke-width", 1.3);
+    arrow.setAttribute("stroke-linecap", "round");
+    arrow.setAttribute("stroke-linejoin", "round");
+    svg.appendChild(arrow);
+  }
+
+  // Invisible hit area for hover
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y - rowH / 2);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    line.setAttribute("stroke-width", 3);
+    line.setAttribute("stroke-opacity", 1);
+    c1.setAttribute("r", 5);
+    c2.setAttribute("r", 5);
+    const dir = d.change < 0 ? "Improved" : (d.change > 0 ? "Worsened" : "Unchanged");
+    tip.innerHTML = `<strong>${d.name}</strong><br>2015: ${d.y2015.toFixed(1)}%  &rarr;  2023: ${d.y2023.toFixed(1)}%<br>Change: ${(d.change > 0 ? "+" : "")}${d.change.toFixed(1)} pp (${dir})`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const rect = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 14) + "px";
+    tip.style.top = (e.clientY - rect.top - 30) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    line.setAttribute("stroke-width", 1.8);
+    line.setAttribute("stroke-opacity", 0.6);
+    c1.setAttribute("r", 3.5);
+    c2.setAttribute("r", 3.5);
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitArea);
+});
+
+// Legend
+const legendY = pad.top + chartH + 10;
+const items = [
+  { label: "Improved (fell >0.5 pp)", color: improvedColor },
+  { label: "Worsened (rose >0.5 pp)", color: worsenedColor },
+  { label: "Roughly stable", color: neutralColor }
+];
+let legendX = colLeft;
+items.forEach(item => {
+  const swatch = document.createElementNS(ns, "rect");
+  swatch.setAttribute("x", legendX);
+  swatch.setAttribute("y", legendY - 4);
+  swatch.setAttribute("width", 10);
+  swatch.setAttribute("height", 10);
+  swatch.setAttribute("rx", 2);
+  swatch.setAttribute("fill", item.color);
+  svg.appendChild(swatch);
+
+  const lbl = document.createElementNS(ns, "text");
+  lbl.setAttribute("x", legendX + 14);
+  lbl.setAttribute("y", legendY + 3);
+  lbl.setAttribute("dominant-baseline", "middle");
+  lbl.setAttribute("font-size", "9");
+  lbl.setAttribute("fill", "#7A786F");
+  lbl.textContent = item.label;
+  svg.appendChild(lbl);
+
+  legendX += item.label.length * 5.6 + 30;
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

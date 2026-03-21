@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 660px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>The Rhythm of European Growth</h1>
+<p class="subtitle">Real GDP per capita growth rate (%) across major EU economies, 2000-2025. The 2009 financial crisis and 2020 pandemic left deep but temporary scars -- southern Europe was hit hardest both times, while Poland avoided recession entirely in 2009. Hover to trace each country.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat SDG 8.10 / Real GDP per capita growth rate</p>
+<script>
+const data = [
+  {code:"DE",name:"Germany",pts:[{y:2000,v:2.8},{y:2001,v:1.6},{y:2002,v:-0.3},{y:2003,v:-0.5},{y:2004,v:1.3},{y:2005,v:1},{y:2006,v:4.1},{y:2007,v:3.1},{y:2008,v:1.2},{y:2009,v:-5.2},{y:2010,v:4.4},{y:2011,v:3.8},{y:2012,v:0.3},{y:2013,v:0.2},{y:2014,v:1.9},{y:2015,v:0.9},{y:2016,v:1.6},{y:2017,v:2.6},{y:2018,v:1},{y:2019,v:0.9},{y:2020,v:-4},{y:2021,v:4.1},{y:2022,v:1.2},{y:2023,v:-1.8},{y:2024,v:-0.8},{y:2025,v:0.2}]},
+  {code:"FR",name:"France",pts:[{y:2000,v:3.4},{y:2001,v:1.2},{y:2002,v:0.3},{y:2003,v:0.3},{y:2004,v:2.1},{y:2005,v:1.1},{y:2006,v:2},{y:2007,v:1.9},{y:2008,v:-0.2},{y:2009,v:-3.3},{y:2010,v:1.5},{y:2011,v:2},{y:2012,v:-0.3},{y:2013,v:0.3},{y:2014,v:0.5},{y:2015,v:0.6},{y:2016,v:0.5},{y:2017,v:1.7},{y:2018,v:1.2},{y:2019,v:1.6},{y:2020,v:-7.8},{y:2021,v:6.4},{y:2022,v:2.3},{y:2023,v:1.2},{y:2024,v:0.9},{y:2025,v:0.6}]},
+  {code:"IT",name:"Italy",pts:[{y:2000,v:3.8},{y:2001,v:1.9},{y:2002,v:0.1},{y:2003,v:-0.5},{y:2004,v:0.7},{y:2005,v:0.2},{y:2006,v:1.4},{y:2007,v:0.8},{y:2008,v:-1.8},{y:2009,v:-5.9},{y:2010,v:1.1},{y:2011,v:0.3},{y:2012,v:-3.4},{y:2013,v:-2},{y:2014,v:0},{y:2015,v:1},{y:2016,v:1.4},{y:2017,v:1.8},{y:2018,v:1},{y:2019,v:0.7},{y:2020,v:-8.4},{y:2021,v:9.5},{y:2022,v:5},{y:2023,v:1},{y:2024,v:0.8},{y:2025,v:0.6}]},
+  {code:"ES",name:"Spain",pts:[{y:2000,v:4.7},{y:2001,v:3.4},{y:2002,v:1.1},{y:2003,v:1.1},{y:2004,v:1.5},{y:2005,v:1.6},{y:2006,v:2.4},{y:2007,v:1.5},{y:2008,v:-0.9},{y:2009,v:-4.6},{y:2010,v:-0.3},{y:2011,v:-1},{y:2012,v:-2.9},{y:2013,v:-1.1},{y:2014,v:1.8},{y:2015,v:4.2},{y:2016,v:2.8},{y:2017,v:2.7},{y:2018,v:1.9},{y:2019,v:1.2},{y:2020,v:-11.4},{y:2021,v:6.7},{y:2022,v:5.4},{y:2023,v:1.3},{y:2024,v:2.4},{y:2025,v:1.8}]},
+  {code:"PL",name:"Poland",pts:[{y:2000,v:4.7},{y:2001,v:1.2},{y:2002,v:2},{y:2003,v:3.6},{y:2004,v:5.1},{y:2005,v:3.3},{y:2006,v:6.3},{y:2007,v:6.8},{y:2008,v:4.4},{y:2009,v:2.5},{y:2010,v:3.5},{y:2011,v:5.2},{y:2012,v:1.5},{y:2013,v:0.8},{y:2014,v:4},{y:2015,v:4.5},{y:2016,v:3.1},{y:2017,v:5.1},{y:2018,v:6.3},{y:2019,v:4.6},{y:2020,v:0},{y:2021,v:7.5},{y:2022,v:3},{y:2023,v:0.6},{y:2024,v:3.3},{y:2025,v:4}]},
+  {code:"NL",name:"Netherlands",pts:[{y:2000,v:3.5},{y:2001,v:1.6},{y:2002,v:-0.4},{y:2003,v:-0.4},{y:2004,v:1.7},{y:2005,v:1.8},{y:2006,v:3.4},{y:2007,v:3.7},{y:2008,v:1.7},{y:2009,v:-4.2},{y:2010,v:0.8},{y:2011,v:1.3},{y:2012,v:-1.3},{y:2013,v:-0.3},{y:2014,v:1.2},{y:2015,v:1.7},{y:2016,v:1.9},{y:2017,v:2.2},{y:2018,v:1.7},{y:2019,v:1.6},{y:2020,v:-4.4},{y:2021,v:5.7},{y:2022,v:4},{y:2023,v:-1.6},{y:2024,v:0.4},{y:2025,v:1.3}]},
+  {code:"SE",name:"Sweden",pts:[{y:2000,v:4.5},{y:2001,v:1.1},{y:2002,v:1.9},{y:2003,v:1.5},{y:2004,v:3.8},{y:2005,v:2.4},{y:2006,v:4},{y:2007,v:2.5},{y:2008,v:-1.7},{y:2009,v:-5.1},{y:2010,v:4.8},{y:2011,v:2.4},{y:2012,v:-1.1},{y:2013,v:0.3},{y:2014,v:1.3},{y:2015,v:3.3},{y:2016,v:0.9},{y:2017,v:0.4},{y:2018,v:0.6},{y:2019,v:1.5},{y:2020,v:-2.6},{y:2021,v:4.6},{y:2022,v:0.2},{y:2023,v:-0.9},{y:2024,v:0.7},{y:2025,v:1.1}]},
+  {code:"EL",name:"Greece",pts:[{y:2000,v:3.7},{y:2001,v:3.8},{y:2002,v:3.1},{y:2003,v:5.5},{y:2004,v:5},{y:2005,v:0.2},{y:2006,v:5.3},{y:2007,v:2.8},{y:2008,v:-0.8},{y:2009,v:-4.8},{y:2010,v:-5.9},{y:2011,v:-9.9},{y:2012,v:-7.2},{y:2013,v:-2.4},{y:2014,v:1.1},{y:2015,v:0},{y:2016,v:-0.5},{y:2017,v:1.2},{y:2018,v:1.6},{y:2019,v:2.4},{y:2020,v:-9},{y:2021,v:9.2},{y:2022,v:6.1},{y:2023,v:2.4},{y:2024,v:2.1},{y:2025,v:2.4}]}
+];
+
+const palette = {
+  "DE": "#5B7FA6",
+  "FR": "#C75E3A",
+  "IT": "#E8A74B",
+  "ES": "#A6724B",
+  "PL": "#7BA87B",
+  "NL": "#D4956B",
+  "SE": "#8BA8C0",
+  "EL": "#B86B6B"
+};
+
+const W = 760, H = 460;
+const margin = { top: 24, right: 100, bottom: 44, left: 54 };
+const iw = W - margin.left - margin.right;
+const ih = H - margin.top - margin.bottom;
+
+const xMin = 1999, xMax = 2026;
+const yMin = -13, yMax = 11;
+const xScale = v => margin.left + (v - xMin) / (xMax - xMin) * iw;
+const yScale = v => margin.top + (yMax - v) / (yMax - yMin) * ih;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+const mkEl = (tag, attrs, parent) => {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  (parent || svg).appendChild(el);
+  return el;
+};
+
+const mkText = (x, y, txt, opts, parent) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "9");
+  t.setAttribute("fill", opts.fill || "#7A786F");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  if (opts.weight) t.setAttribute("font-weight", opts.weight);
+  t.textContent = txt;
+  (parent || svg).appendChild(t);
+  return t;
+};
+
+// Recession shading bands
+const recessions = [
+  { x0: 2008, x1: 2009.5, label: "Financial crisis" },
+  { x0: 2020, x1: 2020.5, label: "COVID-19" }
+];
+recessions.forEach(r => {
+  mkEl("rect", {
+    x: xScale(r.x0), y: margin.top,
+    width: xScale(r.x1) - xScale(r.x0),
+    height: ih,
+    fill: "#E2DFD3", opacity: 0.6
+  });
+  mkText(xScale((r.x0 + r.x1) / 2), margin.top - 6, r.label, { anchor: "middle", size: "8", fill: "#9A9890" });
+});
+
+// Grid lines
+const yTicks = [-12, -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10];
+yTicks.forEach(v => {
+  const isZero = v === 0;
+  mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: isZero ? "#9A9890" : "#E2E0D5",
+    "stroke-width": isZero ? 1 : 0.5,
+    "stroke-dasharray": isZero ? "none" : "none"
+  });
+  const label = v > 0 ? "+" + v + "%" : v + "%";
+  mkText(margin.left - 6, yScale(v) + 3, label, { anchor: "end", mono: true, size: "8" });
+});
+
+const xTicks = [2000, 2004, 2008, 2012, 2016, 2020, 2024];
+xTicks.forEach(v => {
+  mkEl("line", { x1: xScale(v), y1: margin.top, x2: xScale(v), y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": 0.5 });
+  mkText(xScale(v), H - margin.bottom + 14, String(v), { anchor: "middle", mono: true, size: "8" });
+});
+
+// Y axis label
+const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+yLabel.setAttribute("transform", `rotate(-90) translate(${-(H / 2)}, 14)`);
+yLabel.setAttribute("font-size", "9"); yLabel.setAttribute("fill", "#7A786F");
+yLabel.setAttribute("text-anchor", "middle");
+yLabel.textContent = "Growth rate (%)";
+svg.appendChild(yLabel);
+
+// Axis borders
+mkEl("line", { x1: margin.left, y1: margin.top, x2: margin.left, y2: H - margin.bottom, stroke: "#C8C6BB", "stroke-width": 0.75 });
+mkEl("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#C8C6BB", "stroke-width": 0.75 });
+
+const trails = {};
+const allDots = [];
+
+// Compute label positions with collision avoidance
+const labelEntries = data.map(d => {
+  const last = d.pts[d.pts.length - 1];
+  return { code: d.code, name: d.name, rawY: yScale(last.v), lastX: xScale(last.y), lastV: last.v };
+}).sort((a, b) => a.rawY - b.rawY);
+
+const minGap = 10;
+for (let i = 1; i < labelEntries.length; i++) {
+  if (labelEntries[i].rawY - labelEntries[i - 1].rawY < minGap) {
+    labelEntries[i].rawY = labelEntries[i - 1].rawY + minGap;
+  }
+}
+const labelMap = {};
+labelEntries.forEach(e => { labelMap[e.code] = e.rawY; });
+
+// Draw lines and dots
+data.forEach(d => {
+  const col = palette[d.code] || "#7A786F";
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  let pathD = "";
+  d.pts.forEach((p, i) => { pathD += (i === 0 ? "M" : "L") + ` ${xScale(p.y)} ${yScale(p.v)}`; });
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", col);
+  path.setAttribute("stroke-width", "1.75");
+  path.setAttribute("opacity", "0.85");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  g.appendChild(path);
+
+  d.pts.forEach(p => {
+    const dot = mkEl("circle", {
+      cx: xScale(p.y), cy: yScale(p.v), r: 0,
+      fill: col, opacity: 0
+    }, g);
+    allDots.push({ el: dot, code: d.code, name: d.name, year: p.y, value: p.v });
+  });
+
+  trails[d.code] = { g, path, col };
+  svg.appendChild(g);
+
+  // End label
+  const last = d.pts[d.pts.length - 1];
+  const labelY = labelMap[d.code];
+
+  // Connector line from data point to label
+  if (Math.abs(labelY - yScale(last.v)) > 2) {
+    mkEl("line", {
+      x1: xScale(last.y) + 4, y1: yScale(last.v),
+      x2: W - margin.right + 6, y2: labelY,
+      stroke: col, "stroke-width": 0.5, opacity: 0.4
+    });
+  }
+
+  mkText(W - margin.right + 8, labelY + 3, d.name, { size: "9", fill: col, weight: "500" });
+});
+
+// Hover overlay
+const overlay = mkEl("rect", {
+  x: margin.left, y: margin.top,
+  width: iw, height: ih,
+  fill: "transparent", "pointer-events": "all"
+});
+
+const vLine = mkEl("line", {
+  x1: 0, y1: margin.top, x2: 0, y2: H - margin.bottom,
+  stroke: "#B5B3AB", "stroke-width": 0.75, "stroke-dasharray": "3,2",
+  opacity: 0, "pointer-events": "none"
+});
+
+const tip = document.getElementById("tip");
+
+overlay.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width * W;
+  const my = (e.clientY - rect.top) / rect.height * H;
+
+  // Find nearest year
+  const yearRaw = xMin + (mx - margin.left) / iw * (xMax - xMin);
+  const year = Math.round(yearRaw);
+  if (year < 2000 || year > 2025) {
+    tip.style.opacity = 0;
+    vLine.setAttribute("opacity", 0);
+    return;
+  }
+
+  vLine.setAttribute("x1", xScale(year));
+  vLine.setAttribute("x2", xScale(year));
+  vLine.setAttribute("opacity", 1);
+
+  // Build tooltip
+  let rows = data.map(d => {
+    const pt = d.pts.find(p => p.y === year);
+    if (!pt) return null;
+    const sign = pt.v > 0 ? "+" : "";
+    return { name: d.name, v: pt.v, col: palette[d.code], txt: `${sign}${pt.v}%` };
+  }).filter(Boolean).sort((a, b) => b.v - a.v);
+
+  let html = `<div style="font-weight:500;margin-bottom:3px;font-size:11px;">${year}</div>`;
+  rows.forEach(r => {
+    html += `<div><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.col};margin-right:5px;"></span>${r.name}: <span style="font-weight:500">${r.txt}</span></div>`;
+  });
+
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+
+  const chartDiv = document.getElementById("chart");
+  const chartRect = chartDiv.getBoundingClientRect();
+  let tipX = e.clientX - chartRect.left + 16;
+  let tipY = e.clientY - chartRect.top - 10;
+  if (tipX + 180 > chartRect.width) tipX = tipX - 200;
+  tip.style.left = tipX + "px";
+  tip.style.top = tipY + "px";
+
+  // Highlight dots for this year
+  allDots.forEach(dot => {
+    if (dot.year === year) {
+      dot.el.setAttribute("r", "3");
+      dot.el.setAttribute("opacity", "1");
+    } else {
+      dot.el.setAttribute("r", "0");
+      dot.el.setAttribute("opacity", "0");
+    }
+  });
+});
+
+overlay.addEventListener("mouseleave", () => {
+  tip.style.opacity = 0;
+  vLine.setAttribute("opacity", 0);
+  allDots.forEach(dot => {
+    dot.el.setAttribute("r", "0");
+    dot.el.setAttribute("opacity", "0");
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

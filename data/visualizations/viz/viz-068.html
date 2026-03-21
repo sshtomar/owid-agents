@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px 24px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11.5px; color: #7A786F; margin: 0 0 28px; max-width: 680px; line-height: 1.55; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 7px 11px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 16px; font-size: 10.5px; color: #7A786F; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 1px; }
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #A09E96; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 10px; }
+  .annual-section { margin-top: 32px; }
+</style></head><body>
+<h1>The Price of Catastrophe</h1>
+<p class="subtitle">The 25 costliest country-year disaster events since 2005, measured by direct economic loss in current USD. Colombia and the United States dominate the list, each appearing seven times. A single bad year can destroy tens of billions of dollars in infrastructure, agriculture, and housing.</p>
+
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+
+<div class="annual-section">
+  <p class="section-label">Global annual disaster losses, 2005 -- 2023</p>
+  <div id="sparkline" style="position:relative;"></div>
+  <div class="tooltip" id="tip2"></div>
+</div>
+
+<p class="source">Source: UN SDG Indicator 1.5.2 -- VC_DSR_GDPLS -- Direct economic loss attributed to disasters (current USD)</p>
+
+<script>
+const data = [
+  { label: "Colombia 2014", country: "Colombia", year: 2014, value: 75893.8 },
+  { label: "United States 2017", country: "United States", year: 2017, value: 64822.8 },
+  { label: "United States 2021", country: "United States", year: 2021, value: 63290.9 },
+  { label: "Philippines 2021", country: "Philippines", year: 2021, value: 55860.7 },
+  { label: "United States 2020", country: "United States", year: 2020, value: 51814.7 },
+  { label: "Colombia 2016", country: "Colombia", year: 2016, value: 50131.3 },
+  { label: "Indonesia 2016", country: "Indonesia", year: 2016, value: 46326.0 },
+  { label: "United States 2018", country: "United States", year: 2018, value: 44429.8 },
+  { label: "Mozambique 2019", country: "Mozambique", year: 2019, value: 43504.9 },
+  { label: "Colombia 2015", country: "Colombia", year: 2015, value: 38504.3 },
+  { label: "Colombia 2017", country: "Colombia", year: 2017, value: 30283.4 },
+  { label: "Mexico 2019", country: "Mexico", year: 2019, value: 30236.5 },
+  { label: "United States 2019", country: "United States", year: 2019, value: 23730.8 },
+  { label: "United States 2016", country: "United States", year: 2016, value: 23722.2 },
+  { label: "Nepal 2015", country: "Nepal", year: 2015, value: 22879.5 },
+  { label: "South Africa 2016", country: "South Africa", year: 2016, value: 22222.3 },
+  { label: "United States 2015", country: "United States", year: 2015, value: 18221.4 },
+  { label: "Peru 2015", country: "Peru", year: 2015, value: 16641.4 },
+  { label: "Nigeria 2022", country: "Nigeria", year: 2022, value: 14958.0 },
+  { label: "Colombia 2018", country: "Colombia", year: 2018, value: 14396.2 },
+  { label: "Argentina 2022", country: "Argentina", year: 2022, value: 14052.4 },
+  { label: "China 2022", country: "China", year: 2022, value: 13691.6 },
+  { label: "Colombia 2012", country: "Colombia", year: 2012, value: 12240.3 },
+  { label: "Mexico 2022", country: "Mexico", year: 2022, value: 12174.3 },
+  { label: "Colombia 2011", country: "Colombia", year: 2011, value: 11384.2 }
+];
+
+const regionMap = {
+  "United States": "Americas",
+  "Colombia": "Americas",
+  "Mexico": "Americas",
+  "Peru": "Americas",
+  "Argentina": "Americas",
+  "Philippines": "Asia-Pacific",
+  "Indonesia": "Asia-Pacific",
+  "Nepal": "Asia-Pacific",
+  "China": "Asia-Pacific",
+  "Mozambique": "Africa",
+  "South Africa": "Africa",
+  "Nigeria": "Africa"
+};
+
+const regionColors = {
+  "Americas": "#C05746",
+  "Asia-Pacific": "#3E7A8C",
+  "Africa": "#C4963E"
+};
+
+data.forEach(d => {
+  d.region = regionMap[d.country] || "Other";
+  d.color = regionColors[d.region] || "#888";
+});
+
+// Build legend
+const legendEl = document.getElementById("legend");
+Object.entries(regionColors).forEach(([region, color]) => {
+  const item = document.createElement("span");
+  item.className = "legend-item";
+  item.innerHTML = '<span class="legend-swatch" style="background:' + color + '"></span>' + region;
+  legendEl.appendChild(item);
+});
+
+// Chart dimensions
+const W = 740;
+const barH = 22;
+const gap = 3;
+const pad = { left: 150, right: 75, top: 10, bottom: 10 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = data[0].value;
+const xScale = v => pad.left + (v / maxVal) * (W - pad.left - pad.right);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", W);
+svg.style.display = "block";
+
+// Grid lines
+const gridValues = [0, 20000, 40000, 60000];
+gridValues.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#D6D4CC");
+  line.setAttribute("stroke-width", "0.5");
+  svg.appendChild(line);
+
+  const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  txt.setAttribute("x", x);
+  txt.setAttribute("y", pad.top - 3);
+  txt.setAttribute("text-anchor", "middle");
+  txt.setAttribute("font-size", "9");
+  txt.setAttribute("fill", "#A09E96");
+  txt.setAttribute("font-family", "'JetBrains Mono', monospace");
+  txt.textContent = v === 0 ? "$0" : "$" + (v / 1000) + "B";
+  svg.appendChild(txt);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barW = xScale(d.value) - pad.left;
+
+  // Bar
+  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", barW);
+  rect.setAttribute("height", barH);
+  rect.setAttribute("fill", d.color);
+  rect.setAttribute("rx", "1");
+  rect.style.transition = "opacity 0.15s";
+  svg.appendChild(rect);
+
+  // Label on left
+  const labelTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  labelTxt.setAttribute("x", pad.left - 8);
+  labelTxt.setAttribute("y", y + barH / 2 + 4);
+  labelTxt.setAttribute("text-anchor", "end");
+  labelTxt.setAttribute("font-size", "10.5");
+  labelTxt.setAttribute("fill", "#2B2A27");
+  labelTxt.setAttribute("font-weight", "500");
+  labelTxt.textContent = d.label;
+  svg.appendChild(labelTxt);
+
+  // Value label on right of bar
+  const valTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  valTxt.setAttribute("x", xScale(d.value) + 6);
+  valTxt.setAttribute("y", y + barH / 2 + 3.5);
+  valTxt.setAttribute("text-anchor", "start");
+  valTxt.setAttribute("font-size", "9");
+  valTxt.setAttribute("fill", "#7A786F");
+  valTxt.setAttribute("font-family", "'JetBrains Mono', monospace");
+  const billions = (d.value / 1000).toFixed(1);
+  valTxt.textContent = "$" + billions + "B";
+  svg.appendChild(valTxt);
+
+  // Invisible hit area for tooltip
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hit.setAttribute("x", 0);
+  hit.setAttribute("y", y);
+  hit.setAttribute("width", W);
+  hit.setAttribute("height", barH + gap);
+  hit.setAttribute("fill", "transparent");
+  hit.style.cursor = "pointer";
+  svg.appendChild(hit);
+
+  hit.addEventListener("mouseenter", (e) => {
+    rect.setAttribute("opacity", "0.8");
+    const billions = (d.value / 1000).toFixed(1);
+    const millions = d.value.toFixed(0);
+    tip.innerHTML = "<strong>" + d.country + "</strong> -- " + d.year + "<br/>$" + billions + "B ($" + Number(millions).toLocaleString() + "M)";
+    tip.style.opacity = 1;
+  });
+
+  hit.addEventListener("mousemove", (e) => {
+    const chartRect = svg.closest("div").getBoundingClientRect();
+    tip.style.left = (e.clientX - chartRect.left + 14) + "px";
+    tip.style.top = (e.clientY - chartRect.top - 20) + "px";
+  });
+
+  hit.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// --- Annual global losses sparkline ---
+const yearData = [
+  {year:2005,value:13.2},{year:2006,value:10.2},{year:2007,value:31.5},
+  {year:2008,value:25.8},{year:2009,value:14.4},{year:2010,value:28.2},
+  {year:2011,value:19.0},{year:2012,value:25.6},{year:2013,value:20.9},
+  {year:2014,value:92.6},{year:2015,value:124.9},{year:2016,value:197.9},
+  {year:2017,value:138.7},{year:2018,value:101.6},{year:2019,value:155.8},
+  {year:2020,value:97.0},{year:2021,value:144.7},{year:2022,value:101.3},
+  {year:2023,value:39.4}
+];
+
+const sW = 740;
+const sH = 140;
+const sPad = { left: 45, right: 20, top: 20, bottom: 28 };
+const sChartW = sW - sPad.left - sPad.right;
+const sChartH = sH - sPad.top - sPad.bottom;
+
+const maxY = 200;
+const barWidth = sChartW / yearData.length - 3;
+
+const sxScale = (yr) => sPad.left + ((yr - 2005) / (2023 - 2005)) * sChartW;
+const syScale = (v) => sPad.top + sChartH - (v / maxY) * sChartH;
+
+const svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg2.setAttribute("viewBox", "0 0 " + sW + " " + sH);
+svg2.setAttribute("width", sW);
+svg2.style.display = "block";
+
+// Y-axis grid
+[0, 50, 100, 150, 200].forEach(v => {
+  const y = syScale(v);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", sPad.left);
+  line.setAttribute("x2", sW - sPad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", "#D6D4CC");
+  line.setAttribute("stroke-width", "0.5");
+  svg2.appendChild(line);
+
+  if (v > 0) {
+    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt.setAttribute("x", sPad.left - 6);
+    txt.setAttribute("y", y + 3);
+    txt.setAttribute("text-anchor", "end");
+    txt.setAttribute("font-size", "8.5");
+    txt.setAttribute("fill", "#A09E96");
+    txt.setAttribute("font-family", "'JetBrains Mono', monospace");
+    txt.textContent = "$" + v + "B";
+    svg2.appendChild(txt);
+  }
+});
+
+const tip2 = document.getElementById("tip2");
+
+yearData.forEach((d, i) => {
+  const x = sxScale(d.year) - barWidth / 2;
+  const barHeight = (d.value / maxY) * sChartH;
+  const y = sPad.top + sChartH - barHeight;
+
+  const isPeak = d.year === 2016;
+
+  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  rect.setAttribute("x", x);
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", barWidth);
+  rect.setAttribute("height", barHeight);
+  rect.setAttribute("fill", isPeak ? "#C05746" : "#8C8A82");
+  rect.setAttribute("rx", "1");
+  rect.setAttribute("opacity", isPeak ? "1" : "0.55");
+  rect.style.transition = "opacity 0.15s";
+  svg2.appendChild(rect);
+
+  // Year label
+  if (d.year % 2 === 1 || d.year === 2006) {
+    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    txt.setAttribute("x", sxScale(d.year));
+    txt.setAttribute("y", sH - sPad.bottom + 14);
+    txt.setAttribute("text-anchor", "middle");
+    txt.setAttribute("font-size", "8.5");
+    txt.setAttribute("fill", "#A09E96");
+    txt.setAttribute("font-family", "'JetBrains Mono', monospace");
+    txt.textContent = "'" + String(d.year).slice(2);
+    svg2.appendChild(txt);
+  }
+
+  // Hover area
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hit.setAttribute("x", x - 2);
+  hit.setAttribute("y", sPad.top);
+  hit.setAttribute("width", barWidth + 4);
+  hit.setAttribute("height", sChartH + sPad.bottom);
+  hit.setAttribute("fill", "transparent");
+  hit.style.cursor = "pointer";
+  svg2.appendChild(hit);
+
+  hit.addEventListener("mouseenter", () => {
+    rect.setAttribute("opacity", "1");
+    tip2.innerHTML = "<strong>" + d.year + "</strong>: $" + d.value.toFixed(1) + "B in global losses";
+    tip2.style.opacity = 1;
+  });
+
+  hit.addEventListener("mousemove", (e) => {
+    const chartRect = svg2.closest("div").getBoundingClientRect();
+    tip2.style.left = (e.clientX - chartRect.left + 14) + "px";
+    tip2.style.top = (e.clientY - chartRect.top - 20) + "px";
+  });
+
+  hit.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", isPeak ? "1" : "0.55");
+    tip2.style.opacity = 0;
+  });
+});
+
+// Peak annotation
+const peakX = sxScale(2016);
+const peakY = syScale(197.9);
+const annTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+annTxt.setAttribute("x", peakX);
+annTxt.setAttribute("y", peakY - 6);
+annTxt.setAttribute("text-anchor", "middle");
+annTxt.setAttribute("font-size", "8.5");
+annTxt.setAttribute("fill", "#C05746");
+annTxt.setAttribute("font-weight", "600");
+annTxt.setAttribute("font-family", "'JetBrains Mono', monospace");
+annTxt.textContent = "$198B";
+svg2.appendChild(annTxt);
+
+document.getElementById("sparkline").appendChild(svg2);
+</script>
+</body></html>

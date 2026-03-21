@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 1px; }
+</style></head><body>
+<h1>Years Left After 60</h1>
+<p class="subtitle">Life expectancy at age 60 across 41 countries with 2021 WHO data. Singapore leads with nearly 28 additional years, while southern African nations face the steepest deficit -- a person turning 60 in Eswatini can expect roughly 11 more years, less than half the best-performing countries.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3A7CA5;"></div>Europe</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#E8A838;"></div>Asia &amp; Pacific</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#5BA368;"></div>Americas</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C75D43;"></div>Africa</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#8B7EC8;"></div>Middle East</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- WHOSIS_000015 (Life expectancy at age 60, both sexes average, 2021)</p>
+<script>
+const data = [
+  { name: "Singapore", value: 27.90, region: "asia" },
+  { name: "Australia", value: 26.88, region: "asia" },
+  { name: "Norway", value: 25.81, region: "europe" },
+  { name: "Austria", value: 25.09, region: "europe" },
+  { name: "Spain", value: 24.95, region: "europe" },
+  { name: "Japan", value: 24.27, region: "asia" },
+  { name: "Iceland", value: 24.05, region: "europe" },
+  { name: "Israel", value: 23.73, region: "mideast" },
+  { name: "Thailand", value: 23.63, region: "asia" },
+  { name: "United States", value: 23.39, region: "americas" },
+  { name: "France", value: 22.73, region: "europe" },
+  { name: "Costa Rica", value: 21.97, region: "americas" },
+  { name: "Venezuela", value: 21.51, region: "americas" },
+  { name: "Brunei", value: 21.35, region: "asia" },
+  { name: "Germany", value: 21.35, region: "europe" },
+  { name: "Barbados", value: 21.33, region: "americas" },
+  { name: "Turkey", value: 21.08, region: "mideast" },
+  { name: "Vietnam", value: 20.78, region: "asia" },
+  { name: "Colombia", value: 20.15, region: "americas" },
+  { name: "Albania", value: 19.94, region: "europe" },
+  { name: "Nigeria", value: 19.11, region: "africa" },
+  { name: "Myanmar", value: 18.72, region: "asia" },
+  { name: "Seychelles", value: 18.26, region: "africa" },
+  { name: "Croatia", value: 18.01, region: "europe" },
+  { name: "Mauritius", value: 17.99, region: "africa" },
+  { name: "Bahrain", value: 17.76, region: "mideast" },
+  { name: "Senegal", value: 16.84, region: "africa" },
+  { name: "Georgia", value: 16.80, region: "europe" },
+  { name: "Mexico", value: 16.80, region: "americas" },
+  { name: "Mali", value: 16.57, region: "africa" },
+  { name: "Slovakia", value: 16.36, region: "europe" },
+  { name: "Montenegro", value: 16.13, region: "europe" },
+  { name: "Paraguay", value: 15.59, region: "americas" },
+  { name: "Chad", value: 15.46, region: "africa" },
+  { name: "Indonesia", value: 15.40, region: "asia" },
+  { name: "Armenia", value: 14.67, region: "europe" },
+  { name: "Kenya", value: 14.02, region: "africa" },
+  { name: "Mozambique", value: 13.06, region: "africa" },
+  { name: "Botswana", value: 12.89, region: "africa" },
+  { name: "Zimbabwe", value: 12.38, region: "africa" },
+  { name: "Eswatini", value: 11.05, region: "africa" }
+];
+
+const regionColors = {
+  europe: "#3A7CA5",
+  asia: "#E8A838",
+  americas: "#5BA368",
+  africa: "#C75D43",
+  mideast: "#8B7EC8"
+};
+
+const W = 720;
+const barH = 22;
+const gap = 3;
+const pad = { left: 110, right: 55, top: 20, bottom: 30 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = 30;
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines
+[0, 5, 10, 15, 20, 25, 30].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#C5C3BA" : "#DEDCD5");
+  line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 6);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "9");
+  label.textContent = v + " yrs";
+  svg.appendChild(label);
+});
+
+// Bars
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barW = xScale(d.value) - xScale(0);
+  const color = regionColors[d.region];
+
+  // Country label
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + barH / 2 + 3.5);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("fill", "#2B2A27");
+  label.setAttribute("font-size", "10");
+  label.setAttribute("font-weight", i === 0 || i === data.length - 1 ? "600" : "400");
+  label.textContent = d.name;
+  svg.appendChild(label);
+
+  // Bar
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", xScale(0));
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", barW);
+  rect.setAttribute("height", barH);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", "1");
+  rect.style.cursor = "pointer";
+  rect.style.transition = "opacity 0.12s";
+
+  rect.addEventListener("mouseenter", function(e) {
+    this.setAttribute("opacity", "0.8");
+    tip.style.opacity = "1";
+    tip.innerHTML = d.name + " &mdash; " + d.value.toFixed(1) + " additional years at age 60";
+  });
+  rect.addEventListener("mousemove", function(e) {
+    tip.style.left = (e.pageX + 12) + "px";
+    tip.style.top = (e.pageY - 28) + "px";
+  });
+  rect.addEventListener("mouseleave", function() {
+    this.setAttribute("opacity", "1");
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(rect);
+
+  // Value label at end of bar
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", xScale(d.value) + 5);
+  valLabel.setAttribute("y", y + barH / 2 + 3.5);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.textContent = d.value.toFixed(1);
+  svg.appendChild(valLabel);
+});
+
+// Median line
+const values = data.map(d => d.value).sort((a, b) => a - b);
+const median = values[Math.floor(values.length / 2)];
+const medX = xScale(median);
+
+const medLine = document.createElementNS(ns, "line");
+medLine.setAttribute("x1", medX);
+medLine.setAttribute("x2", medX);
+medLine.setAttribute("y1", pad.top - 2);
+medLine.setAttribute("y2", pad.top + chartH + 2);
+medLine.setAttribute("stroke", "#2B2A27");
+medLine.setAttribute("stroke-width", "1");
+medLine.setAttribute("stroke-dasharray", "3,3");
+svg.appendChild(medLine);
+
+const medLabel = document.createElementNS(ns, "text");
+medLabel.setAttribute("x", medX);
+medLabel.setAttribute("y", pad.top + chartH + 16);
+medLabel.setAttribute("text-anchor", "middle");
+medLabel.setAttribute("fill", "#2B2A27");
+medLabel.setAttribute("font-size", "9");
+medLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+medLabel.textContent = "median " + median.toFixed(1);
+svg.appendChild(medLabel);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "c6057d183d1ad9da474bc3b998080436",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"safer-beginnings\">Safer Beginnings</h1>\n<span class=\"paragraph\">Births attended by skilled health staff -- slope chart comparing earliest vs latest survey. Enormous gains in countries like Cambodia (+55pp) and Egypt (+63pp).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "8cb590c79fb5cbdfce5adf513dfcfd40",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Births attended by skilled health staff (% of total)** (World Bank)\n</code></pre></div>\n<span class=\"paragraph\">Births attended by skilled health staff (% of total) from world-bank\nSource: <a href=\"https://data.worldbank.org/indicator/SH.STA.BRTC.ZS\" rel=\"noopener noreferrer\" target=\"_blank\">https://data.worldbank.org/indicator/SH.STA.BRTC.ZS</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "003e670920c8b5a5e17b0a6b1d9f9366",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='029955d5-d425-2567-2d95-0d9e61900e17'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;GR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Greece&#92;&quot;,&#92;&quot;year&#92;&quot;:1980,&#92;&quot;value&#92;&quot;:99.29},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;GR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Greece&#92;&quot;,&#92;&quot;year&#92;&quot;:1981,&#92;&quot;value&#92;&quot;:99.37},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;GR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Greece&#92;&quot;,&#92;&quot;year&#92;&quot;:1982,&#92;&quot;value&#92;&quot;:99.45},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;GR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Greece&#92;&quot;,&#92;&quot;year&#92;&quot;:1983,&#92;&quot;value&#92;&quot;:99.51},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;GR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Greece&#92;&quot;,&#92;&quot;year&#92;&quot;:1984,&#92;&quot;value&#92;&quot;:99.6},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;GT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Guatemala&#92;&quot;,&#92;&quot;year&#92;&quot;:1984,&#92;&quot;value&#92;&quot;:35.0},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;SV&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;El Salvador&#92;&quot;,&#92;&quot;year&#92;&quot;:1985,&#92;&quot;value&#92;&quot;:85.4},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;GR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Greece&#92;&quot;,&#92;&quot;year&#92;&quot;:1985,&#92;&quot;value&#92;&quot;:99.7},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;BY&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Belarus&#92;&quot;,&#92;&quot;year&#92;&quot;:1986,&#92;&quot;value&#92;&quot;:100.0},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;CO&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Colombia&#92;&quot;,&#92;&quot;year&#92;&quot;:1986,&#92;&quot;value&#92;&quot;:71.1}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "fd3d8d1b54fce2d42c35ca70debef42e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a before/after view we take the earliest and latest observation per country and compute the change over time.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "7e886c5cec48bd61f2c4a857de504e2c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='14f7f122-c3e2-4d45-950b-21d2daab50a2'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:25,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Bhutan&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1994,&#92;&quot;start_value&#92;&quot;:12.0,&#92;&quot;end_year&#92;&quot;:2021,&#92;&quot;end_value&#92;&quot;:98.9,&#92;&quot;delta&#92;&quot;:86.9},{&#92;&quot;&#92;&quot;:67,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Equatorial Guinea&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1994,&#92;&quot;start_value&#92;&quot;:5.0,&#92;&quot;end_year&#92;&quot;:2011,&#92;&quot;end_value&#92;&quot;:68.3,&#92;&quot;delta&#92;&quot;:63.3},{&#92;&quot;&#92;&quot;:65,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Egypt, Arab Rep.&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1988,&#92;&quot;start_value&#92;&quot;:34.6,&#92;&quot;end_year&#92;&quot;:2021,&#92;&quot;end_value&#92;&quot;:97.1,&#92;&quot;delta&#92;&quot;:62.49999999999999},{&#92;&quot;&#92;&quot;:107,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Indonesia&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1987,&#92;&quot;start_value&#92;&quot;:36.3,&#92;&quot;end_year&#92;&quot;:2019,&#92;&quot;end_value&#92;&quot;:94.7,&#92;&quot;delta&#92;&quot;:58.400000000000006},{&#92;&quot;&#92;&quot;:34,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Burundi&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1987,&#92;&quot;start_value&#92;&quot;:19.1,&#92;&quot;end_year&#92;&quot;:2021,&#92;&quot;end_value&#92;&quot;:76.5,&#92;&quot;delta&#92;&quot;:57.4},{&#92;&quot;&#92;&quot;:36,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Cambodia&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1995,&#92;&quot;start_value&#92;&quot;:43.3,&#92;&quot;end_year&#92;&quot;:2022,&#92;&quot;end_value&#92;&quot;:98.7,&#92;&quot;delta&#92;&quot;:55.400000000000006},{&#92;&quot;&#92;&quot;:106,&#92;&quot;countryName&#92;&quot;:&#92;&quot;India&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1993,&#92;&quot;start_value&#92;&quot;:34.2,&#92;&quot;end_year&#92;&quot;:2021,&#92;&quot;end_value&#92;&quot;:89.4,&#92;&quot;delta&#92;&quot;:55.2},{&#92;&quot;&#92;&quot;:97,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Honduras&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1987,&#92;&quot;start_value&#92;&quot;:42.1,&#92;&quot;end_year&#92;&quot;:2019,&#92;&quot;end_value&#92;&quot;:94.1,&#92;&quot;delta&#92;&quot;:51.99999999999999},{&#92;&quot;&#92;&quot;:18,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Bangladesh&#92;&quot;,&#92;&quot;start_year&#92;&quot;:1994,&#92;&quot;start_value&#92;&quot;:9.5,&#92;&quot;end_year&#92;&quot;:2019,&#92;&quot;end_value&#92;&quot;:59.0,&#92;&quot;delta&#92;&quot;:49.5},{&#92;&quot;&#92;&quot;:0,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Afghanistan&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2000,&#92;&quot;start_value&#92;&quot;:12.4,&#92;&quot;end_year&#92;&quot;:2020,&#92;&quot;end_value&#92;&quot;:61.8,&#92;&quot;delta&#92;&quot;:49.4}]&quot;' data-total-rows='20' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;start_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;start_value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;end_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;end_value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;delta&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "0ee9550ef7d3f7fb895e2e4d789202f9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='29ca5392-641c-1908-d7bc-4d5d91cdd2f7'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;layer&quot;:[{&quot;mark&quot;:{&quot;type&quot;:&quot;line&quot;},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;detail&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;period&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;period&quot;,&quot;sort&quot;:[&quot;start&quot;,&quot;end&quot;],&quot;title&quot;:&quot;Period&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;}}},{&quot;mark&quot;:{&quot;type&quot;:&quot;circle&quot;,&quot;size&quot;:60},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;period&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;period&quot;,&quot;sort&quot;:[&quot;start&quot;,&quot;end&quot;],&quot;type&quot;:&quot;nominal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}}}],&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////UAQAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAAPAMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAABQDAAAEAAAABgMAAHsiaW5kZXhfY29sdW1ucyI6IFt7ImtpbmQiOiAicmFuZ2UiLCAibmFtZSI6IG51bGwsICJzdGFydCI6IDAsICJzdG9wIjogNDAsICJzdGVwIjogMX1dLCAiY29sdW1uX2luZGV4ZXMiOiBbeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiBudWxsLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IHsiZW5jb2RpbmciOiAiVVRGLTgifX1dLCAiY29sdW1ucyI6IFt7Im5hbWUiOiAiY291bnRyeU5hbWUiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5TmFtZSIsICJwYW5kYXNfdHlwZSI6ICJ1bmljb2RlIiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ5ZWFyIiwgImZpZWxkX25hbWUiOiAieWVhciIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAidmFsdWUiLCAiZmllbGRfbmFtZSI6ICJ2YWx1ZSIsICJwYW5kYXNfdHlwZSI6ICJmbG9hdDY0IiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJwZXJpb2QiLCAiZmllbGRfbmFtZSI6ICJwZXJpb2QiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9XSwgImNyZWF0b3IiOiB7ImxpYnJhcnkiOiAicHlhcnJvdyIsICJ2ZXJzaW9uIjogIjIxLjAuMCJ9LCAicGFuZGFzX3ZlcnNpb24iOiAiMi4yLjMifQAABgAAAHBhbmRhcwAABAAAALAAAABkAAAA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&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;height&quot;:400,&quot;width&quot;:500,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "d27e3943688f36730a2ee97d3fe8427f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Burundi gained 68 percentage points in skilled birth attendance</li>\n<li>Ethiopia rose from 6.5% to nearly 50%</li>\n<li>Ecuador and Colombia near universal coverage</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

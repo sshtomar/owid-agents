@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 14px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart-wrap { position: relative; }
+  svg { display: block; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .tooltip .tt-year { font-size: 11px; font-family: 'Inter', sans-serif; font-weight: 600; margin-bottom: 2px; }
+  .tooltip .tt-val { color: #D4A843; }
+</style>
+</head><body>
+<h1>The Cost of Catastrophe</h1>
+<p class="subtitle">Total global economic damages from natural disasters by year, measured as cumulative share of GDP across all affected countries. The sharp spikes reveal how single events can devastate small island nations, with Hurricane Maria (2017), the Indian Ocean tsunami (2004), and Hurricane Mitch (1998) among the costliest years on record.</p>
+<div id="chart-wrap">
+  <div class="tooltip" id="tooltip">
+    <div class="tt-year" id="tt-year"></div>
+    <div id="tt-detail"></div>
+  </div>
+</div>
+<p class="source">Source: Our World in Data &mdash; Economic Damages from Natural Disasters</p>
+
+<script>
+const DATA = [
+  {year:1960,value:20.67},{year:1961,value:200.55},{year:1962,value:1.77},{year:1963,value:74.81},
+  {year:1964,value:9.04},{year:1965,value:10.84},{year:1966,value:16.14},{year:1967,value:38.01},
+  {year:1968,value:16.49},{year:1969,value:18.82},{year:1970,value:21.60},{year:1971,value:8.50},
+  {year:1972,value:17.29},{year:1973,value:18.29},{year:1974,value:67.41},{year:1975,value:4.23},
+  {year:1976,value:37.21},{year:1977,value:30.11},{year:1978,value:23.45},{year:1979,value:101.76},
+  {year:1980,value:139.86},{year:1981,value:13.46},{year:1982,value:68.18},{year:1983,value:116.64},
+  {year:1984,value:22.64},{year:1985,value:158.97},{year:1986,value:67.96},{year:1987,value:73.03},
+  {year:1988,value:62.81},{year:1989,value:75.85},{year:1990,value:189.12},{year:1991,value:261.19},
+  {year:1992,value:75.45},{year:1993,value:75.12},{year:1994,value:25.20},{year:1995,value:214.41},
+  {year:1996,value:161.36},{year:1997,value:27.70},{year:1998,value:264.33},{year:1999,value:53.38},
+  {year:2000,value:74.10},{year:2001,value:88.15},{year:2002,value:33.13},{year:2003,value:47.84},
+  {year:2004,value:281.18},{year:2005,value:90.46},{year:2006,value:13.81},{year:2007,value:49.62},
+  {year:2008,value:106.71},{year:2009,value:40.04},{year:2010,value:116.01},{year:2011,value:41.99},
+  {year:2012,value:32.65},{year:2013,value:33.51},{year:2014,value:23.44},{year:2015,value:192.65},
+  {year:2016,value:54.08},{year:2017,value:614.23},{year:2018,value:8.20},{year:2019,value:49.31},
+  {year:2020,value:64.74},{year:2021,value:57.46},{year:2022,value:18.73}
+];
+
+const ANNOTATIONS = [
+  {year:2017, label:'Hurricane Maria', sub:'Dominica, Sint Maarten, Puerto Rico', side:'left', yOff:0},
+  {year:2004, label:'Indian Ocean Tsunami', sub:'Grenada, Maldives, Samoa', side:'left', yOff:0},
+  {year:1998, label:'Hurricane Mitch', sub:'St Kitts & Nevis, Honduras', side:'left', yOff:-18},
+  {year:1991, label:'Cyclone Val', sub:'Samoa (85% of total)', side:'right', yOff:0},
+  {year:1995, label:'Hurricane Luis', sub:'Dominica, St Kitts, Antigua', side:'right', yOff:-18},
+  {year:1961, label:'Hurricane Hattie', sub:'Belize (99% of total)', side:'right', yOff:0}
+];
+
+const maxVal = Math.max(...DATA.map(d => d.value));
+
+const W = 900, H = 480;
+const ML = 52, MR = 24, MT = 80, MB = 50;
+const PW = W - ML - MR;
+const PH = H - MT - MB;
+const barW = Math.max(1, Math.floor((PW - DATA.length) / DATA.length));
+const barGap = PW / DATA.length;
+
+const BAR_COLOR = '#C8982A';
+const BAR_HOVER = '#D4A843';
+const BAR_MUTED = '#DBC37A';
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+const wrap = document.getElementById('chart-wrap');
+const svg = el('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H });
+wrap.insertBefore(svg, wrap.firstChild);
+
+// y-axis grid lines and labels
+const yTicks = [0, 100, 200, 300, 400, 500, 600];
+yTicks.forEach(v => {
+  const y = MT + PH - (v / maxVal) * PH;
+  el('line', {
+    x1: ML, x2: ML + PW,
+    y1: y, y2: y,
+    stroke: v === 0 ? '#C8C6BA' : '#ECEADF',
+    'stroke-width': 1
+  }, svg);
+  const t = el('text', {
+    x: ML - 8, y: y + 3.5,
+    'text-anchor': 'end',
+    'font-family': 'JetBrains Mono, monospace',
+    'font-size': '9',
+    fill: '#9A9890'
+  }, svg);
+  t.textContent = v === 0 ? '0' : v;
+});
+
+// y-axis label
+const yLabel = el('text', {
+  x: 0, y: 0,
+  'text-anchor': 'middle',
+  'font-family': 'JetBrains Mono, monospace',
+  'font-size': '8',
+  fill: '#9A9890',
+  transform: 'translate(14,' + (MT + PH / 2) + ') rotate(-90)'
+}, svg);
+yLabel.textContent = 'CUMULATIVE % OF GDP';
+
+// x-axis labels (every 5 years)
+DATA.forEach((d, i) => {
+  if (d.year % 5 === 0) {
+    const x = ML + i * barGap + barGap / 2;
+    const t = el('text', {
+      x: x, y: MT + PH + 18,
+      'text-anchor': 'middle',
+      'font-family': 'JetBrains Mono, monospace',
+      'font-size': '9',
+      fill: '#9A9890'
+    }, svg);
+    t.textContent = d.year;
+
+    el('line', {
+      x1: x, x2: x,
+      y1: MT + PH, y2: MT + PH + 4,
+      stroke: '#C8C6BA',
+      'stroke-width': 1
+    }, svg);
+  }
+});
+
+// bars
+const barEls = [];
+DATA.forEach((d, i) => {
+  const x = ML + i * barGap + (barGap - barW) / 2;
+  const barH = (d.value / maxVal) * PH;
+  const y = MT + PH - barH;
+
+  const bar = el('rect', {
+    x: x, y: y,
+    width: barW, height: barH,
+    rx: 1, ry: 1,
+    fill: BAR_COLOR,
+    opacity: 0.82,
+    'data-index': i
+  }, svg);
+  barEls.push({ bar, x, y, barH });
+});
+
+// hit zones for hover
+DATA.forEach((d, i) => {
+  const x = ML + i * barGap;
+  const hit = el('rect', {
+    x: x, y: MT,
+    width: barGap, height: PH,
+    fill: 'transparent',
+    'data-index': i
+  }, svg);
+  hit.style.cursor = 'pointer';
+  hit.addEventListener('mouseenter', () => onEnter(i));
+  hit.addEventListener('mouseleave', onLeave);
+  hit.addEventListener('mousemove', (e) => onMove(e, i));
+});
+
+// annotations
+const annotGroup = el('g', {}, svg);
+
+ANNOTATIONS.forEach(ann => {
+  const idx = DATA.findIndex(d => d.year === ann.year);
+  if (idx < 0) return;
+  const d = DATA[idx];
+  const bx = ML + idx * barGap + barGap / 2;
+  const barH = (d.value / maxVal) * PH;
+  const by = MT + PH - barH;
+
+  const lineTop = Math.max(12, by - 40 + (ann.yOff || 0));
+  el('line', {
+    x1: bx, x2: bx,
+    y1: by - 3, y2: lineTop,
+    stroke: '#9A9890',
+    'stroke-width': 0.8,
+    'stroke-dasharray': '2,2'
+  }, annotGroup);
+
+  el('circle', {
+    cx: bx, cy: lineTop - 2,
+    r: 2,
+    fill: '#9A9890'
+  }, annotGroup);
+
+  const textAnchor = ann.side === 'left' ? 'end' : 'start';
+  const textX = ann.side === 'left' ? bx - 6 : bx + 6;
+
+  const mainLabel = el('text', {
+    x: textX, y: lineTop - 7,
+    'text-anchor': textAnchor,
+    'font-family': 'Inter, sans-serif',
+    'font-size': '9',
+    'font-weight': '600',
+    fill: '#2B2A27'
+  }, annotGroup);
+  mainLabel.textContent = ann.year + ': ' + ann.label;
+
+  const subLabel = el('text', {
+    x: textX, y: lineTop + 3,
+    'text-anchor': textAnchor,
+    'font-family': 'JetBrains Mono, monospace',
+    'font-size': '7.5',
+    fill: '#9A9890'
+  }, annotGroup);
+  subLabel.textContent = ann.sub;
+});
+
+// tooltip
+const tooltip = document.getElementById('tooltip');
+const ttYear = document.getElementById('tt-year');
+const ttDetail = document.getElementById('tt-detail');
+
+function onEnter(idx) {
+  DATA.forEach((_, i) => {
+    barEls[i].bar.setAttribute('opacity', i === idx ? 1 : 0.3);
+    barEls[i].bar.setAttribute('fill', i === idx ? BAR_HOVER : BAR_MUTED);
+  });
+}
+
+function onLeave() {
+  DATA.forEach((_, i) => {
+    barEls[i].bar.setAttribute('opacity', 0.82);
+    barEls[i].bar.setAttribute('fill', BAR_COLOR);
+  });
+  tooltip.style.opacity = '0';
+}
+
+function onMove(e, idx) {
+  const d = DATA[idx];
+  ttYear.textContent = d.year;
+  ttYear.style.color = BAR_HOVER;
+
+  const ann = ANNOTATIONS.find(a => a.year === d.year);
+  let eventLine = '';
+  if (ann) {
+    eventLine = '<br><span style="color:#9A9890;font-size:9px">' + ann.label + '</span>';
+  }
+
+  ttDetail.innerHTML =
+    '<span class="tt-val">' + d.value.toFixed(1) + '% of GDP</span>' +
+    '<br><span style="color:#9A9890">sum across all countries</span>' +
+    eventLine;
+
+  tooltip.style.opacity = '1';
+
+  const wrapRect = wrap.getBoundingClientRect();
+  let tx = e.clientX - wrapRect.left + 14;
+  let ty = e.clientY - wrapRect.top - 50;
+
+  if (tx + 200 > wrapRect.width) tx = e.clientX - wrapRect.left - 200;
+  if (ty < 0) ty = e.clientY - wrapRect.top + 14;
+
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+}
+</script>
+</body></html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 28px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 2px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 10;
+    line-height: 1.6;
+  }
+</style></head><body>
+<h1>Mind the Gap</h1>
+<p class="subtitle">Gender pay gap (unadjusted) in EU countries: earliest available year vs 2024. Women earn this percentage less than men on average. Hover over a row to see details.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat sdg_05_20 &nbsp;&middot;&nbsp; EU member states only</p>
+
+<script>
+const raw = [
+  {code:"EE",name:"Estonia",     earlyYear:2006,earlyVal:29.8, latestYear:2024,latestVal:18.8},
+  {code:"CZ",name:"Czechia",     earlyYear:2002,earlyVal:22.1, latestYear:2024,latestVal:18.5},
+  {code:"AT",name:"Austria",     earlyYear:2006,earlyVal:25.5, latestYear:2024,latestVal:17.6},
+  {code:"HU",name:"Hungary",     earlyYear:2002,earlyVal:19.1, latestYear:2024,latestVal:16.9},
+  {code:"FI",name:"Finland",     earlyYear:2006,earlyVal:21.3, latestYear:2024,latestVal:16.3},
+  {code:"SK",name:"Slovakia",    earlyYear:2002,earlyVal:27.7, latestYear:2024,latestVal:15.7},
+  {code:"DE",name:"Germany",     earlyYear:2006,earlyVal:22.7, latestYear:2024,latestVal:15.6},
+  {code:"DK",name:"Denmark",     earlyYear:2006,earlyVal:17.6, latestYear:2024,latestVal:14.0},
+  {code:"LV",name:"Latvia",      earlyYear:2006,earlyVal:15.1, latestYear:2024,latestVal:13.9},
+  {code:"EL",name:"Greece",      earlyYear:2002,earlyVal:25.5, latestYear:2024,latestVal:13.4},
+  {code:"BG",name:"Bulgaria",    earlyYear:2002,earlyVal:18.9, latestYear:2024,latestVal:12.0},
+  {code:"CY",name:"Cyprus",      earlyYear:2002,earlyVal:22.5, latestYear:2024,latestVal:11.8},
+  {code:"FR",name:"France",      earlyYear:2006,earlyVal:15.4, latestYear:2024,latestVal:11.8},
+  {code:"NL",name:"Netherlands", earlyYear:2002,earlyVal:18.7, latestYear:2024,latestVal:11.2},
+  {code:"SE",name:"Sweden",      earlyYear:2006,earlyVal:16.5, latestYear:2024,latestVal:11.2},
+  {code:"LT",name:"Lithuania",   earlyYear:2002,earlyVal:13.2, latestYear:2024,latestVal:10.0},
+  {code:"IE",name:"Ireland",     earlyYear:2002,earlyVal:15.1, latestYear:2024,latestVal:8.3},
+  {code:"SI",name:"Slovenia",    earlyYear:2002,earlyVal:6.1,  latestYear:2024,latestVal:8.0},
+  {code:"ES",name:"Spain",       earlyYear:2002,earlyVal:20.2, latestYear:2024,latestVal:7.3},
+  {code:"PT",name:"Portugal",    earlyYear:2006,earlyVal:8.4,  latestYear:2024,latestVal:7.0},
+  {code:"HR",name:"Croatia",     earlyYear:2010,earlyVal:5.7,  latestYear:2024,latestVal:6.6},
+  {code:"IT",name:"Italy",       earlyYear:2006,earlyVal:4.4,  latestYear:2024,latestVal:5.3},
+  {code:"MT",name:"Malta",       earlyYear:2006,earlyVal:5.2,  latestYear:2024,latestVal:4.9},
+  {code:"PL",name:"Poland",      earlyYear:2002,earlyVal:7.5,  latestYear:2024,latestVal:4.0},
+  {code:"RO",name:"Romania",     earlyYear:2002,earlyVal:16.0, latestYear:2024,latestVal:3.7},
+  {code:"BE",name:"Belgium",     earlyYear:2006,earlyVal:9.5,  latestYear:2024,latestVal:0.7},
+  {code:"LU",name:"Luxembourg",  earlyYear:2006,earlyVal:10.7, latestYear:2024,latestVal:-0.8}
+];
+
+// Colors
+const GREEN  = "#5A8A6A"; // improved (gap decreased)
+const AMBER  = "#C97A2A"; // worsened (gap increased)
+const DOT_EARLY  = "#C4BFA8"; // muted warm gray for early dots
+const BG_HIGHLIGHT = "rgba(43,42,39,0.04)";
+const GRID_COLOR = "#E2E0D5";
+const MUTED = "#7A786F";
+const DARK  = "#2B2A27";
+
+const W = 720;
+const rowH = 20;
+const margin = { top: 50, right: 120, bottom: 40, left: 110 };
+const slopeLeft = margin.left + 30;   // x position of left (early) column
+const slopeRight = W - margin.right - 30; // x position of right (latest) column
+const H = raw.length * rowH + margin.top + margin.bottom;
+
+// Data range: -2 to 32
+const minVal = -2;
+const maxVal = 32;
+const yRange = H - margin.top - margin.bottom;
+const yScale = v => margin.top + (maxVal - v) / (maxVal - minVal) * yRange;
+
+// But we are doing a horizontal slope chart (rows = countries, values on x axis)
+// Actually: vertical slope chart with rows for each country.
+// Left side column = early year, right side column = latest year.
+// Each row: country label on left, then two dots connected by a line.
+
+// Re-approach: use a compact slope design where each country is a horizontal row,
+// left dot = early value on a left scale, right dot = latest value on a right scale,
+// connected by a sloping line. Both scales share the same domain.
+
+const xLeft = slopeLeft;
+const xRight = slopeRight;
+
+// Y positions: each country gets a row
+const rowY = (i) => margin.top + i * rowH + rowH / 2;
+
+// X scales (both columns share same scale, left axis for early, right for latest)
+// Show values 0-30 on both axes
+const colWidth = xRight - xLeft;
+
+// For each row, the dot x positions are fixed (xLeft and xRight),
+// and we encode the value with a small horizontal offset within each column.
+// This is a TRUE slope chart: left and right are separate vertical axes for the two time points.
+
+// Vertical scale for left axis (early column)
+const earlyMin = -2, earlyMax = 32;
+const latestMin = -2, latestMax = 32;
+
+// Both axes will be drawn vertically, values go top=high, bottom=low
+// But we are stacking countries vertically. So let's rethink:
+// A proper slope chart: each country is a line. X-axis has two positions (early, latest).
+// Y-axis shows the value. Countries are spread on the chart not in rows but by value.
+
+// Let's do: W=720, left x = 180, right x = 540.
+// Top = 30%, bottom = 2% (y-axis range).
+// Each country gets a dot on the left at (leftX, yScale(earlyVal)) and on right at (rightX, yScale(latestVal))
+// Labels on far left and far right.
+
+// Recompute layout for proper slope chart
+const W2 = 800;
+const H2 = 560;
+const pad = { top: 50, bottom: 40, left: 160, right: 160 };
+const leftX = pad.left;
+const rightX = W2 - pad.right;
+const vMin = -2, vMax = 32;
+const vRange = H2 - pad.top - pad.bottom;
+const vScale = v => pad.top + (vMax - v) / (vMax - vMin) * vRange;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W2} ${H2}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W2 + "px";
+svg.style.cursor = "default";
+
+const ns = "http://www.w3.org/2000/svg";
+const el = (tag, attrs) => {
+  const e = document.createElementNS(ns, tag);
+  Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+  return e;
+};
+const txt = (x, y, text, opts = {}) => {
+  const t = el("text", { x, y,
+    "font-size": opts.size || "9",
+    "fill": opts.fill || MUTED,
+    "text-anchor": opts.anchor || "start",
+    ...(opts.mono ? {"font-family":"'JetBrains Mono', monospace"} : {}),
+    ...(opts.weight ? {"font-weight": opts.weight} : {})
+  });
+  t.textContent = text;
+  return t;
+};
+
+// Grid lines (horizontal, shared value axis)
+[0, 5, 10, 15, 20, 25, 30].forEach(v => {
+  const y = vScale(v);
+  const gridLine = el("line", { x1: leftX - 6, y1: y, x2: rightX + 6, y2: y,
+    stroke: GRID_COLOR, "stroke-width": v === 0 ? "1" : "0.5", "stroke-dasharray": v === 0 ? "none" : "3,4" });
+  svg.appendChild(gridLine);
+  // Left axis labels
+  const lt = txt(leftX - 10, y + 3.5, `${v}%`, { anchor: "end", mono: true, size: "9" });
+  svg.appendChild(lt);
+  // Right axis labels
+  const rt = txt(rightX + 10, y + 3.5, `${v}%`, { anchor: "start", mono: true, size: "9" });
+  svg.appendChild(rt);
+});
+// Zero line label at y=0 for negative
+const y0 = vScale(0);
+const zeroLine = el("line", { x1: leftX - 6, y1: y0, x2: rightX + 6, y2: y0,
+  stroke: "#C4BFA8", "stroke-width": "1" });
+svg.appendChild(zeroLine);
+
+// Column headers
+const headerY = pad.top - 22;
+const hLeft = txt(leftX, headerY, "EARLIEST AVAILABLE", { anchor: "middle", mono: true, size: "9" });
+hLeft.setAttribute("x", leftX);
+svg.appendChild(hLeft);
+const hRight = txt(rightX, headerY, "2024", { anchor: "middle", mono: true, size: "9" });
+svg.appendChild(hRight);
+
+// Vertical axis lines
+const axLeft = el("line", { x1: leftX, y1: pad.top - 10, x2: leftX, y2: H2 - pad.bottom,
+  stroke: GRID_COLOR, "stroke-width": "1" });
+svg.appendChild(axLeft);
+const axRight = el("line", { x1: rightX, y1: pad.top - 10, x2: rightX, y2: H2 - pad.bottom,
+  stroke: GRID_COLOR, "stroke-width": "1" });
+svg.appendChild(axRight);
+
+// Resolve label overlaps: push apart labels that are too close
+function resolveOverlaps(positions, minGap, yMin, yMax) {
+  const sorted = positions.map((y, i) => ({y, i})).sort((a, b) => a.y - b.y);
+  for (let j = 1; j < sorted.length; j++) {
+    if (sorted[j].y - sorted[j-1].y < minGap) {
+      sorted[j].y = sorted[j-1].y + minGap;
+    }
+  }
+  if (sorted.length > 0 && sorted[sorted.length - 1].y > yMax) {
+    sorted[sorted.length - 1].y = yMax;
+    for (let j = sorted.length - 2; j >= 0; j--) {
+      if (sorted[j].y > sorted[j + 1].y - minGap) {
+        sorted[j].y = sorted[j + 1].y - minGap;
+      }
+    }
+  }
+  const result = new Array(positions.length);
+  sorted.forEach(s => { result[s.i] = s.y; });
+  return result;
+}
+
+const labelGap = 13;
+const labelYMin = pad.top;
+const labelYMax = H2 - pad.bottom;
+const leftLabelYs = resolveOverlaps(raw.map(d => vScale(d.earlyVal)), labelGap, labelYMin, labelYMax);
+const rightLabelYs = resolveOverlaps(raw.map(d => vScale(d.latestVal)), labelGap, labelYMin, labelYMax);
+
+// Build row groups for interactivity
+const rowGroups = [];
+
+raw.forEach((d, i) => {
+  const improved = d.latestVal < d.earlyVal;
+  const lineColor = improved ? GREEN : AMBER;
+  const dotColor  = improved ? GREEN : AMBER;
+
+  const y1 = vScale(d.earlyVal);
+  const y2 = vScale(d.latestVal);
+  const lblY1 = leftLabelYs[i];
+  const lblY2 = rightLabelYs[i];
+
+  const g = document.createElementNS(ns, "g");
+  g.style.cursor = "default";
+
+  // Slope line
+  const line = el("line", { x1: leftX, y1, x2: rightX, y2,
+    stroke: lineColor, "stroke-width": "1.5", opacity: "0.75" });
+  g.appendChild(line);
+
+  // Leader lines from dot to displaced label
+  if (Math.abs(lblY1 - y1) > 2) {
+    const leader = el("line", { x1: leftX - 6, y1, x2: leftX - 14, y2: lblY1,
+      stroke: GRID_COLOR, "stroke-width": "0.7" });
+    g.appendChild(leader);
+  }
+  if (Math.abs(lblY2 - y2) > 2) {
+    const leader = el("line", { x1: rightX + 6, y1: y2, x2: rightX + 14, y2: lblY2,
+      stroke: GRID_COLOR, "stroke-width": "0.7" });
+    g.appendChild(leader);
+  }
+
+  // Early dot
+  const c1 = el("circle", { cx: leftX, cy: y1, r: "4",
+    fill: DOT_EARLY, stroke: "#F6F5EE", "stroke-width": "1" });
+  g.appendChild(c1);
+
+  // Latest dot
+  const c2 = el("circle", { cx: rightX, cy: y2, r: "4.5",
+    fill: dotColor, stroke: "#F6F5EE", "stroke-width": "1" });
+  g.appendChild(c2);
+
+  // Country label on left (resolved position)
+  const lbl = txt(leftX - 16, lblY1 + 3.5, d.name, { anchor: "end", size: "10", fill: DARK });
+  g.appendChild(lbl);
+
+  // Country label on right (resolved position)
+  const rbl = txt(rightX + 16, lblY2 + 3.5, d.name, { anchor: "start", size: "10", fill: DARK });
+  g.appendChild(rbl);
+
+  svg.appendChild(g);
+  rowGroups.push({ g, line, c1, c2, lbl, rbl, d, y1, y2, lineColor, dotColor });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity: hover proximity detection
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function setActive(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rowGroups.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "1.5");
+      row.line.setAttribute("opacity", "0.75");
+      row.c1.setAttribute("r", "4");
+      row.c2.setAttribute("r", "4.5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "3");
+      row.line.setAttribute("opacity", "1");
+      row.c1.setAttribute("r", "5.5");
+      row.c2.setAttribute("r", "6");
+    } else {
+      row.g.style.opacity = "0.18";
+      row.line.setAttribute("stroke-width", "1.5");
+      row.line.setAttribute("opacity", "0.75");
+      row.c1.setAttribute("r", "4");
+      row.c2.setAttribute("r", "4.5");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = W2 / rect.width;
+  const scaleY = H2 / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  // Find closest row by proximity to either dot or line
+  let best = -1, bestDist = 14;
+  rowGroups.forEach((row, i) => {
+    // Distance to left dot
+    const d1 = Math.hypot(mx - leftX, my - row.y1);
+    // Distance to right dot
+    const d2 = Math.hypot(mx - rightX, my - row.y2);
+    // Distance to midpoint of slope line
+    const midX = (leftX + rightX) / 2;
+    const midY = (row.y1 + row.y2) / 2;
+    const dm = Math.hypot(mx - midX, my - midY);
+    const dist = Math.min(d1, d2, dm);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  setActive(best);
+
+  if (best >= 0) {
+    const d = rowGroups[best].d;
+    const change = d.latestVal - d.earlyVal;
+    const dir = change < 0 ? "decreased" : "increased";
+    const pp = Math.abs(change).toFixed(1);
+    const lv = d.latestVal < 0 ? `${Math.abs(d.latestVal).toFixed(1)}% (women earn more)` : `${d.latestVal.toFixed(1)}%`;
+    tip.innerHTML = `<b>${d.name}</b><br>${d.earlyYear}: ${d.earlyVal.toFixed(1)}%<br>2024: ${lv}<br>Gap ${dir} by ${pp}pp`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 16) + "px";
+    tip.style.top  = (e.clientY - 48) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  setActive(-1);
+  tip.style.opacity = "0";
+});
+
+// Legend
+const legY = H2 - 8;
+const legItems = [
+  { col: DOT_EARLY, label: "Earliest year" },
+  { col: GREEN,     label: "2024 (gap narrowed)" },
+  { col: AMBER,     label: "2024 (gap widened)" }
+];
+legItems.forEach((l, i) => {
+  const lx = pad.left + i * 185;
+  const c = el("circle", { cx: lx, cy: legY - 3, r: "4", fill: l.col });
+  svg.appendChild(c);
+  const lt = txt(lx + 9, legY, l.label, { mono: true, size: "9" });
+  svg.appendChild(lt);
+});
+</script>
+</body></html>

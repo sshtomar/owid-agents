@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "a91dc0d5eb661a7cfd502d6fc9cf76ed",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"the-safety-divide\">The Safety Divide</h1>\n<span class=\"paragraph\">Intentional homicide rate per 100,000 population for 25 countries spanning the full global spectrum (2020-2023). A 1,000-fold difference separates the most and least violent nations.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "b78554e2638dd7cf08b8577d1383c689",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Number of victims of intentional homicide per 100,000 population, by sex (victims per 100,000 population)** (un-sdg)\n</code></pre></div>\n<span class=\"paragraph\">Number of victims of intentional homicide per 100,000 population, by sex (victims per 100,000 population) from un-sdg\nSource: <a href=\"https://unstats.un.org/sdgs/dataportal/database\" rel=\"noopener noreferrer\" target=\"_blank\">https://unstats.un.org/sdgs/dataportal/database</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "91c4a252c973b26d5c1faef5e57cf760",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='f7aaa4a4-2b06-4a49-7fb8-451d78109dae'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;2&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:23.03},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;8&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Albania&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:4.14},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;19&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Americas&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:28.19},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;660&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Anguilla&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:0.0},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;28&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Antigua and Barbuda&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:6.67},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;51&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Armenia&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:2.91},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;142&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Asia&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:4.68},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;36&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Australia&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:1.41},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;53&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Australia and New Zealand&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:2.26},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;40&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:0.73}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "f586dece2f26effe93f5b83958824442",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a comparison view we take the latest non-null value per country, then sort to show the ranking.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "2566fcfc55008c5e4f733dbf17a9f6c4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='f8f362f4-88ca-1f03-554c-8770bf47aa31'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:28,&#92;&quot;country&#92;&quot;:&#92;&quot;850&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;United States Virgin Islands&#92;&quot;,&#92;&quot;year&#92;&quot;:2012,&#92;&quot;value&#92;&quot;:100.12,&#92;&quot;latest_year&#92;&quot;:2012},{&#92;&quot;&#92;&quot;:119,&#92;&quot;country&#92;&quot;:&#92;&quot;796&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Turks and Caicos Islands&#92;&quot;,&#92;&quot;year&#92;&quot;:2022,&#92;&quot;value&#92;&quot;:76.34,&#92;&quot;latest_year&#92;&quot;:2022},{&#92;&quot;&#92;&quot;:209,&#92;&quot;country&#92;&quot;:&#92;&quot;662&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Saint Lucia&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;value&#92;&quot;:68.85,&#92;&quot;latest_year&#92;&quot;:2023},{&#92;&quot;&#92;&quot;:146,&#92;&quot;country&#92;&quot;:&#92;&quot;170&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Colombia&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;value&#92;&quot;:46.95,&#92;&quot;latest_year&#92;&quot;:2023},{&#92;&quot;&#92;&quot;:155,&#92;&quot;country&#92;&quot;:&#92;&quot;218&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Ecuador&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;value&#92;&quot;:45.72,&#92;&quot;latest_year&#92;&quot;:2023},{&#92;&quot;&#92;&quot;:116,&#92;&quot;country&#92;&quot;:&#92;&quot;710&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;South Africa&#92;&quot;,&#92;&quot;year&#92;&quot;:2022,&#92;&quot;value&#92;&quot;:43.72,&#92;&quot;latest_year&#92;&quot;:2022},{&#92;&quot;&#92;&quot;:114,&#92;&quot;country&#92;&quot;:&#92;&quot;670&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Saint Vincent and the Grenadines&#92;&quot;,&#92;&quot;year&#92;&quot;:2022,&#92;&quot;value&#92;&quot;:41.16,&#92;&quot;latest_year&#92;&quot;:2022},{&#92;&quot;&#92;&quot;:118,&#92;&quot;country&#92;&quot;:&#92;&quot;780&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Trinidad and Tobago&#92;&quot;,&#92;&quot;year&#92;&quot;:2022,&#92;&quot;value&#92;&quot;:40.44,&#92;&quot;latest_year&#92;&quot;:2022},{&#92;&quot;&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;426&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Lesotho&#92;&quot;,&#92;&quot;year&#92;&quot;:2008,&#92;&quot;value&#92;&quot;:38.24,&#92;&quot;latest_year&#92;&quot;:2008},{&#92;&quot;&#92;&quot;:178,&#92;&quot;country&#92;&quot;:&#92;&quot;419&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Latin America and the Caribbean&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;value&#92;&quot;:35.96,&#92;&quot;latest_year&#92;&quot;:2023}]&quot;' data-total-rows='20' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;latest_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "60dd584174f3bbec483e61f8229252bf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='51521208-0b19-5040-dcf8-a64bf3c55e25'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////iAUAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAA/AMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAANQDAAAEAAAAxQMAAHsiaW5kZXhfY29sdW1ucyI6IFsiX19pbmRleF9sZXZlbF8wX18iXSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnkiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5IiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInZhbHVlIiwgImZpZWxkX25hbWUiOiAidmFsdWUiLCAicGFuZGFzX3R5cGUiOiAiZmxvYXQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAibGF0ZXN0X3llYXIiLCAiZmllbGRfbmFtZSI6ICJsYXRlc3RfeWVhciIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiBudWxsLCAiZmllbGRfbmFtZSI6ICJfX2luZGV4X2xldmVsXzBfXyIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogImludDY0IiwgIm1ldGFkYXRhIjogbnVsbH1dLCAiY3JlYXRvciI6IHsibGlicmFyeSI6ICJweWFycm93IiwgInZlcnNpb24iOiAiMjEuMC4wIn0sICJwYW5kYXNfdmVyc2lvbiI6ICIyLjIuMyJ9AAAABgAAAHBhbmRhcwAABgAAACwBAADsAAAAsAAAAHwAAABEAAAABAAAAPz+//8AAAECEAAAACQAAAAEAAAAAAAAABEAAABfX2luZGV4X2xldmVsXzBfXwAAAGz///8AAAABQAAAADj///8AAAECEAAAABwAAAAEAAAAAAAAAAsAAABsYXRlc3RfeWVhcgCg////AAAAAUAAAABs////AAABAxAAAAAcAAAABAAAAAAAAAAFAAAAdmFsdWUABgAIAAYABgAAAAAAAgCc////AAABAhAAAAAgAAAABAAAAAAAAAAEAAAAeWVhcgAAAAAIAAwACAAHAAgAAAAAAAABQAAAANT///8AAAEFEAAAABwAAAAEAAAAAAAAAAsAAABjb3VudHJ5TmFtZQDI////EAAUAAgABgAHAAwAAAAQABAAAAAAAAEFEAAAABwAAAAEAAAAAAAAAAcAAABjb3VudHJ5AAQABAAEAAAAAAAAAP////+YAQAAFAAAAAAAAAAMABYABgAFAAgADAAMAAAAAAMEABgAAACgBAAAAAAAAAAACgAYAAwABAAIAAoAAAD8AAAAEAAAABQAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUAAAAAAAAAFgAAAAAAAAAOQAAAAAAAACYAAAAAAAAAAAAAAAAAAAAmAAAAAAAAABUAAAAAAAAAPAAAAAAAAAAKgEAAAAAAAAgAgAAAAAAAAAAAAAAAAAAIAIAAAAAAACgAAAAAAAAAMACAAAAAAAAAAAAAAAAAADAAgAAAAAAAKAAAAAAAAAAYAMAAAAAAAAAAAAAAAAAAGADAAAAAAAAoAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAACgAAAAAAAAAAAAAAAGAAAAFAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAGAAAACQAAAAwAAAAPAAAAEgAAABUAAAAYAAAAGwAAAB4AAAAgAAAAIwAAACYAAAAoAAAAKwAAAC4AAAAxAAAAMwAAADYAAAA5AAAAAAAAADg1MDc5NjY2MjE3MDIxODcxMDY3MDc4MDQyNjQxOTQ0MzQwNjYwODQzMjg2NjM3MjIxOTMwODQ4NAAAAAAAAAAAAAAAHAAAADQAAAA/AAAARwAAAE4AAABaAAAAegAAAI0AAACUAAAAswAAALoAAADCAAAAygAAANAAAADWAAAA8AAAABUBAAAdAQAAJAEAACoBAAAAAAAAVW5pdGVkIFN0YXRlcyBWaXJnaW4gSXNsYW5kc1R1cmtzIGFuZCBDYWljb3MgSXNsYW5kc1NhaW50IEx1Y2lhQ29sb21iaWFFY3VhZG9yU291dGggQWZyaWNhU2FpbnQgVmluY2VudCBhbmQgdGhlIEdyZW5hZGluZXNUcmluaWRhZCBhbmQgVG9iYWdvTGVzb3Rob0xhdGluIEFtZXJpY2EgYW5kIHRoZSBDYXJpYmJlYW5CYWhhbWFzSG9uZHVyYXNBbmd1aWxsYUJlbGl6ZUd1eWFuYVNhaW50IE1hcnRpbiAoRnJlbmNoIFBhcnQpU21hbGwgaXNsYW5kIGRldmVsb3BpbmcgU3RhdGVzIChTSURTKUFtZXJpY2FzR3JlbmFkYU1leGljbwAAAAAAANwHAAAAAAAA5gcAAAAAAADnBwAAAAAAAOcHAAAAAAAA5wcAAAAAAADmBwAAAAAAAOYHAAAAAAAA5gcAAAAAAADYBwAAAAAAAOcHAAAAAAAA5gcAAAAAAADnBwAAAAAAAN4HAAAAAAAA5gcAAAAAAADnBwAAAAAAAOAHAAAAAAAA5wcAAAAAAADnBwAAAAAAAOcHAAAAAAAA5wcAAAAAAABI4XoUrgdZQPYoXI/CFVNAZmZmZmY2UUCamZmZmXlHQFyPwvUo3EZAXI/C9SjcRUAUrkfhepREQLgehetROERAH4XrUbgeQ0B7FK5H4fpBQJqZmZmZGUBAcT0K16NwP0CkcD0K1yM9QI/C9ShcDzxAFK5H4XoUO0BmZmZmZuY6QJqZmZmZWTpArkfhehSuOUBI4XoUroc5QFyPwvUo3DhA3AcAAAAAAADmBwAAAAAAAOcHAAAAAAAA5wcAAAAAAADnBwAAAAAAAOYHAAAAAAAA5gcAAAAAAADmBwAAAAAAANgHAAAAAAAA5wcAAAAAAADmBwAAAAAAAOcHAAAAAAAA3gcAAAAAAADmBwAAAAAAAOcHAAAAAAAA4AcAAAAAAADnBwAAAAAAAOcHAAAAAAAA5wcAAAAAAADnBwAAAAAAABwAAAAAAAAAdwAAAAAAAADRAAAAAAAAAJIAAAAAAAAAmwAAAAAAAAB0AAAAAAAAAHIAAAAAAAAAdgAAAAAAAAACAAAAAAAAALIAAAAAAAAAYAAAAAAAAACpAAAAAAAAACEAAAAAAAAAYwAAAAAAAACmAAAAAAAAAC8AAAAAAAAA1gAAAAAAAAB+AAAAAAAAAKQAAAAAAAAAuAAAAAAAAAD/////AAAAABAAAAAMABQABgAIAAwAEAAMAAAAAAAEADwAAAAoAAAABAAAAAEAAACYBQAAAAAAAKABAAAAAAAAoAQAAAAAAAAAAAAAAAAAAAAACgAMAAAABAAIAAoAAAD8AwAABAAAAAEAAAAMAAAACAAMAAQACAAIAAAA1AMAAAQAAADFAwAAeyJpbmRleF9jb2x1bW5zIjogWyJfX2luZGV4X2xldmVsXzBfXyJdLCAiY29sdW1uX2luZGV4ZXMiOiBbeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiBudWxsLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IHsiZW5jb2RpbmciOiAiVVRGLTgifX1dLCAiY29sdW1ucyI6IFt7Im5hbWUiOiAiY291bnRyeSIsICJmaWVsZF9uYW1lIjogImNvdW50cnkiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAiY291bnRyeU5hbWUiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5TmFtZSIsICJwYW5kYXNfdHlwZSI6ICJ1bmljb2RlIiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ5ZWFyIiwgImZpZWxkX25hbWUiOiAieWVhciIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAidmFsdWUiLCAiZmllbGRfbmFtZSI6ICJ2YWx1ZSIsICJwYW5kYXNfdHlwZSI6ICJmbG9hdDY0IiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJsYXRlc3RfeWVhciIsICJmaWVsZF9uYW1lIjogImxhdGVzdF95ZWFyIiwgInBhbmRhc190eXBlIjogImludDY0IiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogIl9faW5kZXhfbGV2ZWxfMF9fIiwgInBhbmRhc190eXBlIjogImludDY0IiwgIm51bXB5X3R5cGUiOiAiaW50NjQiLCAibWV0YWRhdGEiOiBudWxsfV0sICJjcmVhdG9yIjogeyJsaWJyYXJ5IjogInB5YXJyb3ciLCAidmVyc2lvbiI6ICIyMS4wLjAifSwgInBhbmRhc192ZXJzaW9uIjogIjIuMi4zIn0AAAAGAAAAcGFuZGFzAAAGAAAALAEAAOwAAACwAAAAfAAAAEQAAAAEAAAA/P7//wAAAQIQAAAAJAAAAAQAAAAAAAAAEQAAAF9faW5kZXhfbGV2ZWxfMF9fAAAAbP///wAAAAFAAAAAOP///wAAAQIQAAAAHAAAAAQAAAAAAAAACwAAAGxhdGVzdF95ZWFyAKD///8AAAABQAAAAGz///8AAAEDEAAAABwAAAAEAAAAAAAAAAUAAAB2YWx1ZQAGAAgABgAGAAAAAAACAJz///8AAAECEAAAACAAAAAEAAAAAAAAAAQAAAB5ZWFyAAAAAAgADAAIAAcACAAAAAAAAAFAAAAA1P///wAAAQUQAAAAHAAAAAQAAAAAAAAACwAAAGNvdW50cnlOYW1lAMj///8QABQACAAGAAcADAAAABAAEAAAAAAAAQUQAAAAHAAAAAQAAAAAAAAABwAAAGNvdW50cnkABAAEAAQAAACwBQAAQVJST1cx&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;bar&quot;},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;legend&quot;:null,&quot;scale&quot;:{&quot;scheme&quot;:&quot;blues&quot;},&quot;type&quot;:&quot;quantitative&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;sort&quot;:&quot;-x&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;}},&quot;height&quot;:500,&quot;width&quot;:700,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "bd4033229ac88f0fc549dcb114991830",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Saint Lucia has the highest rate at 68.85 per 100,000 -- nearly 1,000 times higher than Singapore's 0.07</li>\n<li>Latin America and the Caribbean dominate the top 12 positions</li>\n<li>The United States (8.94) sits far above Western European peers like Germany (0.87) and France (1.94)</li>\n<li>East Asian and Gulf states cluster near zero: Japan 0.23, Singapore 0.07</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

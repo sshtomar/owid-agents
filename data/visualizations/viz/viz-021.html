@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 14px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart-wrap { position: relative; }
+  svg { display: block; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .tooltip .tt-country { font-size: 11px; font-family: 'Inter', sans-serif; font-weight: 600; margin-bottom: 2px; }
+  .tooltip .tt-val { color: #F6C47E; }
+</style>
+</head><body>
+<h1>Forced From Home</h1>
+<p class="subtitle">Refugees by country of origin, 2000–2024. Each line traces the number of people recognized as refugees who fled that country. Hover to inspect values.</p>
+<div id="chart-wrap">
+  <div class="tooltip" id="tooltip">
+    <div class="tt-country" id="tt-country"></div>
+    <div id="tt-year-val"></div>
+  </div>
+</div>
+<p class="source">Source: UNHCR Population Statistics</p>
+
+<script>
+const COUNTRIES = [
+  { code: 'AFG', name: 'Afghanistan',  color: '#C94F2A' },
+  { code: 'SYR', name: 'Syria',        color: '#5E8E6E' },
+  { code: 'UKR', name: 'Ukraine',      color: '#6B8FBF' },
+  { code: 'SSD', name: 'South Sudan',  color: '#B07D3E' },
+  { code: 'SOM', name: 'Somalia',      color: '#9A5B7A' },
+  { code: 'SUD', name: 'Sudan',        color: '#7A6B3E' },
+  { code: 'MYA', name: 'Myanmar',      color: '#4E8A7A' },
+  { code: 'COD', name: 'DR Congo',     color: '#8E6B3E' },
+  { code: 'IRQ', name: 'Iraq',         color: '#6B5EA8' },
+  { code: 'ERT', name: 'Eritrea',      color: '#A07060' },
+  { code: 'COL', name: 'Colombia',     color: '#7A8A5E' }
+];
+
+const YEARS = [2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+const RAW = {
+  AFG: [3587327,3809763,2510294,2136039,2414460,2166139,2107510,3057655,2833116,2887114,3054699,2664423,2586132,2556483,2596259,2666294,2501447,2624265,2681267,2727556,2594827,2712869,5661717,6403144,5766586],
+  SYR: [5868,4861,18908,20816,21430,16395,12327,13684,15206,17915,18451,19931,729011,2468323,3887490,4873236,5524511,6310498,6654374,6615249,6702910,6848865,6559736,6355788,5952174],
+  SSD: [0,0,0,0,0,0,0,0,0,0,0,0,87007,114468,616206,778722,1436707,2439888,2285301,2234805,2188785,2362759,2295082,2292482,2290622],
+  SOM: [475644,440120,432304,402329,389287,395544,464026,457345,561145,678296,770141,1077038,1136709,1121760,1106430,1123144,1012320,986386,949637,901596,812356,776678,786794,842044,894120],
+  UKR: [19310,26712,85258,94141,89582,84223,63716,25980,28416,24512,25102,25372,25248,5154,237617,321399,239062,139581,93248,59844,35156,27562,5684177,5960362,5120036],
+  SUD: [494351,489931,508863,606230,730631,693621,686296,523029,419249,368178,387265,500004,568934,648936,665956,627080,650391,694556,724787,734780,787823,825290,837188,1496923,2094373],
+  IRQ: [526165,530508,422504,368577,311889,262302,1450908,2309246,1903516,1785215,1683576,1428306,746204,401461,369960,264086,316056,362536,372332,336274,333200,343899,287446,329032,305504],
+  COD: [371705,392142,421355,453465,462186,430919,401908,370372,367991,455852,476691,491470,509275,499551,516765,541487,537474,620805,720302,802974,840392,908401,932680,978209,1060086],
+  MYA: [137121,145849,148493,151370,160997,164851,202817,191308,184410,406667,415662,414615,415363,479594,479006,451804,490285,1156742,1145149,1076826,1103245,1177327,1251618,1283426,1322503],
+  ERT: [376847,333222,318167,124111,131108,144062,193738,208747,186392,209164,222457,251941,285356,308210,363081,407428,457247,486209,507260,504300,524738,511911,512674,559853,551296],
+  COL: [9278,17937,30624,37992,47380,60447,72793,551741,373532,389753,395579,395950,394112,396711,360291,340116,311059,191635,138583,189254,189866,115792,109012,115513,77775]
+};
+
+// --- layout constants ---
+const W = 820, H = 440;
+const ML = 52, MR = 130, MT = 18, MB = 36;
+const PW = W - ML - MR, PH = H - MT - MB;
+
+const maxVal = 7200000;
+
+function fmtM(v) {
+  if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+  return v.toString();
+}
+
+function scaleX(year) {
+  return ML + ((year - 2000) / (2024 - 2000)) * PW;
+}
+function scaleY(val) {
+  return MT + PH - (val / maxVal) * PH;
+}
+
+// SVG helper
+function el(tag, attrs, parent) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+const wrap = document.getElementById('chart-wrap');
+const svg = el('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}` });
+wrap.insertBefore(svg, wrap.firstChild);
+
+// --- grid lines & y-axis ---
+const yTicks = [0, 1e6, 2e6, 3e6, 4e6, 5e6, 6e6, 7e6];
+yTicks.forEach(v => {
+  const y = scaleY(v);
+  el('line', { x1: ML, x2: ML + PW, y1: y, y2: y, stroke: v === 0 ? '#C8C6BA' : '#E2E0D5', 'stroke-width': 1 }, svg);
+  if (v > 0) {
+    const t = el('text', {
+      x: ML - 7, y: y + 3.5,
+      'text-anchor': 'end',
+      'font-family': 'JetBrains Mono, monospace',
+      'font-size': '9',
+      fill: '#9A9890'
+    }, svg);
+    t.textContent = fmtM(v);
+  }
+});
+
+// --- x-axis labels ---
+[2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  const x = scaleX(yr);
+  const t = el('text', {
+    x, y: MT + PH + 18,
+    'text-anchor': 'middle',
+    'font-family': 'JetBrains Mono, monospace',
+    'font-size': '9',
+    fill: '#9A9890'
+  }, svg);
+  t.textContent = yr;
+});
+
+// --- annotation: Syria crisis ---
+const syrX = scaleX(2011.5);
+el('line', { x1: syrX, x2: syrX, y1: MT, y2: MT + PH, stroke: '#2B2A27', 'stroke-width': 0.5, 'stroke-dasharray': '3 3', opacity: 0.25 }, svg);
+const annT = el('text', { x: syrX + 3, y: MT + 10, 'font-family': 'Inter, sans-serif', 'font-size': '8', fill: '#9A9890' }, svg);
+annT.textContent = 'Syrian civil war';
+
+// --- annotation: Ukraine 2022 ---
+const ukrX = scaleX(2022);
+el('line', { x1: ukrX, x2: ukrX, y1: MT, y2: MT + PH, stroke: '#2B2A27', 'stroke-width': 0.5, 'stroke-dasharray': '3 3', opacity: 0.25 }, svg);
+const annU = el('text', { x: ukrX + 3, y: MT + 20, 'font-family': 'Inter, sans-serif', 'font-size': '8', fill: '#9A9890' }, svg);
+annU.textContent = 'Russia invades';
+
+// --- draw lines and hitzone paths ---
+const linePaths = {};
+const hitPaths = {};
+
+COUNTRIES.forEach(c => {
+  const vals = RAW[c.code];
+  let d = '';
+  YEARS.forEach((yr, i) => {
+    const x = scaleX(yr), y = scaleY(vals[i]);
+    d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  });
+
+  // visible line
+  const path = el('path', {
+    d, fill: 'none', stroke: c.color,
+    'stroke-width': 1.8, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+    opacity: 0.85
+  }, svg);
+  linePaths[c.code] = path;
+
+  // wider invisible hit zone
+  const hit = el('path', {
+    d, fill: 'none', stroke: 'transparent', 'stroke-width': 10
+  }, svg);
+  hit.style.cursor = 'crosshair';
+  hitPaths[c.code] = hit;
+});
+
+// --- right-side labels with collision avoidance ---
+// Compute desired y positions (last data point)
+const labelData = COUNTRIES.map(c => {
+  const lastVal = RAW[c.code][RAW[c.code].length - 1];
+  return { code: c.code, name: c.name, color: c.color, desiredY: scaleY(lastVal), val: lastVal };
+}).sort((a, b) => a.desiredY - b.desiredY);
+
+// Nudge labels to avoid overlap (min gap 13px)
+const minGap = 13;
+function resolveCollisions(items) {
+  let changed = true;
+  let passes = 0;
+  while (changed && passes < 200) {
+    changed = false;
+    for (let i = 1; i < items.length; i++) {
+      const prev = items[i - 1], cur = items[i];
+      if (cur.y - prev.y < minGap) {
+        const mid = (prev.y + cur.y) / 2;
+        prev.y = mid - minGap / 2;
+        cur.y = mid + minGap / 2;
+        changed = true;
+      }
+    }
+    // clamp to chart area
+    for (const item of items) {
+      item.y = Math.max(MT + 4, Math.min(MT + PH - 4, item.y));
+    }
+    passes++;
+  }
+}
+
+labelData.forEach(d => { d.y = d.desiredY; });
+resolveCollisions(labelData);
+
+const labelEls = {};
+const tickEls = {};
+
+labelData.forEach(d => {
+  const lx = ML + PW + 8;
+  const anchorX = ML + PW;
+  const anchorY = scaleY(RAW[d.code][RAW[d.code].length - 1]);
+
+  // connector tick
+  const tick = el('line', {
+    x1: anchorX, y1: anchorY, x2: lx - 2, y2: d.y,
+    stroke: d.color, 'stroke-width': 0.8, opacity: 0.5
+  }, svg);
+  tickEls[d.code] = tick;
+
+  const t = el('text', {
+    x: lx, y: d.y + 3.5,
+    'text-anchor': 'start',
+    'font-family': 'Inter, sans-serif',
+    'font-size': '10',
+    'font-weight': '500',
+    fill: d.color
+  }, svg);
+  t.textContent = d.name;
+  labelEls[d.code] = t;
+});
+
+// --- crosshair & hover dots ---
+const crosshair = el('line', { x1: 0, x2: 0, y1: MT, y2: MT + PH, stroke: '#2B2A27', 'stroke-width': 0.8, opacity: 0, 'pointer-events': 'none' }, svg);
+const hoverDots = {};
+COUNTRIES.forEach(c => {
+  hoverDots[c.code] = el('circle', { r: 4, fill: c.color, opacity: 0, 'pointer-events': 'none', stroke: '#F6F5EE', 'stroke-width': 1.5 }, svg);
+});
+
+// --- tooltip & interaction ---
+const tooltip = document.getElementById('tooltip');
+const ttCountry = document.getElementById('tt-country');
+const ttYearVal = document.getElementById('tt-year-val');
+
+let activeCountry = null;
+
+function showTooltip(code, year, x, y) {
+  const c = COUNTRIES.find(c => c.code === code);
+  const idx = YEARS.indexOf(year);
+  const val = RAW[code][idx];
+  ttCountry.textContent = c.name;
+  ttCountry.style.color = c.color;
+  ttYearVal.innerHTML = `<span style="color:#9A9890">${year}</span> &nbsp;<span class="tt-val">${fmtM(val)} refugees</span>`;
+  tooltip.style.opacity = '1';
+
+  // position tooltip
+  const svgRect = svg.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  const px = (x / W) * svgRect.width + svgRect.left - wrapRect.left;
+  const py = (y / H) * svgRect.height + svgRect.top - wrapRect.top;
+  let tx = px + 14;
+  if (tx + 180 > wrapRect.width) tx = px - 180;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = (py - 28) + 'px';
+}
+
+function nearestYear(svgX) {
+  const frac = (svgX - ML) / PW;
+  const raw = frac * (YEARS.length - 1);
+  const idx = Math.round(Math.max(0, Math.min(YEARS.length - 1, raw)));
+  return YEARS[idx];
+}
+
+function dimAll(except) {
+  COUNTRIES.forEach(c => {
+    const op = (except === null || c.code === except) ? 0.85 : 0.1;
+    linePaths[c.code].setAttribute('opacity', op);
+    labelEls[c.code].setAttribute('opacity', (except === null || c.code === except) ? 1 : 0.2);
+    tickEls[c.code].setAttribute('opacity', (except === null || c.code === except) ? 0.5 : 0.1);
+  });
+}
+
+function onMove(e) {
+  const rect = svg.getBoundingClientRect();
+  const svgX = ((e.clientX - rect.left) / rect.width) * W;
+  const svgY = ((e.clientY - rect.top) / rect.height) * H;
+
+  if (svgX < ML || svgX > ML + PW || svgY < MT || svgY > MT + PH) {
+    onLeave();
+    return;
+  }
+
+  const year = nearestYear(svgX);
+  const idx = YEARS.indexOf(year);
+  const cx = scaleX(year);
+
+  crosshair.setAttribute('x1', cx);
+  crosshair.setAttribute('x2', cx);
+  crosshair.setAttribute('opacity', 0.25);
+
+  if (activeCountry) {
+    const val = RAW[activeCountry][idx];
+    const cy = scaleY(val);
+    const dot = hoverDots[activeCountry];
+    dot.setAttribute('cx', cx);
+    dot.setAttribute('cy', cy);
+    dot.setAttribute('opacity', 1);
+    showTooltip(activeCountry, year, cx, cy);
+  } else {
+    // show all dots
+    COUNTRIES.forEach(c => {
+      const val = RAW[c.code][idx];
+      const cy = scaleY(val);
+      hoverDots[c.code].setAttribute('cx', cx);
+      hoverDots[c.code].setAttribute('cy', cy);
+      hoverDots[c.code].setAttribute('opacity', 0.7);
+    });
+    // find closest line
+    let best = null, bestDist = Infinity;
+    COUNTRIES.forEach(c => {
+      const val = RAW[c.code][idx];
+      const cy = scaleY(val);
+      const dist = Math.abs(svgY - cy);
+      if (dist < bestDist) { bestDist = dist; best = c.code; }
+    });
+    if (bestDist < 30 && best) {
+      const val = RAW[best][idx];
+      const cy = scaleY(val);
+      showTooltip(best, year, cx, cy);
+    } else {
+      tooltip.style.opacity = '0';
+    }
+  }
+}
+
+function onLeave() {
+  crosshair.setAttribute('opacity', 0);
+  COUNTRIES.forEach(c => hoverDots[c.code].setAttribute('opacity', 0));
+  tooltip.style.opacity = '0';
+  if (!activeCountry) dimAll(null);
+}
+
+svg.addEventListener('mousemove', onMove);
+svg.addEventListener('mouseleave', onLeave);
+
+// hit zone hover for per-line highlighting
+COUNTRIES.forEach(c => {
+  hitPaths[c.code].addEventListener('mouseenter', () => {
+    activeCountry = c.code;
+    dimAll(c.code);
+    COUNTRIES.forEach(cc => hoverDots[cc.code].setAttribute('opacity', 0));
+  });
+  hitPaths[c.code].addEventListener('mouseleave', () => {
+    activeCountry = null;
+    dimAll(null);
+  });
+  hitPaths[c.code].addEventListener('mousemove', onMove);
+});
+</script>
+</body></html>

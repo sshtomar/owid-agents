@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Youth Unemployment Rates Around the World, 2024</h1>
+  <p class="subtitle">Unemployment as % of labor force ages 15-24 (ILO modeled estimates). 28 countries spanning the full range.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank / International Labour Organization (ILO)</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const data = [
+      { country: "Cambodia", value: 0.7, region: "East Asia & Pacific" },
+      { country: "Guinea-Bissau", value: 2.8, region: "Sub-Saharan Africa" },
+      { country: "Cote d'Ivoire", value: 4.2, region: "Sub-Saharan Africa" },
+      { country: "Bolivia", value: 5.2, region: "Latin America & Caribbean" },
+      { country: "Bahrain", value: 5.5, region: "Middle East & North Africa" },
+      { country: "Burkina Faso", value: 6.5, region: "Sub-Saharan Africa" },
+      { country: "El Salvador", value: 7.5, region: "Latin America & Caribbean" },
+      { country: "Honduras", value: 8.3, region: "Latin America & Caribbean" },
+      { country: "Comoros", value: 8.8, region: "Sub-Saharan Africa" },
+      { country: "Australia", value: 9.4, region: "East Asia & Pacific" },
+      { country: "Eritrea", value: 10.1, region: "Sub-Saharan Africa" },
+      { country: "Ireland", value: 10.4, region: "Europe & Central Asia" },
+      { country: "Bulgaria", value: 12.5, region: "Europe & Central Asia" },
+      { country: "Guam", value: 12.9, region: "East Asia & Pacific" },
+      { country: "Azerbaijan", value: 13.5, region: "Europe & Central Asia" },
+      { country: "Fiji", value: 15.1, region: "East Asia & Pacific" },
+      { country: "India", value: 15.7, region: "South Asia" },
+      { country: "Egypt", value: 17.3, region: "Middle East & North Africa" },
+      { country: "Bhutan", value: 17.9, region: "South Asia" },
+      { country: "France", value: 18.6, region: "Europe & Central Asia" },
+      { country: "Estonia", value: 19.3, region: "Europe & Central Asia" },
+      { country: "Costa Rica", value: 20.5, region: "Latin America & Caribbean" },
+      { country: "Guyana", value: 24.7, region: "Latin America & Caribbean" },
+      { country: "Angola", value: 26.7, region: "Sub-Saharan Africa" },
+      { country: "Georgia", value: 29.9, region: "Europe & Central Asia" },
+      { country: "Gabon", value: 36.3, region: "Sub-Saharan Africa" },
+      { country: "Congo, Rep.", value: 40.6, region: "Sub-Saharan Africa" },
+      { country: "Djibouti", value: 76.5, region: "Middle East & North Africa" }
+    ];
+
+    const regionColors = {
+      "East Asia & Pacific": "#3b82f6",
+      "Europe & Central Asia": "#8b5cf6",
+      "Latin America & Caribbean": "#f59e0b",
+      "Middle East & North Africa": "#ef4444",
+      "South Asia": "#10b981",
+      "Sub-Saharan Africa": "#f97316"
+    };
+
+    const chart = Plot.plot({
+      marginLeft: 120,
+      marginRight: 50,
+      width: 800,
+      height: 620,
+      x: {
+        label: "Youth unemployment rate (%)",
+        domain: [0, 80],
+        grid: true
+      },
+      y: {
+        label: null,
+        domain: data.map(d => d.country)
+      },
+      color: {
+        domain: Object.keys(regionColors),
+        range: Object.values(regionColors),
+        legend: true
+      },
+      marks: [
+        Plot.ruleX([0]),
+        Plot.barX(data, {
+          x: "value",
+          y: "country",
+          fill: "region",
+          sort: { y: "x", reverse: false },
+          tip: true
+        }),
+        Plot.text(data, {
+          x: "value",
+          y: "country",
+          text: d => d.value.toFixed(1) + "%",
+          dx: 4,
+          textAnchor: "start",
+          fontSize: 11,
+          fill: "#334155"
+        })
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

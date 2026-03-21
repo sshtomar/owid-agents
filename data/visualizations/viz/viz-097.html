@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 16px; font-size: 10px; color: #7A786F; }
+  .legend-item { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .legend-item:hover { color: #2B2A27; }
+  .legend-swatch { width: 16px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>The COVID Dip in European Life Expectancy</h1>
+<p class="subtitle">Life expectancy at birth across 10 EU countries, 1990-2024. The pandemic reversed decades of steady gains: Bulgaria lost nearly 4 years between 2019 and 2021, while western European nations saw smaller but still historic drops. Most countries had recovered to pre-pandemic levels by 2023.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat -- demo_mlexpec (Life expectancy by age and sex)</p>
+<script>
+const raw = [{"c":"Belgium","y":1990,"v":76.2},{"c":"Belgium","y":1991,"v":76.3},{"c":"Belgium","y":1992,"v":76.5},{"c":"Belgium","y":1993,"v":76.5},{"c":"Belgium","y":1994,"v":76.8},{"c":"Belgium","y":1995,"v":77},{"c":"Belgium","y":1996,"v":77.3},{"c":"Belgium","y":1997,"v":77.5},{"c":"Belgium","y":1998,"v":77.6},{"c":"Belgium","y":1999,"v":77.7},{"c":"Belgium","y":2000,"v":77.9},{"c":"Belgium","y":2001,"v":78.1},{"c":"Belgium","y":2002,"v":78.2},{"c":"Belgium","y":2003,"v":78.3},{"c":"Belgium","y":2004,"v":79},{"c":"Belgium","y":2005,"v":79.1},{"c":"Belgium","y":2006,"v":79.5},{"c":"Belgium","y":2007,"v":79.9},{"c":"Belgium","y":2008,"v":79.8},{"c":"Belgium","y":2009,"v":80.2},{"c":"Belgium","y":2010,"v":80.3},{"c":"Belgium","y":2011,"v":80.7},{"c":"Belgium","y":2012,"v":80.5},{"c":"Belgium","y":2013,"v":80.7},{"c":"Belgium","y":2014,"v":81.4},{"c":"Belgium","y":2015,"v":81.1},{"c":"Belgium","y":2016,"v":81.5},{"c":"Belgium","y":2017,"v":81.6},{"c":"Belgium","y":2018,"v":81.7},{"c":"Belgium","y":2019,"v":82.1},{"c":"Belgium","y":2020,"v":80.8},{"c":"Belgium","y":2021,"v":81.9},{"c":"Belgium","y":2022,"v":81.8},{"c":"Belgium","y":2023,"v":82.5},{"c":"Belgium","y":2024,"v":82.4},{"c":"Bulgaria","y":1990,"v":71.2},{"c":"Bulgaria","y":1991,"v":71.1},{"c":"Bulgaria","y":1992,"v":71.2},{"c":"Bulgaria","y":1993,"v":71.2},{"c":"Bulgaria","y":1994,"v":70.9},{"c":"Bulgaria","y":1995,"v":71},{"c":"Bulgaria","y":1996,"v":70.8},{"c":"Bulgaria","y":1997,"v":70.3},{"c":"Bulgaria","y":1998,"v":70.9},{"c":"Bulgaria","y":1999,"v":71.6},{"c":"Bulgaria","y":2000,"v":71.6},{"c":"Bulgaria","y":2001,"v":71.9},{"c":"Bulgaria","y":2002,"v":72.1},{"c":"Bulgaria","y":2003,"v":72.3},{"c":"Bulgaria","y":2004,"v":72.5},{"c":"Bulgaria","y":2005,"v":72.5},{"c":"Bulgaria","y":2006,"v":72.7},{"c":"Bulgaria","y":2007,"v":73},{"c":"Bulgaria","y":2008,"v":73.3},{"c":"Bulgaria","y":2009,"v":73.7},{"c":"Bulgaria","y":2010,"v":73.8},{"c":"Bulgaria","y":2011,"v":74.2},{"c":"Bulgaria","y":2012,"v":74.4},{"c":"Bulgaria","y":2013,"v":74.9},{"c":"Bulgaria","y":2014,"v":74.5},{"c":"Bulgaria","y":2015,"v":74.7},{"c":"Bulgaria","y":2016,"v":74.9},{"c":"Bulgaria","y":2017,"v":74.8},{"c":"Bulgaria","y":2018,"v":75},{"c":"Bulgaria","y":2019,"v":75.1},{"c":"Bulgaria","y":2020,"v":73.3},{"c":"Bulgaria","y":2021,"v":71.2},{"c":"Bulgaria","y":2022,"v":74.2},{"c":"Bulgaria","y":2023,"v":75.8},{"c":"Bulgaria","y":2024,"v":75.8},{"c":"Czechia","y":1990,"v":71.5},{"c":"Czechia","y":1991,"v":72},{"c":"Czechia","y":1992,"v":72.4},{"c":"Czechia","y":1993,"v":72.9},{"c":"Czechia","y":1994,"v":73.2},{"c":"Czechia","y":1995,"v":73.3},{"c":"Czechia","y":1996,"v":74},{"c":"Czechia","y":1997,"v":74.1},{"c":"Czechia","y":1998,"v":74.7},{"c":"Czechia","y":1999,"v":74.9},{"c":"Czechia","y":2000,"v":75.1},{"c":"Czechia","y":2001,"v":75.3},{"c":"Czechia","y":2002,"v":75.4},{"c":"Czechia","y":2003,"v":75.3},{"c":"Czechia","y":2004,"v":75.9},{"c":"Czechia","y":2005,"v":76.1},{"c":"Czechia","y":2006,"v":76.7},{"c":"Czechia","y":2007,"v":77},{"c":"Czechia","y":2008,"v":77.3},{"c":"Czechia","y":2009,"v":77.4},{"c":"Czechia","y":2010,"v":77.7},{"c":"Czechia","y":2011,"v":78},{"c":"Czechia","y":2012,"v":78.1},{"c":"Czechia","y":2013,"v":78.3},{"c":"Czechia","y":2014,"v":78.9},{"c":"Czechia","y":2015,"v":78.7},{"c":"Czechia","y":2016,"v":79.1},{"c":"Czechia","y":2017,"v":79.1},{"c":"Czechia","y":2018,"v":79.1},{"c":"Czechia","y":2019,"v":79.3},{"c":"Czechia","y":2020,"v":78.3},{"c":"Czechia","y":2021,"v":77.2},{"c":"Czechia","y":2022,"v":79},{"c":"Czechia","y":2023,"v":79.9},{"c":"Czechia","y":2024,"v":80.1},{"c":"France","y":1998,"v":78.7},{"c":"France","y":1999,"v":78.9},{"c":"France","y":2000,"v":79.2},{"c":"France","y":2001,"v":79.3},{"c":"France","y":2002,"v":79.4},{"c":"France","y":2003,"v":79.3},{"c":"France","y":2004,"v":80.3},{"c":"France","y":2005,"v":80.3},{"c":"France","y":2006,"v":80.9},{"c":"France","y":2007,"v":81.3},{"c":"France","y":2008,"v":81.4},{"c":"France","y":2009,"v":81.5},{"c":"France","y":2010,"v":81.8},{"c":"France","y":2011,"v":82.3},{"c":"France","y":2012,"v":82.1},{"c":"France","y":2013,"v":82.4},{"c":"France","y":2014,"v":82.9},{"c":"France","y":2015,"v":82.4},{"c":"France","y":2016,"v":82.7},{"c":"France","y":2017,"v":82.7},{"c":"France","y":2018,"v":82.8},{"c":"France","y":2019,"v":83},{"c":"France","y":2020,"v":82.3},{"c":"France","y":2021,"v":82.4},{"c":"France","y":2022,"v":82.3},{"c":"France","y":2023,"v":83},{"c":"France","y":2024,"v":83},{"c":"Germany","y":1990,"v":77.4},{"c":"Germany","y":1991,"v":75.7},{"c":"Germany","y":1992,"v":76.2},{"c":"Germany","y":1993,"v":76.2},{"c":"Germany","y":1994,"v":76.6},{"c":"Germany","y":1995,"v":76.7},{"c":"Germany","y":1996,"v":77},{"c":"Germany","y":1997,"v":77.4},{"c":"Germany","y":1998,"v":77.8},{"c":"Germany","y":1999,"v":78},{"c":"Germany","y":2000,"v":78.3},{"c":"Germany","y":2001,"v":78.6},{"c":"Germany","y":2002,"v":78.6},{"c":"Germany","y":2003,"v":78.6},{"c":"Germany","y":2004,"v":79.3},{"c":"Germany","y":2005,"v":79.4},{"c":"Germany","y":2006,"v":79.9},{"c":"Germany","y":2007,"v":80.1},{"c":"Germany","y":2008,"v":80.2},{"c":"Germany","y":2009,"v":80.3},{"c":"Germany","y":2010,"v":80.5},{"c":"Germany","y":2011,"v":80.6},{"c":"Germany","y":2012,"v":80.7},{"c":"Germany","y":2013,"v":80.6},{"c":"Germany","y":2014,"v":81.2},{"c":"Germany","y":2015,"v":80.7},{"c":"Germany","y":2016,"v":81},{"c":"Germany","y":2017,"v":81.1},{"c":"Germany","y":2018,"v":81},{"c":"Germany","y":2019,"v":81.3},{"c":"Germany","y":2020,"v":81.1},{"c":"Germany","y":2021,"v":80.8},{"c":"Germany","y":2022,"v":80.7},{"c":"Germany","y":2023,"v":81.1},{"c":"Germany","y":2024,"v":81.2},{"c":"Italy","y":1990,"v":77.1},{"c":"Italy","y":1991,"v":77.1},{"c":"Italy","y":1992,"v":77.5},{"c":"Italy","y":1993,"v":77.8},{"c":"Italy","y":1994,"v":78},{"c":"Italy","y":1995,"v":78.3},{"c":"Italy","y":1996,"v":78.7},{"c":"Italy","y":1997,"v":79},{"c":"Italy","y":1998,"v":79.1},{"c":"Italy","y":1999,"v":79.6},{"c":"Italy","y":2000,"v":79.9},{"c":"Italy","y":2001,"v":80.3},{"c":"Italy","y":2002,"v":80.4},{"c":"Italy","y":2003,"v":80.1},{"c":"Italy","y":2004,"v":80.9},{"c":"Italy","y":2005,"v":80.9},{"c":"Italy","y":2006,"v":81.4},{"c":"Italy","y":2007,"v":81.6},{"c":"Italy","y":2008,"v":81.7},{"c":"Italy","y":2009,"v":81.8},{"c":"Italy","y":2010,"v":82.2},{"c":"Italy","y":2011,"v":82.4},{"c":"Italy","y":2012,"v":82.4},{"c":"Italy","y":2013,"v":82.9},{"c":"Italy","y":2014,"v":83.2},{"c":"Italy","y":2015,"v":82.7},{"c":"Italy","y":2016,"v":83.4},{"c":"Italy","y":2017,"v":83.1},{"c":"Italy","y":2018,"v":83.4},{"c":"Italy","y":2019,"v":83.6},{"c":"Italy","y":2020,"v":82.3},{"c":"Italy","y":2021,"v":82.7},{"c":"Italy","y":2022,"v":82.8},{"c":"Italy","y":2023,"v":83.5},{"c":"Italy","y":2024,"v":83.7},{"c":"Poland","y":1990,"v":70.7},{"c":"Poland","y":1991,"v":70.4},{"c":"Poland","y":1992,"v":71},{"c":"Poland","y":1993,"v":71.5},{"c":"Poland","y":1994,"v":71.8},{"c":"Poland","y":1995,"v":72},{"c":"Poland","y":1996,"v":72.3},{"c":"Poland","y":1997,"v":72.7},{"c":"Poland","y":1998,"v":73.1},{"c":"Poland","y":1999,"v":73.1},{"c":"Poland","y":2000,"v":73.8},{"c":"Poland","y":2001,"v":74.2},{"c":"Poland","y":2002,"v":74.5},{"c":"Poland","y":2003,"v":74.7},{"c":"Poland","y":2004,"v":74.9},{"c":"Poland","y":2005,"v":75},{"c":"Poland","y":2006,"v":75.3},{"c":"Poland","y":2007,"v":75.4},{"c":"Poland","y":2008,"v":75.6},{"c":"Poland","y":2009,"v":75.9},{"c":"Poland","y":2010,"v":76.4},{"c":"Poland","y":2011,"v":76.8},{"c":"Poland","y":2012,"v":76.9},{"c":"Poland","y":2013,"v":77.1},{"c":"Poland","y":2014,"v":77.8},{"c":"Poland","y":2015,"v":77.5},{"c":"Poland","y":2016,"v":78},{"c":"Poland","y":2017,"v":77.8},{"c":"Poland","y":2018,"v":77.7},{"c":"Poland","y":2019,"v":78},{"c":"Poland","y":2020,"v":76.4},{"c":"Poland","y":2021,"v":75.4},{"c":"Poland","y":2022,"v":77.2},{"c":"Poland","y":2023,"v":78.4},{"c":"Poland","y":2024,"v":78.5},{"c":"Romania","y":1990,"v":69.9},{"c":"Romania","y":1991,"v":70.1},{"c":"Romania","y":1992,"v":69.5},{"c":"Romania","y":1993,"v":69.5},{"c":"Romania","y":1994,"v":69.4},{"c":"Romania","y":1995,"v":69.3},{"c":"Romania","y":1996,"v":68.8},{"c":"Romania","y":1997,"v":69.1},{"c":"Romania","y":1998,"v":69.9},{"c":"Romania","y":1999,"v":70.6},{"c":"Romania","y":2000,"v":71.2},{"c":"Romania","y":2001,"v":71.1},{"c":"Romania","y":2002,"v":70.9},{"c":"Romania","y":2003,"v":71},{"c":"Romania","y":2004,"v":71.4},{"c":"Romania","y":2005,"v":71.9},{"c":"Romania","y":2006,"v":72.5},{"c":"Romania","y":2007,"v":73.1},{"c":"Romania","y":2008,"v":73.5},{"c":"Romania","y":2009,"v":73.7},{"c":"Romania","y":2010,"v":73.7},{"c":"Romania","y":2011,"v":74.4},{"c":"Romania","y":2012,"v":74.4},{"c":"Romania","y":2013,"v":75.1},{"c":"Romania","y":2014,"v":75},{"c":"Romania","y":2015,"v":74.9},{"c":"Romania","y":2016,"v":75.2},{"c":"Romania","y":2017,"v":75.2},{"c":"Romania","y":2018,"v":75.3},{"c":"Romania","y":2019,"v":75.6},{"c":"Romania","y":2020,"v":74.2},{"c":"Romania","y":2021,"v":72.8},{"c":"Romania","y":2022,"v":75.1},{"c":"Romania","y":2023,"v":76.4},{"c":"Romania","y":2024,"v":76.5},{"c":"Spain","y":1990,"v":76.9},{"c":"Spain","y":1991,"v":77.1},{"c":"Spain","y":1992,"v":77.6},{"c":"Spain","y":1993,"v":77.7},{"c":"Spain","y":1994,"v":78},{"c":"Spain","y":1995,"v":78.1},{"c":"Spain","y":1996,"v":78.3},{"c":"Spain","y":1997,"v":78.8},{"c":"Spain","y":1998,"v":78.8},{"c":"Spain","y":1999,"v":78.8},{"c":"Spain","y":2000,"v":79.3},{"c":"Spain","y":2001,"v":79.8},{"c":"Spain","y":2002,"v":79.8},{"c":"Spain","y":2003,"v":79.7},{"c":"Spain","y":2004,"v":80.4},{"c":"Spain","y":2005,"v":80.3},{"c":"Spain","y":2006,"v":81.1},{"c":"Spain","y":2007,"v":81.1},{"c":"Spain","y":2008,"v":81.5},{"c":"Spain","y":2009,"v":81.9},{"c":"Spain","y":2010,"v":82.4},{"c":"Spain","y":2011,"v":82.6},{"c":"Spain","y":2012,"v":82.5},{"c":"Spain","y":2013,"v":83.2},{"c":"Spain","y":2014,"v":83.3},{"c":"Spain","y":2015,"v":83},{"c":"Spain","y":2016,"v":83.5},{"c":"Spain","y":2017,"v":83.4},{"c":"Spain","y":2018,"v":83.5},{"c":"Spain","y":2019,"v":84},{"c":"Spain","y":2020,"v":82.3},{"c":"Spain","y":2021,"v":83.3},{"c":"Spain","y":2022,"v":83.2},{"c":"Spain","y":2023,"v":84},{"c":"Spain","y":2024,"v":84},{"c":"Sweden","y":1990,"v":77.7},{"c":"Sweden","y":1991,"v":77.8},{"c":"Sweden","y":1992,"v":78.2},{"c":"Sweden","y":1993,"v":78.2},{"c":"Sweden","y":1994,"v":78.9},{"c":"Sweden","y":1995,"v":79},{"c":"Sweden","y":1996,"v":79.2},{"c":"Sweden","y":1997,"v":79.4},{"c":"Sweden","y":1998,"v":79.5},{"c":"Sweden","y":1999,"v":79.6},{"c":"Sweden","y":2000,"v":79.8},{"c":"Sweden","y":2001,"v":79.9},{"c":"Sweden","y":2002,"v":80},{"c":"Sweden","y":2003,"v":80.3},{"c":"Sweden","y":2004,"v":80.7},{"c":"Sweden","y":2005,"v":80.7},{"c":"Sweden","y":2006,"v":81},{"c":"Sweden","y":2007,"v":81.1},{"c":"Sweden","y":2008,"v":81.3},{"c":"Sweden","y":2009,"v":81.5},{"c":"Sweden","y":2010,"v":81.6},{"c":"Sweden","y":2011,"v":81.9},{"c":"Sweden","y":2012,"v":81.8},{"c":"Sweden","y":2013,"v":82},{"c":"Sweden","y":2014,"v":82.3},{"c":"Sweden","y":2015,"v":82.2},{"c":"Sweden","y":2016,"v":82.4},{"c":"Sweden","y":2017,"v":82.5},{"c":"Sweden","y":2018,"v":82.6},{"c":"Sweden","y":2019,"v":83.2},{"c":"Sweden","y":2020,"v":82.4},{"c":"Sweden","y":2021,"v":83.1},{"c":"Sweden","y":2022,"v":83.1},{"c":"Sweden","y":2023,"v":83.4},{"c":"Sweden","y":2024,"v":83.8}];
+
+// Group by country
+const countries = {};
+raw.forEach(d => {
+  if (!countries[d.c]) countries[d.c] = [];
+  countries[d.c].push(d);
+});
+
+const countryNames = Object.keys(countries).sort();
+
+// Color palette -- western Europe (warm tones), eastern Europe (cool tones)
+const colorMap = {
+  "Spain":    "#C2553A",
+  "Italy":    "#E08A3A",
+  "France":   "#D4A03E",
+  "Germany":  "#7A9B57",
+  "Sweden":   "#4A8C6F",
+  "Belgium":  "#B07AA1",
+  "Poland":   "#4E79A7",
+  "Czechia":  "#6C9CC4",
+  "Romania":  "#59A5D8",
+  "Bulgaria": "#2B6B8E"
+};
+
+// Chart dimensions
+const W = 780;
+const H = 480;
+const pad = { left: 44, right: 80, top: 24, bottom: 36 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+// Scales
+const yearMin = 1990, yearMax = 2024;
+const valMin = 68, valMax = 85;
+const xScale = y => pad.left + ((y - yearMin) / (yearMax - yearMin)) * chartW;
+const yScale = v => pad.top + ((valMax - v) / (valMax - valMin)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// COVID highlight band (2020-2021)
+const covidRect = document.createElementNS(ns, "rect");
+covidRect.setAttribute("x", xScale(2019.5));
+covidRect.setAttribute("y", pad.top);
+covidRect.setAttribute("width", xScale(2021.5) - xScale(2019.5));
+covidRect.setAttribute("height", chartH);
+covidRect.setAttribute("fill", "#E8D8C8");
+covidRect.setAttribute("opacity", "0.4");
+svg.appendChild(covidRect);
+
+// COVID label
+const covidLabel = document.createElementNS(ns, "text");
+covidLabel.setAttribute("x", xScale(2020.5));
+covidLabel.setAttribute("y", pad.top + 14);
+covidLabel.setAttribute("text-anchor", "middle");
+covidLabel.setAttribute("font-size", "8px");
+covidLabel.setAttribute("font-weight", "600");
+covidLabel.setAttribute("fill", "#A08060");
+covidLabel.setAttribute("letter-spacing", "0.5px");
+covidLabel.textContent = "COVID-19";
+svg.appendChild(covidLabel);
+
+// Y gridlines and labels
+const yTicks = [68, 70, 72, 74, 76, 78, 80, 82, 84];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", "#E2DFD6");
+  line.setAttribute("stroke-width", 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("fill", "#A89F91");
+  label.textContent = v;
+  svg.appendChild(label);
+});
+
+// X axis labels
+for (let yr = 1990; yr <= 2024; yr += 5) {
+  const x = xScale(yr);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", H - pad.bottom + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("fill", "#A89F91");
+  label.textContent = yr;
+  svg.appendChild(label);
+}
+
+// Draw lines for each country
+const linePaths = {};
+countryNames.forEach(name => {
+  const pts = countries[name];
+  const color = colorMap[name] || "#999";
+  const pathD = pts.map((p, i) => {
+    const cmd = i === 0 ? "M" : "L";
+    return `${cmd}${xScale(p.y).toFixed(1)},${yScale(p.v).toFixed(1)}`;
+  }).join(" ");
+
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", color);
+  path.setAttribute("stroke-width", "1.8");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-linecap", "round");
+  path.dataset.country = name;
+  linePaths[name] = path;
+  svg.appendChild(path);
+});
+
+// End labels (at the last data point)
+countryNames.forEach(name => {
+  const pts = countries[name];
+  const last = pts[pts.length - 1];
+  const color = colorMap[name] || "#999";
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", xScale(last.y) + 6);
+  label.setAttribute("y", yScale(last.v) + 3);
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("font-weight", "500");
+  label.setAttribute("fill", color);
+  label.dataset.country = name;
+  label.textContent = name;
+  svg.appendChild(label);
+});
+
+// Invisible hover rects for each year column
+const tip = document.getElementById("tip");
+const yearW = chartW / (yearMax - yearMin);
+
+for (let yr = yearMin; yr <= yearMax; yr++) {
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", xScale(yr) - yearW / 2);
+  rect.setAttribute("y", pad.top);
+  rect.setAttribute("width", yearW);
+  rect.setAttribute("height", chartH);
+  rect.setAttribute("fill", "transparent");
+  rect.style.cursor = "crosshair";
+
+  rect.addEventListener("mouseenter", (e) => {
+    // Find all data points for this year
+    const yearData = raw.filter(d => d.y === yr).sort((a, b) => b.v - a.v);
+    if (yearData.length === 0) return;
+
+    // Vertical guide line
+    let guide = svg.querySelector(".guide-line");
+    if (!guide) {
+      guide = document.createElementNS(ns, "line");
+      guide.classList.add("guide-line");
+      guide.setAttribute("stroke", "#C8C4BA");
+      guide.setAttribute("stroke-width", "0.5");
+      guide.setAttribute("stroke-dasharray", "3,3");
+      svg.appendChild(guide);
+    }
+    guide.setAttribute("x1", xScale(yr));
+    guide.setAttribute("x2", xScale(yr));
+    guide.setAttribute("y1", pad.top);
+    guide.setAttribute("y2", pad.top + chartH);
+    guide.style.display = "";
+
+    // Highlight dots
+    svg.querySelectorAll(".hover-dot").forEach(d => d.remove());
+    yearData.forEach(d => {
+      const dot = document.createElementNS(ns, "circle");
+      dot.classList.add("hover-dot");
+      dot.setAttribute("cx", xScale(d.y));
+      dot.setAttribute("cy", yScale(d.v));
+      dot.setAttribute("r", "3");
+      dot.setAttribute("fill", colorMap[d.c] || "#999");
+      dot.setAttribute("stroke", "#F6F5EE");
+      dot.setAttribute("stroke-width", "1.5");
+      svg.appendChild(dot);
+    });
+
+    // Tooltip content
+    let html = `<div style="font-weight:600;margin-bottom:4px;font-size:11px;">${yr}</div>`;
+    yearData.forEach(d => {
+      const swatch = `<span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:${colorMap[d.c]};margin-right:5px;"></span>`;
+      html += `<div style="margin:2px 0;">${swatch}${d.c} <span style="float:right;margin-left:14px;">${d.v.toFixed(1)}</span></div>`;
+    });
+
+    tip.innerHTML = html;
+    tip.style.opacity = "1";
+  });
+
+  rect.addEventListener("mousemove", (e) => {
+    const chartDiv = document.getElementById("chart");
+    const bounds = chartDiv.getBoundingClientRect();
+    let left = e.clientX - bounds.left + 14;
+    let top = e.clientY - bounds.top - 10;
+    // Flip if too close to right edge
+    if (left + 180 > bounds.width) left = e.clientX - bounds.left - 190;
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  });
+
+  rect.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    const guide = svg.querySelector(".guide-line");
+    if (guide) guide.style.display = "none";
+    svg.querySelectorAll(".hover-dot").forEach(d => d.remove());
+  });
+
+  svg.appendChild(rect);
+}
+
+document.getElementById("chart").appendChild(svg);
+
+// Build legend
+const legendDiv = document.getElementById("legend");
+countryNames.forEach(name => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  const swatch = document.createElement("div");
+  swatch.className = "legend-swatch";
+  swatch.style.background = colorMap[name];
+  item.appendChild(swatch);
+  const label = document.createElement("span");
+  label.textContent = name;
+  item.appendChild(label);
+
+  item.addEventListener("mouseenter", () => {
+    Object.keys(linePaths).forEach(n => {
+      linePaths[n].setAttribute("stroke-opacity", n === name ? "1" : "0.15");
+      linePaths[n].setAttribute("stroke-width", n === name ? "2.8" : "1.2");
+    });
+  });
+  item.addEventListener("mouseleave", () => {
+    Object.keys(linePaths).forEach(n => {
+      linePaths[n].setAttribute("stroke-opacity", "1");
+      linePaths[n].setAttribute("stroke-width", "1.8");
+    });
+  });
+  legendDiv.appendChild(item);
+});
+</script>
+</body></html>

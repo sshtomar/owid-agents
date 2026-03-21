@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 12px; color: #7A786F; margin: 0 0 8px; max-width: 680px; line-height: 1.55; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-bottom: 20px; font-size: 10px; color: #7A786F; }
+  .legend-item { display: flex; align-items: center; gap: 5px; cursor: default; }
+  .legend-swatch { width: 16px; height: 3px; border-radius: 1px; }
+  .legend-group { font-family: 'JetBrains Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.6px; color: #A09E96; margin-right: 2px; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 3px; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; line-height: 1.6; }
+  .tooltip .tt-year { font-weight: 500; font-size: 11px; margin-bottom: 2px; }
+  .tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  .tooltip .tt-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .tooltip .tt-val { text-align: right; min-width: 42px; }
+  .tooltip .tt-projected { opacity: 0.6; font-style: italic; }
+  .note { font-size: 10px; color: #A09E96; margin-bottom: 16px; font-style: italic; }
+  svg text { font-family: 'Inter', sans-serif; }
+</style></head><body>
+<h1>Growth Trajectories of the World's Major Economies</h1>
+<p class="subtitle">Annual real GDP growth (%) for 10 large economies, 2000 -- 2030. Emerging markets (China, India, Brazil, Russia, Mexico) consistently outpace advanced economies, but the gap is narrowing. Shaded bands mark the Global Financial Crisis and the COVID-19 pandemic.</p>
+<p class="note">Dashed lines and shaded region indicate IMF projections (2025 -- 2030).</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: IMF World Economic Outlook -- NGDP_RPCH (Real GDP Growth, annual %)</p>
+<script>
+const raw = [{"c":"BRA","n":"Brazil","y":2000,"v":4.4},{"c":"BRA","n":"Brazil","y":2001,"v":1.4},{"c":"BRA","n":"Brazil","y":2002,"v":3.1},{"c":"BRA","n":"Brazil","y":2003,"v":1.1},{"c":"BRA","n":"Brazil","y":2004,"v":5.8},{"c":"BRA","n":"Brazil","y":2005,"v":3.2},{"c":"BRA","n":"Brazil","y":2006,"v":4},{"c":"BRA","n":"Brazil","y":2007,"v":6.1},{"c":"BRA","n":"Brazil","y":2008,"v":5.1},{"c":"BRA","n":"Brazil","y":2009,"v":-0.1},{"c":"BRA","n":"Brazil","y":2010,"v":7.5},{"c":"BRA","n":"Brazil","y":2011,"v":4},{"c":"BRA","n":"Brazil","y":2012,"v":1.9},{"c":"BRA","n":"Brazil","y":2013,"v":3},{"c":"BRA","n":"Brazil","y":2014,"v":0.5},{"c":"BRA","n":"Brazil","y":2015,"v":-3.5},{"c":"BRA","n":"Brazil","y":2016,"v":-3.3},{"c":"BRA","n":"Brazil","y":2017,"v":1.3},{"c":"BRA","n":"Brazil","y":2018,"v":1.8},{"c":"BRA","n":"Brazil","y":2019,"v":1.2},{"c":"BRA","n":"Brazil","y":2020,"v":-3.3},{"c":"BRA","n":"Brazil","y":2021,"v":4.8},{"c":"BRA","n":"Brazil","y":2022,"v":3},{"c":"BRA","n":"Brazil","y":2023,"v":3.2},{"c":"BRA","n":"Brazil","y":2024,"v":3.4},{"c":"BRA","n":"Brazil","y":2025,"v":2.4},{"c":"BRA","n":"Brazil","y":2026,"v":1.9},{"c":"BRA","n":"Brazil","y":2027,"v":2.2},{"c":"BRA","n":"Brazil","y":2028,"v":2.3},{"c":"BRA","n":"Brazil","y":2029,"v":2.4},{"c":"BRA","n":"Brazil","y":2030,"v":2.5},{"c":"CHN","n":"China","y":2000,"v":8.6},{"c":"CHN","n":"China","y":2001,"v":8.3},{"c":"CHN","n":"China","y":2002,"v":9.2},{"c":"CHN","n":"China","y":2003,"v":10.1},{"c":"CHN","n":"China","y":2004,"v":10.1},{"c":"CHN","n":"China","y":2005,"v":11.4},{"c":"CHN","n":"China","y":2006,"v":12.7},{"c":"CHN","n":"China","y":2007,"v":14.2},{"c":"CHN","n":"China","y":2008,"v":9.6},{"c":"CHN","n":"China","y":2009,"v":9.4},{"c":"CHN","n":"China","y":2010,"v":10.6},{"c":"CHN","n":"China","y":2011,"v":9.5},{"c":"CHN","n":"China","y":2012,"v":7.8},{"c":"CHN","n":"China","y":2013,"v":7.8},{"c":"CHN","n":"China","y":2014,"v":7.5},{"c":"CHN","n":"China","y":2015,"v":7},{"c":"CHN","n":"China","y":2016,"v":6.8},{"c":"CHN","n":"China","y":2017,"v":6.9},{"c":"CHN","n":"China","y":2018,"v":6.8},{"c":"CHN","n":"China","y":2019,"v":6.1},{"c":"CHN","n":"China","y":2020,"v":2.3},{"c":"CHN","n":"China","y":2021,"v":8.6},{"c":"CHN","n":"China","y":2022,"v":3.1},{"c":"CHN","n":"China","y":2023,"v":5.4},{"c":"CHN","n":"China","y":2024,"v":5},{"c":"CHN","n":"China","y":2025,"v":4.8},{"c":"CHN","n":"China","y":2026,"v":4.2},{"c":"CHN","n":"China","y":2027,"v":4.2},{"c":"CHN","n":"China","y":2028,"v":4},{"c":"CHN","n":"China","y":2029,"v":3.7},{"c":"CHN","n":"China","y":2030,"v":3.4},{"c":"DEU","n":"Germany","y":2000,"v":2.9},{"c":"DEU","n":"Germany","y":2001,"v":1.6},{"c":"DEU","n":"Germany","y":2002,"v":-0.2},{"c":"DEU","n":"Germany","y":2003,"v":-0.5},{"c":"DEU","n":"Germany","y":2004,"v":1.2},{"c":"DEU","n":"Germany","y":2005,"v":0.9},{"c":"DEU","n":"Germany","y":2006,"v":3.9},{"c":"DEU","n":"Germany","y":2007,"v":2.9},{"c":"DEU","n":"Germany","y":2008,"v":0.9},{"c":"DEU","n":"Germany","y":2009,"v":-5.6},{"c":"DEU","n":"Germany","y":2010,"v":4.1},{"c":"DEU","n":"Germany","y":2011,"v":3.8},{"c":"DEU","n":"Germany","y":2012,"v":0.5},{"c":"DEU","n":"Germany","y":2013,"v":0.4},{"c":"DEU","n":"Germany","y":2014,"v":2.2},{"c":"DEU","n":"Germany","y":2015,"v":1.7},{"c":"DEU","n":"Germany","y":2016,"v":2.2},{"c":"DEU","n":"Germany","y":2017,"v":2.8},{"c":"DEU","n":"Germany","y":2018,"v":1.1},{"c":"DEU","n":"Germany","y":2019,"v":1},{"c":"DEU","n":"Germany","y":2020,"v":-4.1},{"c":"DEU","n":"Germany","y":2021,"v":3.9},{"c":"DEU","n":"Germany","y":2022,"v":1.8},{"c":"DEU","n":"Germany","y":2023,"v":-0.9},{"c":"DEU","n":"Germany","y":2024,"v":-0.5},{"c":"DEU","n":"Germany","y":2025,"v":0.2},{"c":"DEU","n":"Germany","y":2026,"v":0.9},{"c":"DEU","n":"Germany","y":2027,"v":1.5},{"c":"DEU","n":"Germany","y":2028,"v":1.2},{"c":"DEU","n":"Germany","y":2029,"v":1},{"c":"DEU","n":"Germany","y":2030,"v":0.7},{"c":"FRA","n":"France","y":2000,"v":4.4},{"c":"FRA","n":"France","y":2001,"v":1.8},{"c":"FRA","n":"France","y":2002,"v":1.1},{"c":"FRA","n":"France","y":2003,"v":1},{"c":"FRA","n":"France","y":2004,"v":2.5},{"c":"FRA","n":"France","y":2005,"v":2},{"c":"FRA","n":"France","y":2006,"v":2.9},{"c":"FRA","n":"France","y":2007,"v":2.5},{"c":"FRA","n":"France","y":2008,"v":0.3},{"c":"FRA","n":"France","y":2009,"v":-2.7},{"c":"FRA","n":"France","y":2010,"v":1.8},{"c":"FRA","n":"France","y":2011,"v":2.5},{"c":"FRA","n":"France","y":2012,"v":0.2},{"c":"FRA","n":"France","y":2013,"v":0.9},{"c":"FRA","n":"France","y":2014,"v":1},{"c":"FRA","n":"France","y":2015,"v":1},{"c":"FRA","n":"France","y":2016,"v":0.7},{"c":"FRA","n":"France","y":2017,"v":2.3},{"c":"FRA","n":"France","y":2018,"v":1.6},{"c":"FRA","n":"France","y":2019,"v":2.1},{"c":"FRA","n":"France","y":2020,"v":-7.6},{"c":"FRA","n":"France","y":2021,"v":6.8},{"c":"FRA","n":"France","y":2022,"v":2.8},{"c":"FRA","n":"France","y":2023,"v":1.6},{"c":"FRA","n":"France","y":2024,"v":1.1},{"c":"FRA","n":"France","y":2025,"v":0.7},{"c":"FRA","n":"France","y":2026,"v":0.9},{"c":"FRA","n":"France","y":2027,"v":1.2},{"c":"FRA","n":"France","y":2028,"v":1.3},{"c":"FRA","n":"France","y":2029,"v":1.2},{"c":"FRA","n":"France","y":2030,"v":1.2},{"c":"GBR","n":"United Kingdom","y":2000,"v":4.3},{"c":"GBR","n":"United Kingdom","y":2001,"v":2.6},{"c":"GBR","n":"United Kingdom","y":2002,"v":1.8},{"c":"GBR","n":"United Kingdom","y":2003,"v":3.2},{"c":"GBR","n":"United Kingdom","y":2004,"v":2.5},{"c":"GBR","n":"United Kingdom","y":2005,"v":2.7},{"c":"GBR","n":"United Kingdom","y":2006,"v":2.4},{"c":"GBR","n":"United Kingdom","y":2007,"v":2.6},{"c":"GBR","n":"United Kingdom","y":2008,"v":-0.2},{"c":"GBR","n":"United Kingdom","y":2009,"v":-4.6},{"c":"GBR","n":"United Kingdom","y":2010,"v":2.2},{"c":"GBR","n":"United Kingdom","y":2011,"v":1.1},{"c":"GBR","n":"United Kingdom","y":2012,"v":1.5},{"c":"GBR","n":"United Kingdom","y":2013,"v":1.8},{"c":"GBR","n":"United Kingdom","y":2014,"v":3.2},{"c":"GBR","n":"United Kingdom","y":2015,"v":2.2},{"c":"GBR","n":"United Kingdom","y":2016,"v":1.9},{"c":"GBR","n":"United Kingdom","y":2017,"v":2.7},{"c":"GBR","n":"United Kingdom","y":2018,"v":1.4},{"c":"GBR","n":"United Kingdom","y":2019,"v":1.6},{"c":"GBR","n":"United Kingdom","y":2020,"v":-10.3},{"c":"GBR","n":"United Kingdom","y":2021,"v":8.6},{"c":"GBR","n":"United Kingdom","y":2022,"v":4.8},{"c":"GBR","n":"United Kingdom","y":2023,"v":0.4},{"c":"GBR","n":"United Kingdom","y":2024,"v":1.1},{"c":"GBR","n":"United Kingdom","y":2025,"v":1.3},{"c":"GBR","n":"United Kingdom","y":2026,"v":1.3},{"c":"GBR","n":"United Kingdom","y":2027,"v":1.5},{"c":"GBR","n":"United Kingdom","y":2028,"v":1.4},{"c":"GBR","n":"United Kingdom","y":2029,"v":1.4},{"c":"GBR","n":"United Kingdom","y":2030,"v":1.4},{"c":"IND","n":"India","y":2000,"v":3.8},{"c":"IND","n":"India","y":2001,"v":4.8},{"c":"IND","n":"India","y":2002,"v":3.8},{"c":"IND","n":"India","y":2003,"v":7.9},{"c":"IND","n":"India","y":2004,"v":7.9},{"c":"IND","n":"India","y":2005,"v":7.9},{"c":"IND","n":"India","y":2006,"v":8.1},{"c":"IND","n":"India","y":2007,"v":7.7},{"c":"IND","n":"India","y":2008,"v":3.1},{"c":"IND","n":"India","y":2009,"v":7.9},{"c":"IND","n":"India","y":2010,"v":8.5},{"c":"IND","n":"India","y":2011,"v":5.2},{"c":"IND","n":"India","y":2012,"v":5.5},{"c":"IND","n":"India","y":2013,"v":6.4},{"c":"IND","n":"India","y":2014,"v":7.4},{"c":"IND","n":"India","y":2015,"v":8},{"c":"IND","n":"India","y":2016,"v":8.3},{"c":"IND","n":"India","y":2017,"v":6.8},{"c":"IND","n":"India","y":2018,"v":6.5},{"c":"IND","n":"India","y":2019,"v":3.9},{"c":"IND","n":"India","y":2020,"v":-5.8},{"c":"IND","n":"India","y":2021,"v":9.7},{"c":"IND","n":"India","y":2022,"v":7.6},{"c":"IND","n":"India","y":2023,"v":9.2},{"c":"IND","n":"India","y":2024,"v":6.5},{"c":"IND","n":"India","y":2025,"v":6.6},{"c":"IND","n":"India","y":2026,"v":6.2},{"c":"IND","n":"India","y":2027,"v":6.4},{"c":"IND","n":"India","y":2028,"v":6.5},{"c":"IND","n":"India","y":2029,"v":6.5},{"c":"IND","n":"India","y":2030,"v":6.5},{"c":"JPN","n":"Japan","y":2000,"v":2.8},{"c":"JPN","n":"Japan","y":2001,"v":0.4},{"c":"JPN","n":"Japan","y":2002,"v":0},{"c":"JPN","n":"Japan","y":2003,"v":1.5},{"c":"JPN","n":"Japan","y":2004,"v":2.2},{"c":"JPN","n":"Japan","y":2005,"v":1.8},{"c":"JPN","n":"Japan","y":2006,"v":1.4},{"c":"JPN","n":"Japan","y":2007,"v":1.5},{"c":"JPN","n":"Japan","y":2008,"v":-1.2},{"c":"JPN","n":"Japan","y":2009,"v":-5.7},{"c":"JPN","n":"Japan","y":2010,"v":4.1},{"c":"JPN","n":"Japan","y":2011,"v":0},{"c":"JPN","n":"Japan","y":2012,"v":1.4},{"c":"JPN","n":"Japan","y":2013,"v":2},{"c":"JPN","n":"Japan","y":2014,"v":0.3},{"c":"JPN","n":"Japan","y":2015,"v":1.6},{"c":"JPN","n":"Japan","y":2016,"v":0.8},{"c":"JPN","n":"Japan","y":2017,"v":1.7},{"c":"JPN","n":"Japan","y":2018,"v":0.6},{"c":"JPN","n":"Japan","y":2019,"v":-0.4},{"c":"JPN","n":"Japan","y":2020,"v":-4.2},{"c":"JPN","n":"Japan","y":2021,"v":2.7},{"c":"JPN","n":"Japan","y":2022,"v":1},{"c":"JPN","n":"Japan","y":2023,"v":1.2},{"c":"JPN","n":"Japan","y":2024,"v":0.1},{"c":"JPN","n":"Japan","y":2025,"v":1.1},{"c":"JPN","n":"Japan","y":2026,"v":0.6},{"c":"JPN","n":"Japan","y":2027,"v":0.6},{"c":"JPN","n":"Japan","y":2028,"v":0.6},{"c":"JPN","n":"Japan","y":2029,"v":0.5},{"c":"JPN","n":"Japan","y":2030,"v":0.5},{"c":"MEX","n":"Mexico","y":2000,"v":5},{"c":"MEX","n":"Mexico","y":2001,"v":-0.5},{"c":"MEX","n":"Mexico","y":2002,"v":-0.2},{"c":"MEX","n":"Mexico","y":2003,"v":1.2},{"c":"MEX","n":"Mexico","y":2004,"v":3.6},{"c":"MEX","n":"Mexico","y":2005,"v":2.1},{"c":"MEX","n":"Mexico","y":2006,"v":4.8},{"c":"MEX","n":"Mexico","y":2007,"v":2.1},{"c":"MEX","n":"Mexico","y":2008,"v":0.9},{"c":"MEX","n":"Mexico","y":2009,"v":-6.3},{"c":"MEX","n":"Mexico","y":2010,"v":5},{"c":"MEX","n":"Mexico","y":2011,"v":3.4},{"c":"MEX","n":"Mexico","y":2012,"v":3.6},{"c":"MEX","n":"Mexico","y":2013,"v":0.9},{"c":"MEX","n":"Mexico","y":2014,"v":2.5},{"c":"MEX","n":"Mexico","y":2015,"v":2.7},{"c":"MEX","n":"Mexico","y":2016,"v":1.8},{"c":"MEX","n":"Mexico","y":2017,"v":1.9},{"c":"MEX","n":"Mexico","y":2018,"v":2},{"c":"MEX","n":"Mexico","y":2019,"v":-0.4},{"c":"MEX","n":"Mexico","y":2020,"v":-8.4},{"c":"MEX","n":"Mexico","y":2021,"v":6},{"c":"MEX","n":"Mexico","y":2022,"v":3.7},{"c":"MEX","n":"Mexico","y":2023,"v":3.4},{"c":"MEX","n":"Mexico","y":2024,"v":1.4},{"c":"MEX","n":"Mexico","y":2025,"v":1},{"c":"MEX","n":"Mexico","y":2026,"v":1.5},{"c":"MEX","n":"Mexico","y":2027,"v":2},{"c":"MEX","n":"Mexico","y":2028,"v":2.1},{"c":"MEX","n":"Mexico","y":2029,"v":2.1},{"c":"MEX","n":"Mexico","y":2030,"v":2.1},{"c":"RUS","n":"Russia","y":2000,"v":10.1},{"c":"RUS","n":"Russia","y":2001,"v":5.1},{"c":"RUS","n":"Russia","y":2002,"v":4.7},{"c":"RUS","n":"Russia","y":2003,"v":7.4},{"c":"RUS","n":"Russia","y":2004,"v":7.1},{"c":"RUS","n":"Russia","y":2005,"v":6.4},{"c":"RUS","n":"Russia","y":2006,"v":8.2},{"c":"RUS","n":"Russia","y":2007,"v":8.6},{"c":"RUS","n":"Russia","y":2008,"v":5.2},{"c":"RUS","n":"Russia","y":2009,"v":-7.8},{"c":"RUS","n":"Russia","y":2010,"v":4.5},{"c":"RUS","n":"Russia","y":2011,"v":4},{"c":"RUS","n":"Russia","y":2012,"v":4},{"c":"RUS","n":"Russia","y":2013,"v":1.8},{"c":"RUS","n":"Russia","y":2014,"v":0.7},{"c":"RUS","n":"Russia","y":2015,"v":-2},{"c":"RUS","n":"Russia","y":2016,"v":0.2},{"c":"RUS","n":"Russia","y":2017,"v":1.8},{"c":"RUS","n":"Russia","y":2018,"v":2.8},{"c":"RUS","n":"Russia","y":2019,"v":2.2},{"c":"RUS","n":"Russia","y":2020,"v":-2.7},{"c":"RUS","n":"Russia","y":2021,"v":5.9},{"c":"RUS","n":"Russia","y":2022,"v":-1.4},{"c":"RUS","n":"Russia","y":2023,"v":4.1},{"c":"RUS","n":"Russia","y":2024,"v":4.3},{"c":"RUS","n":"Russia","y":2025,"v":0.6},{"c":"RUS","n":"Russia","y":2026,"v":1},{"c":"RUS","n":"Russia","y":2027,"v":1.1},{"c":"RUS","n":"Russia","y":2028,"v":1.1},{"c":"RUS","n":"Russia","y":2029,"v":1.1},{"c":"RUS","n":"Russia","y":2030,"v":1.1},{"c":"USA","n":"United States","y":2000,"v":4.1},{"c":"USA","n":"United States","y":2001,"v":1},{"c":"USA","n":"United States","y":2002,"v":1.7},{"c":"USA","n":"United States","y":2003,"v":2.8},{"c":"USA","n":"United States","y":2004,"v":3.8},{"c":"USA","n":"United States","y":2005,"v":3.5},{"c":"USA","n":"United States","y":2006,"v":2.8},{"c":"USA","n":"United States","y":2007,"v":2},{"c":"USA","n":"United States","y":2008,"v":0.1},{"c":"USA","n":"United States","y":2009,"v":-2.6},{"c":"USA","n":"United States","y":2010,"v":2.7},{"c":"USA","n":"United States","y":2011,"v":1.6},{"c":"USA","n":"United States","y":2012,"v":2.3},{"c":"USA","n":"United States","y":2013,"v":2.1},{"c":"USA","n":"United States","y":2014,"v":2.5},{"c":"USA","n":"United States","y":2015,"v":2.9},{"c":"USA","n":"United States","y":2016,"v":1.8},{"c":"USA","n":"United States","y":2017,"v":2.5},{"c":"USA","n":"United States","y":2018,"v":3},{"c":"USA","n":"United States","y":2019,"v":2.6},{"c":"USA","n":"United States","y":2020,"v":-2.1},{"c":"USA","n":"United States","y":2021,"v":6.2},{"c":"USA","n":"United States","y":2022,"v":2.5},{"c":"USA","n":"United States","y":2023,"v":2.9},{"c":"USA","n":"United States","y":2024,"v":2.8},{"c":"USA","n":"United States","y":2025,"v":2},{"c":"USA","n":"United States","y":2026,"v":2.1},{"c":"USA","n":"United States","y":2027,"v":2.1},{"c":"USA","n":"United States","y":2028,"v":2.1},{"c":"USA","n":"United States","y":2029,"v":1.9},{"c":"USA","n":"United States","y":2030,"v":1.8}];
+
+// --- Configuration ---
+const PROJ_START = 2025;
+const W = 780, H = 440;
+const pad = { top: 20, right: 120, bottom: 40, left: 52 };
+const cW = W - pad.left - pad.right;
+const cH = H - pad.top - pad.bottom;
+
+// Emerging vs Advanced grouping
+const emerging = new Set(["CHN", "IND", "BRA", "RUS", "MEX"]);
+const colors = {
+  CHN: "#C2553A", IND: "#E08B2D", BRA: "#4A9B6E", RUS: "#8B6BBF", MEX: "#D4894A",
+  USA: "#3B6FA0", JPN: "#6B98BF", DEU: "#2D7A6E", GBR: "#5B7EA3", FRA: "#8DABB5"
+};
+
+// --- Scales ---
+const years = [...new Set(raw.map(d => d.y))].sort((a, b) => a - b);
+const minY = Math.min(...raw.map(d => d.v));
+const maxY = Math.max(...raw.map(d => d.v));
+const yMin = Math.floor(minY / 2) * 2 - 2;
+const yMax = Math.ceil(maxY / 2) * 2 + 2;
+
+const xScale = x => pad.left + ((x - years[0]) / (years[years.length - 1] - years[0])) * cW;
+const yScale = v => pad.top + cH - ((v - yMin) / (yMax - yMin)) * cH;
+
+// Group data by country
+const byCountry = {};
+raw.forEach(d => {
+  if (!byCountry[d.c]) byCountry[d.c] = { code: d.c, name: d.n, pts: [] };
+  byCountry[d.c].pts.push(d);
+});
+const countries = Object.values(byCountry);
+
+// --- SVG ---
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.style.display = "block";
+svg.style.overflow = "visible";
+
+function el(tag, attrs) {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  return e;
+}
+
+// --- Recession shading (GFC 2008-2009, COVID 2020) ---
+const recessions = [
+  { start: 2007.5, end: 2009.5, label: "Global Financial Crisis" },
+  { start: 2019.5, end: 2020.5, label: "COVID-19" }
+];
+recessions.forEach(r => {
+  const rx = xScale(r.start);
+  const rw = xScale(r.end) - rx;
+  svg.appendChild(el("rect", { x: rx, y: pad.top, width: rw, height: cH, fill: "#D9C6B0", opacity: 0.25, rx: 2 }));
+  svg.appendChild(el("text", {
+    x: rx + rw / 2, y: pad.top + 12,
+    "text-anchor": "middle", fill: "#A09E96",
+    "font-size": "8px", "font-family": "'JetBrains Mono', monospace",
+    "letter-spacing": "0.3px"
+  })).textContent = r.label;
+});
+
+// --- Projection zone shading ---
+const projX = xScale(PROJ_START - 0.5);
+svg.appendChild(el("rect", {
+  x: projX, y: pad.top,
+  width: xScale(years[years.length - 1]) - projX + 8,
+  height: cH,
+  fill: "#E0DDD4", opacity: 0.45, rx: 2
+}));
+svg.appendChild(el("text", {
+  x: projX + 4, y: pad.top + cH - 6,
+  fill: "#A09E96",
+  "font-size": "8px", "font-family": "'JetBrains Mono', monospace",
+  "letter-spacing": "0.3px"
+})).textContent = "IMF PROJECTIONS";
+
+// --- Grid lines ---
+const yTicks = [];
+for (let v = yMin; v <= yMax; v += 2) yTicks.push(v);
+yTicks.forEach(v => {
+  const yy = yScale(v);
+  svg.appendChild(el("line", {
+    x1: pad.left, y1: yy, x2: W - pad.right, y2: yy,
+    stroke: v === 0 ? "#B0ADA5" : "#DDD9D0",
+    "stroke-width": v === 0 ? 1.2 : 0.5,
+    "stroke-dasharray": v === 0 ? "none" : "2,3"
+  }));
+  svg.appendChild(el("text", {
+    x: pad.left - 8, y: yy + 3,
+    "text-anchor": "end", fill: "#A09E96",
+    "font-size": "9px", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = (v > 0 ? "+" : "") + v + "%";
+});
+
+// X-axis labels
+years.filter(y => y % 5 === 0).forEach(y => {
+  svg.appendChild(el("text", {
+    x: xScale(y), y: pad.top + cH + 20,
+    "text-anchor": "middle", fill: "#A09E96",
+    "font-size": "9px", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = y;
+});
+
+// --- Draw lines ---
+function buildPath(pts) {
+  return pts.map((p, i) => `${i === 0 ? "M" : "L"}${xScale(p.y).toFixed(1)},${yScale(p.v).toFixed(1)}`).join("");
+}
+
+// Sort: draw advanced first (background), then emerging (foreground)
+const sortedCountries = countries.slice().sort((a, b) => {
+  const aE = emerging.has(a.code) ? 1 : 0;
+  const bE = emerging.has(b.code) ? 1 : 0;
+  return aE - bE;
+});
+
+sortedCountries.forEach(c => {
+  const col = colors[c.code];
+  const isEmerging = emerging.has(c.code);
+  const baseOpacity = isEmerging ? 0.85 : 0.5;
+  const strokeW = isEmerging ? 2 : 1.4;
+
+  // Observed (solid)
+  const observed = c.pts.filter(p => p.y < PROJ_START);
+  if (observed.length > 1) {
+    svg.appendChild(el("path", {
+      d: buildPath(observed), fill: "none", stroke: col,
+      "stroke-width": strokeW, opacity: baseOpacity,
+      "stroke-linejoin": "round", "stroke-linecap": "round"
+    }));
+  }
+
+  // Bridge: last observed to first projected (so there is no gap)
+  const lastObs = observed[observed.length - 1];
+  const projected = c.pts.filter(p => p.y >= PROJ_START);
+  if (lastObs && projected.length > 0) {
+    const bridge = [lastObs, projected[0]];
+    svg.appendChild(el("path", {
+      d: buildPath(bridge), fill: "none", stroke: col,
+      "stroke-width": strokeW, opacity: baseOpacity * 0.6,
+      "stroke-dasharray": "4,3",
+      "stroke-linejoin": "round", "stroke-linecap": "round"
+    }));
+  }
+
+  // Projected (dashed)
+  if (projected.length > 1) {
+    svg.appendChild(el("path", {
+      d: buildPath(projected), fill: "none", stroke: col,
+      "stroke-width": strokeW, opacity: baseOpacity * 0.6,
+      "stroke-dasharray": "4,3",
+      "stroke-linejoin": "round", "stroke-linecap": "round"
+    }));
+  }
+
+  // End label
+  const last = c.pts[c.pts.length - 1];
+  const labelEl = el("text", {
+    x: xScale(last.y) + 6, y: yScale(last.v) + 3,
+    fill: col, "font-size": "9px", "font-weight": "500",
+    "font-family": "'Inter', sans-serif",
+    opacity: isEmerging ? 1 : 0.75
+  });
+  labelEl.textContent = c.name;
+  svg.appendChild(labelEl);
+});
+
+// --- Vertical hover line + tooltip ---
+const hoverLine = el("line", {
+  x1: 0, y1: pad.top, x2: 0, y2: pad.top + cH,
+  stroke: "#2B2A27", "stroke-width": 0.7, opacity: 0, "pointer-events": "none"
+});
+svg.appendChild(hoverLine);
+
+// Invisible rect for mouse events
+const hoverRect = el("rect", {
+  x: pad.left, y: pad.top, width: cW, height: cH,
+  fill: "transparent", style: "cursor: crosshair;"
+});
+svg.appendChild(hoverRect);
+
+// Dots group
+const dotsGroup = el("g", { "pointer-events": "none" });
+svg.appendChild(dotsGroup);
+
+const tip = document.getElementById("tip");
+
+function nearestYear(mx) {
+  const rawYear = years[0] + ((mx - pad.left) / cW) * (years[years.length - 1] - years[0]);
+  let best = years[0];
+  years.forEach(y => { if (Math.abs(y - rawYear) < Math.abs(best - rawYear)) best = y; });
+  return best;
+}
+
+hoverRect.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const year = nearestYear(mx);
+  const lx = xScale(year);
+
+  hoverLine.setAttribute("x1", lx);
+  hoverLine.setAttribute("x2", lx);
+  hoverLine.setAttribute("opacity", 0.4);
+
+  // Collect values for this year
+  const vals = [];
+  countries.forEach(c => {
+    const pt = c.pts.find(p => p.y === year);
+    if (pt) vals.push({ name: c.name, code: c.code, value: pt.v, projected: year >= PROJ_START });
+  });
+  vals.sort((a, b) => b.value - a.value);
+
+  // Update dots
+  while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+  vals.forEach(v => {
+    dotsGroup.appendChild(el("circle", {
+      cx: lx, cy: yScale(v.value), r: 3,
+      fill: colors[v.code], stroke: "#F6F5EE", "stroke-width": 1.2
+    }));
+  });
+
+  // Tooltip
+  const isProj = year >= PROJ_START;
+  let html = `<div class="tt-year">${year}${isProj ? " (projected)" : ""}</div>`;
+  vals.forEach(v => {
+    const cls = v.projected ? ' tt-projected' : '';
+    html += `<div class="tt-row${cls}"><span class="tt-dot" style="background:${colors[v.code]}"></span>${v.name} <span class="tt-val">${v.value > 0 ? "+" : ""}${v.value.toFixed(1)}%</span></div>`;
+  });
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+
+  // Position tooltip
+  const chartDiv = document.getElementById("chart");
+  const chartRect = chartDiv.getBoundingClientRect();
+  const tipW = tip.offsetWidth;
+  const pixelX = lx / scaleX + rect.left - chartRect.left;
+  const pixelY = (e.clientY - chartRect.top);
+  const flipX = (pixelX + tipW + 20) > chartRect.width;
+  tip.style.left = (flipX ? pixelX - tipW - 12 : pixelX + 14) + "px";
+  tip.style.top = Math.max(0, pixelY - 40) + "px";
+});
+
+hoverRect.addEventListener("mouseleave", function() {
+  hoverLine.setAttribute("opacity", 0);
+  tip.style.opacity = 0;
+  while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// --- Legend ---
+const legendEl = document.getElementById("legend");
+function addGroup(label, codes) {
+  const grp = document.createElement("span");
+  grp.className = "legend-group";
+  grp.textContent = label + ": ";
+  legendEl.appendChild(grp);
+  codes.forEach(code => {
+    const c = byCountry[code];
+    if (!c) return;
+    const item = document.createElement("span");
+    item.className = "legend-item";
+    const sw = document.createElement("span");
+    sw.className = "legend-swatch";
+    sw.style.background = colors[code];
+    item.appendChild(sw);
+    item.appendChild(document.createTextNode(c.name));
+    legendEl.appendChild(item);
+  });
+}
+addGroup("Emerging", ["CHN", "IND", "BRA", "RUS", "MEX"]);
+addGroup("Advanced", ["USA", "DEU", "JPN", "GBR", "FRA"]);
+</script>
+</body></html>

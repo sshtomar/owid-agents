@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 1px; }
+</style></head><body>
+<h1>Every Breath You Take</h1>
+<p class="subtitle">Mean annual concentration of fine particulate matter (PM2.5) in micrograms per cubic metre, 2019. The WHO guideline is 5 ug/m3. Bars are coloured by severity: green for countries meeting interim targets, through amber and orange to deep red for levels exceeding 10 times the guideline.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- SDGPM25 (Mean Annual PM2.5 Concentration)</p>
+<script>
+const data = [
+  { name: "Cameroon", value: 54.84 },
+  { name: "Tajikistan", value: 53.65 },
+  { name: "Niger", value: 50.75 },
+  { name: "Bangladesh", value: 50.12 },
+  { name: "Ghana", value: 46.04 },
+  { name: "Cote d'Ivoire", value: 43.50 },
+  { name: "Yemen", value: 43.04 },
+  { name: "Chad", value: 42.97 },
+  { name: "Guinea-Bissau", value: 40.06 },
+  { name: "Togo", value: 39.42 },
+  { name: "Uzbekistan", value: 38.19 },
+  { name: "Mongolia", value: 36.47 },
+  { name: "Angola", value: 33.19 },
+  { name: "Kazakhstan", value: 27.54 },
+  { name: "Malaysia", value: 25.32 },
+  { name: "Turkey", value: 23.25 },
+  { name: "Ethiopia", value: 22.23 },
+  { name: "Indonesia", value: 19.34 },
+  { name: "Poland", value: 19.51 },
+  { name: "Hungary", value: 16.07 },
+  { name: "Italy", value: 14.01 },
+  { name: "France", value: 12.03 },
+  { name: "Japan", value: 11.08 },
+  { name: "Brazil", value: 9.57 },
+  { name: "UK", value: 8.83 },
+  { name: "New Zealand", value: 8.61 },
+  { name: "Australia", value: 7.94 },
+  { name: "Brunei", value: 6.86 },
+  { name: "Iceland", value: 6.07 },
+  { name: "Canada", value: 5.20 }
+];
+
+data.sort((a, b) => b.value - a.value);
+
+const severityLevels = [
+  { label: "WHO guideline (<5)", max: 5, color: "#2D8F4E" },
+  { label: "Interim target 4 (5-10)", max: 10, color: "#5FAD56" },
+  { label: "Interim target 3 (10-15)", max: 15, color: "#F5B841" },
+  { label: "Interim target 2 (15-25)", max: 25, color: "#E8832A" },
+  { label: "Interim target 1 (25-35)", max: 35, color: "#D94F30" },
+  { label: "Above all targets (>35)", max: Infinity, color: "#A12B1F" }
+];
+
+function getColor(v) {
+  for (const s of severityLevels) {
+    if (v <= s.max) return s.color;
+  }
+  return severityLevels[severityLevels.length - 1].color;
+}
+
+// Legend
+const legendEl = document.getElementById("legend");
+severityLevels.forEach(s => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = `<div class="legend-swatch" style="background:${s.color}"></div>${s.label}`;
+  legendEl.appendChild(item);
+});
+
+const W = 720;
+const barH = 22;
+const gap = 3;
+const pad = { left: 130, right: 70, top: 30, bottom: 40 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const maxVal = 60;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+document.getElementById("chart").appendChild(svg);
+
+function x(v) { return pad.left + (v / maxVal) * (W - pad.left - pad.right); }
+
+// Reference lines with labels
+const refs = [
+  { val: 5, label: "WHO guideline", color: "#2D8F4E" },
+  { val: 10, label: "IT-4", color: "#5FAD56" },
+  { val: 15, label: "IT-3", color: "#F5B841" },
+  { val: 25, label: "IT-2", color: "#E8832A" }
+];
+
+refs.forEach(r => {
+  const lx = x(r.val);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", lx);
+  line.setAttribute("x2", lx);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", r.color);
+  line.setAttribute("stroke-width", 1.5);
+  line.setAttribute("stroke-dasharray", "4,3");
+  line.setAttribute("opacity", 0.7);
+  svg.appendChild(line);
+
+  const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  txt.setAttribute("x", lx);
+  txt.setAttribute("y", pad.top - 6);
+  txt.setAttribute("text-anchor", "middle");
+  txt.setAttribute("font-size", "9px");
+  txt.setAttribute("font-family", "'JetBrains Mono', monospace");
+  txt.setAttribute("fill", r.color);
+  txt.setAttribute("font-weight", "500");
+  txt.textContent = r.val === 5 ? `${r.label} (${r.val})` : `${r.label} (${r.val})`;
+  svg.appendChild(txt);
+});
+
+// X-axis ticks
+[0, 10, 20, 30, 40, 50, 60].forEach(v => {
+  const tx = x(v);
+  const tick = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  tick.setAttribute("x", tx);
+  tick.setAttribute("y", pad.top + chartH + 18);
+  tick.setAttribute("text-anchor", "middle");
+  tick.setAttribute("font-size", "9px");
+  tick.setAttribute("font-family", "'JetBrains Mono', monospace");
+  tick.setAttribute("fill", "#7A786F");
+  tick.textContent = v;
+  svg.appendChild(tick);
+});
+
+// X-axis label
+const xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+xLabel.setAttribute("x", (pad.left + W - pad.right) / 2);
+xLabel.setAttribute("y", pad.top + chartH + 34);
+xLabel.setAttribute("text-anchor", "middle");
+xLabel.setAttribute("font-size", "9px");
+xLabel.setAttribute("fill", "#7A786F");
+xLabel.textContent = "PM2.5 concentration (ug/m3)";
+svg.appendChild(xLabel);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const by = pad.top + i * (barH + gap);
+  const bw = x(d.value) - pad.left;
+  const col = getColor(d.value);
+
+  // Bar
+  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", by);
+  rect.setAttribute("width", bw);
+  rect.setAttribute("height", barH);
+  rect.setAttribute("fill", col);
+  rect.setAttribute("rx", 1);
+  rect.style.transition = "opacity 0.15s";
+
+  rect.addEventListener("mouseenter", (e) => {
+    rect.setAttribute("opacity", 0.8);
+    const severity = d.value <= 5 ? "Meets WHO guideline" :
+                     d.value <= 10 ? "Within interim target 4" :
+                     d.value <= 15 ? "Within interim target 3" :
+                     d.value <= 25 ? "Within interim target 2" :
+                     d.value <= 35 ? "Within interim target 1" :
+                     "Exceeds all targets";
+    const multiple = (d.value / 5).toFixed(1);
+    tip.style.opacity = 1;
+    tip.innerHTML = `${d.name}: ${d.value.toFixed(1)} ug/m3 (${multiple}x guideline)<br>${severity}`;
+  });
+  rect.addEventListener("mousemove", (e) => {
+    tip.style.left = (e.pageX + 12) + "px";
+    tip.style.top = (e.pageY - 20) + "px";
+  });
+  rect.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", 1);
+    tip.style.opacity = 0;
+  });
+  svg.appendChild(rect);
+
+  // Country label
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", by + barH / 2 + 4);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "11px");
+  label.setAttribute("fill", "#2B2A27");
+  label.textContent = d.name;
+  svg.appendChild(label);
+
+  // Value label
+  const valLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  valLabel.setAttribute("x", pad.left + bw + 5);
+  valLabel.setAttribute("y", by + barH / 2 + 4);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("font-size", "10px");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1);
+  svg.appendChild(valLabel);
+});
+</script>
+</body></html>

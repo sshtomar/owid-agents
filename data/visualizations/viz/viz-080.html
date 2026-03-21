@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: pointer; }
+  .legend-item:hover { color: #2B2A27; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 1px; }
+  .legend-group { font-family: 'JetBrains Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: #B0AEA4; margin-right: 4px; }
+</style></head><body>
+<h1>The Diabetes Divide</h1>
+<p class="subtitle">Age-standardized diabetes prevalence (%) across 12 countries, 1990-2022. Gulf states and Pacific islands carry the heaviest burden, often exceeding 25%. Rapid rises in South Asia and the Middle East contrast with slower climbs in East Asia and Western nations.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- NCD_DIABETES_PREVALENCE_AGESTD</p>
+<script>
+const raw = [{"c":"ARE","n":"UAE","y":1990,"v":20.25},{"c":"CHN","n":"China","y":1990,"v":5.66},{"c":"USA","n":"United States","y":1990,"v":6.83},{"c":"FJI","n":"Fiji","y":1991,"v":16.75},{"c":"PAK","n":"Pakistan","y":1991,"v":12.14},{"c":"ARE","n":"UAE","y":1992,"v":22.27},{"c":"FJI","n":"Fiji","y":1992,"v":14.34},{"c":"THA","n":"Thailand","y":1992,"v":6.52},{"c":"WSM","n":"Samoa","y":1992,"v":11.46},{"c":"EGY","n":"Egypt","y":1993,"v":12.05},{"c":"FJI","n":"Fiji","y":1993,"v":17.25},{"c":"MHL","n":"Marshall Islands","y":1993,"v":28.58},{"c":"PAK","n":"Pakistan","y":1993,"v":9.13},{"c":"ARE","n":"UAE","y":1994,"v":24.17},{"c":"IND","n":"India","y":1994,"v":12.32},{"c":"KWT","n":"Kuwait","y":1994,"v":17.57},{"c":"WSM","n":"Samoa","y":1994,"v":17.55},{"c":"IND","n":"India","y":1995,"v":12.13},{"c":"ARE","n":"UAE","y":1996,"v":22},{"c":"THA","n":"Thailand","y":1996,"v":6.71},{"c":"USA","n":"United States","y":1996,"v":8.9},{"c":"ARE","n":"UAE","y":1998,"v":24.36},{"c":"MHL","n":"Marshall Islands","y":1998,"v":42.35},{"c":"MHL","n":"Marshall Islands","y":1999,"v":43.28},{"c":"IDN","n":"Indonesia","y":2000,"v":5.01},{"c":"EGY","n":"Egypt","y":2001,"v":12.58},{"c":"KWT","n":"Kuwait","y":2001,"v":28.64},{"c":"USA","n":"United States","y":2001,"v":8.6},{"c":"CHN","n":"China","y":2002,"v":8.33},{"c":"FJI","n":"Fiji","y":2002,"v":16.9},{"c":"IND","n":"India","y":2003,"v":19.33},{"c":"IDN","n":"Indonesia","y":2004,"v":5.3},{"c":"EGY","n":"Egypt","y":2005,"v":20.23},{"c":"THA","n":"Thailand","y":2005,"v":10.5},{"c":"KWT","n":"Kuwait","y":2006,"v":23.32},{"c":"THA","n":"Thailand","y":2006,"v":8.17},{"c":"ARE","n":"UAE","y":2007,"v":35.75},{"c":"EGY","n":"Egypt","y":2007,"v":19.62},{"c":"MHL","n":"Marshall Islands","y":2007,"v":41.84},{"c":"IDN","n":"Indonesia","y":2008,"v":5.93},{"c":"IND","n":"India","y":2008,"v":21.1},{"c":"PAK","n":"Pakistan","y":2008,"v":20.36},{"c":"ARE","n":"UAE","y":2012,"v":35.11},{"c":"EGY","n":"Egypt","y":2013,"v":24.76},{"c":"KWT","n":"Kuwait","y":2013,"v":35.15},{"c":"IDN","n":"Indonesia","y":2014,"v":8.33},{"c":"THA","n":"Thailand","y":2014,"v":9.94},{"c":"EGY","n":"Egypt","y":2015,"v":25.15},{"c":"IND","n":"India","y":2015,"v":23.2},{"c":"EGY","n":"Egypt","y":2016,"v":29.46},{"c":"EGY","n":"Egypt","y":2017,"v":31.96},{"c":"IND","n":"India","y":2017,"v":19.61},{"c":"KWT","n":"Kuwait","y":2018,"v":35.06},{"c":"IDN","n":"Indonesia","y":2019,"v":11.8},{"c":"PAK","n":"Pakistan","y":2019,"v":35.55},{"c":"KWT","n":"Kuwait","y":2020,"v":35.07},{"c":"USA","n":"United States","y":2020,"v":13.96},{"c":"WSM","n":"Samoa","y":2020,"v":23.64},{"c":"CHN","n":"China","y":2021,"v":11.47},{"c":"THA","n":"Thailand","y":2021,"v":15.55},{"c":"WSM","n":"Samoa","y":2021,"v":23.54},{"c":"FJI","n":"Fiji","y":2022,"v":25.78},{"c":"USA","n":"United States","y":2022,"v":12.48}];
+
+const groups = {
+  "Gulf / Middle East": ["KWT", "ARE", "EGY", "PAK"],
+  "Pacific Islands": ["MHL", "FJI", "WSM"],
+  "Asia": ["IND", "CHN", "THA", "IDN"],
+  "Western": ["USA"]
+};
+
+const palette = {
+  "KWT":  "#C2402A",
+  "ARE":  "#E8693A",
+  "EGY":  "#D4894D",
+  "PAK":  "#A85B36",
+  "MHL":  "#5B4AB5",
+  "FJI":  "#8270D6",
+  "WSM":  "#A899E8",
+  "IND":  "#1B7A5A",
+  "CHN":  "#3BAA7E",
+  "THA":  "#6DC4A0",
+  "IDN":  "#9ED8BF",
+  "USA":  "#3A76B0"
+};
+
+const nameMap = {};
+raw.forEach(d => { nameMap[d.c] = d.n; });
+
+// Group data by country
+const byCountry = {};
+raw.forEach(d => {
+  if (!byCountry[d.c]) byCountry[d.c] = [];
+  byCountry[d.c].push(d);
+});
+Object.values(byCountry).forEach(arr => arr.sort((a, b) => a.y - b.y));
+
+const allCountries = Object.keys(byCountry);
+
+// Chart dimensions
+const W = 720;
+const H = 440;
+const pad = { left: 48, right: 120, top: 20, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const minYear = 1990;
+const maxYear = 2022;
+const minVal = 0;
+const maxVal = 48;
+
+const xScale = y => pad.left + ((y - minYear) / (maxYear - minYear)) * chartW;
+const yScale = v => pad.top + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+  return e;
+}
+
+const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+svg.style.display = "block";
+
+// Y-axis grid lines and labels
+for (let v = 0; v <= maxVal; v += 10) {
+  const y = yScale(v);
+  svg.appendChild(el("line", { x1: pad.left, x2: W - pad.right, y1: y, y2: y, stroke: "#D8D6CE", "stroke-width": 0.5 }));
+  const label = el("text", { x: pad.left - 8, y: y + 3.5, "text-anchor": "end", fill: "#B0AEA4", "font-size": "9" });
+  label.textContent = v + "%";
+  svg.appendChild(label);
+}
+
+// X-axis labels
+for (let yr = 1990; yr <= 2022; yr += 4) {
+  const x = xScale(yr);
+  const label = el("text", { x: x, y: H - pad.bottom + 18, "text-anchor": "middle", fill: "#B0AEA4", "font-size": "9" });
+  label.textContent = yr;
+  svg.appendChild(label);
+  svg.appendChild(el("line", { x1: x, x2: x, y1: pad.top, y2: pad.top + chartH, stroke: "#E5E3DC", "stroke-width": 0.5, "stroke-dasharray": "2,3" }));
+}
+
+// Draw lines and dots for each country
+const pathElements = {};
+const dotElements = {};
+const labelElements = {};
+
+allCountries.forEach(code => {
+  const pts = byCountry[code];
+  const color = palette[code];
+
+  // Line path
+  const pathD = pts.map((d, i) => (i === 0 ? "M" : "L") + xScale(d.y).toFixed(1) + "," + yScale(d.v).toFixed(1)).join(" ");
+  const path = el("path", { d: pathD, fill: "none", stroke: color, "stroke-width": 1.8, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.85 });
+  path.dataset.country = code;
+  svg.appendChild(path);
+  pathElements[code] = path;
+
+  // Dots
+  dotElements[code] = [];
+  pts.forEach(d => {
+    const dot = el("circle", { cx: xScale(d.y), cy: yScale(d.v), r: 2.5, fill: color, stroke: "#F6F5EE", "stroke-width": 1 });
+    dot.dataset.country = code;
+    dot.dataset.year = d.y;
+    dot.dataset.value = d.v;
+    dot.dataset.name = nameMap[code];
+    svg.appendChild(dot);
+    dotElements[code].push(dot);
+  });
+
+  // End label
+  const last = pts[pts.length - 1];
+  const lbl = el("text", { x: xScale(last.y) + 6, y: yScale(last.v) + 3.5, fill: color, "font-size": "9", "font-weight": "500" });
+  lbl.textContent = nameMap[code];
+  lbl.dataset.country = code;
+  svg.appendChild(lbl);
+  labelElements[code] = lbl;
+});
+
+// Resolve label overlaps via nudging
+function resolveLabels() {
+  const labels = allCountries.map(code => {
+    const pts = byCountry[code];
+    const last = pts[pts.length - 1];
+    return { code, baseY: yScale(last.v), y: yScale(last.v), x: xScale(last.y) + 6 };
+  });
+  labels.sort((a, b) => a.baseY - b.baseY);
+  const spacing = 10;
+  for (let i = 1; i < labels.length; i++) {
+    if (labels[i].y - labels[i - 1].y < spacing) {
+      labels[i].y = labels[i - 1].y + spacing;
+    }
+  }
+  labels.forEach(l => {
+    labelElements[l.code].setAttribute("y", l.y + 3.5);
+  });
+}
+resolveLabels();
+
+document.getElementById("chart").appendChild(svg);
+
+// Tooltip and hover
+const tip = document.getElementById("tip");
+const chartDiv = document.getElementById("chart");
+
+function highlight(code) {
+  allCountries.forEach(c => {
+    const dim = c !== code;
+    pathElements[c].setAttribute("opacity", dim ? 0.15 : 1);
+    pathElements[c].setAttribute("stroke-width", dim ? 1.2 : 2.5);
+    dotElements[c].forEach(dot => {
+      dot.setAttribute("opacity", dim ? 0.15 : 1);
+      dot.setAttribute("r", dim ? 2 : 3.5);
+    });
+    labelElements[c].setAttribute("opacity", dim ? 0.2 : 1);
+    labelElements[c].setAttribute("font-weight", dim ? "400" : "600");
+  });
+}
+
+function resetHighlight() {
+  allCountries.forEach(c => {
+    pathElements[c].setAttribute("opacity", 0.85);
+    pathElements[c].setAttribute("stroke-width", 1.8);
+    dotElements[c].forEach(dot => {
+      dot.setAttribute("opacity", 1);
+      dot.setAttribute("r", 2.5);
+    });
+    labelElements[c].setAttribute("opacity", 1);
+    labelElements[c].setAttribute("font-weight", "500");
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleX;
+
+  let closest = null;
+  let closestDist = Infinity;
+
+  allCountries.forEach(code => {
+    byCountry[code].forEach(d => {
+      const dx = xScale(d.y) - mx;
+      const dy = yScale(d.v) - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < closestDist && dist < 30) {
+        closestDist = dist;
+        closest = { code, ...d };
+      }
+    });
+  });
+
+  if (closest) {
+    highlight(closest.code);
+    tip.style.opacity = 1;
+    tip.innerHTML = "<strong>" + nameMap[closest.code] + "</strong><br>" + closest.y + ": " + closest.v.toFixed(1) + "%";
+    const tipRect = tip.getBoundingClientRect();
+    const chartRect = chartDiv.getBoundingClientRect();
+    let tx = e.clientX - chartRect.left + 12;
+    let ty = e.clientY - chartRect.top - 10;
+    if (tx + tipRect.width > chartRect.width) tx = tx - tipRect.width - 24;
+    tip.style.left = tx + "px";
+    tip.style.top = ty + "px";
+  } else {
+    resetHighlight();
+    tip.style.opacity = 0;
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  resetHighlight();
+  tip.style.opacity = 0;
+});
+
+// Build legend
+const legendDiv = document.getElementById("legend");
+Object.entries(groups).forEach(([groupName, codes]) => {
+  const groupLabel = document.createElement("span");
+  groupLabel.className = "legend-group";
+  groupLabel.textContent = groupName + ":";
+  legendDiv.appendChild(groupLabel);
+  codes.forEach(code => {
+    const item = document.createElement("span");
+    item.className = "legend-item";
+    const swatch = document.createElement("span");
+    swatch.className = "legend-swatch";
+    swatch.style.background = palette[code];
+    item.appendChild(swatch);
+    const text = document.createElement("span");
+    text.textContent = nameMap[code];
+    item.appendChild(text);
+    item.addEventListener("mouseenter", () => highlight(code));
+    item.addEventListener("mouseleave", resetHighlight);
+    legendDiv.appendChild(item);
+  });
+});
+</script>
+</body></html>

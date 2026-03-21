@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Broadband Divide</h1>
+<p class="subtitle">Fixed broadband subscriptions per 100 inhabitants, 2000-2023. Wealthy nations saturated above 30 per 100 while much of the developing world remains below 10, revealing a persistent digital infrastructure gap.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 17.6.1 -- IT_NET_BBNDN (Fixed broadband subscriptions)</p>
+<script>
+const series = [
+  {
+    name: "Switzerland",
+    color: "#3A9E8F",
+    data: [
+      [2000,0.8],[2001,4.2],[2002,8.6],[2003,13.4],[2004,18.3],[2005,22.2],
+      [2006,26.0],[2007,29.6],[2008,32.4],[2009,34.6],[2010,36.2],[2011,38.3],
+      [2012,40.1],[2013,41.7],[2014,43.1],[2015,44.2],[2016,45.1],[2017,45.8],
+      [2018,46.0],[2019,46.2],[2020,46.4],[2021,46.6],[2022,46.9],[2023,47.2]
+    ]
+  },
+  {
+    name: "France",
+    color: "#6C8EBF",
+    data: [
+      [2000,0.3],[2001,0.8],[2002,2.5],[2003,5.2],[2004,9.1],[2005,13.2],
+      [2006,17.3],[2007,21.7],[2008,25.5],[2009,28.7],[2010,31.3],[2011,33.8],
+      [2012,35.4],[2013,37.0],[2014,38.9],[2015,40.4],[2016,41.4],[2017,42.3],
+      [2018,43.1],[2019,44.0],[2020,44.8],[2021,45.3],[2022,45.8],[2023,46.2]
+    ]
+  },
+  {
+    name: "South Korea",
+    color: "#5B7BB4",
+    data: [
+      [2000,8.2],[2001,17.8],[2002,24.2],[2003,25.5],[2004,26.4],[2005,27.0],
+      [2006,29.1],[2007,30.6],[2008,32.1],[2009,33.5],[2010,35.7],[2011,36.6],
+      [2012,37.5],[2013,38.2],[2014,39.0],[2015,39.8],[2016,40.5],[2017,41.1],
+      [2018,41.6],[2019,42.2],[2020,42.8],[2021,43.3],[2022,43.8],[2023,44.3]
+    ]
+  },
+  {
+    name: "Germany",
+    color: "#8DA4C7",
+    data: [
+      [2000,0.3],[2001,2.5],[2002,3.9],[2003,5.4],[2004,8.5],[2005,13.1],
+      [2006,18.1],[2007,24.0],[2008,27.8],[2009,30.6],[2010,32.2],[2011,33.7],
+      [2012,34.5],[2013,35.0],[2014,35.8],[2015,36.8],[2016,37.9],[2017,40.2],
+      [2018,41.3],[2019,42.4],[2020,43.2],[2021,43.9],[2022,44.3],[2023,45.0]
+    ]
+  },
+  {
+    name: "Maldives",
+    color: "#E6A040",
+    data: [
+      [2002,0.07],[2003,0.17],[2004,0.24],[2005,1.05],[2006,1.92],[2007,3.04],
+      [2008,4.29],[2009,4.11],[2010,3.99],[2011,4.41],[2012,4.40],[2013,4.85],
+      [2014,4.61],[2015,5.27],[2016,6.43],[2017,7.74],[2018,9.71],[2019,10.6],
+      [2020,12.3],[2021,14.7],[2022,17.5],[2023,18.9]
+    ]
+  },
+  {
+    name: "Brazil",
+    color: "#C78044",
+    data: [
+      [2000,0.1],[2001,0.2],[2002,0.4],[2003,0.6],[2004,1.7],[2005,1.8],
+      [2006,3.1],[2007,5.1],[2008,6.0],[2009,6.4],[2010,7.2],[2011,8.6],
+      [2012,9.5],[2013,10.5],[2014,11.4],[2015,12.2],[2016,12.9],[2017,13.8],
+      [2018,14.9],[2019,15.5],[2020,16.1],[2021,16.9],[2022,17.6],[2023,18.3]
+    ]
+  },
+  {
+    name: "Philippines",
+    color: "#D09050",
+    data: [
+      [2001,0.01],[2002,0.03],[2003,0.07],[2004,0.11],[2005,0.14],[2006,0.30],
+      [2007,0.56],[2008,1.16],[2009,1.88],[2010,1.90],[2011,1.89],[2012,2.23],
+      [2013,2.63],[2014,2.92],[2015,2.87],[2016,2.91],[2017,3.26],[2018,3.58],
+      [2019,5.88],[2020,7.28],[2021,8.67],[2022,7.70],[2023,6.53]
+    ]
+  },
+  {
+    name: "Nicaragua",
+    color: "#D06050",
+    data: [
+      [2000,0.01],[2001,0.03],[2002,0.04],[2003,0.08],[2004,0.09],[2005,0.19],
+      [2006,0.34],[2007,0.49],[2008,0.76],[2009,1.37],[2010,1.26],[2011,1.45],
+      [2012,1.70],[2013,2.18],[2014,1.82],[2015,1.88],[2016,2.82],[2017,3.30],
+      [2018,2.99],[2019,3.34],[2020,4.40],[2021,4.48],[2022,4.96],[2023,5.37]
+    ]
+  },
+  {
+    name: "Guatemala",
+    color: "#CC7055",
+    data: [
+      [2005,0.21],[2006,0.30],[2007,0.43],[2008,0.69],[2009,1.12],[2010,1.81],
+      [2012,1.86],[2013,2.28],[2014,2.73],[2015,2.82],[2016,3.07],[2017,3.19],
+      [2019,3.45],[2020,3.58],[2021,3.54],[2022,5.14],[2023,4.52]
+    ]
+  },
+  {
+    name: "Nepal",
+    color: "#B86040",
+    data: [
+      [2007,0.04],[2008,0.04],[2009,0.06],[2010,0.21],[2011,0.34],
+      [2012,0.81],[2013,1.09],[2014,0.87],[2015,1.04],[2016,0.77],
+      [2017,1.71],[2018,2.68],[2019,3.46],[2020,4.23],[2021,4.20],[2022,4.71]
+    ]
+  },
+  {
+    name: "Cuba",
+    color: "#C05050",
+    data: [
+      [2007,0.02],[2008,0.02],[2009,0.03],[2010,0.03],[2011,0.04],
+      [2012,0.04],[2013,0.05],[2014,0.07],[2015,0.07],[2016,0.13],
+      [2017,0.26],[2018,0.78],[2019,1.45],[2020,1.83],[2021,2.07],[2023,2.01]
+    ]
+  },
+  {
+    name: "Papua New Guinea",
+    color: "#9B5050",
+    data: [
+      [2008,0.04],[2009,0.06],[2010,0.08],[2011,0.10],[2012,0.12],
+      [2013,0.15],[2014,0.17],[2015,0.19],[2016,0.21],[2017,0.21],
+      [2019,0.23],[2020,0.23],[2021,0.23],[2022,0.23]
+    ]
+  }
+];
+
+const W = 740;
+const H = 420;
+const pad = { left: 44, right: 130, top: 20, bottom: 36 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const yearMin = 2000;
+const yearMax = 2023;
+const valMax = 50;
+
+function xScale(year) { return pad.left + ((year - yearMin) / (yearMax - yearMin)) * chartW; }
+function yScale(val) { return pad.top + chartH - (val / valMax) * chartH; }
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Y grid lines and labels
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", pad.left + chartW);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#C5C3B8" : "#E2E0D5");
+  line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 6);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.textContent = v;
+  svg.appendChild(label);
+});
+
+// X axis labels
+for (let yr = 2000; yr <= 2023; yr += 5) {
+  const x = xScale(yr);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top + chartH + 16);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.textContent = yr;
+  svg.appendChild(label);
+
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 4);
+  tick.setAttribute("stroke", "#C5C3B8");
+  tick.setAttribute("stroke-width", "0.5");
+  svg.appendChild(tick);
+}
+
+// Draw lines
+series.forEach(s => {
+  const path = document.createElementNS(ns, "path");
+  let d = "";
+  s.data.forEach((pt, i) => {
+    const x = xScale(pt[0]);
+    const y = yScale(pt[1]);
+    d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+  });
+  path.setAttribute("d", d);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", s.color);
+  path.setAttribute("stroke-width", "1.8");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-linecap", "round");
+  svg.appendChild(path);
+
+  // End dot
+  const last = s.data[s.data.length - 1];
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(last[0]));
+  dot.setAttribute("cy", yScale(last[1]));
+  dot.setAttribute("r", "2.5");
+  dot.setAttribute("fill", s.color);
+  svg.appendChild(dot);
+
+  // End label
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", xScale(last[0]) + 6);
+  label.setAttribute("y", yScale(last[1]) + 3.5);
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", s.color);
+  label.setAttribute("font-weight", "500");
+  label.textContent = s.name;
+  svg.appendChild(label);
+});
+
+// Hover overlay
+const overlay = document.createElementNS(ns, "rect");
+overlay.setAttribute("x", pad.left);
+overlay.setAttribute("y", pad.top);
+overlay.setAttribute("width", chartW);
+overlay.setAttribute("height", chartH);
+overlay.setAttribute("fill", "transparent");
+overlay.style.cursor = "crosshair";
+svg.appendChild(overlay);
+
+// Hover line
+const hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", pad.top + chartH);
+hoverLine.setAttribute("stroke", "#2B2A27");
+hoverLine.setAttribute("stroke-width", "0.5");
+hoverLine.setAttribute("stroke-dasharray", "3,2");
+hoverLine.style.opacity = "0";
+hoverLine.style.pointerEvents = "none";
+svg.appendChild(hoverLine);
+
+// Hover dots group
+const dotsGroup = document.createElementNS(ns, "g");
+dotsGroup.style.pointerEvents = "none";
+svg.appendChild(dotsGroup);
+
+const tip = document.getElementById("tip");
+
+overlay.addEventListener("mousemove", e => {
+  const rect = overlay.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const ratio = mx / rect.width;
+  const year = Math.round(yearMin + ratio * (yearMax - yearMin));
+  const x = xScale(year);
+
+  hoverLine.setAttribute("x1", x);
+  hoverLine.setAttribute("x2", x);
+  hoverLine.style.opacity = "1";
+
+  dotsGroup.innerHTML = "";
+
+  const vals = [];
+  series.forEach(s => {
+    // Find closest data point for this year
+    let closest = null;
+    let minDist = Infinity;
+    s.data.forEach(pt => {
+      const dist = Math.abs(pt[0] - year);
+      if (dist < minDist) { minDist = dist; closest = pt; }
+    });
+    if (closest && minDist <= 1) {
+      const cy = yScale(closest[1]);
+      const dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("cx", x);
+      dot.setAttribute("cy", cy);
+      dot.setAttribute("r", "3");
+      dot.setAttribute("fill", s.color);
+      dot.setAttribute("stroke", "#F6F5EE");
+      dot.setAttribute("stroke-width", "1.5");
+      dotsGroup.appendChild(dot);
+      vals.push({ name: s.name, value: closest[1], color: s.color });
+    }
+  });
+
+  if (vals.length > 0) {
+    vals.sort((a, b) => b.value - a.value);
+    let html = `<div style="font-weight:500;margin-bottom:4px;font-size:11px;">${year}</div>`;
+    vals.forEach(v => {
+      html += `<div style="display:flex;align-items:center;gap:5px;margin:2px 0;">`;
+      html += `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${v.color};"></span>`;
+      html += `<span>${v.name}</span>`;
+      html += `<span style="margin-left:auto;font-weight:500;">${v.value.toFixed(1)}</span>`;
+      html += `</div>`;
+    });
+    tip.innerHTML = html;
+    tip.style.opacity = "1";
+
+    const chartEl = document.getElementById("chart");
+    const chartRect = chartEl.getBoundingClientRect();
+    const tipW = tip.offsetWidth;
+    let tipX = e.clientX - chartRect.left + 14;
+    if (tipX + tipW > chartRect.width - 10) tipX = e.clientX - chartRect.left - tipW - 14;
+    tip.style.left = tipX + "px";
+    tip.style.top = (e.clientY - chartRect.top - 20) + "px";
+  }
+});
+
+overlay.addEventListener("mouseleave", () => {
+  hoverLine.style.opacity = "0";
+  dotsGroup.innerHTML = "";
+  tip.style.opacity = "0";
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

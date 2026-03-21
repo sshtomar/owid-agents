@@ -1,18 +1,31 @@
 import express from "express";
 import cors from "cors";
+import { join } from "node:path";
 import {
   listDatasets,
   getDataset,
   listVisualizations,
   getVisualization,
   getVizHtml,
+  getVizNotebook,
+  getVizNotebookWasm,
 } from "../src/catalog.js";
 
-const app = express();
+export const app = express();
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
+
+const WASM_NOTEBOOKS_DIR = join(
+  import.meta.dirname,
+  "..",
+  "data",
+  "visualizations",
+  "notebooks",
+  "wasm",
+);
 
 app.use(cors());
 app.use(express.json());
+app.use("/wasm-notebooks", express.static(WASM_NOTEBOOKS_DIR));
 
 // --- Dataset endpoints ---
 
@@ -53,12 +66,32 @@ app.get("/api/visualizations/:id", (req, res) => {
   res.json({ ...viz, htmlCode: html });
 });
 
+app.get("/api/visualizations/:id/notebook/wasm", (req, res) => {
+  const viz = getVisualization(req.params.id);
+  if (!viz?.notebookPath || !getVizNotebookWasm(req.params.id)) {
+    res.status(404).json({ error: "WASM notebook not found" });
+    return;
+  }
+  res.redirect(`/wasm-notebooks/${req.params.id}.html`);
+});
+
+app.get("/api/visualizations/:id/notebook", (req, res) => {
+  const notebook = getVizNotebook(req.params.id);
+  if (!notebook) {
+    res.status(404).json({ error: "Notebook not found" });
+    return;
+  }
+  res.type("text/plain").send(notebook);
+});
+
 // --- Health ---
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.listen(PORT, () => {
-  console.log(`API server running at http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`API server running at http://localhost:${PORT}`);
+  });
+}

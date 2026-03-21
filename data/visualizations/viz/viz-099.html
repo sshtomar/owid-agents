@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11.5px; color: #7A786F; margin: 0 0 24px; max-width: 700px; line-height: 1.55; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart-wrap { position: relative; }
+  svg { display: block; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    white-space: nowrap;
+    z-index: 10;
+    line-height: 1.5;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 20px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #5A584F; cursor: pointer; user-select: none; }
+  .legend-item.dimmed { opacity: 0.3; }
+  .legend-swatch { width: 16px; height: 3px; border-radius: 1px; flex-shrink: 0; }
+</style>
+</head><body>
+<h1>The Long Leverage: Private Sector Debt Accumulation Since 1950</h1>
+<p class="subtitle">Private sector debt as a share of GDP for eight major economies, tracking the multi-decade financial cycles that define modern capitalism. The United States shows a near-continuous build-up from 76% in 1950 to a peak of 236% in 2008. France and Canada have steadily climbed since the mid-1990s, while Japan has been deleveraging from its 1990s bubble peak.</p>
+<div class="legend" id="legend"></div>
+<div id="chart-wrap">
+  <div class="tooltip" id="tooltip"></div>
+</div>
+<p class="source">Source: IMF Global Debt Database &mdash; Private Sector Debt, % of GDP (Privatedebt_all)</p>
+
+<script>
+const SERIES = [
+  {id:"USA",name:"United States",d:[{y:1950,v:75.8},{y:1951,v:72.7},{y:1952,v:88.2},{y:1953,v:88.0},{y:1954,v:106.1},{y:1955,v:120.1},{y:1956,v:126.2},{y:1957,v:120.8},{y:1958,v:140.8},{y:1959,v:145.4},{y:1960,v:146.6},{y:1961,v:160.2},{y:1962,v:156.4},{y:1963,v:156.5},{y:1964,v:153.8},{y:1965,v:151.6},{y:1966,v:147.3},{y:1967,v:147.8},{y:1968,v:144.5},{y:1969,v:145.0},{y:1970,v:145.1},{y:1971,v:143.7},{y:1972,v:143.3},{y:1973,v:145.7},{y:1974,v:143.1},{y:1975,v:153.6},{y:1976,v:149.9},{y:1977,v:150.6},{y:1978,v:150.8},{y:1979,v:154.0},{y:1980,v:157.0},{y:1981,v:155.2},{y:1982,v:157.1},{y:1983,v:155.5},{y:1984,v:158.2},{y:1985,v:163.7},{y:1986,v:167.3},{y:1987,v:171.3},{y:1988,v:175.7},{y:1989,v:174.9},{y:1990,v:174.7},{y:1991,v:172.5},{y:1992,v:170.9},{y:1993,v:169.4},{y:1994,v:167.4},{y:1995,v:168.3},{y:1996,v:169.6},{y:1997,v:168.2},{y:1998,v:177.2},{y:1999,v:185.0},{y:2000,v:196.3},{y:2001,v:203.1},{y:2002,v:209.0},{y:2003,v:206.4},{y:2004,v:210.3},{y:2005,v:216.2},{y:2006,v:222.5},{y:2007,v:230.6},{y:2008,v:235.6},{y:2009,v:235.2},{y:2010,v:226.2},{y:2011,v:222.1},{y:2012,v:218.4},{y:2013,v:218.4},{y:2014,v:218.6},{y:2015,v:221.1},{y:2016,v:226.1},{y:2017,v:223.2},{y:2018,v:223.6},{y:2019,v:229.6},{y:2020,v:238.5},{y:2021,v:229.4},{y:2022,v:230.7},{y:2023,v:224.5},{y:2024,v:216.6}]},
+  {id:"JPN",name:"Japan",d:[{y:1994,v:282.4},{y:1995,v:288.5},{y:1996,v:282.4},{y:1997,v:243.5},{y:1998,v:237.5},{y:1999,v:235.1},{y:2000,v:227.3},{y:2001,v:216.1},{y:2002,v:217.2},{y:2003,v:214.1},{y:2004,v:207.5},{y:2005,v:207.5},{y:2006,v:208.1},{y:2007,v:204.4},{y:2008,v:207.5},{y:2009,v:215.4},{y:2010,v:206.9},{y:2011,v:207.7},{y:2012,v:202.1},{y:2013,v:199.6},{y:2014,v:201.2},{y:2015,v:196.8},{y:2016,v:196.3},{y:2017,v:198.3},{y:2018,v:203.1},{y:2019,v:205.9},{y:2020,v:222.4},{y:2021,v:224.5},{y:2022,v:230.0},{y:2023,v:221.9},{y:2024,v:219.9}]},
+  {id:"GBR",name:"United Kingdom",d:[{y:1995,v:155.6},{y:1996,v:149.8},{y:1997,v:153.9},{y:1998,v:173.7},{y:1999,v:166.4},{y:2000,v:183.5},{y:2001,v:194.8},{y:2002,v:218.6},{y:2003,v:214.0},{y:2004,v:217.7},{y:2005,v:221.8},{y:2006,v:223.0},{y:2007,v:227.4},{y:2008,v:241.0},{y:2009,v:247.2},{y:2010,v:235.6},{y:2011,v:245.9},{y:2012,v:242.1},{y:2013,v:225.2},{y:2014,v:234.9},{y:2015,v:227.5},{y:2016,v:236.8},{y:2017,v:226.3},{y:2018,v:207.9},{y:2019,v:200.1},{y:2020,v:226.8},{y:2021,v:199.8},{y:2022,v:170.8},{y:2023,v:162.2},{y:2024,v:156.5}]},
+  {id:"FRA",name:"France",d:[{y:1995,v:164.2},{y:1996,v:164.6},{y:1997,v:166.1},{y:1998,v:172.2},{y:1999,v:181.5},{y:2000,v:188.2},{y:2001,v:194.0},{y:2002,v:193.7},{y:2003,v:193.8},{y:2004,v:194.6},{y:2005,v:202.8},{y:2006,v:210.5},{y:2007,v:217.6},{y:2008,v:222.2},{y:2009,v:233.5},{y:2010,v:235.9},{y:2011,v:241.7},{y:2012,v:240.1},{y:2013,v:237.6},{y:2014,v:244.3},{y:2015,v:251.2},{y:2016,v:257.7},{y:2017,v:261.9},{y:2018,v:265.6},{y:2019,v:268.0},{y:2020,v:299.1},{y:2021,v:286.6},{y:2022,v:288.2},{y:2023,v:279.1},{y:2024,v:276.5}]},
+  {id:"DEU",name:"Germany",d:[{y:1995,v:148.3},{y:1996,v:152.9},{y:1997,v:155.8},{y:1998,v:160.0},{y:1999,v:170.4},{y:2000,v:180.7},{y:2001,v:180.7},{y:2002,v:183.2},{y:2003,v:182.7},{y:2004,v:175.7},{y:2005,v:174.5},{y:2006,v:173.3},{y:2007,v:170.3},{y:2008,v:172.2},{y:2009,v:176.9},{y:2010,v:170.5},{y:2011,v:164.6},{y:2012,v:164.8},{y:2013,v:164.7},{y:2014,v:158.3},{y:2015,v:157.5},{y:2016,v:157.0},{y:2017,v:156.7},{y:2018,v:160.4},{y:2019,v:165.3},{y:2020,v:175.5},{y:2021,v:178.4},{y:2022,v:174.2},{y:2023,v:168.2},{y:2024,v:163.8}]},
+  {id:"CAN",name:"Canada",d:[{y:1990,v:165.2},{y:1991,v:172.3},{y:1992,v:174.9},{y:1993,v:177.8},{y:1994,v:175.8},{y:1995,v:175.5},{y:1996,v:176.3},{y:1997,v:180.4},{y:1998,v:190.1},{y:1999,v:186.1},{y:2000,v:180.4},{y:2001,v:187.6},{y:2002,v:191.1},{y:2003,v:188.1},{y:2004,v:186.8},{y:2005,v:182.2},{y:2006,v:185.7},{y:2007,v:203.5},{y:2008,v:216.3},{y:2009,v:231.9},{y:2010,v:229.4},{y:2011,v:229.3},{y:2012,v:236.1},{y:2013,v:236.5},{y:2014,v:242.1},{y:2015,v:257.9},{y:2016,v:267.0},{y:2017,v:269.0},{y:2018,v:272.8},{y:2019,v:278.2},{y:2020,v:303.9},{y:2021,v:281.9},{y:2022,v:266.2},{y:2023,v:267.1},{y:2024,v:266.3}]},
+  {id:"ESP",name:"Spain",d:[{y:1995,v:128.9},{y:1996,v:129.9},{y:1997,v:133.3},{y:1998,v:144.7},{y:1999,v:162.7},{y:2000,v:177.3},{y:2001,v:187.2},{y:2002,v:192.0},{y:2003,v:202.7},{y:2004,v:217.9},{y:2005,v:238.3},{y:2006,v:262.7},{y:2007,v:275.7},{y:2008,v:271.5},{y:2009,v:274.8},{y:2010,v:268.7},{y:2011,v:263.9},{y:2012,v:255.0},{y:2013,v:251.5},{y:2014,v:239.7},{y:2015,v:223.5},{y:2016,v:216.1},{y:2017,v:207.5},{y:2018,v:200.4},{y:2019,v:195.5},{y:2020,v:217.8},{y:2021,v:205.3},{y:2022,v:184.9},{y:2023,v:165.5}]},
+  {id:"KOR",name:"South Korea",d:[{y:2008,v:217.8},{y:2009,v:226.8},{y:2010,v:220.4},{y:2011,v:224.2},{y:2012,v:225.7},{y:2013,v:226.9},{y:2014,v:229.0},{y:2015,v:227.5},{y:2016,v:228.1},{y:2017,v:226.8},{y:2018,v:230.9},{y:2019,v:238.2},{y:2020,v:254.1},{y:2021,v:263.4},{y:2022,v:270.7},{y:2023,v:263.2},{y:2024,v:255.8}]}
+];
+
+const COLORS = [
+  "#D45B3F", "#3A9E8F", "#4A8FBF", "#D4A843",
+  "#8B6BB5", "#E08963", "#C47BA0", "#6B9E4A"
+];
+
+const W = 860, H = 500;
+const ML = 48, MR = 100, MT = 16, MB = 36;
+const PW = W - ML - MR;
+const PH = H - MT - MB;
+
+// Data range: 1950 - 2024, value range: 0 - 320
+const Y0 = 1950, Y1 = 2024;
+const V0 = 0, V1 = 320;
+
+function xScale(yr) { return ML + ((yr - Y0) / (Y1 - Y0)) * PW; }
+function yScale(val) { return MT + PH - ((val - V0) / (V1 - V0)) * PH; }
+
+const ns = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+const wrap = document.getElementById("chart-wrap");
+const tip = document.getElementById("tooltip");
+const svg = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H });
+wrap.insertBefore(svg, wrap.firstChild);
+
+// y-axis grid lines
+[0, 50, 100, 150, 200, 250, 300].forEach(v => {
+  const y = yScale(v);
+  el("line", {
+    x1: ML, x2: ML + PW,
+    y1: y, y2: y,
+    stroke: v === 0 ? "#C8C6BA" : "#ECEADF",
+    "stroke-width": 1
+  }, svg);
+  const t = el("text", {
+    x: ML - 8, y: y + 3.5,
+    "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9",
+    fill: "#9A9890"
+  }, svg);
+  t.textContent = v + "%";
+});
+
+// 100% reference line (debt equals GDP)
+const refY = yScale(100);
+el("line", {
+  x1: ML, x2: ML + PW,
+  y1: refY, y2: refY,
+  stroke: "#C8C6BA",
+  "stroke-width": 1,
+  "stroke-dasharray": "4,3"
+}, svg);
+const refLabel = el("text", {
+  x: ML + PW + 4, y: refY + 3,
+  "font-family": "JetBrains Mono, monospace",
+  "font-size": "8",
+  fill: "#9A9890"
+}, svg);
+refLabel.textContent = "debt = GDP";
+
+// Crisis annotation lines
+const crises = [
+  { year: 1973, label: "Oil Crisis" },
+  { year: 2008, label: "GFC" },
+  { year: 2020, label: "COVID" }
+];
+crises.forEach(c => {
+  const cx = xScale(c.year);
+  el("line", {
+    x1: cx, x2: cx,
+    y1: MT, y2: MT + PH,
+    stroke: "#D8D5C8",
+    "stroke-width": 1,
+    "stroke-dasharray": "2,3"
+  }, svg);
+  const t = el("text", {
+    x: cx, y: MT - 4,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8",
+    fill: "#B0AD9F"
+  }, svg);
+  t.textContent = c.label;
+});
+
+// x-axis labels
+for (let yr = 1950; yr <= 2024; yr += 10) {
+  if (yr > 2024) break;
+  const x = xScale(yr);
+  const t = el("text", {
+    x: x, y: MT + PH + 18,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9",
+    fill: "#9A9890"
+  }, svg);
+  t.textContent = yr;
+  el("line", {
+    x1: x, x2: x,
+    y1: MT + PH, y2: MT + PH + 4,
+    stroke: "#C8C6BA",
+    "stroke-width": 1
+  }, svg);
+}
+// Add 2024 tick
+const x2024 = xScale(2024);
+const t2024 = el("text", {
+  x: x2024, y: MT + PH + 18,
+  "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace",
+  "font-size": "9",
+  fill: "#9A9890"
+}, svg);
+t2024.textContent = "2024";
+el("line", {
+  x1: x2024, x2: x2024,
+  y1: MT + PH, y2: MT + PH + 4,
+  stroke: "#C8C6BA",
+  "stroke-width": 1
+}, svg);
+
+// Track visibility for legend toggling
+const visible = SERIES.map(() => true);
+
+// Build paths and dots per series
+const seriesEls = SERIES.map((s, i) => {
+  const color = COLORS[i];
+  const g = el("g", {}, svg);
+
+  const path = el("path", {
+    fill: "none",
+    stroke: color,
+    "stroke-width": 2,
+    "stroke-linejoin": "round",
+    "stroke-linecap": "round"
+  }, g);
+
+  // Dots only at key inflection points to avoid clutter
+  const dots = s.d.filter((pt, j) => {
+    if (j === 0 || j === s.d.length - 1) return true;
+    // Show dots at local peaks/troughs and every 10 years
+    if (pt.y % 10 === 0) return true;
+    const prev = s.d[j - 1];
+    const next = s.d[j + 1];
+    if (next && ((pt.v > prev.v && pt.v > next.v) || (pt.v < prev.v && pt.v < next.v))) {
+      const mag = Math.abs(pt.v - prev.v);
+      if (mag > 8) return true;
+    }
+    return false;
+  }).map(pt => {
+    const c = el("circle", {
+      cx: xScale(pt.y),
+      cy: yScale(pt.v),
+      r: 2.5,
+      fill: color,
+      stroke: "#F6F5EE",
+      "stroke-width": 1.5,
+      style: "cursor:pointer"
+    }, g);
+    return { el: c, pt };
+  });
+
+  // End label
+  const last = s.d[s.d.length - 1];
+  const label = el("text", {
+    x: xScale(last.y) + 6,
+    y: yScale(last.v) + 3.5,
+    "font-family": "Inter, sans-serif",
+    "font-size": "9",
+    "font-weight": "500",
+    fill: color
+  }, g);
+  label.textContent = s.name;
+
+  // Build path d attribute
+  let pathD = "";
+  s.d.forEach((pt, j) => {
+    pathD += (j === 0 ? "M" : "L") + xScale(pt.y).toFixed(1) + "," + yScale(pt.v).toFixed(1);
+  });
+  path.setAttribute("d", pathD);
+
+  return { g, path, dots, label, color };
+});
+
+// Resolve overlapping end labels
+function resolveLabels() {
+  const labels = [];
+  SERIES.forEach((s, i) => {
+    if (!visible[i]) return;
+    const last = s.d[s.d.length - 1];
+    labels.push({ i, y: yScale(last.v), name: s.name });
+  });
+  labels.sort((a, b) => a.y - b.y);
+  const minGap = 12;
+  for (let pass = 0; pass < 8; pass++) {
+    for (let j = 1; j < labels.length; j++) {
+      const diff = labels[j].y - labels[j - 1].y;
+      if (diff < minGap) {
+        const shift = (minGap - diff) / 2;
+        labels[j - 1].y -= shift;
+        labels[j].y += shift;
+      }
+    }
+  }
+  labels.forEach(l => {
+    seriesEls[l.i].label.setAttribute("y", l.y + 3.5);
+  });
+}
+resolveLabels();
+
+// Hover overlay for vertical crosshair
+const overlay = el("rect", {
+  x: ML, y: MT,
+  width: PW, height: PH,
+  fill: "transparent",
+  style: "cursor:crosshair"
+}, svg);
+
+const crosshair = el("line", {
+  x1: 0, x2: 0,
+  y1: MT, y2: MT + PH,
+  stroke: "#C8C6BA",
+  "stroke-width": 1,
+  "stroke-dasharray": "3,2",
+  opacity: 0,
+  "pointer-events": "none"
+}, svg);
+
+function nearestYear(mx) {
+  const yr = Math.round(Y0 + ((mx - ML) / PW) * (Y1 - Y0));
+  return Math.max(Y0, Math.min(Y1, yr));
+}
+
+function closestPoint(series, year) {
+  let best = null, bestDist = Infinity;
+  for (const pt of series.d) {
+    const dist = Math.abs(pt.y - year);
+    if (dist < bestDist) { bestDist = dist; best = pt; }
+  }
+  return bestDist <= 1 ? best : null;
+}
+
+overlay.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (W / rect.width);
+  const my = (e.clientY - rect.top) * (H / rect.height);
+  const yr = nearestYear(mx);
+  const cx = xScale(yr);
+
+  crosshair.setAttribute("x1", cx);
+  crosshair.setAttribute("x2", cx);
+  crosshair.setAttribute("opacity", 1);
+
+  let rows = [];
+  SERIES.forEach((s, i) => {
+    if (!visible[i]) return;
+    const pt = closestPoint(s, yr);
+    if (pt) {
+      rows.push({ name: s.name, value: pt.v, year: pt.y, color: COLORS[i] });
+    }
+  });
+
+  if (rows.length === 0) {
+    tip.style.opacity = 0;
+    return;
+  }
+
+  rows.sort((a, b) => b.value - a.value);
+  let html = '<div style="font-family:Inter,sans-serif;font-weight:600;font-size:11px;margin-bottom:4px">' + yr + '</div>';
+  rows.forEach(r => {
+    html += '<div style="display:flex;align-items:center;gap:6px;margin:2px 0">';
+    html += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + r.color + '"></span>';
+    html += '<span>' + r.name + '</span>';
+    html += '<span style="margin-left:auto;font-weight:500;color:#D4A843">' + r.value.toFixed(1) + '%</span>';
+    html += '</div>';
+  });
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+
+  const tipRect = tip.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  let tx = (cx / W) * rect.width + rect.left - wrapRect.left + 14;
+  let ty = my / H * rect.height - 20;
+  if (tx + tipRect.width > wrapRect.width - 10) {
+    tx = (cx / W) * rect.width + rect.left - wrapRect.left - tipRect.width - 14;
+  }
+  if (ty < 0) ty = 4;
+  tip.style.left = tx + "px";
+  tip.style.top = ty + "px";
+});
+
+overlay.addEventListener("mouseleave", function() {
+  crosshair.setAttribute("opacity", 0);
+  tip.style.opacity = 0;
+});
+
+// Individual dot hover
+SERIES.forEach((s, si) => {
+  seriesEls[si].dots.forEach(({ el: dot, pt }) => {
+    dot.addEventListener("mouseenter", function() {
+      dot.setAttribute("r", 5);
+      const rect = svg.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      const dx = parseFloat(dot.getAttribute("cx"));
+      const dy = parseFloat(dot.getAttribute("cy"));
+      tip.innerHTML = '<div style="font-family:Inter,sans-serif;font-weight:600;font-size:11px;margin-bottom:2px">' +
+        s.name + '</div>' +
+        '<div><span style="color:#9A9890">' + pt.y + ':</span> <span style="color:#D4A843;font-weight:500">' + pt.v.toFixed(1) + '% of GDP</span></div>';
+      tip.style.opacity = 1;
+      const tipR = tip.getBoundingClientRect();
+      let tx = (dx / W) * rect.width + rect.left - wrapRect.left + 12;
+      let ty = (dy / H) * rect.height - tipR.height / 2;
+      if (tx + tipR.width > wrapRect.width - 10) {
+        tx = (dx / W) * rect.width + rect.left - wrapRect.left - tipR.width - 12;
+      }
+      if (ty < 0) ty = 4;
+      tip.style.left = tx + "px";
+      tip.style.top = ty + "px";
+    });
+    dot.addEventListener("mouseleave", function() {
+      dot.setAttribute("r", 2.5);
+      tip.style.opacity = 0;
+    });
+  });
+});
+
+// Legend with toggle
+const legendEl = document.getElementById("legend");
+SERIES.forEach((s, i) => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = '<span class="legend-swatch" style="background:' + COLORS[i] + '"></span>' + s.name;
+  item.addEventListener("click", function() {
+    visible[i] = !visible[i];
+    item.classList.toggle("dimmed", !visible[i]);
+    seriesEls[i].g.style.opacity = visible[i] ? 1 : 0.08;
+    resolveLabels();
+  });
+  legendEl.appendChild(item);
+});
+</script>
+</body></html>

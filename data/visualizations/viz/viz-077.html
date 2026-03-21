@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 660px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-bottom: 16px; display: flex; gap: 18px; align-items: center; }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 1px; margin-right: 4px; vertical-align: middle; }
+</style></head><body>
+<h1>Can They Read? Can They Count?</h1>
+<p class="subtitle">Proportion of children and young people achieving minimum proficiency in reading and mathematics (%), latest available data (2019-2023). The 50% threshold line separates countries where a majority of students meet basic learning standards from those where most do not. Across 124 countries with recent data, the median sits at just 44% -- meaning that in the typical country, fewer than half of children reach minimum proficiency.</p>
+<div class="legend">
+  <span><span class="legend-dot" style="background:#3A7C6A;"></span> Above 50%</span>
+  <span><span class="legend-dot" style="background:#C4553A;"></span> Below 50%</span>
+  <span style="margin-left: 8px; border-left: 1.5px dashed #2B2A27; height: 10px; display: inline-block;"></span>
+  <span>50% threshold</span>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG Indicator 4.1.1 -- SE_TOT_PRFL (Proportion achieving minimum proficiency in reading &amp; math)</p>
+<script>
+const data = [
+  { name: "South Korea", value: 93.4, year: 2023 },
+  { name: "Singapore", value: 92.7, year: 2023 },
+  { name: "Macao", value: 92.1, year: 2023 },
+  { name: "Hong Kong", value: 91.9, year: 2023 },
+  { name: "Lithuania", value: 86.6, year: 2023 },
+  { name: "Netherlands", value: 85.8, year: 2023 },
+  { name: "Estonia", value: 85.0, year: 2022 },
+  { name: "Poland", value: 84.1, year: 2023 },
+  { name: "Japan", value: 83.1, year: 2022 },
+  { name: "United Kingdom", value: 82.7, year: 2023 },
+  { name: "Switzerland", value: 81.1, year: 2022 },
+  { name: "Ireland", value: 81.0, year: 2022 },
+  { name: "Czechia", value: 80.9, year: 2023 },
+  { name: "Sweden", value: 79.8, year: 2023 },
+  { name: "Denmark", value: 79.6, year: 2022 },
+  { name: "Turkey", value: 78.6, year: 2023 },
+  { name: "Latvia", value: 78.6, year: 2023 },
+  { name: "Belgium", value: 78.3, year: 2023 },
+  { name: "Finland", value: 76.6, year: 2023 },
+  { name: "Germany", value: 74.9, year: 2023 },
+  { name: "Portugal", value: 73.9, year: 2023 },
+  { name: "Viet Nam", value: 72.6, year: 2022 },
+  { name: "Armenia", value: 72.3, year: 2023 },
+  { name: "United States", value: 70.8, year: 2023 },
+  { name: "Italy", value: 69.2, year: 2023 },
+  { name: "Spain", value: 65.8, year: 2023 },
+  { name: "Canada", value: 64.7, year: 2023 },
+  { name: "Australia", value: 64.1, year: 2023 },
+  { name: "Norway", value: 63.4, year: 2023 },
+  { name: "New Zealand", value: 61.5, year: 2023 },
+  { name: "Kazakhstan", value: 59.5, year: 2023 },
+  { name: "UAE", value: 57.7, year: 2023 },
+  { name: "France", value: 56.3, year: 2023 },
+  { name: "Costa Rica", value: 52.9, year: 2022 },
+  { name: "Montenegro", value: 50.1, year: 2023 },
+  { name: "Peru", value: 49.6, year: 2022 },
+  { name: "Qatar", value: 46.5, year: 2023 },
+  { name: "Egypt", value: 44.6, year: 2021 },
+  { name: "Uruguay", value: 43.5, year: 2022 },
+  { name: "Mexico", value: 38.3, year: 2022 },
+  { name: "Malaysia", value: 37.5, year: 2022 },
+  { name: "Uzbekistan", value: 35.0, year: 2023 },
+  { name: "Jordan", value: 32.2, year: 2023 },
+  { name: "Argentina", value: 29.9, year: 2022 },
+  { name: "Saudi Arabia", value: 28.8, year: 2023 },
+  { name: "Colombia", value: 28.8, year: 2022 },
+  { name: "Thailand", value: 28.4, year: 2022 },
+  { name: "Chile", value: 28.4, year: 2023 },
+  { name: "Iran", value: 27.9, year: 2023 },
+  { name: "Kenya", value: 27.2, year: 2023 },
+  { name: "Brazil", value: 26.6, year: 2022 },
+  { name: "Morocco", value: 23.2, year: 2023 },
+  { name: "Indonesia", value: 21.0, year: 2022 },
+  { name: "Kuwait", value: 20.8, year: 2023 },
+  { name: "Philippines", value: 17.8, year: 2022 },
+  { name: "Cambodia", value: 12.6, year: 2022 },
+  { name: "Paraguay", value: 12.3, year: 2022 },
+  { name: "Honduras", value: 11.2, year: 2019 },
+  { name: "Cameroon", value: 11.1, year: 2019 },
+  { name: "Zambia", value: 9.7, year: 2023 },
+  { name: "Dominican Rep.", value: 8.1, year: 2022 },
+  { name: "Pakistan", value: 7.6, year: 2019 },
+  { name: "Chad", value: 7.6, year: 2019 },
+  { name: "Madagascar", value: 6.3, year: 2019 },
+  { name: "Nicaragua", value: 3.9, year: 2019 },
+  { name: "Cote d'Ivoire", value: 1.2, year: 2023 }
+];
+
+const W = 740;
+const barH = 20;
+const gap = 3;
+const pad = { left: 130, right: 60, top: 24, bottom: 30 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const chartW = W - pad.left - pad.right;
+
+const xScale = v => pad.left + (v / 100) * chartW;
+const thresholdX = xScale(50);
+
+const aboveColor = "#3A7C6A";
+const belowColor = "#C4553A";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// X-axis grid lines
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  if (v === 50) {
+    line.setAttribute("stroke", "#2B2A27");
+    line.setAttribute("stroke-width", 1.5);
+    line.setAttribute("stroke-dasharray", "4,3");
+  } else {
+    line.setAttribute("stroke", "#DDD9CE");
+    line.setAttribute("stroke-width", 0.5);
+  }
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 10);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", v === 50 ? "#2B2A27" : "#7A786F");
+  label.setAttribute("font-weight", v === 50 ? "500" : "400");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barWidth = Math.max((d.value / 100) * chartW, 1);
+  const color = d.value >= 50 ? aboveColor : belowColor;
+
+  // Bar
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y + 2);
+  rect.setAttribute("width", barWidth);
+  rect.setAttribute("height", barH - 4);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  // Country label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "10");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  // Value label at end of bar
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", pad.left + barWidth + 5);
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "8");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1) + "%";
+
+  // Invisible hit area for hover
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    rect.setAttribute("opacity", "0.75");
+    const status = d.value >= 50 ? "Above threshold" : "Below threshold";
+    tip.innerHTML = `<strong>${d.name}</strong>  ${d.value.toFixed(1)}%  (${d.year})  ${status}`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 14) + "px";
+    tip.style.top = (e.clientY - r.top - 22) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+// 50% threshold label at bottom
+const threshLabel = document.createElementNS(ns, "text");
+threshLabel.setAttribute("x", thresholdX);
+threshLabel.setAttribute("y", pad.top + chartH + 16);
+threshLabel.setAttribute("text-anchor", "middle");
+threshLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+threshLabel.setAttribute("font-size", "8");
+threshLabel.setAttribute("fill", "#2B2A27");
+threshLabel.setAttribute("font-weight", "500");
+threshLabel.setAttribute("letter-spacing", "0.5");
+threshLabel.textContent = "50% THRESHOLD";
+svg.appendChild(threshLabel);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

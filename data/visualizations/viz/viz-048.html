@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Lifelines Home</h1>
+<p class="subtitle">Personal remittances received as % of GDP, 2000--2024. Entire economies now depend on money sent home by workers abroad. Honduras went from 7% to 26% in two decades; El Salvador and Guatemala followed similar paths. For these nations, diaspora earnings are not a supplement -- they are the economy.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- BX.TRF.PWKR.DT.GD.ZS (Personal remittances, received, % of GDP)</p>
+<script>
+const series = [
+  { name: "Honduras", color: "#E06050", data: [[2000,6.6],[2001,8.0],[2002,10.2],[2003,10.5],[2004,13.2],[2005,18.5],[2006,21.6],[2007,21.1],[2008,20.3],[2009,17.0],[2010,16.5],[2011,15.9],[2012,15.8],[2013,16.7],[2014,17.1],[2015,17.5],[2016,17.8],[2017,18.7],[2018,19.8],[2019,21.7],[2020,23.9],[2021,25.6],[2022,27.0],[2023,26.1],[2024,25.7]] },
+  { name: "El Salvador", color: "#D4763A", data: [[2000,15.0],[2001,15.7],[2002,15.4],[2003,16.0],[2004,18.7],[2005,20.6],[2006,21.8],[2007,21.8],[2008,20.9],[2009,19.3],[2010,18.8],[2011,18.0],[2012,18.3],[2013,18.0],[2014,18.4],[2015,18.2],[2016,18.9],[2017,20.0],[2018,20.7],[2019,21.0],[2020,23.8],[2021,26.2],[2022,24.6],[2023,24.5],[2024,24.0]] },
+  { name: "Gambia", color: "#B8860B", data: [[2003,11.1],[2004,6.3],[2005,5.8],[2006,6.0],[2007,4.3],[2008,4.1],[2009,5.5],[2010,7.5],[2011,6.5],[2012,7.5],[2013,8.0],[2014,11.2],[2015,11.2],[2016,9.8],[2017,10.6],[2018,12.7],[2019,15.2],[2020,23.0],[2021,27.2],[2022,22.8],[2023,21.6],[2024,22.0]] },
+  { name: "Comoros", color: "#9B59B6", data: [[2003,5.9],[2004,7.8],[2005,8.2],[2006,9.2],[2007,9.3],[2008,11.1],[2009,11.1],[2010,9.6],[2011,10.6],[2012,10.8],[2014,13.9],[2015,13.7],[2016,11.5],[2017,12.2],[2018,14.6],[2019,14.2],[2020,18.6],[2021,22.6],[2022,23.1],[2023,23.0],[2024,19.6]] },
+  { name: "Guatemala", color: "#3A9E8F", data: [[2000,3.1],[2001,3.4],[2002,7.8],[2003,10.0],[2004,11.1],[2005,11.4],[2006,12.4],[2007,12.6],[2008,11.5],[2009,10.8],[2010,10.4],[2011,9.7],[2012,10.0],[2013,10.0],[2014,9.9],[2015,10.4],[2016,11.1],[2017,11.7],[2018,12.9],[2019,13.8],[2020,14.7],[2021,17.8],[2022,19.0],[2023,19.1],[2024,19.1]] },
+  { name: "Haiti", color: "#6C5B7B", data: [[2000,8.5],[2001,9.8],[2002,10.9],[2003,16.0],[2004,15.3],[2005,14.0],[2006,13.9],[2007,13.2],[2008,13.1],[2009,11.9],[2010,12.4],[2011,11.9],[2012,11.8],[2013,12.0],[2014,13.1],[2015,14.8],[2016,15.8],[2017,16.0],[2018,16.7],[2019,17.9],[2020,22.5],[2021,19.1],[2022,18.8],[2023,18.9],[2024,16.3]] },
+  { name: "Jamaica", color: "#2980B9", data: [[2000,9.7],[2001,11.4],[2002,12.8],[2003,14.6],[2004,15.7],[2005,15.7],[2006,16.1],[2007,16.6],[2008,15.7],[2009,15.6],[2010,15.3],[2011,14.6],[2012,14.6],[2013,15.2],[2014,16.3],[2015,15.8],[2016,16.3],[2017,15.6],[2018,14.8],[2019,15.1],[2020,20.4],[2021,23.2],[2022,19.6],[2023,16.8],[2024,16.2]] },
+  { name: "Georgia", color: "#1ABC9C", data: [[2000,6.7],[2001,6.8],[2002,6.7],[2003,6.2],[2004,7.0],[2005,7.0],[2006,8.1],[2007,8.7],[2008,8.3],[2009,10.3],[2010,9.5],[2011,10.0],[2012,10.5],[2013,11.1],[2014,11.1],[2015,9.6],[2016,9.8],[2017,10.9],[2018,11.4],[2019,12.8],[2020,13.2],[2021,14.0],[2022,15.4],[2023,13.7],[2024,11.9]] },
+  { name: "Guinea-Bissau", color: "#7D8CA3", data: [[2000,2.0],[2001,2.4],[2002,3.8],[2003,4.2],[2004,4.8],[2005,3.1],[2006,4.0],[2007,5.7],[2008,5.2],[2009,5.5],[2010,4.9],[2011,4.5],[2012,4.3],[2013,5.7],[2014,8.1],[2015,7.4],[2016,7.6],[2017,7.2],[2018,8.2],[2019,9.5],[2020,10.3],[2021,10.8],[2022,10.2],[2023,9.6],[2024,9.8]] },
+  { name: "Dominican Rep.", color: "#E67E22", data: [[2000,7.6],[2001,7.7],[2002,8.1],[2003,10.9],[2004,11.2],[2005,7.6],[2006,8.1],[2007,7.7],[2008,7.5],[2009,7.1],[2010,7.2],[2011,7.3],[2012,7.0],[2013,7.2],[2014,7.2],[2015,7.3],[2016,7.3],[2017,7.8],[2018,8.0],[2019,8.3],[2020,10.6],[2021,11.3],[2022,9.1],[2023,8.8],[2024,9.0]] },
+  { name: "Egypt", color: "#C0392B", data: [[2000,2.9],[2001,3.0],[2002,3.4],[2003,3.7],[2004,4.2],[2005,5.6],[2006,5.0],[2007,5.9],[2008,5.3],[2009,3.8],[2010,5.7],[2011,6.1],[2012,6.9],[2013,6.2],[2014,6.4],[2015,5.6],[2016,5.6],[2017,10.0],[2018,9.7],[2019,8.4],[2020,7.7],[2021,7.4],[2022,5.9],[2023,4.9],[2024,7.6]] },
+  { name: "Fiji", color: "#5DADE2", data: [[2000,2.6],[2001,4.7],[2002,5.4],[2003,5.4],[2004,6.4],[2005,6.8],[2006,6.7],[2007,5.4],[2008,4.2],[2009,6.0],[2010,5.6],[2011,4.2],[2012,4.8],[2013,4.9],[2014,4.5],[2015,5.4],[2016,5.5],[2017,5.2],[2018,5.2],[2019,5.4],[2020,7.5],[2021,9.5],[2022,9.2],[2023,8.8],[2024,7.1]] }
+];
+
+const W = 760, H = 480;
+const pad = { left: 42, right: 110, top: 20, bottom: 36 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const minYear = 2000, maxYear = 2024;
+const maxVal = 30;
+
+const xScale = yr => pad.left + (yr - minYear) / (maxYear - minYear) * chartW;
+const yScale = v => pad.top + (maxVal - v) / maxVal * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+svg.style.cursor = "crosshair";
+
+// Y-axis grid lines and labels
+[0, 5, 10, 15, 20, 25, 30].forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#B5B2A6" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 6);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// X-axis labels
+[2000, 2004, 2008, 2012, 2016, 2020, 2024].forEach(yr => {
+  const x = xScale(yr);
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 4);
+  tick.setAttribute("stroke", "#B5B2A6");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", yScale(0) + 16);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+});
+
+// Annotation: COVID spike
+const covidX = xScale(2020);
+const covidLine = document.createElementNS(ns, "line");
+covidLine.setAttribute("x1", covidX);
+covidLine.setAttribute("x2", covidX);
+covidLine.setAttribute("y1", pad.top);
+covidLine.setAttribute("y2", yScale(0));
+covidLine.setAttribute("stroke", "#B5B2A6");
+covidLine.setAttribute("stroke-width", 0.5);
+covidLine.setAttribute("stroke-dasharray", "3,3");
+svg.appendChild(covidLine);
+
+const covidLabel = document.createElementNS(ns, "text");
+covidLabel.setAttribute("x", covidX + 4);
+covidLabel.setAttribute("y", pad.top + 10);
+covidLabel.setAttribute("font-size", "8");
+covidLabel.setAttribute("fill", "#B5B2A6");
+covidLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+covidLabel.textContent = "COVID";
+svg.appendChild(covidLabel);
+
+// Draw lines and endpoint labels
+const lineEls = [];
+const labelEls = [];
+
+// Resolve label collisions on right side
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const endLabels = series.map(s => {
+  const last = s.data[s.data.length - 1];
+  return { name: s.name, y: yScale(last[1]), val: last[1], color: s.color };
+});
+resolveCollisions(endLabels, 12);
+
+series.forEach((s, idx) => {
+  // Build path
+  let pathD = "";
+  s.data.forEach((pt, i) => {
+    const x = xScale(pt[0]);
+    const y = yScale(pt[1]);
+    pathD += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+  });
+
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", s.color);
+  path.setAttribute("stroke-width", "2");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("opacity", "0.85");
+  path.style.transition = "opacity 0.15s, stroke-width 0.15s";
+  svg.appendChild(path);
+
+  // Endpoint dot
+  const lastPt = s.data[s.data.length - 1];
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(lastPt[0]));
+  dot.setAttribute("cy", yScale(lastPt[1]));
+  dot.setAttribute("r", "3");
+  dot.setAttribute("fill", s.color);
+  dot.style.transition = "r 0.15s";
+  svg.appendChild(dot);
+
+  // Endpoint label
+  const labelInfo = endLabels.find(l => l.name === s.name);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", W - pad.right + 8);
+  label.setAttribute("y", labelInfo.y + 3);
+  label.setAttribute("text-anchor", "start");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", s.color);
+  label.setAttribute("font-weight", "500");
+  label.textContent = s.name + " " + lastPt[1].toFixed(0) + "%";
+  label.style.transition = "opacity 0.15s";
+  svg.appendChild(label);
+
+  lineEls.push({ path, dot, label, series: s, idx });
+});
+
+// Invisible hit areas for each line + interactivity
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlightLine(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  lineEls.forEach((el, i) => {
+    if (idx === -1) {
+      el.path.setAttribute("opacity", "0.85");
+      el.path.setAttribute("stroke-width", "2");
+      el.dot.setAttribute("r", "3");
+      el.label.setAttribute("opacity", "1");
+    } else if (i === idx) {
+      el.path.setAttribute("opacity", "1");
+      el.path.setAttribute("stroke-width", "3");
+      el.dot.setAttribute("r", "4.5");
+      el.label.setAttribute("opacity", "1");
+    } else {
+      el.path.setAttribute("opacity", "0.12");
+      el.path.setAttribute("stroke-width", "1.5");
+      el.dot.setAttribute("r", "2");
+      el.label.setAttribute("opacity", "0.2");
+    }
+  });
+}
+
+// Vertical hover line
+const hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", yScale(0));
+hoverLine.setAttribute("stroke", "#B5B2A6");
+hoverLine.setAttribute("stroke-width", "0.5");
+hoverLine.setAttribute("stroke-dasharray", "2,2");
+hoverLine.style.opacity = "0";
+hoverLine.style.transition = "opacity 0.1s";
+svg.appendChild(hoverLine);
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const svgX = (e.clientX - rect.left) / rect.width * W;
+  const svgY = (e.clientY - rect.top) / rect.height * H;
+
+  // Show vertical hover line
+  if (svgX >= pad.left && svgX <= W - pad.right) {
+    hoverLine.setAttribute("x1", svgX);
+    hoverLine.setAttribute("x2", svgX);
+    hoverLine.style.opacity = "1";
+  } else {
+    hoverLine.style.opacity = "0";
+  }
+
+  // Find closest line
+  let best = -1, bestDist = 18;
+  const hoverYear = minYear + (svgX - pad.left) / chartW * (maxYear - minYear);
+
+  lineEls.forEach((el, i) => {
+    const pts = el.series.data;
+    // Interpolate y at hoverYear
+    let interpY = null;
+    for (let j = 0; j < pts.length - 1; j++) {
+      if (hoverYear >= pts[j][0] && hoverYear <= pts[j + 1][0]) {
+        const t = (hoverYear - pts[j][0]) / (pts[j + 1][0] - pts[j][0]);
+        const val = pts[j][1] + t * (pts[j + 1][1] - pts[j][1]);
+        interpY = yScale(val);
+        break;
+      }
+    }
+    if (interpY !== null) {
+      const dist = Math.abs(svgY - interpY);
+      if (dist < bestDist) { bestDist = dist; best = i; }
+    }
+  });
+
+  highlightLine(best);
+
+  if (best >= 0) {
+    const s = lineEls[best].series;
+    // Find closest year data point
+    const yr = Math.round(hoverYear);
+    const pt = s.data.find(d => d[0] === yr);
+    if (pt) {
+      tip.innerHTML = `<strong>${s.name}</strong>  ${pt[0]}: ${pt[1].toFixed(1)}% of GDP`;
+      tip.style.opacity = "1";
+      const chartEl = document.getElementById("chart");
+      const chartRect = chartEl.getBoundingClientRect();
+      tip.style.left = (e.clientX - chartRect.left + 14) + "px";
+      tip.style.top = (e.clientY - chartRect.top - 24) + "px";
+    }
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  highlightLine(-1);
+  hoverLine.style.opacity = "0";
+  tip.style.opacity = "0";
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

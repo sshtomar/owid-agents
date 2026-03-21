@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>The Persistent Plague</h1>
+  <p class="subtitle">Tuberculosis incidence per 100,000 population for 10 high-burden countries. South Africa's HIV-fuelled epidemic peaked above 1,200 before plunging. Ethiopia and Russia halved their rates. The Philippines keeps climbing. Nigeria has not budged.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: WHO Global Health Observatory -- MDG_0000000020 (TB incidence per 100k)</p>
+<script>
+const raw = [
+  {c:"ZAF",n:"South Africa",y:2002,v:971},{c:"ZAF",n:"South Africa",y:2010,v:1230},{c:"ZAF",n:"South Africa",y:2014,v:1070},{c:"ZAF",n:"South Africa",y:2016,v:805},{c:"ZAF",n:"South Africa",y:2024,v:389},
+  {c:"PHL",n:"Philippines",y:2000,v:590},{c:"PHL",n:"Philippines",y:2010,v:531},{c:"PHL",n:"Philippines",y:2012,v:539},{c:"PHL",n:"Philippines",y:2017,v:554},{c:"PHL",n:"Philippines",y:2018,v:554},{c:"PHL",n:"Philippines",y:2022,v:627},
+  {c:"ETH",n:"Ethiopia",y:2001,v:462},{c:"ETH",n:"Ethiopia",y:2002,v:437},{c:"ETH",n:"Ethiopia",y:2003,v:412},{c:"ETH",n:"Ethiopia",y:2019,v:163},
+  {c:"COD",n:"DR Congo",y:2006,v:542},{c:"COD",n:"DR Congo",y:2014,v:461},{c:"COD",n:"DR Congo",y:2015,v:452},{c:"COD",n:"DR Congo",y:2020,v:409},{c:"COD",n:"DR Congo",y:2021,v:401},
+  {c:"MOZ",n:"Mozambique",y:2002,v:339},{c:"MOZ",n:"Mozambique",y:2004,v:341},{c:"MOZ",n:"Mozambique",y:2014,v:361},{c:"MOZ",n:"Mozambique",y:2017,v:361},{c:"MOZ",n:"Mozambique",y:2020,v:361},{c:"MOZ",n:"Mozambique",y:2021,v:361},{c:"MOZ",n:"Mozambique",y:2023,v:361},
+  {c:"NGA",n:"Nigeria",y:2006,v:219},{c:"NGA",n:"Nigeria",y:2012,v:219},{c:"NGA",n:"Nigeria",y:2014,v:219},{c:"NGA",n:"Nigeria",y:2022,v:219},{c:"NGA",n:"Nigeria",y:2024,v:219},
+  {c:"PAK",n:"Pakistan",y:2004,v:276},{c:"PAK",n:"Pakistan",y:2006,v:276},{c:"PAK",n:"Pakistan",y:2009,v:276},{c:"PAK",n:"Pakistan",y:2019,v:263},{c:"PAK",n:"Pakistan",y:2020,v:260},{c:"PAK",n:"Pakistan",y:2023,v:267},
+  {c:"IND",n:"India",y:2005,v:311},{c:"IND",n:"India",y:2007,v:298},{c:"IND",n:"India",y:2019,v:202},
+  {c:"RUS",n:"Russia",y:2000,v:95},{c:"RUS",n:"Russia",y:2005,v:88},{c:"RUS",n:"Russia",y:2012,v:77},{c:"RUS",n:"Russia",y:2014,v:70},{c:"RUS",n:"Russia",y:2016,v:63},{c:"RUS",n:"Russia",y:2024,v:34},
+  {c:"KEN",n:"Kenya",y:2002,v:534},{c:"KEN",n:"Kenya",y:2007,v:618},{c:"KEN",n:"Kenya",y:2011,v:506},{c:"KEN",n:"Kenya",y:2015,v:380}
+];
+
+const countries = ["ZAF","PHL","ETH","COD","MOZ","NGA","PAK","IND","RUS","KEN"];
+const palette = {
+  ZAF: "#E06050",
+  PHL: "#D4A017",
+  ETH: "#3A9E8F",
+  COD: "#7B68A8",
+  MOZ: "#E88C5A",
+  NGA: "#6B8E9B",
+  PAK: "#C47DB5",
+  IND: "#4A7FC1",
+  RUS: "#8AB065",
+  KEN: "#B56B4F"
+};
+
+const W = 740;
+const H = 440;
+const pad = { left: 52, right: 110, top: 20, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const minYear = 2000;
+const maxYear = 2024;
+const maxVal = 1300;
+
+const xScale = yr => pad.left + ((yr - minYear) / (maxYear - minYear)) * chartW;
+const yScale = v => pad.top + ((maxVal - v) / maxVal) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Gridlines and Y axis
+const yTicks = [0, 200, 400, 600, 800, 1000, 1200];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#B8B4A8" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v;
+  svg.appendChild(label);
+});
+
+// X axis ticks
+for (let yr = 2000; yr <= 2024; yr += 4) {
+  const x = xScale(yr);
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 5);
+  tick.setAttribute("stroke", "#B8B4A8");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", yScale(0) + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+}
+
+// Tooltip
+const tip = document.getElementById("tip");
+
+// Draw lines and dots for each country
+countries.forEach(code => {
+  const pts = raw.filter(d => d.c === code).sort((a, b) => a.y - b.y);
+  const color = palette[code];
+  const name = pts[0].n;
+
+  // Path
+  if (pts.length > 1) {
+    const path = document.createElementNS(ns, "path");
+    let d = "";
+    pts.forEach((p, i) => {
+      const cmd = i === 0 ? "M" : "L";
+      d += `${cmd}${xScale(p.y)},${yScale(p.v)} `;
+    });
+    path.setAttribute("d", d);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", 2);
+    path.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("stroke-linecap", "round");
+    svg.appendChild(path);
+  }
+
+  // Dots with hover
+  pts.forEach(p => {
+    const cx = xScale(p.y);
+    const cy = yScale(p.v);
+
+    // Invisible larger hit area
+    const hitCircle = document.createElementNS(ns, "circle");
+    hitCircle.setAttribute("cx", cx);
+    hitCircle.setAttribute("cy", cy);
+    hitCircle.setAttribute("r", 8);
+    hitCircle.setAttribute("fill", "transparent");
+    hitCircle.style.cursor = "pointer";
+
+    hitCircle.addEventListener("mouseenter", e => {
+      tip.innerHTML = `<strong>${name}</strong>  ${p.y}: ${p.v} per 100k`;
+      tip.style.opacity = 1;
+    });
+    hitCircle.addEventListener("mousemove", e => {
+      const chartEl = document.getElementById("chart");
+      const rect = chartEl.getBoundingClientRect();
+      tip.style.left = (e.clientX - rect.left + 12) + "px";
+      tip.style.top = (e.clientY - rect.top - 24) + "px";
+    });
+    hitCircle.addEventListener("mouseleave", () => {
+      tip.style.opacity = 0;
+    });
+
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", cx);
+    dot.setAttribute("cy", cy);
+    dot.setAttribute("r", 3);
+    dot.setAttribute("fill", color);
+
+    svg.appendChild(dot);
+    svg.appendChild(hitCircle);
+  });
+
+  // End label
+  const last = pts[pts.length - 1];
+  const lx = xScale(last.y) + 6;
+  const ly = yScale(last.v);
+
+  const endLabel = document.createElementNS(ns, "text");
+  endLabel.setAttribute("x", lx);
+  endLabel.setAttribute("y", ly + 3);
+  endLabel.setAttribute("font-size", "9");
+  endLabel.setAttribute("font-weight", "500");
+  endLabel.setAttribute("fill", color);
+  endLabel.textContent = name;
+  svg.appendChild(endLabel);
+});
+
+// Adjust overlapping end labels
+// Countries sorted by their last y-position, nudge if too close
+const labelData = countries.map(code => {
+  const pts = raw.filter(d => d.c === code).sort((a, b) => a.y - b.y);
+  const last = pts[pts.length - 1];
+  return { code, baseY: yScale(last.v) };
+});
+labelData.sort((a, b) => a.baseY - b.baseY);
+
+const minGap = 11;
+const adjustedY = {};
+let prevY = -Infinity;
+labelData.forEach(item => {
+  let targetY = item.baseY;
+  if (targetY - prevY < minGap) {
+    targetY = prevY + minGap;
+  }
+  adjustedY[item.code] = targetY;
+  prevY = targetY;
+});
+
+// Re-draw end labels with adjusted positions
+// Remove old text labels at the right edge and redraw
+const existingTexts = svg.querySelectorAll("text");
+const toRemove = [];
+existingTexts.forEach(t => {
+  const x = parseFloat(t.getAttribute("x"));
+  if (x > W - pad.right) toRemove.push(t);
+});
+toRemove.forEach(t => t.remove());
+
+countries.forEach(code => {
+  const pts = raw.filter(d => d.c === code).sort((a, b) => a.y - b.y);
+  const last = pts[pts.length - 1];
+  const name = pts[0].n;
+  const color = palette[code];
+
+  const lx = xScale(last.y) + 6;
+  const ly = adjustedY[code];
+
+  const endLabel = document.createElementNS(ns, "text");
+  endLabel.setAttribute("x", lx);
+  endLabel.setAttribute("y", ly + 3);
+  endLabel.setAttribute("font-size", "9");
+  endLabel.setAttribute("font-weight", "500");
+  endLabel.setAttribute("fill", color);
+  endLabel.textContent = `${name} (${last.v})`;
+  svg.appendChild(endLabel);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

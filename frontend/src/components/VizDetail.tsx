@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
+import { useIsMobile } from "../hooks/useIsMobile";
 import ChartRenderer from "./ChartRenderer";
 
 interface VizDetailData {
@@ -12,6 +13,7 @@ interface VizDetailData {
   highlights: string[];
   createdAt: string;
   htmlCode: string;
+  notebookPath?: string;
 }
 
 const styles: Record<string, React.CSSProperties> = {
@@ -84,11 +86,57 @@ const styles: Record<string, React.CSSProperties> = {
   },
   highlightItem: {
     fontSize: 11,
-    color: "#2B2A27",
+    color: "#5A5850",
     lineHeight: 1.6,
     paddingLeft: 12,
     borderLeft: "2px solid #EA5E33",
     marginBottom: 10,
+  },
+  notebookRow: {
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+    marginTop: 24,
+  },
+  notebookLink: {
+    display: "inline-block",
+    padding: "8px 14px",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.3px",
+    color: "#EA5E33",
+    border: "1px solid #EA5E33",
+    borderRadius: 2,
+    textDecoration: "none",
+    textTransform: "uppercase" as const,
+  },
+  notebookDownload: {
+    display: "inline-block",
+    padding: "8px 14px",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.3px",
+    color: "#7A786F",
+    border: "1px solid #C2C0B5",
+    borderRadius: 2,
+    textDecoration: "none",
+    textTransform: "uppercase" as const,
+  },
+  downloadBtn: {
+    display: "inline-block",
+    padding: "8px 14px",
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.3px",
+    color: "#fff",
+    backgroundColor: "#EA5E33",
+    border: "1px solid #EA5E33",
+    borderRadius: 2,
+    textTransform: "uppercase" as const,
+    cursor: "pointer",
   },
   empty: {
     textAlign: "center" as const,
@@ -137,7 +185,20 @@ function Crosshair({ style }: { style: React.CSSProperties }) {
   );
 }
 
+function downloadHtml(html: string, filename: string) {
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function VizDetail() {
+  const mobile = useIsMobile();
   const { id } = useParams<{ id: string }>();
   const { data, loading, error } = useApi<VizDetailData>(
     `/visualizations/${id}`
@@ -148,14 +209,21 @@ export default function VizDetail() {
   if (!data) return <div style={styles.empty}>Not found</div>;
 
   return (
-    <div style={styles.container}>
+    <div style={{
+      ...styles.container,
+      padding: mobile ? "20px 16px" : "32px 40px",
+    }}>
       <Link to="/gallery" style={styles.backLink}>
         {"<-"} Back to Gallery
       </Link>
       <h1 style={styles.title}>{data.title}</h1>
       <p style={styles.desc}>{data.description}</p>
 
-      <div style={styles.meta}>
+      <div style={{
+        ...styles.meta,
+        flexWrap: "wrap" as const,
+        gap: mobile ? 16 : 32,
+      }}>
         <div>
           <div style={styles.metaLabel}>Chart Type</div>
           <div style={styles.metaValue}>{data.chartType}</div>
@@ -190,6 +258,38 @@ export default function VizDetail() {
           ))}
         </div>
       )}
+
+      <div style={{
+        ...styles.notebookRow,
+        flexWrap: "wrap" as const,
+      }}>
+        <button
+          onClick={() => downloadHtml(data.htmlCode, `${data.id}.html`)}
+          style={styles.downloadBtn}
+        >
+          Download Chart (.html)
+        </button>
+        {data.notebookPath && (
+          <>
+            <a
+              href={`/wasm-notebooks/${data.id}.html`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.notebookLink}
+            >
+              Open Marimo Notebook (WASM)
+            </a>
+            <a
+              href={`/api/visualizations/${data.id}/notebook`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.notebookDownload}
+            >
+              Download .py
+            </a>
+          </>
+        )}
+      </div>
     </div>
   );
 }

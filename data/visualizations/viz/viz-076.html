@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend { display: flex; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: pointer; transition: opacity 0.15s; }
+  .legend-item.muted { opacity: 0.3; }
+  .legend-line { width: 14px; height: 2px; border-radius: 1px; }
+  svg text { font-family: 'Inter', sans-serif; }
+  #tooltip {
+    position: fixed;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 10;
+    white-space: nowrap;
+    line-height: 1.7;
+    max-height: 360px;
+    overflow: hidden;
+  }
+  .tt-year { font-weight: 500; margin-bottom: 2px; border-bottom: 1px solid #5A584F; padding-bottom: 3px; }
+  .tt-row { display: flex; align-items: center; gap: 6px; }
+  .tt-dot { width: 6px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+  .tt-name { flex: 1; }
+  .tt-val { text-align: right; font-weight: 500; }
+</style>
+</head><body>
+<h1>The Classroom Boom</h1>
+<p class="subtitle">Gross secondary school enrollment (%) across 12 countries at different stages of development, 1970 to 2024. Over five decades, developing nations have dramatically expanded access to secondary education, narrowing the gap with high-income countries where enrollment already exceeded 100%.</p>
+<div class="legend" id="legend"></div>
+<svg id="chart"></svg>
+<p class="source">Source: World Bank -- SE.SEC.ENRR (School enrollment, secondary, % gross)</p>
+<div id="tooltip"></div>
+
+<script>
+var COUNTRIES = [
+  { code: "FR", name: "France",      color: "#457B9D" },
+  { code: "DE", name: "Germany",     color: "#6B705C" },
+  { code: "KR", name: "South Korea", color: "#2A9D8F" },
+  { code: "CL", name: "Chile",       color: "#E07A5F" },
+  { code: "CN", name: "China",       color: "#A63D40" },
+  { code: "ID", name: "Indonesia",   color: "#D4A373" },
+  { code: "EG", name: "Egypt",       color: "#CB997E" },
+  { code: "KE", name: "Kenya",       color: "#8D99AE" },
+  { code: "IN", name: "India",       color: "#B5838D" },
+  { code: "GH", name: "Ghana",       color: "#7F6A93" },
+  { code: "BD", name: "Bangladesh",  color: "#9C6644" },
+  { code: "ET", name: "Ethiopia",    color: "#264653" }
+];
+
+var RAW = [
+  {c:"CN",y:1970,v:25.7},{c:"CN",y:1971,v:34.3},{c:"CN",y:1972,v:43.9},{c:"CN",y:1973,v:53.9},
+  {c:"CN",y:1974,v:58.2},{c:"CN",y:1975,v:57.6},{c:"CN",y:1976,v:58.1},{c:"CN",y:1977,v:57.2},
+  {c:"CN",y:1978,v:53.2},{c:"CN",y:1979,v:47.6},{c:"CN",y:1980,v:40.3},{c:"CN",y:1981,v:36.7},
+  {c:"CN",y:1982,v:32.6},{c:"CN",y:1983,v:30.1},{c:"CN",y:1984,v:29.9},{c:"CN",y:1985,v:31.3},
+  {c:"CN",y:1986,v:32.6},{c:"CN",y:1987,v:35.1},{c:"CN",y:1988,v:37.2},{c:"CN",y:1989,v:38.2},
+  {c:"CN",y:1990,v:39.0},{c:"CN",y:1991,v:41.6},{c:"CN",y:1992,v:44.4},{c:"CN",y:1993,v:46.8},
+  {c:"CN",y:1994,v:47.2},{c:"CN",y:1995,v:49.0},{c:"CN",y:1996,v:52.3},{c:"CN",y:1997,v:54.7},
+  {c:"CN",y:1999,v:58.6},{c:"CN",y:2000,v:59.5},{c:"CN",y:2001,v:62.2},{c:"CN",y:2002,v:62.8},
+  {c:"CN",y:2003,v:64.1},{c:"CN",y:2006,v:74.1},{c:"CN",y:2007,v:78.2},{c:"CN",y:2008,v:82.7},
+  {c:"CN",y:2009,v:88.3},{c:"CN",y:2010,v:90.8},{c:"CN",y:2011,v:92.0},{c:"CN",y:2012,v:92.3},
+  {c:"ID",y:1970,v:18.1},{c:"ID",y:1971,v:18.6},{c:"ID",y:1972,v:18.7},{c:"ID",y:1973,v:19.1},
+  {c:"ID",y:1974,v:19.7},{c:"ID",y:1975,v:21.2},{c:"ID",y:1976,v:22.0},{c:"ID",y:1977,v:22.6},
+  {c:"ID",y:1978,v:24.0},{c:"ID",y:1981,v:28.1},{c:"ID",y:1982,v:30.3},{c:"ID",y:1983,v:33.7},
+  {c:"ID",y:1984,v:34.0},{c:"ID",y:1986,v:41.7},{c:"ID",y:1987,v:47.2},{c:"ID",y:1988,v:49.3},
+  {c:"ID",y:1989,v:49.2},{c:"ID",y:1990,v:46.7},{c:"ID",y:1991,v:45.0},{c:"ID",y:1992,v:44.2},
+  {c:"ID",y:1993,v:43.8},{c:"ID",y:1994,v:44.7},{c:"ID",y:1995,v:47.5},{c:"ID",y:1996,v:50.3},
+  {c:"ID",y:1997,v:54.0},{c:"ID",y:1998,v:54.3},{c:"ID",y:1999,v:54.6},{c:"ID",y:2000,v:55.6},
+  {c:"ID",y:2001,v:56.2},{c:"ID",y:2002,v:57.6},{c:"ID",y:2003,v:60.7},{c:"ID",y:2004,v:63.0},
+  {c:"ID",y:2005,v:61.6},{c:"ID",y:2006,v:64.6},{c:"ID",y:2007,v:71.9},{c:"ID",y:2008,v:70.2},
+  {c:"ID",y:2009,v:74.5},{c:"ID",y:2010,v:75.7},{c:"ID",y:2011,v:78.1},{c:"ID",y:2012,v:80.1},
+  {c:"ID",y:2013,v:81.9},{c:"ID",y:2014,v:83.6},{c:"ID",y:2015,v:87.8},{c:"ID",y:2016,v:87.8},
+  {c:"ID",y:2017,v:90.9},{c:"ID",y:2018,v:92.8},{c:"ID",y:2019,v:94.9},{c:"ID",y:2020,v:96.9},
+  {c:"ID",y:2021,v:97.8},{c:"ID",y:2022,v:97.8},{c:"ID",y:2023,v:96.0},{c:"ID",y:2024,v:98.8},
+  {c:"KE",y:1970,v:17.4},{c:"KE",y:1971,v:17.8},{c:"KE",y:1972,v:18.5},{c:"KE",y:1973,v:18.9},
+  {c:"KE",y:1974,v:19.9},{c:"KE",y:1975,v:21.0},{c:"KE",y:1976,v:23.1},{c:"KE",y:1977,v:23.5},
+  {c:"KE",y:1978,v:24.9},{c:"KE",y:1979,v:25.7},{c:"KE",y:1980,v:28.4},{c:"KE",y:1981,v:27.7},
+  {c:"KE",y:1982,v:27.7},{c:"KE",y:1983,v:29.0},{c:"KE",y:1984,v:30.5},{c:"KE",y:1985,v:38.2},
+  {c:"KE",y:1986,v:38.0},{c:"KE",y:1987,v:40.5},{c:"KE",y:1988,v:40.3},{c:"KE",y:1999,v:40.3},
+  {c:"KE",y:2000,v:41.0},{c:"KE",y:2001,v:41.7},{c:"KE",y:2002,v:41.9},{c:"KE",y:2003,v:43.6},
+  {c:"KE",y:2004,v:47.1},{c:"KE",y:2005,v:47.3},{c:"KE",y:2006,v:48.8},{c:"KE",y:2007,v:50.9},
+  {c:"KE",y:2008,v:57.0},{c:"KE",y:2009,v:57.7},{c:"KE",y:2015,v:72.6},{c:"KE",y:2016,v:74.5},
+  {c:"KE",y:2021,v:80.4},{c:"KE",y:2022,v:83.8},{c:"KE",y:2023,v:84.3},
+  {c:"EG",y:1971,v:30.7},{c:"EG",y:1972,v:32.4},{c:"EG",y:1973,v:33.9},{c:"EG",y:1974,v:35.4},
+  {c:"EG",y:1975,v:38.7},{c:"EG",y:1976,v:41.5},{c:"EG",y:1977,v:44.8},{c:"EG",y:1978,v:46.9},
+  {c:"EG",y:1979,v:48.2},{c:"EG",y:1980,v:49.3},{c:"EG",y:1981,v:50.3},{c:"EG",y:1982,v:51.9},
+  {c:"EG",y:1983,v:53.3},{c:"EG",y:1984,v:54.5},{c:"EG",y:1985,v:55.8},{c:"EG",y:1986,v:57.9},
+  {c:"EG",y:1987,v:59.6},{c:"EG",y:1988,v:59.1},{c:"EG",y:1989,v:58.0},{c:"EG",y:1990,v:68.7},
+  {c:"EG",y:1991,v:69.1},{c:"EG",y:1992,v:64.2},{c:"EG",y:1993,v:65.0},{c:"EG",y:1994,v:70.2},
+  {c:"EG",y:1995,v:68.2},{c:"EG",y:1996,v:66.1},{c:"EG",y:1997,v:70.2},{c:"EG",y:1999,v:76.1},
+  {c:"EG",y:2000,v:77.8},{c:"EG",y:2001,v:79.4},{c:"EG",y:2002,v:78.8},{c:"EG",y:2003,v:78.5},
+  {c:"EG",y:2004,v:77.8},{c:"EG",y:2009,v:63.2},{c:"EG",y:2010,v:64.7},{c:"EG",y:2011,v:72.5},
+  {c:"EG",y:2012,v:73.0},{c:"EG",y:2013,v:73.9},{c:"EG",y:2014,v:73.4},{c:"EG",y:2016,v:75.8},
+  {c:"EG",y:2017,v:76.4},{c:"EG",y:2018,v:77.0},{c:"EG",y:2019,v:77.9},{c:"EG",y:2020,v:79.7},
+  {c:"EG",y:2021,v:81.9},{c:"EG",y:2023,v:84.5},{c:"EG",y:2024,v:84.8},
+  {c:"ET",y:1971,v:4.1},{c:"ET",y:1972,v:4.4},{c:"ET",y:1973,v:4.8},{c:"ET",y:1974,v:5.2},
+  {c:"ET",y:1984,v:11.6},{c:"ET",y:1986,v:12.5},{c:"ET",y:1987,v:13.8},{c:"ET",y:1988,v:15.2},
+  {c:"ET",y:1989,v:15.2},{c:"ET",y:1991,v:13.9},{c:"ET",y:1992,v:12.0},{c:"ET",y:1993,v:10.7},
+  {c:"ET",y:1994,v:10.3},{c:"ET",y:1995,v:10.5},{c:"ET",y:1996,v:11.1},{c:"ET",y:1999,v:13.3},
+  {c:"ET",y:2000,v:14.5},{c:"ET",y:2001,v:17.3},{c:"ET",y:2002,v:19.2},{c:"ET",y:2003,v:19.6},
+  {c:"ET",y:2004,v:21.5},{c:"ET",y:2005,v:23.9},{c:"ET",y:2006,v:27.5},{c:"ET",y:2007,v:30.3},
+  {c:"ET",y:2008,v:31.3},{c:"ET",y:2009,v:31.6},{c:"ET",y:2010,v:33.0},{c:"ET",y:2011,v:34.4},
+  {c:"ET",y:2012,v:36.2},{c:"ET",y:2015,v:33.9},
+  {c:"GH",y:1971,v:41.3},{c:"GH",y:1973,v:37.8},{c:"GH",y:1974,v:34.6},{c:"GH",y:1975,v:32.8},
+  {c:"GH",y:1976,v:32.1},{c:"GH",y:1977,v:31.8},{c:"GH",y:1978,v:31.3},{c:"GH",y:1979,v:31.2},
+  {c:"GH",y:1980,v:32.4},{c:"GH",y:1981,v:33.2},{c:"GH",y:1982,v:32.5},{c:"GH",y:1983,v:33.5},
+  {c:"GH",y:1984,v:34.2},{c:"GH",y:1985,v:33.6},{c:"GH",y:1986,v:34.4},{c:"GH",y:1987,v:34.6},
+  {c:"GH",y:1988,v:36.8},{c:"GH",y:1989,v:33.3},{c:"GH",y:1990,v:34.0},{c:"GH",y:1995,v:33.3},
+  {c:"GH",y:1999,v:32.5},{c:"GH",y:2000,v:32.6},{c:"GH",y:2001,v:30.9},{c:"GH",y:2002,v:32.3},
+  {c:"GH",y:2003,v:33.7},{c:"GH",y:2004,v:36.1},{c:"GH",y:2005,v:38.1},{c:"GH",y:2006,v:39.8},
+  {c:"GH",y:2007,v:43.8},{c:"GH",y:2008,v:46.1},{c:"GH",y:2009,v:47.9},{c:"GH",y:2011,v:55.6},
+  {c:"GH",y:2012,v:56.7},{c:"GH",y:2013,v:68.2},{c:"GH",y:2014,v:64.0},{c:"GH",y:2015,v:67.0},
+  {c:"GH",y:2016,v:67.3},{c:"GH",y:2017,v:66.6},{c:"GH",y:2018,v:68.2},{c:"GH",y:2019,v:71.2},
+  {c:"GH",y:2020,v:74.0},{c:"GH",y:2021,v:76.2},{c:"GH",y:2022,v:77.8},
+  {c:"BD",y:1973,v:18.8},{c:"BD",y:1976,v:16.6},{c:"BD",y:1977,v:16.7},{c:"BD",y:1979,v:16.9},
+  {c:"BD",y:1980,v:18.9},{c:"BD",y:1981,v:16.8},{c:"BD",y:1983,v:20.2},{c:"BD",y:1984,v:20.4},
+  {c:"BD",y:1985,v:19.8},{c:"BD",y:1986,v:19.3},{c:"BD",y:1987,v:19.6},{c:"BD",y:1988,v:19.4},
+  {c:"BD",y:1989,v:19.3},{c:"BD",y:1990,v:19.9},{c:"BD",y:1998,v:41.9},{c:"BD",y:1999,v:45.1},
+  {c:"BD",y:2000,v:46.7},{c:"BD",y:2001,v:48.5},{c:"BD",y:2002,v:49.6},{c:"BD",y:2003,v:49.5},
+  {c:"BD",y:2004,v:46.3},{c:"BD",y:2005,v:45.2},{c:"BD",y:2006,v:45.7},{c:"BD",y:2007,v:46.5},
+  {c:"BD",y:2008,v:44.6},{c:"BD",y:2009,v:48.1},{c:"BD",y:2010,v:49.5},{c:"BD",y:2011,v:49.8},
+  {c:"BD",y:2012,v:51.7},{c:"BD",y:2013,v:55.6},{c:"BD",y:2015,v:59.4},{c:"BD",y:2016,v:64.2},
+  {c:"BD",y:2017,v:62.3},{c:"BD",y:2018,v:65.3},{c:"BD",y:2019,v:65.1},{c:"BD",y:2020,v:66.4},
+  {c:"BD",y:2021,v:66.8},{c:"BD",y:2022,v:67.0},{c:"BD",y:2023,v:66.0},{c:"BD",y:2024,v:64.3},
+  {c:"IN",y:2000,v:47.2},{c:"IN",y:2001,v:46.8},{c:"IN",y:2002,v:48.8},{c:"IN",y:2003,v:51.4},
+  {c:"IN",y:2004,v:53.2},{c:"IN",y:2005,v:55.9},{c:"IN",y:2006,v:56.8},{c:"IN",y:2007,v:59.1},
+  {c:"IN",y:2008,v:62.2},{c:"IN",y:2009,v:61.4},{c:"IN",y:2010,v:64.9},{c:"IN",y:2011,v:67.1},
+  {c:"IN",y:2012,v:69.8},{c:"IN",y:2013,v:69.5},{c:"IN",y:2014,v:74.9},{c:"IN",y:2015,v:74.6},
+  {c:"IN",y:2016,v:75.9},{c:"IN",y:2017,v:74.7},{c:"IN",y:2018,v:76.0},{c:"IN",y:2019,v:75.9},
+  {c:"IN",y:2020,v:78.0},{c:"IN",y:2021,v:80.8},{c:"IN",y:2022,v:81.7},{c:"IN",y:2023,v:79.3},
+  {c:"IN",y:2024,v:78.1},
+  {c:"FR",y:2000,v:105.6},{c:"FR",y:2001,v:104.6},{c:"FR",y:2002,v:103.2},{c:"FR",y:2003,v:102.8},
+  {c:"FR",y:2004,v:102.2},{c:"FR",y:2005,v:106.8},{c:"FR",y:2006,v:106.9},{c:"FR",y:2007,v:106.7},
+  {c:"FR",y:2008,v:106.4},{c:"FR",y:2009,v:106.2},{c:"FR",y:2010,v:106.4},{c:"FR",y:2011,v:106.6},
+  {c:"FR",y:2012,v:105.8},{c:"FR",y:2013,v:104.4},{c:"FR",y:2014,v:103.4},{c:"FR",y:2015,v:103.4},
+  {c:"FR",y:2016,v:103.3},{c:"FR",y:2017,v:103.8},{c:"FR",y:2018,v:103.8},{c:"FR",y:2019,v:104.1},
+  {c:"FR",y:2020,v:104.6},{c:"FR",y:2021,v:104.5},{c:"FR",y:2022,v:104.3},{c:"FR",y:2023,v:104.0},
+  {c:"DE",y:2000,v:99.1},{c:"DE",y:2001,v:99.6},{c:"DE",y:2002,v:100.9},{c:"DE",y:2003,v:101.2},
+  {c:"DE",y:2004,v:101.4},{c:"DE",y:2005,v:101.4},{c:"DE",y:2006,v:102.5},{c:"DE",y:2007,v:102.0},
+  {c:"DE",y:2008,v:103.2},{c:"DE",y:2009,v:103.3},{c:"DE",y:2010,v:104.9},{c:"DE",y:2011,v:105.3},
+  {c:"DE",y:2012,v:104.4},{c:"DE",y:2013,v:103.9},{c:"DE",y:2014,v:103.3},{c:"DE",y:2015,v:102.2},
+  {c:"DE",y:2016,v:100.9},{c:"DE",y:2017,v:101.1},{c:"DE",y:2018,v:100.8},{c:"DE",y:2019,v:101.2},
+  {c:"DE",y:2020,v:101.3},{c:"DE",y:2021,v:101.2},{c:"DE",y:2022,v:100.8},{c:"DE",y:2023,v:100.6},
+  {c:"KR",y:2000,v:98.1},{c:"KR",y:2001,v:97.6},{c:"KR",y:2002,v:97.3},{c:"KR",y:2003,v:97.0},
+  {c:"KR",y:2004,v:97.0},{c:"KR",y:2005,v:97.2},{c:"KR",y:2006,v:96.8},{c:"KR",y:2007,v:96.7},
+  {c:"KR",y:2008,v:96.3},{c:"KR",y:2009,v:96.9},{c:"KR",y:2010,v:97.3},{c:"KR",y:2011,v:97.5},
+  {c:"KR",y:2012,v:97.4},{c:"KR",y:2013,v:97.8},{c:"KR",y:2014,v:98.6},{c:"KR",y:2015,v:98.6},
+  {c:"KR",y:2016,v:98.7},{c:"KR",y:2017,v:99.1},{c:"KR",y:2018,v:99.3},{c:"KR",y:2019,v:98.4},
+  {c:"KR",y:2020,v:97.1},{c:"KR",y:2021,v:98.1},{c:"KR",y:2022,v:97.8},{c:"KR",y:2023,v:96.3},
+  {c:"CL",y:2000,v:86.9},{c:"CL",y:2002,v:89.4},{c:"CL",y:2003,v:90.6},{c:"CL",y:2004,v:91.0},
+  {c:"CL",y:2005,v:92.0},{c:"CL",y:2006,v:92.0},{c:"CL",y:2007,v:91.6},{c:"CL",y:2008,v:91.5},
+  {c:"CL",y:2009,v:89.9},{c:"CL",y:2010,v:91.0},{c:"CL",y:2011,v:91.0},{c:"CL",y:2012,v:89.5},
+  {c:"CL",y:2013,v:99.2},{c:"CL",y:2014,v:99.9},{c:"CL",y:2015,v:100.9},{c:"CL",y:2016,v:101.5},
+  {c:"CL",y:2017,v:102.3},{c:"CL",y:2018,v:103.2},{c:"CL",y:2019,v:104.4},{c:"CL",y:2020,v:103.7},
+  {c:"CL",y:2021,v:106.7},{c:"CL",y:2022,v:106.1},{c:"CL",y:2023,v:105.8}
+];
+
+// Gather unique years
+var allYears = [];
+for (var i = 0; i < RAW.length; i++) {
+  if (allYears.indexOf(RAW[i].y) === -1) allYears.push(RAW[i].y);
+}
+allYears.sort(function(a, b) { return a - b; });
+
+var yearMin = allYears[0];
+var yearMax = allYears[allYears.length - 1];
+
+// Build per-country series
+var series = {};
+for (var i = 0; i < COUNTRIES.length; i++) {
+  series[COUNTRIES[i].code] = [];
+}
+for (var i = 0; i < RAW.length; i++) {
+  var d = RAW[i];
+  series[d.c].push({ year: d.y, value: d.v });
+}
+for (var code in series) {
+  series[code].sort(function(a, b) { return a.year - b.year; });
+}
+
+// Build year lookup for tooltip
+var byYear = {};
+for (var i = 0; i < RAW.length; i++) {
+  var d = RAW[i];
+  if (byYear[d.y] === undefined) byYear[d.y] = {};
+  byYear[d.y][d.c] = d.v;
+}
+
+// Chart dimensions
+var W = 840, H = 460;
+var margin = { top: 14, right: 100, bottom: 36, left: 44 };
+var cw = W - margin.left - margin.right;
+var ch = H - margin.top - margin.bottom;
+
+var yMin = 0;
+var yMaxVal = 120;
+
+function xScale(year) {
+  return margin.left + ((year - yearMin) / (yearMax - yearMin)) * cw;
+}
+function yScale(val) {
+  return margin.top + ch - ((val - yMin) / (yMaxVal - yMin)) * ch;
+}
+
+// Track which countries are visible
+var visible = {};
+for (var i = 0; i < COUNTRIES.length; i++) {
+  visible[COUNTRIES[i].code] = true;
+}
+
+// Build legend
+var legendEl = document.getElementById('legend');
+for (var i = 0; i < COUNTRIES.length; i++) {
+  (function(country) {
+    var item = document.createElement('div');
+    item.className = 'legend-item';
+    item.setAttribute('data-code', country.code);
+    item.innerHTML = '<div class="legend-line" style="background:' + country.color + '"></div>' + country.name;
+    item.addEventListener('click', function() {
+      visible[country.code] = !visible[country.code];
+      item.className = visible[country.code] ? 'legend-item' : 'legend-item muted';
+      redraw();
+    });
+    legendEl.appendChild(item);
+  })(COUNTRIES[i]);
+}
+
+// Build SVG
+var svg = document.getElementById('chart');
+svg.setAttribute('width', W);
+svg.setAttribute('height', H);
+svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+svg.style.overflow = 'visible';
+
+var ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  var e = document.createElementNS(ns, tag);
+  for (var k in attrs) {
+    if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
+  }
+  return e;
+}
+
+// Static grid layer
+var gridGroup = el('g', {});
+svg.appendChild(gridGroup);
+
+// Y-axis grid and labels
+var yTicks = [0, 20, 40, 60, 80, 100, 120];
+for (var i = 0; i < yTicks.length; i++) {
+  var v = yTicks[i];
+  var y = yScale(v);
+  gridGroup.appendChild(el('line', {
+    x1: margin.left, x2: W - margin.right, y1: y, y2: y,
+    stroke: '#DDDCD4', 'stroke-width': 1
+  }));
+  var label = el('text', {
+    x: margin.left - 8, y: y + 3,
+    'text-anchor': 'end', fill: '#7A786F',
+    'font-family': "'JetBrains Mono', monospace", 'font-size': '9px'
+  });
+  label.textContent = v + '%';
+  gridGroup.appendChild(label);
+}
+
+// 100% reference line (slightly bolder)
+gridGroup.appendChild(el('line', {
+  x1: margin.left, x2: W - margin.right,
+  y1: yScale(100), y2: yScale(100),
+  stroke: '#B8B5AA', 'stroke-width': 1, 'stroke-dasharray': '4,3'
+}));
+
+// X-axis labels
+var xLabelYears = [];
+for (var y = 1970; y <= 2024; y += 5) {
+  if (y >= yearMin && y <= yearMax) xLabelYears.push(y);
+}
+if (xLabelYears[xLabelYears.length - 1] < yearMax) xLabelYears.push(yearMax);
+
+for (var i = 0; i < xLabelYears.length; i++) {
+  var yr = xLabelYears[i];
+  var x = xScale(yr);
+  var label = el('text', {
+    x: x, y: H - 8,
+    'text-anchor': 'middle', fill: '#7A786F',
+    'font-family': "'JetBrains Mono', monospace", 'font-size': '9px'
+  });
+  label.textContent = yr;
+  gridGroup.appendChild(label);
+  if (yr > yearMin && yr < yearMax) {
+    gridGroup.appendChild(el('line', {
+      x1: x, x2: x, y1: margin.top, y2: margin.top + ch,
+      stroke: '#ECEAE2', 'stroke-width': 1
+    }));
+  }
+}
+
+// Y-axis title
+var yTitle = el('text', {
+  x: 12, y: margin.top + ch / 2,
+  'text-anchor': 'middle', fill: '#7A786F',
+  'font-family': "'JetBrains Mono', monospace", 'font-size': '8px',
+  'letter-spacing': '0.5px',
+  transform: 'rotate(-90, 12, ' + (margin.top + ch / 2) + ')'
+});
+yTitle.textContent = 'GROSS ENROLLMENT RATIO (%)';
+gridGroup.appendChild(yTitle);
+
+// Lines layer
+var linesGroup = el('g', {});
+svg.appendChild(linesGroup);
+
+// End labels layer
+var labelsGroup = el('g', {});
+svg.appendChild(labelsGroup);
+
+function redraw() {
+  // Clear lines and labels
+  while (linesGroup.firstChild) linesGroup.removeChild(linesGroup.firstChild);
+  while (labelsGroup.firstChild) labelsGroup.removeChild(labelsGroup.firstChild);
+
+  for (var ci = 0; ci < COUNTRIES.length; ci++) {
+    var country = COUNTRIES[ci];
+    var pts = series[country.code];
+    if (pts.length < 2) continue;
+
+    var isVisible = visible[country.code];
+
+    // Build line path
+    var pathD = '';
+    for (var j = 0; j < pts.length; j++) {
+      var px = xScale(pts[j].year);
+      var py = yScale(pts[j].value);
+      pathD += (j === 0 ? 'M' : 'L') + px.toFixed(1) + ',' + py.toFixed(1);
+    }
+
+    linesGroup.appendChild(el('path', {
+      d: pathD,
+      fill: 'none',
+      stroke: country.color,
+      'stroke-width': isVisible ? '2' : '0.5',
+      opacity: isVisible ? '0.85' : '0.15',
+      'stroke-linejoin': 'round',
+      'stroke-linecap': 'round'
+    }));
+
+    // End label
+    if (isVisible) {
+      var lastPt = pts[pts.length - 1];
+      var lx = xScale(lastPt.year) + 6;
+      var ly = yScale(lastPt.value);
+
+      var endLabel = el('text', {
+        x: lx, y: ly + 3,
+        fill: country.color,
+        'font-size': '9px',
+        'font-weight': '500',
+        'font-family': "'Inter', sans-serif"
+      });
+      endLabel.textContent = country.name;
+      labelsGroup.appendChild(endLabel);
+    }
+  }
+}
+
+redraw();
+
+// Hover interaction
+var tooltip = document.getElementById('tooltip');
+var vertLine = el('line', {
+  x1: 0, x2: 0, y1: margin.top, y2: margin.top + ch,
+  stroke: '#2B2A27', 'stroke-width': 1, opacity: 0, 'stroke-dasharray': '3,2'
+});
+svg.appendChild(vertLine);
+
+// Hover dots group
+var dotsGroup = el('g', {});
+svg.appendChild(dotsGroup);
+
+// Invisible overlay for mouse tracking
+var overlay = el('rect', {
+  x: margin.left, y: margin.top, width: cw, height: ch,
+  fill: 'transparent', cursor: 'crosshair'
+});
+svg.appendChild(overlay);
+
+function findClosestYear(mouseX) {
+  var targetYear = yearMin + ((mouseX - margin.left) / cw) * (yearMax - yearMin);
+  var best = allYears[0];
+  var bestDist = Math.abs(targetYear - best);
+  for (var i = 1; i < allYears.length; i++) {
+    var dist = Math.abs(targetYear - allYears[i]);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = allYears[i];
+    }
+  }
+  return best;
+}
+
+overlay.addEventListener('mousemove', function(e) {
+  var rect = svg.getBoundingClientRect();
+  var mouseX = e.clientX - rect.left;
+  var year = findClosestYear(mouseX);
+  var x = xScale(year);
+
+  vertLine.setAttribute('x1', x);
+  vertLine.setAttribute('x2', x);
+  vertLine.setAttribute('opacity', '0.4');
+
+  // Remove old dots
+  while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+
+  // Build tooltip content
+  var entries = [];
+  for (var ci = 0; ci < COUNTRIES.length; ci++) {
+    var country = COUNTRIES[ci];
+    if (!visible[country.code]) continue;
+    var val = byYear[year] && byYear[year][country.code];
+    if (val !== undefined) {
+      entries.push({ name: country.name, value: val, color: country.color });
+      // Draw dot
+      dotsGroup.appendChild(el('circle', {
+        cx: x, cy: yScale(val), r: 3,
+        fill: country.color, stroke: '#F6F5EE', 'stroke-width': 1.5
+      }));
+    }
+  }
+
+  entries.sort(function(a, b) { return b.value - a.value; });
+
+  var html = '<div class="tt-year">' + year + '</div>';
+  for (var i = 0; i < entries.length; i++) {
+    html += '<div class="tt-row">' +
+      '<div class="tt-dot" style="background:' + entries[i].color + '"></div>' +
+      '<span class="tt-name">' + entries[i].name + '</span>' +
+      '<span class="tt-val">' + entries[i].value.toFixed(1) + '%</span>' +
+      '</div>';
+  }
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = '1';
+
+  // Position tooltip
+  var tx = e.clientX + 14;
+  var ty = e.clientY - 20;
+  if (tx + 180 > window.innerWidth) tx = e.clientX - 190;
+  if (ty + 200 > window.innerHeight) ty = e.clientY - 220;
+  if (ty < 0) ty = 10;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+});
+
+overlay.addEventListener('mouseleave', function() {
+  tooltip.style.opacity = '0';
+  vertLine.setAttribute('opacity', '0');
+  while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+});
+</script>
+</body></html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Hospital Beds Around the World</h1>
+<p class="subtitle">Hospital beds per 1,000 people, 1960 -- 2023. Japan and South Korea lead with very high bed counts driven by ageing populations; post-Soviet Kazakhstan collapsed from communist-era peaks; China is building capacity fast while South Asia remains critically low.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- SH.MED.BEDS.ZS (Hospital beds per 1,000 people)</p>
+<script>
+const series = [
+  { name: "Japan", color: "#C2453D", data: [{y:1960,v:9},{y:1970,v:12.5},{y:1980,v:13.7},{y:1985,v:14.7},{y:1993,v:15.6},{y:1994,v:15.5},{y:1995,v:15.4},{y:1996,v:15.2},{y:1997,v:15.1},{y:1998,v:15},{y:1999,v:14.8},{y:2000,v:14.67},{y:2001,v:14.59},{y:2002,v:14.43},{y:2003,v:14.26},{y:2004,v:14.18},{y:2005,v:14.06},{y:2006,v:13.96},{y:2007,v:13.86},{y:2008,v:13.7},{y:2009,v:13.6},{y:2010,v:13.5},{y:2011,v:13.37},{y:2012,v:13.32},{y:2013,v:13.27},{y:2014,v:13.18},{y:2015,v:13.15},{y:2016,v:13.09},{y:2017,v:13.01},{y:2018,v:12.93},{y:2019,v:12.79},{y:2020,v:12.62},{y:2021,v:12.6},{y:2022,v:12.59}] },
+  { name: "South Korea", color: "#E07A3A", data: [{y:1980,v:1.7},{y:1985,v:2.4},{y:1989,v:3},{y:1990,v:3.1},{y:1991,v:3.3},{y:1992,v:3.5},{y:1993,v:3.7},{y:1994,v:4.1},{y:1995,v:4.4},{y:1996,v:4.6},{y:1997,v:4.8},{y:1998,v:5.1},{y:1999,v:5.6},{y:2000,v:4.68},{y:2001,v:4.48},{y:2002,v:4.87},{y:2003,v:5.13},{y:2004,v:5.46},{y:2005,v:5.94},{y:2006,v:6.54},{y:2007,v:7.32},{y:2008,v:7.84},{y:2009,v:8.32},{y:2010,v:8.88},{y:2011,v:9.68},{y:2012,v:10.38},{y:2013,v:11},{y:2014,v:11.63},{y:2015,v:11.62},{y:2016,v:11.97},{y:2017,v:12.26},{y:2018,v:12.43},{y:2019,v:12.43},{y:2020,v:12.65},{y:2021,v:12.75},{y:2022,v:12.81}] },
+  { name: "Kazakhstan", color: "#8B6DB0", data: [{y:1980,v:13.09},{y:1981,v:13.23},{y:1982,v:13.31},{y:1983,v:13.37},{y:1984,v:13.51},{y:1985,v:13.59},{y:1986,v:13.56},{y:1987,v:13.56},{y:1988,v:13.54},{y:1989,v:13.63},{y:1990,v:13.67},{y:1991,v:13.71},{y:1992,v:13.46},{y:1993,v:13.17},{y:1994,v:12.14},{y:1995,v:11.65},{y:1996,v:10.33},{y:1997,v:8.45},{y:1998,v:8.19},{y:1999,v:7.25},{y:2000,v:6.9},{y:2001,v:6.65},{y:2002,v:6.66},{y:2003,v:7.29},{y:2004,v:7.36},{y:2005,v:7.36},{y:2006,v:7.39},{y:2007,v:7.35},{y:2008,v:7.36},{y:2009,v:7.3},{y:2010,v:7.07},{y:2011,v:6.89},{y:2012,v:6.53},{y:2013,v:6.12},{y:2014,v:5.91},{y:2015,v:5.67},{y:2016,v:5.45},{y:2017,v:5.33},{y:2018,v:5.2},{y:2019,v:5.01},{y:2020,v:6.54}] },
+  { name: "Germany", color: "#3A7CA5", data: [{y:1960,v:10.5},{y:1970,v:11.3},{y:1980,v:11.5},{y:1985,v:11},{y:1990,v:10.4},{y:1991,v:10.1},{y:1992,v:9.9},{y:1993,v:9.7},{y:1994,v:9.7},{y:1995,v:9.7},{y:1996,v:9.6},{y:1997,v:9.4},{y:1998,v:9.3},{y:1999,v:9.2},{y:2000,v:9.16},{y:2001,v:9.06},{y:2002,v:8.92},{y:2003,v:8.79},{y:2004,v:8.62},{y:2005,v:8.51},{y:2006,v:8.37},{y:2007,v:8.34},{y:2008,v:8.31},{y:2009,v:8.34},{y:2010,v:8.34},{y:2011,v:8.32},{y:2012,v:8.29},{y:2013,v:8.24},{y:2014,v:8.19},{y:2015,v:8.09},{y:2016,v:8.02},{y:2017,v:7.96},{y:2018,v:7.94},{y:2019,v:7.87},{y:2020,v:7.77},{y:2021,v:7.71},{y:2022,v:7.64},{y:2023,v:7.55}] },
+  { name: "Bulgaria", color: "#6B9E78", data: [{y:1960,v:6.21},{y:1980,v:8.85},{y:1981,v:8.86},{y:1982,v:8.89},{y:1983,v:8.88},{y:1984,v:8.96},{y:1985,v:9.11},{y:1986,v:9.45},{y:1987,v:9.56},{y:1988,v:9.56},{y:1989,v:9.7},{y:1990,v:9.79},{y:1991,v:9.77},{y:1992,v:10.21},{y:1993,v:10.49},{y:1994,v:10.2},{y:1995,v:10.37},{y:1996,v:10.47},{y:1997,v:10.28},{y:1998,v:8.41},{y:1999,v:7.49},{y:2000,v:7.57},{y:2001,v:7.19},{y:2002,v:6.49},{y:2003,v:6.3},{y:2004,v:6.16},{y:2005,v:6.45},{y:2006,v:6.25},{y:2007,v:6.43},{y:2008,v:6.57},{y:2009,v:6.68},{y:2010,v:6.58},{y:2011,v:6.42},{y:2012,v:6.6},{y:2013,v:6.82},{y:2014,v:7.13},{y:2015,v:7.24},{y:2016,v:7.27},{y:2017,v:7.45},{y:2018,v:7.57},{y:2019,v:7.74},{y:2020,v:7.82},{y:2021,v:7.92},{y:2022,v:8.01},{y:2023,v:8.2}] },
+  { name: "France", color: "#5B8DBE", data: [{y:1974,v:10.5},{y:1975,v:10.6},{y:1976,v:10.6},{y:1977,v:10.8},{y:1978,v:10.9},{y:1979,v:11.1},{y:1980,v:11.1},{y:1981,v:11.1},{y:1982,v:11},{y:1983,v:10.8},{y:1984,v:10.7},{y:1985,v:10.5},{y:1986,v:10.3},{y:1987,v:10.2},{y:1988,v:10.1},{y:1989,v:9.9},{y:1990,v:9.7},{y:1991,v:9.6},{y:1992,v:9.4},{y:1993,v:9.3},{y:1994,v:9.1},{y:1995,v:8.9},{y:1996,v:8.8},{y:1997,v:8.6},{y:1998,v:8.4},{y:1999,v:8.3},{y:2000,v:8.14},{y:2001,v:8},{y:2002,v:7.88},{y:2003,v:7.71},{y:2004,v:7.55},{y:2005,v:7.39},{y:2006,v:7.27},{y:2007,v:7.22},{y:2008,v:7.06},{y:2009,v:6.81},{y:2010,v:6.57},{y:2011,v:6.5},{y:2012,v:6.48},{y:2013,v:6.41},{y:2014,v:6.35},{y:2015,v:6.28},{y:2016,v:6.21},{y:2017,v:6.12},{y:2018,v:6.04},{y:2019,v:5.96},{y:2020,v:5.86},{y:2021,v:5.77},{y:2022,v:5.65}] },
+  { name: "China", color: "#D4A03C", data: [{y:1965,v:1.44},{y:1966,v:1.52},{y:1967,v:1.5},{y:1968,v:1.45},{y:1969,v:1.45},{y:1970,v:1.54},{y:1971,v:1.58},{y:1972,v:1.71},{y:1973,v:1.77},{y:1974,v:1.85},{y:1975,v:1.92},{y:1976,v:2},{y:1977,v:2.07},{y:1978,v:2.14},{y:1979,v:2.2},{y:1980,v:2.23},{y:1981,v:2.25},{y:1982,v:2.26},{y:1983,v:2.29},{y:1984,v:2.33},{y:1985,v:2.37},{y:1986,v:2.4},{y:1987,v:2.48},{y:1988,v:2.54},{y:1989,v:2.56},{y:1990,v:2.58},{y:1991,v:2.6},{y:1992,v:2.62},{y:1993,v:2.63},{y:1994,v:2.63},{y:1995,v:2.61},{y:1996,v:2.55},{y:1997,v:2.55},{y:1998,v:2.53},{y:1999,v:2.52},{y:2000,v:1.71},{y:2001,v:1.69},{y:2002,v:1.73},{y:2003,v:1.75},{y:2004,v:1.82},{y:2005,v:1.87},{y:2006,v:1.94},{y:2007,v:2.02},{y:2008,v:2.16},{y:2009,v:2.32},{y:2010,v:2.51},{y:2011,v:2.72},{y:2012,v:3.04},{y:2013,v:3.32},{y:2014,v:3.57},{y:2015,v:3.82},{y:2016,v:4.05},{y:2017,v:4.33},{y:2018,v:4.59},{y:2019,v:4.82},{y:2020,v:5},{y:2021,v:5.2},{y:2022,v:5.38},{y:2023,v:5.63}] },
+  { name: "Cuba", color: "#3A9E8F", data: [{y:1960,v:4.37},{y:1970,v:4.63},{y:1990,v:5.42},{y:1993,v:6},{y:1996,v:5.13},{y:2000,v:5.29},{y:2001,v:5.1},{y:2002,v:5},{y:2003,v:4.94},{y:2004,v:4.93},{y:2005,v:4.87},{y:2006,v:4.86},{y:2007,v:4.85},{y:2008,v:4.63},{y:2009,v:4.56},{y:2010,v:4.56},{y:2011,v:4.04},{y:2012,v:4.04},{y:2013,v:4.04},{y:2014,v:4.03},{y:2015,v:4.07},{y:2016,v:4.15},{y:2017,v:4.17},{y:2018,v:4.19},{y:2019,v:4.21},{y:2020,v:4.23},{y:2021,v:4.27},{y:2022,v:4.32},{y:2023,v:4.33}] },
+  { name: "Brazil", color: "#7BBF5E", data: [{y:1960,v:3.2},{y:1970,v:3.69},{y:1975,v:5},{y:1987,v:3.56},{y:1990,v:3.35},{y:1993,v:3.5},{y:1996,v:3.11},{y:2000,v:2.81},{y:2001,v:2.78},{y:2002,v:2.59},{y:2003,v:2.42},{y:2005,v:2.52},{y:2006,v:2.48},{y:2007,v:2.5},{y:2008,v:2.6},{y:2009,v:2.58},{y:2010,v:2.59},{y:2011,v:2.55},{y:2012,v:2.51},{y:2013,v:2.49},{y:2014,v:2.48},{y:2015,v:2.39},{y:2016,v:2.36},{y:2017,v:2.34},{y:2018,v:2.3},{y:2019,v:2.29},{y:2020,v:2.49},{y:2021,v:2.52}] },
+  { name: "India", color: "#C97A2E", data: [{y:1960,v:0.46},{y:1970,v:0.6},{y:1975,v:0.59},{y:1980,v:0.77},{y:1981,v:0.77},{y:1985,v:0.77},{y:1987,v:0.72},{y:1991,v:0.79},{y:2000,v:2.13},{y:2001,v:2.09},{y:2002,v:2.05},{y:2003,v:2.02},{y:2004,v:1.99},{y:2005,v:1.95},{y:2006,v:1.92},{y:2007,v:1.89},{y:2008,v:1.87},{y:2009,v:1.84},{y:2010,v:1.81},{y:2011,v:1.79},{y:2012,v:1.76},{y:2013,v:1.74},{y:2014,v:1.72},{y:2015,v:1.7},{y:2016,v:1.68},{y:2017,v:1.66},{y:2018,v:1.64},{y:2019,v:1.62},{y:2020,v:1.61},{y:2021,v:1.59}] },
+  { name: "Bangladesh", color: "#A0522D", data: [{y:1970,v:0.16},{y:1980,v:0.22},{y:1981,v:0.23},{y:1985,v:0.29},{y:1990,v:0.3},{y:1991,v:0.31},{y:1994,v:0.3},{y:1999,v:0.3},{y:2007,v:0.35},{y:2008,v:0.37},{y:2009,v:0.49},{y:2010,v:0.54},{y:2011,v:0.53},{y:2012,v:0.61},{y:2013,v:0.58},{y:2014,v:0.6},{y:2015,v:0.76},{y:2016,v:0.79},{y:2017,v:0.84},{y:2018,v:0.88},{y:2019,v:0.89},{y:2020,v:0.97},{y:2021,v:0.94},{y:2022,v:1.01},{y:2023,v:0.92}] },
+  { name: "Ethiopia", color: "#8B4513", data: [{y:1960,v:0.29},{y:1970,v:0.29},{y:1975,v:0.29},{y:1980,v:0.3},{y:1990,v:0.24},{y:2008,v:0.2},{y:2016,v:0.33}] }
+];
+
+const W = 760, H = 460;
+const pad = { left: 50, right: 110, top: 30, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const yearMin = 1960, yearMax = 2023;
+const valMin = 0, valMax = 16;
+
+const xScale = yr => pad.left + ((yr - yearMin) / (yearMax - yearMin)) * chartW;
+const yScale = val => pad.top + chartH - ((val - valMin) / (valMax - valMin)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Y-axis gridlines and labels
+for (let v = 0; v <= valMax; v += 2) {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#B5B2A8" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 1);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("dominant-baseline", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v;
+  svg.appendChild(label);
+}
+
+// X-axis labels
+for (let yr = 1960; yr <= 2020; yr += 10) {
+  const x = xScale(yr);
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 5);
+  tick.setAttribute("stroke", "#B5B2A8");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", yScale(0) + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+}
+
+// Y-axis title
+const yTitle = document.createElementNS(ns, "text");
+yTitle.setAttribute("x", 14);
+yTitle.setAttribute("y", pad.top + chartH / 2);
+yTitle.setAttribute("text-anchor", "middle");
+yTitle.setAttribute("dominant-baseline", "middle");
+yTitle.setAttribute("transform", "rotate(-90, 14, " + (pad.top + chartH / 2) + ")");
+yTitle.setAttribute("font-size", "9");
+yTitle.setAttribute("fill", "#7A786F");
+yTitle.textContent = "Beds per 1,000 people";
+svg.appendChild(yTitle);
+
+// Clip path
+const defs = document.createElementNS(ns, "defs");
+const clipPath = document.createElementNS(ns, "clipPath");
+clipPath.setAttribute("id", "plotArea");
+const clipRect = document.createElementNS(ns, "rect");
+clipRect.setAttribute("x", pad.left);
+clipRect.setAttribute("y", pad.top - 5);
+clipRect.setAttribute("width", chartW);
+clipRect.setAttribute("height", chartH + 10);
+clipPath.appendChild(clipRect);
+defs.appendChild(clipPath);
+svg.appendChild(defs);
+
+const plotGroup = document.createElementNS(ns, "g");
+plotGroup.setAttribute("clip-path", "url(#plotArea)");
+
+// Draw lines
+series.forEach(s => {
+  if (s.data.length < 2) return;
+  const path = document.createElementNS(ns, "path");
+  let d = "M" + xScale(s.data[0].y) + "," + yScale(s.data[0].v);
+  for (let i = 1; i < s.data.length; i++) {
+    d += " L" + xScale(s.data[i].y) + "," + yScale(s.data[i].v);
+  }
+  path.setAttribute("d", d);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", s.color);
+  path.setAttribute("stroke-width", 1.8);
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-linecap", "round");
+  path.dataset.series = s.name;
+  plotGroup.appendChild(path);
+});
+
+svg.appendChild(plotGroup);
+
+// End labels (right side of chart)
+const labelPositions = [];
+series.forEach(s => {
+  const last = s.data[s.data.length - 1];
+  labelPositions.push({ name: s.name, color: s.color, year: last.y, value: last.v, rawY: yScale(last.v) });
+});
+labelPositions.sort((a, b) => a.rawY - b.rawY);
+
+// Resolve label overlaps
+const labelH = 11;
+for (let pass = 0; pass < 10; pass++) {
+  for (let i = 1; i < labelPositions.length; i++) {
+    const prev = labelPositions[i - 1];
+    const curr = labelPositions[i];
+    if (curr.rawY - prev.rawY < labelH) {
+      const mid = (prev.rawY + curr.rawY) / 2;
+      prev.rawY = mid - labelH / 2;
+      curr.rawY = mid + labelH / 2;
+    }
+  }
+}
+
+labelPositions.forEach(lp => {
+  const x = W - pad.right + 6;
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", lp.rawY);
+  label.setAttribute("dominant-baseline", "middle");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("font-weight", "500");
+  label.setAttribute("fill", lp.color);
+  label.textContent = lp.name;
+  svg.appendChild(label);
+
+  // Small dot at end of line
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(lp.year));
+  dot.setAttribute("cy", yScale(lp.value));
+  dot.setAttribute("r", 2.5);
+  dot.setAttribute("fill", lp.color);
+  svg.appendChild(dot);
+});
+
+// Draw dots for Ethiopia since it has few points
+series.forEach(s => {
+  if (s.data.length <= 10) {
+    s.data.forEach(pt => {
+      const dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("cx", xScale(pt.y));
+      dot.setAttribute("cy", yScale(pt.v));
+      dot.setAttribute("r", 2);
+      dot.setAttribute("fill", s.color);
+      svg.appendChild(dot);
+    });
+  }
+});
+
+// Interactive vertical hover line and tooltip
+const hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("x1", 0);
+hoverLine.setAttribute("x2", 0);
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", pad.top + chartH);
+hoverLine.setAttribute("stroke", "#2B2A27");
+hoverLine.setAttribute("stroke-width", 0.5);
+hoverLine.setAttribute("stroke-dasharray", "3,2");
+hoverLine.style.opacity = 0;
+hoverLine.style.pointerEvents = "none";
+svg.appendChild(hoverLine);
+
+// Hover dots
+const hoverDots = series.map(s => {
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("r", 3.5);
+  dot.setAttribute("fill", s.color);
+  dot.setAttribute("stroke", "#F6F5EE");
+  dot.setAttribute("stroke-width", 1.5);
+  dot.style.opacity = 0;
+  dot.style.pointerEvents = "none";
+  svg.appendChild(dot);
+  return dot;
+});
+
+// Hit area for mouse events
+const hitArea = document.createElementNS(ns, "rect");
+hitArea.setAttribute("x", pad.left);
+hitArea.setAttribute("y", pad.top);
+hitArea.setAttribute("width", chartW);
+hitArea.setAttribute("height", chartH);
+hitArea.setAttribute("fill", "transparent");
+hitArea.style.cursor = "crosshair";
+
+const tip = document.getElementById("tip");
+
+hitArea.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const svgScale = W / rect.width;
+  const mouseX = (e.clientX - rect.left) * svgScale;
+  const hoveredYear = Math.round(yearMin + ((mouseX - pad.left) / chartW) * (yearMax - yearMin));
+  const clampedYear = Math.max(yearMin, Math.min(yearMax, hoveredYear));
+
+  hoverLine.setAttribute("x1", xScale(clampedYear));
+  hoverLine.setAttribute("x2", xScale(clampedYear));
+  hoverLine.style.opacity = 1;
+
+  let tooltipRows = [];
+  series.forEach((s, idx) => {
+    // Find closest data point to hovered year
+    let closest = null;
+    let minDist = Infinity;
+    s.data.forEach(pt => {
+      const dist = Math.abs(pt.y - clampedYear);
+      if (dist < minDist) { minDist = dist; closest = pt; }
+    });
+    if (closest && minDist <= 3) {
+      hoverDots[idx].setAttribute("cx", xScale(closest.y));
+      hoverDots[idx].setAttribute("cy", yScale(closest.v));
+      hoverDots[idx].style.opacity = 1;
+      tooltipRows.push({ name: s.name, color: s.color, value: closest.v, year: closest.y });
+    } else {
+      hoverDots[idx].style.opacity = 0;
+    }
+  });
+
+  if (tooltipRows.length > 0) {
+    tooltipRows.sort((a, b) => b.value - a.value);
+    let html = '<div style="font-weight:500;margin-bottom:4px;font-size:11px;font-family:Inter,sans-serif;">' + clampedYear + '</div>';
+    tooltipRows.forEach(r => {
+      html += '<div style="display:flex;align-items:center;gap:5px;margin:2px 0;">';
+      html += '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + r.color + ';flex-shrink:0;"></span>';
+      html += '<span style="flex:1;">' + r.name + '</span>';
+      html += '<span style="margin-left:10px;font-weight:500;">' + r.value.toFixed(1) + '</span>';
+      html += '</div>';
+    });
+    tip.innerHTML = html;
+    tip.style.opacity = 1;
+
+    const chartEl = document.getElementById("chart");
+    const chartRect = chartEl.getBoundingClientRect();
+    let tipX = e.clientX - chartRect.left + 16;
+    let tipY = e.clientY - chartRect.top - 20;
+    if (tipX + 180 > chartRect.width) tipX = e.clientX - chartRect.left - 190;
+    tip.style.left = tipX + "px";
+    tip.style.top = tipY + "px";
+  }
+});
+
+hitArea.addEventListener("mouseleave", () => {
+  hoverLine.style.opacity = 0;
+  hoverDots.forEach(d => d.style.opacity = 0);
+  tip.style.opacity = 0;
+});
+
+svg.appendChild(hitArea);
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

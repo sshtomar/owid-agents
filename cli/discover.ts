@@ -1,6 +1,12 @@
 import { parseArgs } from "node:util";
 import * as worldBank from "../src/api-clients/world-bank.js";
 import * as whoGho from "../src/api-clients/who-gho.js";
+import * as unSdg from "../src/api-clients/un-sdg.js";
+import * as eurostat from "../src/api-clients/eurostat.js";
+import * as unhcr from "../src/api-clients/unhcr.js";
+import * as imf from "../src/api-clients/imf.js";
+import * as owid from "../src/api-clients/owid.js";
+import * as unesco from "../src/api-clients/unesco.js";
 import { addDataset } from "../src/catalog.js";
 import type { DatasetEntry, DatasetFile, Provider } from "../src/types.js";
 
@@ -25,7 +31,15 @@ function getProvider(): { provider: Provider; client: typeof worldBank } {
   const p = values.provider as Provider;
   if (p === "world-bank") return { provider: p, client: worldBank };
   if (p === "who-gho") return { provider: p, client: whoGho };
-  console.error("Error: --provider must be 'world-bank' or 'who-gho'");
+  if (p === "un-sdg") return { provider: p, client: unSdg };
+  if (p === "eurostat") return { provider: p, client: eurostat };
+  if (p === "unhcr") return { provider: p, client: unhcr };
+  if (p === "imf") return { provider: p, client: imf };
+  if (p === "owid") return { provider: p, client: owid };
+  if (p === "unesco") return { provider: p, client: unesco };
+  console.error(
+    "Error: --provider must be one of: world-bank, who-gho, un-sdg, eurostat, unhcr, imf, owid, unesco"
+  );
   process.exit(1);
 }
 
@@ -100,18 +114,26 @@ async function save() {
 
   const countries = [...new Set(result.data.map((d) => d.country))];
   const years = result.data.map((d) => d.year);
-  const prefix = provider === "world-bank" ? "wb" : "who";
-  const id = `${prefix}--${indicator.replace(/\./g, "-")}`;
+  const prefixMap: Record<Provider, string> = {
+    "world-bank": "wb",
+    "who-gho": "who",
+    "un-sdg": "sdg",
+    eurostat: "eu",
+    unhcr: "unhcr",
+    imf: "imf",
+    owid: "owid",
+    unesco: "unesco",
+  };
+  const prefix = prefixMap[provider];
+  const idSafe = indicator.replace(/[.:]/g, "-");
+  const id = `${prefix}--${idSafe}`;
 
-  const sourceUrl =
-    provider === "world-bank"
-      ? worldBank.getSourceUrl(indicator)
-      : whoGho.getSourceUrl(indicator);
+  const sourceUrl = client.getSourceUrl(indicator);
 
   const entry: DatasetEntry = {
     id,
     title: values.title ?? result.name,
-    description: `${result.name} from ${provider === "world-bank" ? "World Bank" : "WHO GHO"}`,
+    description: `${result.name} from ${provider}`,
     source: {
       provider,
       indicatorId: indicator,
@@ -158,18 +180,18 @@ async function main() {
 
 Commands:
   search    Search for indicators
-            --provider <world-bank|who-gho>
+            --provider <world-bank|who-gho|un-sdg|eurostat>
             --topic <string>        Topic filter
             --query <string>        Keyword search
             --limit <number>        Max results (default: 20)
 
   fetch     Preview data for an indicator
-            --provider <world-bank|who-gho>
+            --provider <world-bank|who-gho|un-sdg|eurostat>
             --indicator <string>
             --countries <string>    Comma-separated ISO3 codes
 
   save      Fetch and save a dataset to the catalog
-            --provider <world-bank|who-gho>
+            --provider <world-bank|who-gho|un-sdg|eurostat>
             --indicator <string>
             --title <string>        Human-readable title
             --topics <string>       Comma-separated topic tags`);

@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "9d399b0f36d37aacadaf7fe3aa748744",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"the-slow-killers\">The Slow Killers</h1>\n<span class=\"paragraph\">Probability of dying from non-communicable diseases (cancer, diabetes, cardiovascular, respiratory) between ages 30-70 for 20 countries, earliest vs most recent year. Most nations are winning this fight, but progress varies enormously.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "3f6d62515f46fa58a3c52e58ef8401b0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Probability (%) of dying between age 30 and exact age 70 from any of cardiovascular disease, cancer, diabetes, or chronic respiratory disease** (WHO Global Health Observatory)\n</code></pre></div>\n<span class=\"paragraph\">Probability (%) of dying between age 30 and exact age 70 from any of cardiovascular disease, cancer, diabetes, or chronic respiratory disease from who-gho\nSource: <a href=\"https://www.who.int/data/gho/data/indicators/indicator-details/GHO/NCDMORT3070\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.who.int/data/gho/data/indicators/indicator-details/GHO/NCDMORT3070</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "323058af9302880042c6f5ccd354ae96",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='4ad2df33-535e-e835-8342-774c7196461d'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;AGO&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;AGO&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:27.8},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;TJK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;TJK&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:32.0},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;UKR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;UKR&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:23.5},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;ISL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;ISL&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:15.4},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;ARE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;ARE&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:10.7},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;WSM&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;WSM&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:32.2},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;MNE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;MNE&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:31.9},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;IRL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;IRL&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:21.6},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;IDN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;IDN&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:25.0},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;NPL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;NPL&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:19.6}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "fd3d8d1b54fce2d42c35ca70debef42e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a before/after view we take the earliest and latest observation per country and compute the change over time.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "7e886c5cec48bd61f2c4a857de504e2c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='46dd8bcc-7e4a-61f0-55df-9ab42ae9a764'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:21,&#92;&quot;countryName&#92;&quot;:&#92;&quot;BLR&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2013,&#92;&quot;start_value&#92;&quot;:16.4,&#92;&quot;end_year&#92;&quot;:2021,&#92;&quot;end_value&#92;&quot;:36.4,&#92;&quot;delta&#92;&quot;:20.0},{&#92;&quot;&#92;&quot;:76,&#92;&quot;countryName&#92;&quot;:&#92;&quot;HRV&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2012,&#92;&quot;start_value&#92;&quot;:11.3,&#92;&quot;end_year&#92;&quot;:2019,&#92;&quot;end_value&#92;&quot;:21.5,&#92;&quot;delta&#92;&quot;:10.2},{&#92;&quot;&#92;&quot;:54,&#92;&quot;countryName&#92;&quot;:&#92;&quot;ESP&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2004,&#92;&quot;start_value&#92;&quot;:7.4,&#92;&quot;end_year&#92;&quot;:2006,&#92;&quot;end_value&#92;&quot;:16.9,&#92;&quot;delta&#92;&quot;:9.499999999999998},{&#92;&quot;&#92;&quot;:103,&#92;&quot;countryName&#92;&quot;:&#92;&quot;LSO&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2003,&#92;&quot;start_value&#92;&quot;:25.6,&#92;&quot;end_year&#92;&quot;:2019,&#92;&quot;end_value&#92;&quot;:33.9,&#92;&quot;delta&#92;&quot;:8.299999999999997},{&#92;&quot;&#92;&quot;:34,&#92;&quot;countryName&#92;&quot;:&#92;&quot;CIV&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2001,&#92;&quot;start_value&#92;&quot;:17.0,&#92;&quot;end_year&#92;&quot;:2015,&#92;&quot;end_value&#92;&quot;:24.1,&#92;&quot;delta&#92;&quot;:7.100000000000001},{&#92;&quot;&#92;&quot;:89,&#92;&quot;countryName&#92;&quot;:&#92;&quot;JPN&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2010,&#92;&quot;start_value&#92;&quot;:6.3,&#92;&quot;end_year&#92;&quot;:2013,&#92;&quot;end_value&#92;&quot;:12.2,&#92;&quot;delta&#92;&quot;:5.8999999999999995},{&#92;&quot;&#92;&quot;:94,&#92;&quot;countryName&#92;&quot;:&#92;&quot;KIR&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2005,&#92;&quot;start_value&#92;&quot;:35.4,&#92;&quot;end_year&#92;&quot;:2018,&#92;&quot;end_value&#92;&quot;:40.7,&#92;&quot;delta&#92;&quot;:5.300000000000004},{&#92;&quot;&#92;&quot;:151,&#92;&quot;countryName&#92;&quot;:&#92;&quot;SLB&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2007,&#92;&quot;start_value&#92;&quot;:37.6,&#92;&quot;end_year&#92;&quot;:2019,&#92;&quot;end_value&#92;&quot;:42.4,&#92;&quot;delta&#92;&quot;:4.799999999999997},{&#92;&quot;&#92;&quot;:139,&#92;&quot;countryName&#92;&quot;:&#92;&quot;PRT&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2015,&#92;&quot;start_value&#92;&quot;:11.5,&#92;&quot;end_year&#92;&quot;:2017,&#92;&quot;end_value&#92;&quot;:15.8,&#92;&quot;delta&#92;&quot;:4.300000000000001},{&#92;&quot;&#92;&quot;:192,&#92;&quot;countryName&#92;&quot;:&#92;&quot;ZWE&#92;&quot;,&#92;&quot;start_year&#92;&quot;:2003,&#92;&quot;start_value&#92;&quot;:26.9,&#92;&quot;end_year&#92;&quot;:2021,&#92;&quot;end_value&#92;&quot;:31.2,&#92;&quot;delta&#92;&quot;:4.300000000000001}]&quot;' data-total-rows='20' data-total-columns='6' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;start_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;start_value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;end_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;end_value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;delta&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "0ee9550ef7d3f7fb895e2e4d789202f9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='fda3f255-0586-838e-9d2b-2ee031554109'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;layer&quot;:[{&quot;mark&quot;:{&quot;type&quot;:&quot;line&quot;},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;detail&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;period&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;period&quot;,&quot;sort&quot;:[&quot;start&quot;,&quot;end&quot;],&quot;title&quot;:&quot;Period&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;}}},{&quot;mark&quot;:{&quot;type&quot;:&quot;circle&quot;,&quot;size&quot;:60},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;period&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;period&quot;,&quot;sort&quot;:[&quot;start&quot;,&quot;end&quot;],&quot;type&quot;:&quot;nominal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}}}],&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////UAQAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAAPAMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAABQDAAAEAAAABgMAAHsiaW5kZXhfY29sdW1ucyI6IFt7ImtpbmQiOiAicmFuZ2UiLCAibmFtZSI6IG51bGwsICJzdGFydCI6IDAsICJzdG9wIjogNDAsICJzdGVwIjogMX1dLCAiY29sdW1uX2luZGV4ZXMiOiBbeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiBudWxsLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IHsiZW5jb2RpbmciOiAiVVRGLTgifX1dLCAiY29sdW1ucyI6IFt7Im5hbWUiOiAiY291bnRyeU5hbWUiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5TmFtZSIsICJwYW5kYXNfdHlwZSI6ICJ1bmljb2RlIiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ5ZWFyIiwgImZpZWxkX25hbWUiOiAieWVhciIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAidmFsdWUiLCAiZmllbGRfbmFtZSI6ICJ2YWx1ZSIsICJwYW5kYXNfdHlwZSI6ICJmbG9hdDY0IiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJwZXJpb2QiLCAiZmllbGRfbmFtZSI6ICJwZXJpb2QiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9XSwgImNyZWF0b3IiOiB7ImxpYnJhcnkiOiAicHlhcnJvdyIsICJ2ZXJzaW9uIjogIjIxLjAuMCJ9LCAicGFuZGFzX3ZlcnNpb24iOiAiMi4yLjMifQAABgAAAHBhbmRhcwAABAAAALAAAABkAAAA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ZGVuZP////8AAAAAEAAAAAwAFAAGAAgADAAQAAwAAAAAAAQAPAAAACgAAAAEAAAAAQAAAGAEAAAAAAAAQAEAAAAAAADwBAAAAAAAAAAAAAAAAAAAAAAKAAwAAAAEAAgACgAAADwDAAAEAAAAAQAAAAwAAAAIAAwABAAIAAgAAAAUAwAABAAAAAYDAAB7ImluZGV4X2NvbHVtbnMiOiBbeyJraW5kIjogInJhbmdlIiwgIm5hbWUiOiBudWxsLCAic3RhcnQiOiAwLCAic3RvcCI6IDQwLCAic3RlcCI6IDF9XSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInZhbHVlIiwgImZpZWxkX25hbWUiOiAidmFsdWUiLCAicGFuZGFzX3R5cGUiOiAiZmxvYXQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAicGVyaW9kIiwgImZpZWxkX25hbWUiOiAicGVyaW9kIiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfV0sICJjcmVhdG9yIjogeyJsaWJyYXJ5IjogInB5YXJyb3ciLCAidmVyc2lvbiI6ICIyMS4wLjAifSwgInBhbmRhc192ZXJzaW9uIjogIjIuMi4zIn0AAAYAAABwYW5kYXMAAAQAAACwAAAAZAAAADAAAAAEAAAAcP///wAAAQUQAAAAGAAAAAQAAAAAAAAABgAAAHBlcmlvZAAAXP///5j///8AAAEDEAAAABwAAAAEAAAAAAAAAAUAAAB2YWx1ZQAGAAgABgAGAAAAAAACAMj///8AAAECEAAAACAAAAAEAAAAAAAAAAQAAAB5ZWFyAAAAAAgADAAIAAcACAAAAAAAAAFAAAAAEAAUAAgABgAHAAwAAAAQABAAAAAAAAEFEAAAACAAAAAEAAAAAAAAAAsAAABjb3VudHJ5TmFtZQAEAAQABAAAAHgEAABBUlJPVzE=&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;height&quot;:400,&quot;width&quot;:500,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "0393ae60cde1075adb41f34ed8d14f49",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>South Korea cut NCD mortality from 23.2% to 9.2%, the most dramatic improvement in the dataset</li>\n<li>Russia's trajectory reversed: NCD mortality rose from 24.4% to 28.0% before recent improvements</li>\n<li>Egypt is one of the few countries where NCD mortality worsened, rising from 29.5% to 30.6%</li>\n<li>Germany and the USA both achieved significant reductions, but the USA's 2020 data reflects COVID disruption</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

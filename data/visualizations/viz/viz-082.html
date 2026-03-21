@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Doctor Divide</h1>
+<p class="subtitle">Medical doctors per 10,000 population, latest available year. Cuba leads the world with 85 doctors per 10,000 people -- more than 200 times the density in Niger. The WHO considers 10 doctors per 10,000 a minimum threshold for basic health coverage; most of Sub-Saharan Africa falls far short.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- HWF_0001 (Medical Doctors per 10,000 Population)</p>
+<script>
+const data = [
+  { name: "Cuba", value: 85.05, year: 2022 },
+  { name: "Greece", value: 65.76, year: 2022 },
+  { name: "Portugal", value: 60.22, year: 2023 },
+  { name: "Austria", value: 50.98, year: 2015 },
+  { name: "Norway", value: 45.78, year: 2019 },
+  { name: "Switzerland", value: 45.59, year: 2023 },
+  { name: "Denmark", value: 45.30, year: 2023 },
+  { name: "Germany", value: 44.43, year: 2020 },
+  { name: "Spain", value: 44.29, year: 2023 },
+  { name: "Sweden", value: 44.08, year: 2021 },
+  { name: "Australia", value: 38.08, year: 2019 },
+  { name: "United Kingdom", value: 32.31, year: 2022 },
+  { name: "China", value: 28.19, year: 2023 },
+  { name: "United States", value: 25.71, year: 2020 },
+  { name: "Pakistan", value: 12.84, year: 2024 },
+  { name: "India", value: 9.39, year: 2023 },
+  { name: "Nigeria", value: 3.80, year: 2023 },
+  { name: "Ethiopia", value: 1.05, year: 2022 },
+  { name: "Chad", value: 0.82, year: 2022 },
+  { name: "Somalia", value: 0.65, year: 2024 },
+  { name: "Malawi", value: 0.54, year: 2022 },
+  { name: "South Sudan", value: 0.41, year: 2022 },
+  { name: "Niger", value: 0.39, year: 2019 }
+];
+
+const WHO_THRESHOLD = 10;
+
+const W = 740;
+const barH = 24;
+const gap = 4;
+const pad = { left: 132, right: 70, top: 30, bottom: 36 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = Math.ceil(data[0].value / 10) * 10;
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const highColor = "#3A9E8F";
+const lowColor = "#E06050";
+const thresholdColor = "#D4A017";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines and x-axis tick labels
+const tickInterval = 10;
+for (let v = 0; v <= maxVal; v += tickInterval) {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1.5 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 10);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v;
+  svg.appendChild(label);
+}
+
+// WHO threshold line
+const threshX = xScale(WHO_THRESHOLD);
+const threshLine = document.createElementNS(ns, "line");
+threshLine.setAttribute("x1", threshX);
+threshLine.setAttribute("x2", threshX);
+threshLine.setAttribute("y1", pad.top - 5);
+threshLine.setAttribute("y2", pad.top + chartH + 2);
+threshLine.setAttribute("stroke", thresholdColor);
+threshLine.setAttribute("stroke-width", 1.5);
+threshLine.setAttribute("stroke-dasharray", "4,3");
+svg.appendChild(threshLine);
+
+// WHO threshold label
+const threshLabel = document.createElementNS(ns, "text");
+threshLabel.setAttribute("x", threshX);
+threshLabel.setAttribute("y", pad.top + chartH + 16);
+threshLabel.setAttribute("text-anchor", "middle");
+threshLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+threshLabel.setAttribute("font-size", "8");
+threshLabel.setAttribute("fill", thresholdColor);
+threshLabel.setAttribute("font-weight", "500");
+threshLabel.setAttribute("letter-spacing", "0.5");
+threshLabel.textContent = "WHO MINIMUM (10)";
+svg.appendChild(threshLabel);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barWidth = Math.max(xScale(d.value) - pad.left, 1);
+  const belowThreshold = d.value < WHO_THRESHOLD;
+  const color = belowThreshold ? lowColor : highColor;
+
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y + 2);
+  rect.setAttribute("width", barWidth);
+  rect.setAttribute("height", barH - 4);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", pad.left + barWidth + 5);
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1);
+
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    rect.setAttribute("opacity", "0.75");
+    const status = d.value >= WHO_THRESHOLD ? "Above WHO minimum" : "Below WHO minimum";
+    tip.innerHTML = `<strong>${d.name}</strong> &nbsp; ${d.value.toFixed(1)} doctors per 10k &nbsp; (${d.year}) &nbsp; ${status}`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 12) + "px";
+    tip.style.top = (e.clientY - r.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+// Legend
+const legendY = pad.top + chartH + 26;
+const legendItems = [
+  { color: highColor, label: "Above WHO minimum" },
+  { color: lowColor, label: "Below WHO minimum" }
+];
+let legendX = pad.left;
+legendItems.forEach(item => {
+  const swatch = document.createElementNS(ns, "rect");
+  swatch.setAttribute("x", legendX);
+  swatch.setAttribute("y", legendY - 5);
+  swatch.setAttribute("width", 10);
+  swatch.setAttribute("height", 10);
+  swatch.setAttribute("fill", item.color);
+  swatch.setAttribute("rx", 1);
+  svg.appendChild(swatch);
+
+  const lbl = document.createElementNS(ns, "text");
+  lbl.setAttribute("x", legendX + 14);
+  lbl.setAttribute("y", legendY + 2);
+  lbl.setAttribute("dominant-baseline", "middle");
+  lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "8");
+  lbl.setAttribute("fill", "#7A786F");
+  lbl.textContent = item.label;
+  svg.appendChild(lbl);
+
+  legendX += 130;
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

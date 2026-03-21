@@ -1,27 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { useApi } from "../hooks/useApi";
+import { useIsMobile } from "../hooks/useIsMobile";
 import ChartRenderer from "./ChartRenderer";
-
-interface VizEntry {
-  id: string;
-  title: string;
-  description: string;
-  chartType: string;
-  highlights: string[];
-  createdAt: string;
-  generatedCode: string;
-}
-
-interface VizListResponse {
-  visualizations: VizEntry[];
-  count: number;
-}
+import SearchBar from "./SearchBar";
+import { VizEntry, VizListResponse, THEMES, matchesSearch, matchesTheme } from "../search";
 
 const SPRING = {
   gentle: { type: "spring" as const, stiffness: 300, damping: 30 },
 };
+
+function downloadHtml(html: string, filename: string) {
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -78,7 +78,7 @@ function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
           borderRadius: 2,
           overflow: "hidden",
         }}>
-          <ChartRenderer html={viz.generatedCode} />
+          <ChartRenderer html={viz.generatedCode} hideChrome />
         </div>
         {viz.highlights.length > 0 && (
           <div style={{
@@ -93,12 +93,84 @@ function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
           </div>
         )}
       </Link>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          downloadHtml(viz.generatedCode, `${viz.id}.html`);
+        }}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          marginTop: 8,
+          padding: "5px 10px",
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: 9,
+          fontWeight: 500,
+          letterSpacing: "0.3px",
+          color: "#7A786F",
+          backgroundColor: "transparent",
+          border: "1px solid #C2C0B5",
+          borderRadius: 2,
+          textTransform: "uppercase" as const,
+          cursor: "pointer",
+        }}
+      >
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#7A786F" strokeWidth="1.5">
+          <path d="M6 1v7M3 6l3 3 3-3M1 10h10" />
+        </svg>
+        Download
+      </button>
+      {viz.notebookPath && (
+        <a
+          href={`/wasm-notebooks/${viz.id}.html`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            marginTop: 8,
+            marginLeft: 8,
+            padding: "5px 10px",
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 9,
+            fontWeight: 500,
+            letterSpacing: "0.3px",
+            color: "#EA5E33",
+            backgroundColor: "transparent",
+            border: "1px solid #EA5E33",
+            borderRadius: 2,
+            textTransform: "uppercase",
+            textDecoration: "none",
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#EA5E33" strokeWidth="1.5">
+            <path d="M2 10h8M6 2v6M3.5 5.5 6 8l2.5-2.5" />
+          </svg>
+          Marimo Notebook
+        </a>
+      )}
     </motion.div>
   );
 }
 
 export default function VizGallery() {
+  const mobile = useIsMobile();
   const { data, loading, error } = useApi<VizListResponse>("/visualizations");
+  const [query, setQuery] = useState("");
+  const [activeThemes, setActiveThemes] = useState<string[]>([]);
+
+  const vizList = data?.visualizations ?? [];
+
+  const filtered = useMemo(() => {
+    return vizList.filter((viz) => {
+      const passesQuery = !query || matchesSearch(viz, query);
+      const passesTheme = activeThemes.length === 0 ||
+        activeThemes.some((label) => matchesTheme(viz, THEMES.find((t) => t.label === label)!));
+      return passesQuery && passesTheme;
+    });
+  }, [vizList, query, activeThemes]);
 
   if (loading) {
     return (
@@ -128,11 +200,9 @@ export default function VizGallery() {
     );
   }
 
-  const vizList = data?.visualizations ?? [];
-
   return (
     <div style={{
-      padding: "32px 40px",
+      padding: mobile ? "20px 16px" : "32px 40px",
       backgroundColor: "#F6F5EE",
       minHeight: "100%",
     }}>
@@ -150,12 +220,21 @@ export default function VizGallery() {
         }}>
           All Charts
         </h1>
-        <p style={{ fontSize: 12, color: "#7A786F" }}>
+        <p style={{ fontSize: 12, color: "#7A786F", margin: "0 0 16px" }}>
           {vizList.length} visualizations from public datasets
         </p>
+
+        <SearchBar
+          query={query}
+          onQueryChange={setQuery}
+          activeThemes={activeThemes}
+          onThemesChange={setActiveThemes}
+          resultCount={filtered.length}
+          totalCount={vizList.length}
+        />
       </div>
 
-      {vizList.length === 0 ? (
+      {filtered.length === 0 ? (
         <div style={{
           textAlign: "center",
           padding: 64,
@@ -163,18 +242,39 @@ export default function VizGallery() {
           fontSize: 11,
           fontFamily: "'JetBrains Mono', monospace",
         }}>
-          No visualizations yet.
+          {vizList.length === 0
+            ? "No visualizations yet."
+            : `No charts match "${query || activeThemes.join(", ")}". Try a different search.`}
         </div>
       ) : (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(500px, 1fr))",
-          gap: 40,
-        }}>
-          {vizList.map((viz, i) => (
-            <GalleryCard key={viz.id} viz={viz} index={i} />
-          ))}
-        </div>
+        <>
+          {(query || activeThemes.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                fontSize: 11,
+                color: "#7A786F",
+                fontFamily: "'JetBrains Mono', monospace",
+                marginBottom: 20,
+              }}
+            >
+              {filtered.length} of {vizList.length} charts
+            </motion.div>
+          )}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: mobile
+              ? "1fr"
+              : "repeat(auto-fill, minmax(500px, 1fr))",
+            gap: mobile ? 32 : 40,
+          }}>
+            {filtered.map((viz, i) => (
+              <GalleryCard key={viz.id} viz={viz} index={i} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

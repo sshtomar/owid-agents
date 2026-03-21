@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11.5px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.55; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 3px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.6; }
+  .tooltip .tt-year { font-weight: 600; font-size: 11px; margin-bottom: 4px; font-family: 'Inter', sans-serif; }
+  .tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  .tooltip .tt-swatch { width: 8px; height: 8px; border-radius: 1px; flex-shrink: 0; }
+  .tooltip .tt-total { border-top: 1px solid rgba(246,245,238,0.25); margin-top: 4px; padding-top: 4px; font-weight: 500; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: #5A5850; cursor: default; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+</style></head><body>
+<h1>The Rising Tide of Displacement</h1>
+<p class="subtitle">Pending asylum seekers worldwide by country of origin, 2000--2024. From under one million at the turn of the century to over 8 million by 2024, the global asylum crisis has accelerated sharply -- driven by successive waves of displacement from Venezuela, Afghanistan, Iraq, and Syria.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UNHCR Refugee Statistics -- Asylum seekers by country of origin</p>
+<script>
+const data = [{"year":2000,"Venezuela":172,"Afghanistan":40290,"Iraq":40630,"El Salvador":176478,"DR Congo":19844,"Syria":3730,"Guatemala":101803,"Colombia":5003,"All others":559372},{"year":2001,"Venezuela":334,"Afghanistan":30782,"Iraq":34826,"El Salvador":164987,"DR Congo":28257,"Syria":3853,"Guatemala":99542,"Colombia":15467,"All others":565335},{"year":2002,"Venezuela":779,"Afghanistan":26687,"Iraq":29641,"El Salvador":151584,"DR Congo":44078,"Syria":4264,"Guatemala":96112,"Colombia":21920,"All others":718056},{"year":2003,"Venezuela":2016,"Afghanistan":26308,"Iraq":31591,"El Salvador":128655,"DR Congo":51942,"Syria":3548,"Guatemala":88582,"Colombia":22938,"All others":639987},{"year":2004,"Venezuela":2682,"Afghanistan":16983,"Iraq":30619,"El Salvador":91767,"DR Congo":50911,"Syria":3781,"Guatemala":58642,"Colombia":21525,"All others":607375},{"year":2005,"Venezuela":2816,"Afghanistan":14023,"Iraq":34438,"El Salvador":45203,"DR Congo":55950,"Syria":6992,"Guatemala":31848,"Colombia":19744,"All others":590105},{"year":2006,"Venezuela":2367,"Afghanistan":14959,"Iraq":47294,"El Salvador":28779,"DR Congo":29211,"Syria":7493,"Guatemala":20532,"Colombia":21914,"All others":567704},{"year":2007,"Venezuela":1751,"Afghanistan":16077,"Iraq":27667,"El Salvador":18609,"DR Congo":36291,"Syria":6849,"Guatemala":14998,"Colombia":43097,"All others":574619},{"year":2008,"Venezuela":1518,"Afghanistan":23177,"Iraq":25654,"El Salvador":11152,"DR Congo":36277,"Syria":5978,"Guatemala":10243,"Colombia":52620,"All others":657312},{"year":2009,"Venezuela":1571,"Afghanistan":30406,"Iraq":22372,"El Salvador":9744,"DR Congo":31104,"Syria":5559,"Guatemala":9104,"Colombia":64335,"All others":813835},{"year":2010,"Venezuela":626,"Afghanistan":37101,"Iraq":29939,"El Salvador":1543,"DR Congo":43082,"Syria":9739,"Guatemala":1023,"Colombia":60336,"All others":652580},{"year":2011,"Venezuela":570,"Afghanistan":39199,"Iraq":24485,"El Salvador":1633,"DR Congo":52315,"Syria":14441,"Guatemala":1105,"Colombia":42586,"All others":719357},{"year":2012,"Venezuela":496,"Afghanistan":62304,"Iraq":24239,"El Salvador":1646,"DR Congo":58670,"Syria":26016,"Guatemala":1325,"Colombia":18635,"All others":748166},{"year":2013,"Venezuela":1154,"Afghanistan":75284,"Iraq":43145,"El Salvador":11260,"DR Congo":65353,"Syria":41019,"Guatemala":8435,"Colombia":15638,"All others":901646},{"year":2014,"Venezuela":4822,"Afghanistan":85407,"Iraq":103724,"El Salvador":18035,"DR Congo":67339,"Syria":79649,"Guatemala":15800,"Colombia":4713,"All others":1415215},{"year":2015,"Venezuela":15087,"Afghanistan":258862,"Iraq":237168,"El Salvador":31450,"DR Congo":76029,"Syria":245857,"Guatemala":26951,"Colombia":6879,"All others":2325177},{"year":2016,"Venezuela":45074,"Afghanistan":369072,"Iraq":278367,"El Salvador":62163,"DR Congo":82709,"Syria":184337,"Guatemala":46222,"Colombia":12581,"All others":1648996},{"year":2017,"Venezuela":148096,"Afghanistan":333986,"Iraq":272627,"El Salvador":104901,"DR Congo":136152,"Syria":147179,"Guatemala":72726,"Colombia":32478,"All others":1841362},{"year":2018,"Venezuela":464223,"Afghanistan":310107,"Iraq":256716,"El Salvador":119271,"DR Congo":133422,"Syria":139576,"Guatemala":86875,"Colombia":45674,"All others":1945765},{"year":2019,"Venezuela":794491,"Afghanistan":251047,"Iraq":302731,"El Salvador":136277,"DR Congo":145502,"Syria":118450,"Guatemala":119521,"Colombia":75548,"All others":2204574},{"year":2020,"Venezuela":851265,"Afghanistan":238791,"Iraq":272567,"El Salvador":149542,"DR Congo":145372,"Syria":107085,"Guatemala":146111,"Colombia":70917,"All others":2203276},{"year":2021,"Venezuela":971106,"Afghanistan":262860,"Iraq":254454,"El Salvador":153246,"DR Congo":148099,"Syria":139754,"Guatemala":160428,"Colombia":80705,"All others":2445483},{"year":2022,"Venezuela":1137162,"Afghanistan":294493,"Iraq":228961,"El Salvador":148758,"DR Congo":135099,"Syria":156616,"Guatemala":166901,"Colombia":144210,"All others":3030112},{"year":2023,"Venezuela":1200130,"Afghanistan":296033,"Iraq":192202,"El Salvador":133042,"DR Congo":149805,"Syria":182954,"Guatemala":176035,"Colombia":301824,"All others":4226475},{"year":2024,"Venezuela":1360041,"Afghanistan":384732,"Iraq":151623,"El Salvador":136774,"DR Congo":165456,"Syria":167334,"Guatemala":195319,"Colombia":397872,"All others":5393561}];
+
+const keys = ["Venezuela","Afghanistan","Iraq","Syria","El Salvador","DR Congo","Guatemala","Colombia","All others"];
+
+const colors = {
+  "Venezuela": "#D64933",
+  "Afghanistan": "#E8913A",
+  "Iraq": "#C9A227",
+  "Syria": "#7B904B",
+  "El Salvador": "#4A90A4",
+  "DR Congo": "#6B5B95",
+  "Guatemala": "#B56576",
+  "Colombia": "#3D7068",
+  "All others": "#C4C0B4"
+};
+
+const W = 760, H = 420;
+const pad = { top: 10, right: 20, bottom: 36, left: 58 };
+const cw = W - pad.left - pad.right;
+const ch = H - pad.top - pad.bottom;
+
+// Build legend
+const legendEl = document.getElementById("legend");
+keys.forEach(k => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = `<span class="legend-swatch" style="background:${colors[k]}"></span>${k}`;
+  legendEl.appendChild(item);
+});
+
+// Create SVG
+const svgNS = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(svgNS, "svg");
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+document.getElementById("chart").appendChild(svg);
+
+// Scales
+const years = data.map(d => d.year);
+const xScale = (year) => pad.left + ((year - years[0]) / (years[years.length-1] - years[0])) * cw;
+
+// Compute stacked values
+const stacked = data.map(row => {
+  let y0 = 0;
+  const layers = {};
+  keys.forEach(k => {
+    const y1 = y0 + row[k];
+    layers[k] = { y0, y1, value: row[k] };
+    y0 = y1;
+  });
+  return { year: row.year, layers, total: y0 };
+});
+
+const maxY = Math.max(...stacked.map(s => s.total));
+const yScale = (v) => pad.top + ch - (v / maxY) * ch;
+
+// Gridlines
+const yTicks = [0, 2000000, 4000000, 6000000, 8000000];
+yTicks.forEach(tick => {
+  if (tick === 0) return;
+  const line = document.createElementNS(svgNS, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", yScale(tick));
+  line.setAttribute("y2", yScale(tick));
+  line.setAttribute("stroke", "#DAD8CE");
+  line.setAttribute("stroke-width", "0.5");
+  svg.appendChild(line);
+});
+
+// Stacked areas
+keys.forEach(key => {
+  const path = document.createElementNS(svgNS, "path");
+  let d = "";
+  // Forward pass (top edge)
+  stacked.forEach((s, i) => {
+    const x = xScale(s.year);
+    const y = yScale(s.layers[key].y1);
+    d += (i === 0 ? "M" : "L") + x + "," + y;
+  });
+  // Backward pass (bottom edge)
+  for (let i = stacked.length - 1; i >= 0; i--) {
+    const x = xScale(stacked[i].year);
+    const y = yScale(stacked[i].layers[key].y0);
+    d += "L" + x + "," + y;
+  }
+  d += "Z";
+  path.setAttribute("d", d);
+  path.setAttribute("fill", colors[key]);
+  path.setAttribute("opacity", "0.88");
+  svg.appendChild(path);
+});
+
+// X axis
+const xAxisLine = document.createElementNS(svgNS, "line");
+xAxisLine.setAttribute("x1", pad.left);
+xAxisLine.setAttribute("x2", W - pad.right);
+xAxisLine.setAttribute("y1", pad.top + ch);
+xAxisLine.setAttribute("y2", pad.top + ch);
+xAxisLine.setAttribute("stroke", "#A8A59C");
+xAxisLine.setAttribute("stroke-width", "1");
+svg.appendChild(xAxisLine);
+
+const xTickYears = [2000, 2004, 2008, 2012, 2016, 2020, 2024];
+xTickYears.forEach(year => {
+  const x = xScale(year);
+  const tick = document.createElementNS(svgNS, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", pad.top + ch);
+  tick.setAttribute("y2", pad.top + ch + 5);
+  tick.setAttribute("stroke", "#A8A59C");
+  tick.setAttribute("stroke-width", "1");
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top + ch + 20);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "10");
+  label.textContent = year;
+  svg.appendChild(label);
+});
+
+// Y axis labels
+yTicks.forEach(tick => {
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", yScale(tick) + 3.5);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "10");
+  label.setAttribute("font-family", "JetBrains Mono, monospace");
+  if (tick === 0) {
+    label.textContent = "0";
+  } else {
+    label.textContent = (tick / 1000000).toFixed(0) + "M";
+  }
+  svg.appendChild(label);
+});
+
+// Y axis title
+const yTitle = document.createElementNS(svgNS, "text");
+yTitle.setAttribute("x", 14);
+yTitle.setAttribute("y", pad.top + ch / 2);
+yTitle.setAttribute("text-anchor", "middle");
+yTitle.setAttribute("fill", "#7A786F");
+yTitle.setAttribute("font-size", "9");
+yTitle.setAttribute("transform", `rotate(-90, 14, ${pad.top + ch / 2})`);
+yTitle.textContent = "Pending asylum seekers";
+svg.appendChild(yTitle);
+
+// Hover overlay
+const overlay = document.createElementNS(svgNS, "rect");
+overlay.setAttribute("x", pad.left);
+overlay.setAttribute("y", pad.top);
+overlay.setAttribute("width", cw);
+overlay.setAttribute("height", ch);
+overlay.setAttribute("fill", "transparent");
+svg.appendChild(overlay);
+
+// Vertical hover line
+const hoverLine = document.createElementNS(svgNS, "line");
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", pad.top + ch);
+hoverLine.setAttribute("stroke", "#2B2A27");
+hoverLine.setAttribute("stroke-width", "1");
+hoverLine.setAttribute("stroke-dasharray", "3,3");
+hoverLine.setAttribute("opacity", "0");
+svg.appendChild(hoverLine);
+
+const tip = document.getElementById("tip");
+const chartDiv = document.getElementById("chart");
+
+function formatNum(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(2) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(0) + "K";
+  return n.toString();
+}
+
+overlay.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const relX = mx - pad.left;
+  const yearIdx = Math.round((relX / cw) * (years.length - 1));
+  const idx = Math.max(0, Math.min(years.length - 1, yearIdx));
+  const row = stacked[idx];
+  const x = xScale(row.year);
+
+  hoverLine.setAttribute("x1", x);
+  hoverLine.setAttribute("x2", x);
+  hoverLine.setAttribute("opacity", "0.6");
+
+  let html = `<div class="tt-year">${row.year}</div>`;
+  const reversedKeys = [...keys].reverse();
+  reversedKeys.forEach(k => {
+    const val = row.layers[k].value;
+    html += `<div class="tt-row"><span class="tt-swatch" style="background:${colors[k]}"></span>${k}: ${formatNum(val)}</div>`;
+  });
+  html += `<div class="tt-total">Total: ${formatNum(row.total)}</div>`;
+  tip.innerHTML = html;
+  tip.style.opacity = "1";
+
+  const tipRect = tip.getBoundingClientRect();
+  const chartRect = chartDiv.getBoundingClientRect();
+  let tipX = e.clientX - chartRect.left + 14;
+  if (tipX + tipRect.width > chartRect.width - 10) {
+    tipX = e.clientX - chartRect.left - tipRect.width - 14;
+  }
+  let tipY = e.clientY - chartRect.top - tipRect.height / 2;
+  tipY = Math.max(0, Math.min(chartRect.height - tipRect.height, tipY));
+  tip.style.left = tipX + "px";
+  tip.style.top = tipY + "px";
+});
+
+overlay.addEventListener("mouseleave", function() {
+  hoverLine.setAttribute("opacity", "0");
+  tip.style.opacity = "0";
+});
+
+// Annotation for 2015 spike
+const ann2015x = xScale(2015);
+const ann2015y = yScale(stacked[15].total) - 8;
+const annText = document.createElementNS(svgNS, "text");
+annText.setAttribute("x", ann2015x - 36);
+annText.setAttribute("y", Math.max(pad.top + 14, ann2015y));
+annText.setAttribute("fill", "#7A786F");
+annText.setAttribute("font-size", "8.5");
+annText.setAttribute("font-style", "italic");
+annText.textContent = "2015 migration crisis";
+svg.appendChild(annText);
+</script></body></html>

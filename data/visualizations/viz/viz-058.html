@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; line-height: 1.6; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>The Renewable Divergence</h1>
+  <p class="subtitle">Renewable energy as a share of total final energy consumption (%), 2000 to 2022. Iceland leads at 82% driven by geothermal and hydro. Denmark quadrupled its share via wind power. China's share halved as coal consumption surged, then began a slow recovery. The global average has barely budged: from 15.7% to 17.9% in 22 years.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: UN SDG 7.2.1 -- EG_FEC_RNEW (Renewable energy share in total final energy consumption)</p>
+<script>
+const series = [
+  {name:"Iceland",code:"IS",data:[{y:2000,v:60.7},{y:2001,v:62.1},{y:2002,v:61.9},{y:2003,v:61.9},{y:2004,v:61.9},{y:2005,v:62.7},{y:2006,v:64.2},{y:2007,v:67.6},{y:2008,v:74.0},{y:2009,v:74.7},{y:2010,v:76.0},{y:2011,v:77.1},{y:2012,v:77.7},{y:2013,v:76.8},{y:2014,v:77.6},{y:2015,v:78.0},{y:2016,v:80.9},{y:2017,v:80.8},{y:2018,v:81.4},{y:2019,v:81.7},{y:2020,v:82.9},{y:2021,v:82.4},{y:2022,v:82.2}]},
+  {name:"Sweden",code:"SE",data:[{y:2000,v:39.8},{y:2001,v:37.4},{y:2002,v:35.9},{y:2003,v:34.6},{y:2004,v:35.5},{y:2005,v:39.3},{y:2006,v:40.1},{y:2007,v:41.8},{y:2008,v:43.2},{y:2009,v:45.7},{y:2010,v:44.7},{y:2011,v:45.4},{y:2012,v:48.3},{y:2013,v:47.3},{y:2014,v:48.6},{y:2015,v:51.9},{y:2016,v:51.0},{y:2017,v:51.9},{y:2018,v:51.5},{y:2019,v:52.7},{y:2020,v:57.6},{y:2021,v:57.7},{y:2022,v:59.6}]},
+  {name:"Uruguay",code:"UY",data:[{y:2000,v:38.7},{y:2001,v:41.6},{y:2002,v:43.3},{y:2003,v:43.8},{y:2004,v:39.3},{y:2005,v:41.3},{y:2006,v:37.6},{y:2007,v:43.2},{y:2008,v:44.1},{y:2009,v:44.6},{y:2010,v:53.3},{y:2011,v:49.7},{y:2012,v:47.9},{y:2013,v:51.9},{y:2014,v:56.7},{y:2015,v:59.4},{y:2016,v:60.3},{y:2017,v:60.8},{y:2018,v:60.8},{y:2019,v:59.3},{y:2020,v:61.2},{y:2021,v:57.8},{y:2022,v:57.5}]},
+  {name:"Brazil",code:"BR",data:[{y:2000,v:42.7},{y:2001,v:41.3},{y:2002,v:42.9},{y:2003,v:45.1},{y:2004,v:45.2},{y:2005,v:46.1},{y:2006,v:46.7},{y:2007,v:47.2},{y:2008,v:47.0},{y:2009,v:48.9},{y:2010,v:46.8},{y:2011,v:45.3},{y:2012,v:43.5},{y:2013,v:42.3},{y:2014,v:41.7},{y:2015,v:43.7},{y:2016,v:45.4},{y:2017,v:45.3},{y:2018,v:46.9},{y:2019,v:47.5},{y:2020,v:50.0},{y:2021,v:46.5},{y:2022,v:48.4}]},
+  {name:"Denmark",code:"DK",data:[{y:2000,v:10.7},{y:2001,v:11.1},{y:2002,v:11.9},{y:2003,v:12.7},{y:2004,v:14.4},{y:2005,v:16.1},{y:2006,v:15.3},{y:2007,v:17.7},{y:2008,v:18.5},{y:2009,v:19.3},{y:2010,v:21.2},{y:2011,v:23.8},{y:2012,v:26.9},{y:2013,v:27.1},{y:2014,v:30.2},{y:2015,v:32.5},{y:2016,v:31.9},{y:2017,v:35.0},{y:2018,v:34.6},{y:2019,v:37.3},{y:2020,v:39.4},{y:2021,v:39.2},{y:2022,v:38.8}]},
+  {name:"India",code:"IN",data:[{y:2000,v:46.8},{y:2001,v:47.0},{y:2002,v:45.7},{y:2003,v:45.5},{y:2004,v:44.8},{y:2005,v:44.1},{y:2006,v:43.1},{y:2007,v:41.4},{y:2008,v:38.9},{y:2009,v:37.8},{y:2010,v:36.4},{y:2011,v:35.0},{y:2012,v:34.8},{y:2013,v:35.0},{y:2014,v:34.0},{y:2015,v:33.2},{y:2016,v:32.9},{y:2017,v:32.5},{y:2018,v:32.9},{y:2019,v:33.4},{y:2020,v:35.9},{y:2021,v:34.4},{y:2022,v:34.1}]},
+  {name:"Germany",code:"DE",data:[{y:2000,v:3.7},{y:2001,v:3.9},{y:2002,v:4.4},{y:2003,v:5.4},{y:2004,v:6.3},{y:2005,v:7.3},{y:2006,v:8.6},{y:2007,v:10.5},{y:2008,v:10.3},{y:2009,v:10.7},{y:2010,v:11.6},{y:2011,v:12.5},{y:2012,v:13.6},{y:2013,v:13.6},{y:2014,v:14.0},{y:2015,v:14.6},{y:2016,v:14.2},{y:2017,v:15.2},{y:2018,v:16.0},{y:2019,v:17.1},{y:2020,v:18.5},{y:2021,v:17.9},{y:2022,v:19.6}]},
+  {name:"China",code:"CN",data:[{y:2000,v:29.8},{y:2001,v:28.6},{y:2002,v:27.2},{y:2003,v:24.0},{y:2004,v:20.3},{y:2005,v:17.6},{y:2006,v:16.5},{y:2007,v:15.0},{y:2008,v:14.2},{y:2009,v:13.5},{y:2010,v:12.3},{y:2011,v:11.4},{y:2012,v:11.6},{y:2013,v:11.5},{y:2014,v:11.9},{y:2015,v:12.2},{y:2016,v:12.6},{y:2017,v:13.2},{y:2018,v:13.5},{y:2019,v:14.0},{y:2020,v:14.3},{y:2021,v:14.4},{y:2022,v:15.2}]},
+  {name:"World",code:"WD",data:[{y:2000,v:15.7},{y:2001,v:15.4},{y:2002,v:15.4},{y:2003,v:15.2},{y:2004,v:14.9},{y:2005,v:14.8},{y:2006,v:14.9},{y:2007,v:14.7},{y:2008,v:14.8},{y:2009,v:15.2},{y:2010,v:14.9},{y:2011,v:14.9},{y:2012,v:15.1},{y:2013,v:15.4},{y:2014,v:15.6},{y:2015,v:15.6},{y:2016,v:15.8},{y:2017,v:16.0},{y:2018,v:16.3},{y:2019,v:16.6},{y:2020,v:17.9},{y:2021,v:17.6},{y:2022,v:17.9}]},
+  {name:"USA",code:"US",data:[{y:2000,v:5.4},{y:2001,v:4.7},{y:2002,v:4.8},{y:2003,v:5.3},{y:2004,v:5.5},{y:2005,v:5.8},{y:2006,v:6.4},{y:2007,v:6.3},{y:2008,v:6.8},{y:2009,v:7.3},{y:2010,v:7.4},{y:2011,v:8.4},{y:2012,v:8.5},{y:2013,v:8.9},{y:2014,v:9.0},{y:2015,v:8.9},{y:2016,v:9.3},{y:2017,v:9.7},{y:2018,v:9.9},{y:2019,v:10.2},{y:2020,v:11.0},{y:2021,v:10.9},{y:2022,v:11.3}]}
+];
+
+const palette = {
+  IS: "#3A7CA5",
+  SE: "#5B8FA8",
+  UY: "#7B68A8",
+  BR: "#4A9E6B",
+  DK: "#D06B5C",
+  IN: "#D4A017",
+  DE: "#2B7A4B",
+  CN: "#C47DB5",
+  WD: "#7A786F",
+  US: "#4A7FC1"
+};
+
+const W = 820;
+const H = 500;
+const pad = { left: 50, right: 130, top: 20, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const minYear = 2000;
+const maxYear = 2022;
+const maxVal = 90;
+
+const xScale = function(yr) { return pad.left + ((yr - minYear) / (maxYear - minYear)) * chartW; };
+const yScale = function(v) { return pad.top + ((maxVal - v) / maxVal) * chartH; };
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Y-axis gridlines
+var yTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+yTicks.forEach(function(v) {
+  var y = yScale(v);
+  var line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#B8B4A8" : "#E8E5DB");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  var label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// X-axis ticks
+for (var yr = 2000; yr <= 2022; yr += 2) {
+  var x = xScale(yr);
+  var tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 5);
+  tick.setAttribute("stroke", "#B8B4A8");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  if (yr % 4 === 0) {
+    var label = document.createElementNS(ns, "text");
+    label.setAttribute("x", x);
+    label.setAttribute("y", yScale(0) + 18);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-family", "'JetBrains Mono', monospace");
+    label.setAttribute("font-size", "9");
+    label.setAttribute("fill", "#7A786F");
+    label.textContent = yr;
+    svg.appendChild(label);
+  }
+}
+
+// Vertical hover line
+var tip = document.getElementById("tip");
+var hoverLine = document.createElementNS(ns, "line");
+hoverLine.setAttribute("x1", 0);
+hoverLine.setAttribute("x2", 0);
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", yScale(0));
+hoverLine.setAttribute("stroke", "#B8B4A8");
+hoverLine.setAttribute("stroke-width", 0.5);
+hoverLine.setAttribute("stroke-dasharray", "3,3");
+hoverLine.style.opacity = "0";
+svg.appendChild(hoverLine);
+
+// World line: dashed for distinction
+var worldSeries = series.find(function(s) { return s.code === "WD"; });
+if (worldSeries) {
+  var wPts = worldSeries.data;
+  var wPath = document.createElementNS(ns, "path");
+  var wD = "";
+  wPts.forEach(function(p, i) {
+    wD += (i === 0 ? "M" : "L") + xScale(p.y) + "," + yScale(p.v) + " ";
+  });
+  wPath.setAttribute("d", wD);
+  wPath.setAttribute("fill", "none");
+  wPath.setAttribute("stroke", palette.WD);
+  wPath.setAttribute("stroke-width", 1.5);
+  wPath.setAttribute("stroke-dasharray", "4,3");
+  wPath.setAttribute("stroke-linejoin", "round");
+  wPath.setAttribute("stroke-linecap", "round");
+  wPath.setAttribute("opacity", "0.7");
+  wPath.dataset.code = "WD";
+  svg.appendChild(wPath);
+}
+
+// Draw lines for each country (except World)
+var paths = [];
+series.forEach(function(s) {
+  if (s.code === "WD") return;
+  var color = palette[s.code];
+  var pts = s.data;
+
+  if (pts.length > 1) {
+    var path = document.createElementNS(ns, "path");
+    var d = "";
+    pts.forEach(function(p, i) {
+      d += (i === 0 ? "M" : "L") + xScale(p.y) + "," + yScale(p.v) + " ";
+    });
+    path.setAttribute("d", d);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", 2);
+    path.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("opacity", "0.85");
+    path.dataset.code = s.code;
+    svg.appendChild(path);
+    paths.push({ el: path, code: s.code });
+  }
+});
+
+// End labels with collision avoidance
+var labelData = series.map(function(s) {
+  var last = s.data[s.data.length - 1];
+  return { code: s.code, name: s.name, baseY: yScale(last.v), lastVal: last.v };
+});
+labelData.sort(function(a, b) { return a.baseY - b.baseY; });
+
+var minGap = 11;
+var prevY = -Infinity;
+labelData.forEach(function(item) {
+  var targetY = item.baseY;
+  if (targetY - prevY < minGap) {
+    targetY = prevY + minGap;
+  }
+  item.adjustedY = targetY;
+  prevY = targetY;
+});
+
+var endLabels = [];
+labelData.forEach(function(item) {
+  var last = series.find(function(s) { return s.code === item.code; }).data.slice(-1)[0];
+  var lx = xScale(last.y) + 8;
+  var color = palette[item.code];
+
+  var endLabel = document.createElementNS(ns, "text");
+  endLabel.setAttribute("x", lx);
+  endLabel.setAttribute("y", item.adjustedY + 3);
+  endLabel.setAttribute("font-size", "9");
+  endLabel.setAttribute("font-weight", "500");
+  endLabel.setAttribute("fill", color);
+  endLabel.textContent = item.name + " " + item.lastVal.toFixed(1) + "%";
+  if (item.code === "WD") {
+    endLabel.setAttribute("font-style", "italic");
+  }
+  endLabel.dataset.code = item.code;
+  svg.appendChild(endLabel);
+  endLabels.push(endLabel);
+});
+
+// Start dots
+series.forEach(function(s) {
+  var first = s.data[0];
+  var color = palette[s.code];
+  var dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(first.y));
+  dot.setAttribute("cy", yScale(first.v));
+  dot.setAttribute("r", 2.5);
+  dot.setAttribute("fill", color);
+  dot.setAttribute("opacity", "0.7");
+  svg.appendChild(dot);
+});
+
+// End dots
+series.forEach(function(s) {
+  var last = s.data[s.data.length - 1];
+  var color = palette[s.code];
+  var dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(last.y));
+  dot.setAttribute("cy", yScale(last.v));
+  dot.setAttribute("r", 3);
+  dot.setAttribute("fill", color);
+  svg.appendChild(dot);
+});
+
+// Invisible hit area for hover
+var hitRect = document.createElementNS(ns, "rect");
+hitRect.setAttribute("x", pad.left);
+hitRect.setAttribute("y", pad.top);
+hitRect.setAttribute("width", chartW);
+hitRect.setAttribute("height", chartH);
+hitRect.setAttribute("fill", "transparent");
+svg.appendChild(hitRect);
+
+hitRect.addEventListener("mousemove", function(e) {
+  var rect = svg.getBoundingClientRect();
+  var svgScale = W / rect.width;
+  var mx = (e.clientX - rect.left) * svgScale;
+  var hoveredYear = Math.round(minYear + ((mx - pad.left) / chartW) * (maxYear - minYear));
+  hoveredYear = Math.max(minYear, Math.min(maxYear, hoveredYear));
+
+  var hx = xScale(hoveredYear);
+  hoverLine.setAttribute("x1", hx);
+  hoverLine.setAttribute("x2", hx);
+  hoverLine.style.opacity = "1";
+
+  var lines = [];
+  series.forEach(function(s) {
+    var pt = s.data.find(function(d) { return d.y === hoveredYear; });
+    if (pt) {
+      lines.push('<span style="color:' + palette[s.code] + '">' + s.name + '</span>: ' + pt.v.toFixed(1) + '%');
+    }
+  });
+
+  tip.innerHTML = '<strong>' + hoveredYear + '</strong><br>' + lines.join('<br>');
+  tip.style.opacity = "1";
+
+  var tipX = e.clientX + 14;
+  var tipY = e.clientY - 10;
+  if (tipX + 180 > window.innerWidth) tipX = e.clientX - 190;
+  tip.style.left = tipX + "px";
+  tip.style.top = tipY + "px";
+
+  // Highlight hovered year: brighten all lines
+  paths.forEach(function(p) { p.el.setAttribute("opacity", "0.85"); });
+});
+
+hitRect.addEventListener("mouseleave", function() {
+  hoverLine.style.opacity = "0";
+  tip.style.opacity = "0";
+  paths.forEach(function(p) { p.el.setAttribute("opacity", "0.85"); });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

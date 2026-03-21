@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Air We Breathe Kills</h1>
+<p class="subtitle">Deaths attributed to household and ambient air pollution by country, 2019 (WHO estimates). India alone accounts for more deaths than all other countries in this chart combined. Totals aggregate both household and ambient sources where both are reported.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- AIR_41 (Air Pollution Attributable Deaths)</p>
+<script>
+const data = [
+  { code: "IND", name: "India", value: 321087 },
+  { code: "IDN", name: "Indonesia", value: 81932 },
+  { code: "RUS", name: "Russia", value: 36364 },
+  { code: "IRN", name: "Iran", value: 33910 },
+  { code: "PHL", name: "Philippines", value: 29863 },
+  { code: "ITA", name: "Italy", value: 17954 },
+  { code: "TUR", name: "Turkey", value: 13544 },
+  { code: "NGA", name: "Nigeria", value: 11265 },
+  { code: "GBR", name: "United Kingdom", value: 9677 },
+  { code: "YEM", name: "Yemen", value: 8792 },
+  { code: "CIV", name: "Ivory Coast", value: 8505 },
+  { code: "MAR", name: "Morocco", value: 6897 },
+  { code: "TCD", name: "Chad", value: 6684 },
+  { code: "SOM", name: "Somalia", value: 5552 },
+  { code: "VEN", name: "Venezuela", value: 5185 },
+  { code: "COD", name: "DR Congo", value: 5171 },
+  { code: "USA", name: "United States", value: 5031 },
+  { code: "BEN", name: "Benin", value: 5006 },
+  { code: "BRA", name: "Brazil", value: 2722 },
+  { code: "ESP", name: "Spain", value: 2211 },
+  { code: "PAK", name: "Pakistan", value: 1859 },
+  { code: "KAZ", name: "Kazakhstan", value: 1355 },
+  { code: "FRA", name: "France", value: 1157 },
+  { code: "NER", name: "Niger", value: 1096 },
+  { code: "ISR", name: "Israel", value: 1064 }
+];
+
+const W = 740;
+const barH = 22;
+const gap = 3;
+const pad = { left: 140, right: 80, top: 10, bottom: 10 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const chartW = W - pad.left - pad.right;
+
+const maxVal = data[0].value;
+
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines
+const ticks = [0, 50000, 100000, 150000, 200000, 250000, 300000];
+ticks.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#B5B2A8" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  if (v > 0) {
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", x);
+    label.setAttribute("y", pad.top - 4);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-family", "'JetBrains Mono', monospace");
+    label.setAttribute("font-size", "8");
+    label.setAttribute("fill", "#9D9B93");
+    label.textContent = (v / 1000) + "k";
+    svg.appendChild(label);
+  }
+});
+
+const tip = document.getElementById("tip");
+
+function fmt(n) {
+  return n.toLocaleString("en-US");
+}
+
+// Color scale: gradient from muted to deep
+const colorHigh = [180, 60, 50];  // deep rust
+const colorLow = [180, 130, 110]; // muted tan
+
+function barColor(value) {
+  const t = Math.pow(value / maxVal, 0.4);
+  const r = Math.round(colorLow[0] + (colorHigh[0] - colorLow[0]) * t);
+  const g = Math.round(colorLow[1] + (colorHigh[1] - colorLow[1]) * t);
+  const b = Math.round(colorLow[2] + (colorHigh[2] - colorLow[2]) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barWidth = Math.max(xScale(d.value) - pad.left, 2);
+  const color = barColor(d.value);
+
+  // Bar
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y + 2);
+  rect.setAttribute("width", barWidth);
+  rect.setAttribute("height", barH - 4);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  // Country name label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "10.5");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  // Value label
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", xScale(d.value) + 6);
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "8.5");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = fmt(Math.round(d.value));
+
+  // Hit area for hover
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    rect.setAttribute("opacity", "0.75");
+    const total = data.reduce((s, c) => s + c.value, 0);
+    const pct = ((d.value / total) * 100).toFixed(1);
+    tip.innerHTML = `<strong>${d.name}</strong> (${d.code})&nbsp;&nbsp;${fmt(Math.round(d.value))} deaths&nbsp;&nbsp;${pct}% of chart total`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const bounding = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - bounding.left + 14) + "px";
+    tip.style.top = (e.clientY - bounding.top - 24) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Sanitation Access: Two Decades of Progress (and Stagnation)</h1>
+  <p class="subtitle">People using at least basic sanitation services (% of population), 2000 vs 2022. Lines connect each country across 22 years.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank / WHO-UNICEF Joint Monitoring Programme (JMP) | Indicator: SH.STA.BASS.ZS</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const data = [
+      {country: "Cambodia", y2000: 10.4, y2022: 77.1, change: 66.6, group: "dramatic"},
+      {country: "India", y2000: 14.7, y2022: 77.8, change: 63.2, group: "dramatic"},
+      {country: "Indonesia", y2000: 41.6, y2022: 85.6, change: 44.1, group: "dramatic"},
+      {country: "Bangladesh", y2000: 23.7, y2022: 63.7, change: 40.0, group: "large"},
+      {country: "China", y2000: 56.8, y2022: 95.9, change: 39.1, group: "large"},
+      {country: "Bolivia", y2000: 34.9, y2022: 69.1, change: 34.2, group: "large"},
+      {country: "Afghanistan", y2000: 22.3, y2022: 51.7, change: 29.4, group: "large"},
+      {country: "Ghana", y2000: 5.7, y2022: 29.0, change: 23.3, group: "moderate"},
+      {country: "Colombia", y2000: 75.4, y2022: 94.8, change: 19.4, group: "moderate"},
+      {country: "Brazil", y2000: 73.4, y2022: 91.0, change: 17.7, group: "moderate"},
+      {country: "Kenya", y2000: 23.6, y2022: 39.5, change: 15.8, group: "moderate"},
+      {country: "Haiti", y2000: 19.4, y2022: 28.9, change: 9.5, group: "stagnant"},
+      {country: "Ethiopia", y2000: 3.0, y2022: 9.7, change: 6.7, group: "stagnant"},
+      {country: "Egypt", y2000: 92.0, y2022: 96.6, change: 4.7, group: "high"},
+      {country: "Chad", y2000: 9.7, y2022: 12.9, change: 3.2, group: "stagnant"},
+      {country: "Germany", y2000: 99.2, y2022: 99.2, change: 0.0, group: "high"},
+      {country: "Japan", y2000: 100.0, y2022: 99.9, change: -0.1, group: "high"},
+      {country: "DR Congo", y2000: 23.7, y2022: 16.2, change: -7.6, group: "declined"}
+    ];
+
+    const colorMap = {
+      "dramatic": "#0e7c42",
+      "large": "#3ba272",
+      "moderate": "#6bb99a",
+      "high": "#7a8fa6",
+      "stagnant": "#d97706",
+      "declined": "#dc2626"
+    };
+
+    const legendLabels = {
+      "dramatic": "Dramatic gain (40+ pp)",
+      "large": "Large gain (25-40 pp)",
+      "moderate": "Moderate gain (10-25 pp)",
+      "high": "High baseline (near universal)",
+      "stagnant": "Stagnant (<10 pp gain)",
+      "declined": "Declined"
+    };
+
+    const long = data.flatMap(d => [
+      {country: d.country, year: 2000, value: d.y2000, group: d.group},
+      {country: d.country, year: 2022, value: d.y2022, group: d.group}
+    ]);
+
+    const chart = Plot.plot({
+      width: 900,
+      height: 700,
+      marginLeft: 110,
+      marginRight: 110,
+      marginTop: 30,
+      marginBottom: 50,
+      x: {
+        type: "point",
+        domain: [2000, 2022],
+        label: null,
+        tickFormat: d => String(d),
+        padding: 0.15
+      },
+      y: {
+        domain: [0, 105],
+        label: "% of population with basic sanitation",
+        grid: true,
+        ticks: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+      },
+      color: {
+        domain: ["dramatic", "large", "moderate", "high", "stagnant", "declined"],
+        range: ["#0e7c42", "#3ba272", "#6bb99a", "#7a8fa6", "#d97706", "#dc2626"],
+        legend: true,
+        tickFormat: d => legendLabels[d]
+      },
+      marks: [
+        Plot.ruleY([0], {stroke: "#e2e8f0"}),
+        Plot.line(long, {
+          x: "year",
+          y: "value",
+          z: "country",
+          stroke: "group",
+          strokeWidth: 2,
+          strokeOpacity: 0.7
+        }),
+        Plot.dot(long, {
+          x: "year",
+          y: "value",
+          z: "country",
+          fill: "group",
+          r: 4,
+          stroke: "#fff",
+          strokeWidth: 1
+        }),
+        Plot.text(long.filter(d => d.year === 2000), {
+          x: "year",
+          y: "value",
+          text: d => `${d.country} ${d.value.toFixed(0)}%`,
+          textAnchor: "end",
+          dx: -10,
+          fontSize: 10,
+          fill: d => colorMap[d.group]
+        }),
+        Plot.text(long.filter(d => d.year === 2022), {
+          x: "year",
+          y: "value",
+          text: d => `${d.value.toFixed(0)}% ${d.country}`,
+          textAnchor: "start",
+          dx: 10,
+          fontSize: 10,
+          fill: d => colorMap[d.group]
+        })
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

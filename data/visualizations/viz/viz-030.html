@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend { display: flex; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #7A786F; }
+  .legend-circle { width: 8px; height: 8px; border-radius: 50%; }
+  #tooltip {
+    position: fixed;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 10;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+</style>
+</head><body>
+<h1>Investing in Minds</h1>
+<p class="subtitle">Government education spending as a share of GDP varies widely. Nordic nations and a few developing countries lead, while some of the world's largest economies spend comparatively little. Each dot shows the most recent available year per country.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-circle" style="background:#5A8C6F"></div>Above 5.5% of GDP</div>
+  <div class="legend-item"><div class="legend-circle" style="background:#C6923A"></div>3.5% - 5.5%</div>
+  <div class="legend-item"><div class="legend-circle" style="background:#C46B5A"></div>Below 3.5%</div>
+</div>
+<svg id="chart"></svg>
+<p class="source">Source: UNESCO Institute for Statistics (UIS) &middot; Most recent year available per country (2019-2024)</p>
+<div id="tooltip"></div>
+
+<script>
+const DATA = [
+  { name: "Cuba", year: 2022, value: 8.44 },
+  { name: "Botswana", year: 2020, value: 8.06 },
+  { name: "Sweden", year: 2022, value: 7.32 },
+  { name: "Iceland", year: 2022, value: 7.31 },
+  { name: "Finland", year: 2022, value: 6.38 },
+  { name: "Denmark", year: 2022, value: 6.36 },
+  { name: "South Africa", year: 2024, value: 6.02 },
+  { name: "Israel", year: 2022, value: 5.93 },
+  { name: "United Kingdom", year: 2021, value: 5.91 },
+  { name: "Brazil", year: 2022, value: 5.62 },
+  { name: "Norway", year: 2022, value: 5.43 },
+  { name: "United States", year: 2021, value: 5.42 },
+  { name: "France", year: 2022, value: 5.32 },
+  { name: "Germany", year: 2022, value: 5.24 },
+  { name: "Australia", year: 2022, value: 5.06 },
+  { name: "Canada", year: 2022, value: 4.84 },
+  { name: "India", year: 2022, value: 4.10 },
+  { name: "Mexico", year: 2022, value: 4.06 },
+  { name: "Kenya", year: 2024, value: 4.02 },
+  { name: "Japan", year: 2021, value: 3.34 },
+  { name: "Turkiye", year: 2022, value: 3.10 },
+  { name: "Thailand", year: 2023, value: 2.52 },
+  { name: "Bangladesh", year: 2024, value: 2.03 },
+  { name: "Myanmar", year: 2019, value: 2.00 },
+  { name: "Pakistan", year: 2023, value: 1.95 },
+  { name: "Sri Lanka", year: 2023, value: 1.83 }
+];
+
+const GLOBAL_AVG = 4.5;
+const N = DATA.length;
+
+const ROW_H = 26;
+const marginTop = 30;
+const marginRight = 40;
+const marginBottom = 30;
+const marginLeft = 120;
+const W = 780;
+const plotH = N * ROW_H;
+const H = marginTop + plotH + marginBottom;
+const plotW = W - marginLeft - marginRight;
+
+const VAL_MAX = 10;
+
+function xScale(v) {
+  return marginLeft + (v / VAL_MAX) * plotW;
+}
+
+function yCenter(i) {
+  return marginTop + i * ROW_H + ROW_H / 2;
+}
+
+function dotColor(v) {
+  if (v >= 5.5) return "#5A8C6F";
+  if (v >= 3.5) return "#C6923A";
+  return "#C46B5A";
+}
+
+const svg = document.getElementById("chart");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.style.display = "block";
+svg.style.maxWidth = "100%";
+svg.style.overflow = "visible";
+
+function el(tag, attrs, parent) {
+  var e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (var k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// Background
+el("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }, svg);
+
+// X-axis gridlines and tick labels
+var xTicks = [0, 2, 4, 6, 8, 10];
+for (var ti = 0; ti < xTicks.length; ti++) {
+  var t = xTicks[ti];
+  var x = xScale(t);
+  el("line", {
+    x1: x, y1: marginTop,
+    x2: x, y2: marginTop + plotH,
+    stroke: t === 0 ? "#C5C3B8" : "#E8E6DD",
+    "stroke-width": t === 0 ? 1 : 0.7
+  }, svg);
+  var label = el("text", {
+    x: x, y: marginTop + plotH + 16,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": 9,
+    fill: "#7A786F"
+  }, svg);
+  label.textContent = t + "%";
+}
+
+// Global average reference line
+var avgX = xScale(GLOBAL_AVG);
+el("line", {
+  x1: avgX, y1: marginTop - 6,
+  x2: avgX, y2: marginTop + plotH,
+  stroke: "#9E9D89",
+  "stroke-width": 1.5,
+  "stroke-dasharray": "5 3"
+}, svg);
+var avgLabel = el("text", {
+  x: avgX, y: marginTop - 10,
+  "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace",
+  "font-size": 8.5,
+  fill: "#7A786F"
+}, svg);
+avgLabel.textContent = "Global avg ~4.5%";
+
+// Rows
+var dotElements = [];
+for (var i = 0; i < N; i++) {
+  var d = DATA[i];
+  var cy = yCenter(i);
+
+  // Alternating row background
+  if (i % 2 === 0) {
+    el("rect", {
+      x: marginLeft, y: cy - ROW_H / 2,
+      width: plotW, height: ROW_H,
+      fill: "#EEEDEA", opacity: 0.5
+    }, svg);
+  }
+
+  // Country label
+  var nameLabel = el("text", {
+    x: marginLeft - 10, y: cy + 4,
+    "text-anchor": "end",
+    "font-family": "Inter, sans-serif",
+    "font-size": 11,
+    "font-weight": 500,
+    fill: "#2B2A27"
+  }, svg);
+  nameLabel.textContent = d.name;
+
+  // Connecting line from axis to dot
+  el("line", {
+    x1: marginLeft, y1: cy,
+    x2: xScale(d.value), y2: cy,
+    stroke: dotColor(d.value),
+    "stroke-width": 1.5,
+    opacity: 0.25
+  }, svg);
+
+  // Dot
+  var dot = el("circle", {
+    cx: xScale(d.value), cy: cy,
+    r: 6,
+    fill: dotColor(d.value),
+    stroke: "#F6F5EE",
+    "stroke-width": 1.5,
+    cursor: "pointer"
+  }, svg);
+
+  // Value label next to dot
+  var valLabel = el("text", {
+    x: xScale(d.value) + 11, y: cy + 3.5,
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": 9,
+    fill: "#7A786F"
+  }, svg);
+  valLabel.textContent = d.value.toFixed(1) + "%";
+
+  dotElements.push({ dot: dot, data: d, cy: cy, valLabel: valLabel });
+}
+
+// Tooltip interaction
+var tooltip = document.getElementById("tooltip");
+
+for (var j = 0; j < dotElements.length; j++) {
+  (function(item) {
+    item.dot.addEventListener("mouseenter", function(e) {
+      item.dot.setAttribute("r", 8);
+      item.dot.setAttribute("stroke-width", 2);
+
+      var diff = item.data.value - GLOBAL_AVG;
+      var diffSign = diff >= 0 ? "+" : "";
+      var diffStr = diffSign + diff.toFixed(1) + "pp";
+
+      tooltip.innerHTML =
+        "<div style='font-weight:600;margin-bottom:3px'>" + item.data.name + "</div>" +
+        "<div>" + item.data.value.toFixed(2) + "% of GDP (" + item.data.year + ")</div>" +
+        "<div style='color:" + (diff >= 0 ? "#8BC49A" : "#E8917F") + "'>" + diffStr + " vs global avg</div>";
+      tooltip.style.opacity = "1";
+    });
+
+    item.dot.addEventListener("mousemove", function(e) {
+      var tx = e.clientX + 16;
+      var ty = e.clientY - 30;
+      if (tx + 200 > window.innerWidth) {
+        tx = e.clientX - 200;
+      }
+      tooltip.style.left = tx + "px";
+      tooltip.style.top = ty + "px";
+    });
+
+    item.dot.addEventListener("mouseleave", function() {
+      item.dot.setAttribute("r", 6);
+      item.dot.setAttribute("stroke-width", 1.5);
+      tooltip.style.opacity = "0";
+    });
+  })(dotElements[j]);
+}
+
+// Also add hover zones per row for easier interaction
+for (var k = 0; k < dotElements.length; k++) {
+  (function(item, idx) {
+    var hoverRect = el("rect", {
+      x: marginLeft, y: item.cy - ROW_H / 2,
+      width: plotW, height: ROW_H,
+      fill: "transparent",
+      cursor: "pointer"
+    }, svg);
+
+    hoverRect.addEventListener("mouseenter", function() {
+      item.dot.setAttribute("r", 8);
+      item.dot.setAttribute("stroke-width", 2);
+    });
+
+    hoverRect.addEventListener("mousemove", function(e) {
+      var diff = item.data.value - GLOBAL_AVG;
+      var diffSign = diff >= 0 ? "+" : "";
+      var diffStr = diffSign + diff.toFixed(1) + "pp";
+
+      tooltip.innerHTML =
+        "<div style='font-weight:600;margin-bottom:3px'>" + item.data.name + "</div>" +
+        "<div>" + item.data.value.toFixed(2) + "% of GDP (" + item.data.year + ")</div>" +
+        "<div style='color:" + (diff >= 0 ? "#8BC49A" : "#E8917F") + "'>" + diffStr + " vs global avg</div>";
+      tooltip.style.opacity = "1";
+
+      var tx = e.clientX + 16;
+      var ty = e.clientY - 30;
+      if (tx + 200 > window.innerWidth) {
+        tx = e.clientX - 200;
+      }
+      tooltip.style.left = tx + "px";
+      tooltip.style.top = ty + "px";
+    });
+
+    hoverRect.addEventListener("mouseleave", function() {
+      item.dot.setAttribute("r", 6);
+      item.dot.setAttribute("stroke-width", 1.5);
+      tooltip.style.opacity = "0";
+    });
+  })(dotElements[k], k);
+}
+</script>
+</body></html>

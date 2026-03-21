@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Living on Credit - Household Debt as % of GDP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F6F5EE;
+    color: #2B2A27;
+    font-family: 'Inter', sans-serif;
+    padding: 40px 48px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: #2B2A27;
+    margin-bottom: 6px;
+  }
+  p.subtitle {
+    font-size: 11px;
+    color: #7A786F;
+    max-width: 600px;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  p.source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7A786F;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 16px;
+  }
+  .chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+  }
+  svg text {
+    font-family: 'Inter', sans-serif;
+  }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    line-height: 1.6;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+    white-space: nowrap;
+  }
+  .tooltip.visible { opacity: 1; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-bottom: 20px;
+    max-width: 900px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #7A786F;
+    cursor: pointer;
+    user-select: none;
+  }
+  .legend-swatch {
+    width: 12px;
+    height: 3px;
+    border-radius: 1px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Living on Credit</h1>
+<p class="subtitle">Household debt as a percentage of GDP, 2000 to 2024. Switzerland and Australia carry consistently high household leverage, while Spain and Ireland show dramatic spikes and subsequent deleveraging after the 2008 financial crisis.</p>
+
+<div class="legend" id="legend"></div>
+
+<div class="chart-container" id="chartContainer">
+  <svg id="chart"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<p class="source">Source: IMF Global Debt Database -- imf.org/external/datamapper/HH_LS</p>
+
+<script>
+(function() {
+  var DATA = {
+    "Switzerland": {"code":"CHE","values":[{"y":2000,"v":100.80},{"y":2001,"v":99.36},{"y":2002,"v":102.88},{"y":2003,"v":107.52},{"y":2004,"v":107.91},{"y":2005,"v":109.16},{"y":2006,"v":107.20},{"y":2007,"v":103.65},{"y":2008,"v":101.37},{"y":2009,"v":107.04},{"y":2010,"v":107.66},{"y":2011,"v":110.24},{"y":2012,"v":113.08},{"y":2013,"v":116.53},{"y":2014,"v":119.56},{"y":2015,"v":122.34},{"y":2016,"v":123.83},{"y":2017,"v":126.38},{"y":2018,"v":125.42},{"y":2019,"v":127.03},{"y":2020,"v":134.96},{"y":2021,"v":130.30},{"y":2022,"v":126.24},{"y":2023,"v":126.04},{"y":2024,"v":125.43}]},
+    "Australia": {"code":"AUS","values":[{"y":2000,"v":70.18},{"y":2001,"v":73.88},{"y":2002,"v":81.39},{"y":2003,"v":90.62},{"y":2004,"v":96.79},{"y":2005,"v":101.33},{"y":2006,"v":106.11},{"y":2007,"v":109.17},{"y":2008,"v":107.25},{"y":2009,"v":112.20},{"y":2010,"v":111.11},{"y":2011,"v":109.01},{"y":2012,"v":109.89},{"y":2013,"v":112.19},{"y":2014,"v":115.87},{"y":2015,"v":120.98},{"y":2016,"v":123.76},{"y":2017,"v":123.03},{"y":2018,"v":122.26},{"y":2019,"v":118.98},{"y":2020,"v":122.34},{"y":2021,"v":117.69},{"y":2022,"v":110.70},{"y":2023,"v":109.82},{"y":2024,"v":112.15}]},
+    "Canada": {"code":"CAN","values":[{"y":2000,"v":61.34},{"y":2001,"v":62.77},{"y":2002,"v":64.94},{"y":2003,"v":66.82},{"y":2004,"v":69.61},{"y":2005,"v":72.26},{"y":2006,"v":75.90},{"y":2007,"v":80.73},{"y":2008,"v":83.47},{"y":2009,"v":94.91},{"y":2010,"v":94.86},{"y":2011,"v":93.99},{"y":2012,"v":95.26},{"y":2013,"v":95.40},{"y":2014,"v":95.14},{"y":2015,"v":100.71},{"y":2016,"v":104.18},{"y":2017,"v":103.60},{"y":2018,"v":103.04},{"y":2019,"v":103.52},{"y":2020,"v":112.13},{"y":2021,"v":105.55},{"y":2022,"v":100.19},{"y":2023,"v":100.60},{"y":2024,"v":100.07}]},
+    "South Korea": {"code":"KOR","values":[{"y":2000,"v":47.55},{"y":2001,"v":52.64},{"y":2002,"v":61.72},{"y":2003,"v":60.57},{"y":2004,"v":58.11},{"y":2005,"v":61.13},{"y":2006,"v":65.00},{"y":2007,"v":66.46},{"y":2008,"v":68.12},{"y":2009,"v":70.14},{"y":2010,"v":70.15},{"y":2011,"v":73.30},{"y":2012,"v":73.98},{"y":2013,"v":74.91},{"y":2014,"v":76.39},{"y":2015,"v":79.16},{"y":2016,"v":82.94},{"y":2017,"v":84.82},{"y":2018,"v":86.81},{"y":2019,"v":89.57},{"y":2020,"v":97.08},{"y":2021,"v":98.67},{"y":2022,"v":97.29},{"y":2023,"v":93.55},{"y":2024,"v":90.14}]},
+    "Netherlands": {"code":"NLD","values":[{"y":2000,"v":93.71},{"y":2001,"v":94.96},{"y":2002,"v":99.76},{"y":2003,"v":106.86},{"y":2004,"v":110.66},{"y":2005,"v":114.06},{"y":2006,"v":115.60},{"y":2007,"v":115.86},{"y":2008,"v":116.67},{"y":2009,"v":124.91},{"y":2010,"v":125.94},{"y":2011,"v":125.09},{"y":2012,"v":125.54},{"y":2013,"v":122.75},{"y":2014,"v":120.64},{"y":2015,"v":119.06},{"y":2016,"v":117.95},{"y":2017,"v":115.75},{"y":2018,"v":112.93},{"y":2019,"v":109.49},{"y":2020,"v":114.58},{"y":2021,"v":108.99},{"y":2022,"v":101.49},{"y":2023,"v":95.50},{"y":2024,"v":93.60}]},
+    "United States": {"code":"USA","values":[{"y":2000,"v":70.71},{"y":2001,"v":74.58},{"y":2002,"v":79.31},{"y":2003,"v":85.10},{"y":2004,"v":89.06},{"y":2005,"v":92.44},{"y":2006,"v":96.61},{"y":2007,"v":98.40},{"y":2008,"v":95.89},{"y":2009,"v":96.72},{"y":2010,"v":91.50},{"y":2011,"v":87.58},{"y":2012,"v":83.39},{"y":2013,"v":81.55},{"y":2014,"v":78.75},{"y":2015,"v":76.95},{"y":2016,"v":77.04},{"y":2017,"v":76.65},{"y":2018,"v":75.03},{"y":2019,"v":74.65},{"y":2020,"v":77.98},{"y":2021,"v":77.01},{"y":2022,"v":74.59},{"y":2023,"v":71.83},{"y":2024,"v":69.35}]},
+    "United Kingdom": {"code":"GBR","values":[{"y":2000,"v":65.27},{"y":2001,"v":69.21},{"y":2002,"v":75.02},{"y":2003,"v":79.82},{"y":2004,"v":85.38},{"y":2005,"v":87.43},{"y":2006,"v":91.59},{"y":2007,"v":94.75},{"y":2008,"v":95.29},{"y":2009,"v":98.07},{"y":2010,"v":94.95},{"y":2011,"v":92.34},{"y":2012,"v":90.87},{"y":2013,"v":89.70},{"y":2014,"v":88.29},{"y":2015,"v":88.13},{"y":2016,"v":88.12},{"y":2017,"v":87.20},{"y":2018,"v":86.86},{"y":2019,"v":85.70},{"y":2020,"v":92.91},{"y":2021,"v":87.80},{"y":2022,"v":82.46},{"y":2023,"v":78.31},{"y":2024,"v":76.18}]},
+    "Spain": {"code":"ESP","values":[{"y":2000,"v":45.64},{"y":2001,"v":47.32},{"y":2002,"v":51.21},{"y":2003,"v":56.71},{"y":2004,"v":63.49},{"y":2005,"v":70.88},{"y":2006,"v":78.22},{"y":2007,"v":81.95},{"y":2008,"v":82.77},{"y":2009,"v":84.99},{"y":2010,"v":84.31},{"y":2011,"v":82.45},{"y":2012,"v":81.41},{"y":2013,"v":77.61},{"y":2014,"v":73.14},{"y":2015,"v":67.61},{"y":2016,"v":64.10},{"y":2017,"v":60.85},{"y":2018,"v":58.61},{"y":2019,"v":56.52},{"y":2020,"v":62.14},{"y":2021,"v":57.18},{"y":2022,"v":51.46},{"y":2023,"v":46.10},{"y":2024,"v":43.70}]},
+    "Ireland": {"code":"IRL","values":[{"y":2002,"v":51.36},{"y":2003,"v":58.25},{"y":2004,"v":69.72},{"y":2005,"v":81.05},{"y":2006,"v":91.57},{"y":2007,"v":97.57},{"y":2008,"v":107.92},{"y":2009,"v":117.56},{"y":2010,"v":112.27},{"y":2011,"v":104.99},{"y":2012,"v":97.40},{"y":2013,"v":93.90},{"y":2014,"v":78.89},{"y":2015,"v":58.09},{"y":2016,"v":54.52},{"y":2017,"v":54.51},{"y":2018,"v":48.16},{"y":2019,"v":41.38},{"y":2020,"v":34.30},{"y":2021,"v":29.86},{"y":2022,"v":27.48},{"y":2023,"v":28.93},{"y":2024,"v":29.63}]},
+    "India": {"code":"IND","values":[{"y":2007,"v":40.76},{"y":2008,"v":40.97},{"y":2009,"v":35.32},{"y":2010,"v":35.17},{"y":2011,"v":34.49},{"y":2012,"v":33.62},{"y":2013,"v":32.94},{"y":2014,"v":32.70},{"y":2015,"v":32.40},{"y":2016,"v":32.04},{"y":2017,"v":33.25},{"y":2018,"v":34.14},{"y":2019,"v":35.95},{"y":2020,"v":40.12},{"y":2021,"v":37.57},{"y":2022,"v":38.90},{"y":2023,"v":39.94},{"y":2024,"v":40.77}]},
+    "Mexico": {"code":"MEX","values":[{"y":2000,"v":7.33},{"y":2001,"v":7.58},{"y":2002,"v":8.30},{"y":2003,"v":8.90},{"y":2004,"v":9.54},{"y":2005,"v":10.48},{"y":2006,"v":11.35},{"y":2007,"v":12.91},{"y":2008,"v":12.65},{"y":2009,"v":12.87},{"y":2010,"v":12.67},{"y":2011,"v":13.01},{"y":2012,"v":13.32},{"y":2013,"v":13.99},{"y":2014,"v":14.07},{"y":2015,"v":14.69},{"y":2016,"v":15.46},{"y":2017,"v":15.59},{"y":2018,"v":15.61},{"y":2019,"v":15.60},{"y":2020,"v":16.73},{"y":2021,"v":16.00},{"y":2022,"v":15.98},{"y":2023,"v":16.23},{"y":2024,"v":16.71}]}
+  };
+
+  var COLORS = {
+    "Switzerland":    "#B5564E",
+    "Australia":      "#D4913A",
+    "Canada":         "#C2785C",
+    "South Korea":    "#7B8C5D",
+    "Netherlands":    "#5E8B8A",
+    "United States":  "#4A6FA5",
+    "United Kingdom": "#8B6CAE",
+    "Spain":          "#C47A9B",
+    "Ireland":        "#6B9E78",
+    "India":          "#A89060",
+    "Mexico":         "#9B7653"
+  };
+
+  var margin = { top: 20, right: 100, bottom: 36, left: 48 };
+  var containerWidth = Math.min(900, window.innerWidth - 96);
+  var width = containerWidth - margin.left - margin.right;
+  var height = 420 - margin.top - margin.bottom;
+  var yearMin = 2000;
+  var yearMax = 2024;
+  var valueMin = 0;
+  var valueMax = 140;
+
+  var svg = document.getElementById("chart");
+  svg.setAttribute("width", containerWidth);
+  svg.setAttribute("height", 420);
+  svg.setAttribute("viewBox", "0 0 " + containerWidth + " 420");
+
+  function x(year) {
+    return margin.left + ((year - yearMin) / (yearMax - yearMin)) * width;
+  }
+  function y(val) {
+    return margin.top + (1 - (val - valueMin) / (valueMax - valueMin)) * height;
+  }
+
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    if (attrs) {
+      for (var k in attrs) el.setAttribute(k, attrs[k]);
+    }
+    return el;
+  }
+
+  // Grid lines
+  var yTicks = [0, 20, 40, 60, 80, 100, 120, 140];
+  yTicks.forEach(function(v) {
+    var yy = y(v);
+    svg.appendChild(svgEl("line", {
+      x1: margin.left, y1: yy, x2: margin.left + width, y2: yy,
+      stroke: "#DDD9CE", "stroke-width": 1
+    }));
+    svg.appendChild(svgEl("text", {
+      x: margin.left - 8, y: yy + 3,
+      "text-anchor": "end",
+      fill: "#7A786F",
+      "font-size": "9px",
+      "font-family": "'JetBrains Mono', monospace"
+    })).textContent = v + "%";
+  });
+
+  // X axis ticks
+  for (var yr = 2000; yr <= 2024; yr += 4) {
+    var xx = x(yr);
+    svg.appendChild(svgEl("line", {
+      x1: xx, y1: margin.top + height, x2: xx, y2: margin.top + height + 5,
+      stroke: "#7A786F", "stroke-width": 1
+    }));
+    svg.appendChild(svgEl("text", {
+      x: xx, y: margin.top + height + 20,
+      "text-anchor": "middle",
+      fill: "#7A786F",
+      "font-size": "9px",
+      "font-family": "'JetBrains Mono', monospace"
+    })).textContent = yr;
+  }
+
+  // 2008 crisis annotation line
+  var crisisX = x(2008);
+  svg.appendChild(svgEl("line", {
+    x1: crisisX, y1: margin.top, x2: crisisX, y2: margin.top + height,
+    stroke: "#2B2A27", "stroke-width": 1,
+    "stroke-dasharray": "4,3", opacity: 0.35
+  }));
+  var crisisLabel = svgEl("text", {
+    x: crisisX + 5, y: margin.top + 10,
+    fill: "#2B2A27",
+    "font-size": "8px",
+    "font-family": "'JetBrains Mono', monospace",
+    "letter-spacing": "0.3px",
+    opacity: 0.5
+  });
+  crisisLabel.textContent = "2008 FINANCIAL CRISIS";
+  svg.appendChild(crisisLabel);
+
+  // Draw lines for each country
+  var countryNames = Object.keys(DATA);
+  var lineElements = {};
+  var endLabels = {};
+
+  countryNames.forEach(function(name) {
+    var d = DATA[name];
+    var pts = d.values;
+    var pathStr = "";
+    pts.forEach(function(p, i) {
+      var cmd = i === 0 ? "M" : "L";
+      pathStr += cmd + x(p.y).toFixed(2) + "," + y(p.v).toFixed(2);
+    });
+    var path = svgEl("path", {
+      d: pathStr,
+      fill: "none",
+      stroke: COLORS[name],
+      "stroke-width": 1.8,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    });
+    svg.appendChild(path);
+    lineElements[name] = path;
+
+    // End label
+    var lastPt = pts[pts.length - 1];
+    var label = svgEl("text", {
+      x: x(lastPt.y) + 6,
+      y: y(lastPt.v) + 3,
+      fill: COLORS[name],
+      "font-size": "9px",
+      "font-weight": "500",
+      "font-family": "'Inter', sans-serif"
+    });
+    label.textContent = name === "United Kingdom" ? "UK" :
+                        name === "United States" ? "USA" :
+                        name === "South Korea" ? "S.Korea" :
+                        name === "Netherlands" ? "NL" : name;
+    svg.appendChild(label);
+    endLabels[name] = label;
+  });
+
+  // Build legend
+  var legendEl = document.getElementById("legend");
+  countryNames.forEach(function(name) {
+    var item = document.createElement("div");
+    item.className = "legend-item";
+    item.innerHTML = '<span class="legend-swatch" style="background:' + COLORS[name] + '"></span><span>' + name + '</span>';
+    legendEl.appendChild(item);
+  });
+
+  // Vertical hover line and tooltip
+  var hoverLine = svgEl("line", {
+    x1: 0, y1: margin.top, x2: 0, y2: margin.top + height,
+    stroke: "#2B2A27", "stroke-width": 1, opacity: 0,
+    "pointer-events": "none"
+  });
+  svg.appendChild(hoverLine);
+
+  // Hover dots
+  var hoverDots = {};
+  countryNames.forEach(function(name) {
+    var dot = svgEl("circle", {
+      r: 3, fill: COLORS[name], stroke: "#F6F5EE", "stroke-width": 1.5,
+      opacity: 0, "pointer-events": "none"
+    });
+    svg.appendChild(dot);
+    hoverDots[name] = dot;
+  });
+
+  // Invisible hover rect
+  var hoverRect = svgEl("rect", {
+    x: margin.left, y: margin.top,
+    width: width, height: height,
+    fill: "transparent", cursor: "crosshair"
+  });
+  svg.appendChild(hoverRect);
+
+  var tooltip = document.getElementById("tooltip");
+  var chartContainer = document.getElementById("chartContainer");
+
+  function getYearFromX(px) {
+    var fraction = (px - margin.left) / width;
+    var year = Math.round(yearMin + fraction * (yearMax - yearMin));
+    return Math.max(yearMin, Math.min(yearMax, year));
+  }
+
+  function findValue(points, year) {
+    for (var i = 0; i < points.length; i++) {
+      if (points[i].y === year) return points[i].v;
+    }
+    return null;
+  }
+
+  hoverRect.addEventListener("mousemove", function(e) {
+    var rect = svg.getBoundingClientRect();
+    var px = e.clientX - rect.left;
+    var year = getYearFromX(px);
+    var xPos = x(year);
+
+    hoverLine.setAttribute("x1", xPos);
+    hoverLine.setAttribute("x2", xPos);
+    hoverLine.setAttribute("opacity", 0.2);
+
+    var lines = [];
+    var entries = [];
+    countryNames.forEach(function(name) {
+      var val = findValue(DATA[name].values, year);
+      if (val !== null) {
+        entries.push({ name: name, val: val });
+        var dot = hoverDots[name];
+        dot.setAttribute("cx", xPos);
+        dot.setAttribute("cy", y(val));
+        dot.setAttribute("opacity", 1);
+      } else {
+        hoverDots[name].setAttribute("opacity", 0);
+      }
+    });
+
+    entries.sort(function(a, b) { return b.val - a.val; });
+    lines.push("<strong>" + year + "</strong>");
+    entries.forEach(function(e) {
+      var shortName = e.name === "United Kingdom" ? "UK" :
+                      e.name === "United States" ? "USA" :
+                      e.name === "South Korea" ? "S.Korea" :
+                      e.name === "Netherlands" ? "NL" : e.name;
+      lines.push('<span style="color:' + COLORS[e.name] + ';">\u25CF</span> ' + shortName + ": " + e.val.toFixed(1) + "%");
+    });
+
+    tooltip.innerHTML = lines.join("<br>");
+    tooltip.classList.add("visible");
+
+    var containerRect = chartContainer.getBoundingClientRect();
+    var tipX = e.clientX - containerRect.left + 16;
+    var tipY = e.clientY - containerRect.top - 20;
+
+    // Flip to left if near right edge
+    if (tipX + 160 > containerRect.width) {
+      tipX = e.clientX - containerRect.left - 170;
+    }
+    if (tipY < 0) tipY = 10;
+
+    tooltip.style.left = tipX + "px";
+    tooltip.style.top = tipY + "px";
+  });
+
+  hoverRect.addEventListener("mouseleave", function() {
+    hoverLine.setAttribute("opacity", 0);
+    tooltip.classList.remove("visible");
+    countryNames.forEach(function(name) {
+      hoverDots[name].setAttribute("opacity", 0);
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "71a30859a908de0f11a89dfd4d74a574",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"the-price-of-a-year-of-life\">The Price of a Year of Life</h1>\n<span class=\"paragraph\">Health spending per capita vs life expectancy across 20 countries. Some achieve long lives cheaply. Others spend enormously for modest returns.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "d4b1756c5d5007701cedcde884cc9c55",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Current health expenditure per capita (current US$)** (World Bank)\n</code></pre></div>\n<span class=\"paragraph\">Current health expenditure per capita (current US$) from World Bank\nSource: <a href=\"https://data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD\" rel=\"noopener noreferrer\" target=\"_blank\">https://data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD</a></span>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Life expectancy at birth, total (years)** (World Bank)\n</code></pre></div>\n<span class=\"paragraph\">Life expectancy at birth, total (years) from World Bank\nSource: <a href=\"https://data.worldbank.org/indicator/SP.DYN.LE00.IN\" rel=\"noopener noreferrer\" target=\"_blank\">https://data.worldbank.org/indicator/SP.DYN.LE00.IN</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "df1c40ef1e1903d67f405d6fc4e4189e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='e8dedd0a-3190-9f6a-5b64-cddc76eb132a'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;ZH&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa Eastern and Southern&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:42.7649736223739},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;ZI&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa Western and Central&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:18.1469163027153},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;1A&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Arab World&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:111.859374944682},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;S3&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Caribbean small states&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:290.570618755862},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;B8&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Central Europe and the Baltics&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:221.752169441733},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;V2&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Early-demographic dividend&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:63.4025062509756},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;Z4&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:239.832676205172},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;4E&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific (excluding high income)&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:38.3870416172518},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;T4&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific (IDA &amp; IBRD countries)&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:38.3962606653257},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;XC&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Euro area&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:1730.79127830952}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "d656bcf27d1bdccda52cef1710c1729e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='PKri-0' random-id='fc0cab19-3968-cc1a-4cf2-5d93a61be218'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;ZH&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa Eastern and Southern&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:44.169658253166},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;ZI&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa Western and Central&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:37.779636388716},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;1A&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Arab World&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:44.7940556740454},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;S3&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Caribbean small states&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:60.296075668361},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;B8&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Central Europe and the Baltics&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:67.9434733023062},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;V2&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Early-demographic dividend&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:46.9134137524997},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;Z4&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:41.7077571998044},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;4E&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific (excluding high income)&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:37.8466800040122},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;T4&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific (IDA &amp; IBRD countries)&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:37.6087627658498},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;XC&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Euro area&#92;&quot;,&#92;&quot;year&#92;&quot;:1960,&#92;&quot;value&#92;&quot;:69.2643837390806}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "98cfbc2ad8c7fccdb5cb414d372498f4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a multi-dataset view we merge the datasets on country and year, keeping only rows where all indicators have values.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "08eafd0e13ffe517b981834136698c5d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='e1110bc1-0433-2fd3-9fd8-bed56ad59f33'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Cuba&#92;&quot;,&#92;&quot;year&#92;&quot;:2020,&#92;&quot;x_value&#92;&quot;:1199.35327148,&#92;&quot;y_value&#92;&quot;:77.407},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa Eastern and Southern&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:88.48558529145,&#92;&quot;y_value&#92;&quot;:65.1461543479959},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Africa Western and Central&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:65.8868541984824,&#92;&quot;y_value&#92;&quot;:58.8557215483276},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Arab World&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:363.465124423147,&#92;&quot;y_value&#92;&quot;:72.4446783578531},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Caribbean small states&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:915.847407140298,&#92;&quot;y_value&#92;&quot;:73.1716450013098},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Central Europe and the Baltics&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:1626.96748530039,&#92;&quot;y_value&#92;&quot;:77.8966245256412},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;Early-demographic dividend&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:201.321276167908,&#92;&quot;y_value&#92;&quot;:71.7962449795855},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:881.290897960564,&#92;&quot;y_value&#92;&quot;:76.6594177267807},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific (excluding high income)&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:570.046154107498,&#92;&quot;y_value&#92;&quot;:75.8806830895266},{&#92;&quot;countryName&#92;&quot;:&#92;&quot;East Asia &amp; Pacific (IDA &amp; IBRD countries)&#92;&quot;,&#92;&quot;year&#92;&quot;:2023,&#92;&quot;x_value&#92;&quot;:570.065194520576,&#92;&quot;y_value&#92;&quot;:75.9085643603807}]&quot;' data-total-rows='138' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;x_value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;y_value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "f1591f914146d3c30b27a5732d264ae7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='BYtC-0' random-id='e78dfb20-6f2c-766b-1359-f5fa2ff52524'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////YAQAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAARAMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAABwDAAAEAAAADQMAAHsiaW5kZXhfY29sdW1ucyI6IFt7ImtpbmQiOiAicmFuZ2UiLCAibmFtZSI6IG51bGwsICJzdGFydCI6IDAsICJzdG9wIjogMTM4LCAic3RlcCI6IDF9XSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInhfdmFsdWUiLCAiZmllbGRfbmFtZSI6ICJ4X3ZhbHVlIiwgInBhbmRhc190eXBlIjogImZsb2F0NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInlfdmFsdWUiLCAiZmllbGRfbmFtZSI6ICJ5X3ZhbHVlIiwgInBhbmRhc190eXBlIjogImZsb2F0NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfV0sICJjcmVhdG9yIjogeyJsaWJyYXJ5IjogInB5YXJyb3ciLCAidmVyc2lvbiI6ICIyMS4wLjAifSwgInBhbmRhc192ZXJzaW9uIjogIjIuMi4zIn0AAAAGAAAAcGFuZGFzAAAEAAAAuAAAAGwAAAA0AAAABAAAAGj///8AAAEDEAAAABgAAAAEAAAAAAAAAAcAAAB5X3ZhbHVlANL///8AAAIAlP///wAAAQMQAAAAIAAAAAQAAAAAAAAABwAAAHhfdmFsdWUAAAAGAAgABgAGAAAAAAACAMj///8AAAECEAAAACAAAAAEAAAAAAAAAAQAAAB5ZWFyAAAAAAgADAAIAAcACAAAAAAAAAFAAAAAEAAUAAgABgAHAAwAAAAQABAAAAAAAAEFEAAAACAAAAAEAAAAAAAAAAsAAABjb3VudHJ5TmFtZQAEAAQABAAAAAAAAAD/////KAEAABQAAAAAAAAADAAWAAYABQAIAAwADAAAAAADBAAYAAAAABcAAAAAAAAAAAoAGAAMAAQACAAKAAAArAAAABAAAACKAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAIAAAAAAAAwAgAAAAAAAN4HAAAAAAAAEAoAAAAAAAAAAAAAAAAAABAKAAAAAAAAUAQAAAAAAABgDgAAAAAAAAAAAAAAAAAAYA4AAAAAAABQBAAAAAAAALASAAAAAAAAAAAAAAAAAACwEgAAAAAAAFAEAAAAAAAAAAAAAAQAAACKAAAAAAAAAAAAAAAAAAAAigAAAAAAAAAAAAAAAAAAAIoAAAAAAAAAAAAAAAAAAACKAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAfAAAAOQAAAEMAAABZAAAAdwAAAJEAAACkAAAAzwAAAPkAAAACAQAAFwEAAEQBAABwAQAAfgEAAKYBAADMAQAA1wEAAOABAADwAQAA+QEAAAECAAAKAgAAIwIAADwCAABtAgAAoQIAAM0CAADgAgAA6gIAAP0CAAAuAwAAdwMAALUDAADCAwAAzwMAANsDAADtAwAACAQAACEEAAA5BAAARQQAAE8EAABmBAAAeAQAAKIEAADLBAAA3gQAAOMEAADuBAAA9QQAAPwEAAADBQAACQUAABwFAAAlBQAALAUAADUFAAA8BQAARgUAAFIFAABZBQAAYwUAAGsFAAByBQAAeQUAAH8FAACEBQAAigUAAJEFAACnBQAArwUAALUFAADGBQAAzgUAANoFAADhBQAA6wUAAPMFAAD7BQAAAQYAABkGAAAdBgAAIgYAACcGAAAvBgAANgYAAEYGAABRBgAAWwYAAGgGAABvBgAAdQYAAHwGAACDBgAAiwYAAJMGAAClBgAArAYAALwGAADHBgAA2AYAAN8GAADmBgAA7gYAAPYGAAD6BgAAAQcAAAcHAAAMBwAAFwcAAB4HAAAlBwAAKgcAADAHAAA3BwAAQAcAAEYHAABTBwAAWQcAAF4HAABmBwAAbQcAAHQHAAB5BwAAggcAAJQHAACYBwAAnwcAAKUHAACqBwAAsQcAALYHAAC8BwAAxgcAAMsHAADTBwAA3gcAAAAAAABDdWJhQWZyaWNhIEVhc3Rlcm4gYW5kIFNvdXRoZXJuQWZyaWNhIFdlc3Rlcm4gYW5kIENlbnRyYWxBcmFiIFdvcmxkQ2FyaWJiZWFuIHNtYWxsIHN0YXRlc0NlbnRyYWwgRXVyb3BlIGFuZCB0aGUgQmFsdGljc0Vhcmx5LWRlbW9ncmFwaGljIGRpdmlkZW5kRWFzdCBBc2lhICYgUGFjaWZpY0Vhc3QgQXNpYSAmIFBhY2lmaWMgKGV4Y2x1ZGluZyBoaWdoIGluY29tZSlFYXN0IEFzaWEgJiBQYWNpZmljIChJREEgJiBJQlJEIGNvdW50cmllcylFdXJvIGFyZWFFdXJvcGUgJiBDZW50cmFsIEFzaWFFdXJvcGUgJiBDZW50cmFsIEFzaWEgKGV4Y2x1ZGluZyBoaWdoIGluY29tZSlFdXJvcGUgJiBDZW50cmFsIEFzaWEgKElEQSAmIElCUkQgY291bnRyaWVzKUV1cm9wZWFuIFVuaW9uRnJhZ2lsZSBhbmQgY29uZmxpY3QgYWZmZWN0ZWQgc2l0dWF0aW9uc0hlYXZpbHkgaW5kZWJ0ZWQgcG9vciBjb3VudHJpZXMgKEhJUEMpSGlnaCBpbmNvbWVJQlJEIG9ubHlJREEgJiBJQlJEIHRvdGFsSURBIGJsZW5kSURBIG9ubHlJREEgdG90YWxMYXRlLWRlbW9ncmFwaGljIGRpdmlkZW5kTGF0aW4gQW1lcmljYSAmIENhcmliYmVhbkxhdGluIEFtZXJpY2EgJiBDYXJpYmJlYW4gKGV4Y2x1ZGluZyBoaWdoIGluY29tZSlMYXRpbiBBbWVyaWNhICYgdGhlIENhcmliYmVhbiAoSURBICYgSUJSRCBjb3VudHJpZXMpTGVhc3QgZGV2ZWxvcGVkIGNvdW50cmllczogVU4gY2xhc3NpZmljYXRpb25Mb3cgJiBtaWRkbGUgaW5jb21lTG93IGluY29tZUxvd2VyIG1pZGRsZSBpbmNvbWVNaWRkbGUgRWFzdCwgTm9ydGggQWZyaWNhLCBBZmdoYW5pc3RhbiAmIFBha2lzdGFuTWlkZGxlIEVhc3QsIE5vcnRoIEFmcmljYSwgQWZnaGFuaXN0YW4gJiBQYWtpc3RhbiAoZXhjbHVkaW5nIGhpZ2ggaW5jb21lKU1pZGRsZSBFYXN0LCBOb3J0aCBBZnJpY2EsIEFmZ2hhbmlzdGFuICYgUGFraXN0YW4gKElEQSAmIElCUkQpTWlkZGxlIGluY29tZU5vcnRoIEFtZXJpY2FPRUNEIG1lbWJlcnNPdGhlciBzbWFsbCBzdGF0ZXNQYWNpZmljIGlzbGFuZCBzbWFsbCBzdGF0ZXNQb3N0LWRlbW9ncmFwaGljIGRpdmlkZW5kUHJlLWRlbW9ncmFwaGljIGRpdmlkZW5kU21hbGwgc3RhdGVzU291dGggQXNpYVNvdXRoIEFzaWEgKElEQSAmIElCUkQpU3ViLVNhaGFyYW4gQWZyaWNhU3ViLVNhaGFyYW4gQWZyaWNhIChleGNsdWRpbmcgaGlnaCBpbmNvbWUpU3ViLVNhaGFyYW4gQWZyaWNhIChJREEgJiBJQlJEIGNvdW50cmllcylVcHBlciBtaWRkbGUgaW5jb21lV29ybGRBZmdoYW5pc3RhbkFsYmFuaWFBbGdlcmlhQW5kb3JyYUFuZ29sYUFudGlndWEgYW5kIEJhcmJ1ZGFBcmdlbnRpbmFBcm1lbmlhQXVzdHJhbGlhQXVzdHJpYUF6ZXJiYWlqYW5CYWhhbWFzLCBUaGVCYWhyYWluQmFuZ2xhZGVzaEJhcmJhZG9zQmVsYXJ1c0JlbGdpdW1CZWxpemVCZW5pbkJodXRhbkJvbGl2aWFCb3NuaWEgYW5kIEhlcnplZ292aW5hQm90c3dhbmFCcmF6aWxCcnVuZWkgRGFydXNzYWxhbUJ1bGdhcmlhQnVya2luYSBGYXNvQnVydW5kaUNhYm8gVmVyZGVDYW1ib2RpYUNhbWVyb29uQ2FuYWRhQ2VudHJhbCBBZnJpY2FuIFJlcHVibGljQ2hhZENoaWxlQ2hpbmFDb2xvbWJpYUNvbW9yb3NDb25nbywgRGVt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&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;circle&quot;,&quot;size&quot;:80},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;x_value&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;y_value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;x_value&quot;,&quot;title&quot;:&quot;Health Expenditure per Capita (current US&#36;)&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;y_value&quot;,&quot;title&quot;:&quot;Life Expectancy at Birth&quot;,&quot;type&quot;:&quot;quantitative&quot;}},&quot;height&quot;:400,&quot;width&quot;:600,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "631679d4cb8a75a5cf41557f7da8828d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Cuba achieves 78.1 years of life expectancy spending just $1,199 per person -- rivaling countries that spend 5x more</li>\n<li>Germany and Australia spend $6,800-7,000 per person but trail Japan and Italy in life expectancy</li>\n<li>Bangladesh reaches 74.7 years on just $53 per person -- the highest efficiency in the dataset</li>\n<li>Ethiopia spends $35 per person, the least of any country shown, and has the shortest life expectancy at 67.3 years</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

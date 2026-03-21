@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; line-height: 1.5; max-width: 680px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Structural Transformation: From Farm to Office</h1>
+  <p class="subtitle">Employment in agriculture vs. services as a share of total employment, 2024. Each dot is a country. As economies develop, workers shift from farms to service jobs -- a pattern visible in the strong inverse relationship below.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank / ILO modeled estimates -- SL.AGR.EMPL.ZS and SL.SRV.EMPL.ZS, 2024</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const raw = [{"c":"AF","n":"Afghanistan","a":51.5,"s":29.5,"r":"South Asia","lb":1},{"c":"AL","n":"Albania","a":31.4,"s":46.8,"r":"Europe & Central Asia","lb":0},{"c":"DZ","n":"Algeria","a":9.7,"s":58.2,"r":"Middle East & North Africa","lb":0},{"c":"AO","n":"Angola","a":52.2,"s":40.7,"r":"Sub-Saharan Africa","lb":0},{"c":"AR","n":"Argentina","a":7.2,"s":71.6,"r":"Latin America & Caribbean","lb":0},{"c":"AM","n":"Armenia","a":27.5,"s":51.6,"r":"Europe & Central Asia","lb":0},{"c":"AU","n":"Australia","a":2.2,"s":78.4,"r":"East Asia & Pacific","lb":1},{"c":"AT","n":"Austria","a":2.8,"s":72.3,"r":"Europe & Central Asia","lb":0},{"c":"AZ","n":"Azerbaijan","a":34.7,"s":49.9,"r":"Europe & Central Asia","lb":0},{"c":"BS","n":"Bahamas, The","a":0.8,"s":84.4,"r":"Latin America & Caribbean","lb":0},{"c":"BH","n":"Bahrain","a":0.9,"s":64.1,"r":"Middle East & North Africa","lb":0},{"c":"BD","n":"Bangladesh","a":44.7,"s":37.4,"r":"South Asia","lb":1},{"c":"BB","n":"Barbados","a":1.3,"s":82.5,"r":"Latin America & Caribbean","lb":0},{"c":"BY","n":"Belarus","a":9.7,"s":59.2,"r":"Europe & Central Asia","lb":0},{"c":"BE","n":"Belgium","a":1,"s":79.5,"r":"Europe & Central Asia","lb":0},{"c":"BZ","n":"Belize","a":16.4,"s":68.2,"r":"Latin America & Caribbean","lb":0},{"c":"BJ","n":"Benin","a":41.1,"s":40.7,"r":"Sub-Saharan Africa","lb":0},{"c":"BT","n":"Bhutan","a":43.2,"s":41.3,"r":"South Asia","lb":0},{"c":"BO","n":"Bolivia","a":24.9,"s":55.1,"r":"Latin America & Caribbean","lb":0},{"c":"BA","n":"Bosnia and Herzegovina","a":17.1,"s":52.2,"r":"Europe & Central Asia","lb":0},{"c":"BW","n":"Botswana","a":18.1,"s":66.1,"r":"Sub-Saharan Africa","lb":0},{"c":"BR","n":"Brazil","a":7.7,"s":72,"r":"Latin America & Caribbean","lb":1},{"c":"BN","n":"Brunei Darussalam","a":1.2,"s":78.3,"r":"East Asia & Pacific","lb":0},{"c":"BG","n":"Bulgaria","a":4.8,"s":67,"r":"Europe & Central Asia","lb":0},{"c":"BF","n":"Burkina Faso","a":52.2,"s":31.2,"r":"Sub-Saharan Africa","lb":0},{"c":"BI","n":"Burundi","a":85.4,"s":11.5,"r":"Sub-Saharan Africa","lb":1},{"c":"CV","n":"Cabo Verde","a":9.6,"s":67.5,"r":"Sub-Saharan Africa","lb":0},{"c":"KH","n":"Cambodia","a":34.2,"s":37.4,"r":"East Asia & Pacific","lb":0},{"c":"CM","n":"Cameroon","a":42.4,"s":43,"r":"Sub-Saharan Africa","lb":0},{"c":"CA","n":"Canada","a":1.1,"s":79.9,"r":"North America","lb":0},{"c":"CF","n":"Central African Republic","a":66.1,"s":20.5,"r":"Sub-Saharan Africa","lb":1},{"c":"TD","n":"Chad","a":71.9,"s":19.6,"r":"Sub-Saharan Africa","lb":1},{"c":"JG","n":"Channel Islands","a":2.1,"s":85.1,"r":"Other","lb":0},{"c":"CL","n":"Chile","a":6.2,"s":72.1,"r":"Latin America & Caribbean","lb":0},{"c":"CN","n":"China","a":22.2,"s":46.2,"r":"East Asia & Pacific","lb":1},{"c":"CO","n":"Colombia","a":14.3,"s":65.7,"r":"Latin America & Caribbean","lb":0},{"c":"KM","n":"Comoros","a":34.1,"s":51.2,"r":"Sub-Saharan Africa","lb":0},{"c":"CD","n":"Congo, Dem. Rep.","a":58.9,"s":33.1,"r":"Sub-Saharan Africa","lb":0},{"c":"CG","n":"Congo, Rep.","a":36.8,"s":43.7,"r":"Sub-Saharan Africa","lb":0},{"c":"CR","n":"Costa Rica","a":11.8,"s":69.6,"r":"Latin America & Caribbean","lb":0},{"c":"CI","n":"Cote d'Ivoire","a":46.3,"s":39.7,"r":"Sub-Saharan Africa","lb":0},{"c":"HR","n":"Croatia","a":4.5,"s":68.9,"r":"Europe & Central Asia","lb":0},{"c":"CU","n":"Cuba","a":15.8,"s":67.2,"r":"Latin America & Caribbean","lb":0},{"c":"CY","n":"Cyprus","a":2.2,"s":81.5,"r":"Europe & Central Asia","lb":0},{"c":"CZ","n":"Czechia","a":2.8,"s":61.9,"r":"Europe & Central Asia","lb":0},{"c":"DK","n":"Denmark","a":1.7,"s":79.3,"r":"Europe & Central Asia","lb":0},{"c":"DJ","n":"Djibouti","a":1.2,"s":92.3,"r":"Sub-Saharan Africa","lb":1},{"c":"DO","n":"Dominican Republic","a":7.2,"s":73.7,"r":"Latin America & Caribbean","lb":0},{"c":"EC","n":"Ecuador","a":32.6,"s":50.8,"r":"Latin America & Caribbean","lb":0},{"c":"EG","n":"Egypt, Arab Rep.","a":18,"s":52.8,"r":"Middle East & North Africa","lb":0},{"c":"SV","n":"El Salvador","a":14.1,"s":62.7,"r":"Latin America & Caribbean","lb":0},{"c":"GQ","n":"Equatorial Guinea","a":55.1,"s":34.8,"r":"Sub-Saharan Africa","lb":0},{"c":"ER","n":"Eritrea","a":56,"s":31.3,"r":"Sub-Saharan Africa","lb":0},{"c":"EE","n":"Estonia","a":3.1,"s":70.5,"r":"Europe & Central Asia","lb":0},{"c":"SZ","n":"Eswatini","a":14.9,"s":59,"r":"Sub-Saharan Africa","lb":0},{"c":"ET","n":"Ethiopia","a":61,"s":32.6,"r":"Sub-Saharan Africa","lb":1},{"c":"FJ","n":"Fiji","a":36.1,"s":51.3,"r":"East Asia & Pacific","lb":0},{"c":"FI","n":"Finland","a":3.6,"s":75.5,"r":"Europe & Central Asia","lb":0},{"c":"FR","n":"France","a":2.4,"s":78.1,"r":"Europe & Central Asia","lb":0},{"c":"PF","n":"French Polynesia","a":2,"s":83.6,"r":"East Asia & Pacific","lb":0},{"c":"GA","n":"Gabon","a":29.1,"s":52.2,"r":"Sub-Saharan Africa","lb":0},{"c":"GM","n":"Gambia, The","a":28.3,"s":53,"r":"Sub-Saharan Africa","lb":0},{"c":"GE","n":"Georgia","a":34.8,"s":48.9,"r":"Europe & Central Asia","lb":0},{"c":"DE","n":"Germany","a":1.1,"s":72.6,"r":"Europe & Central Asia","lb":1},{"c":"GH","n":"Ghana","a":35.2,"s":46.9,"r":"Sub-Saharan Africa","lb":0},{"c":"GR","n":"Greece","a":11,"s":72.7,"r":"Europe & Central Asia","lb":0},{"c":"GU","n":"Guam","a":1.6,"s":79,"r":"Other","lb":0},{"c":"GT","n":"Guatemala","a":29.4,"s":48,"r":"Latin America & Caribbean","lb":0},{"c":"GN","n":"Guinea","a":48.2,"s":37.7,"r":"Sub-Saharan Africa","lb":0},{"c":"GW","n":"Guinea-Bissau","a":61.7,"s":28.6,"r":"Sub-Saharan Africa","lb":0},{"c":"GY","n":"Guyana","a":12.6,"s":57,"r":"Latin America & Caribbean","lb":0},{"c":"HT","n":"Haiti","a":46.7,"s":44.4,"r":"Latin America & Caribbean","lb":0},{"c":"HN","n":"Honduras","a":22.6,"s":55.6,"r":"Latin America & Caribbean","lb":0},{"c":"HK","n":"Hong Kong SAR, China","a":0.2,"s":85.7,"r":"East Asia & Pacific","lb":1},{"c":"HU","n":"Hungary","a":4.2,"s":64.9,"r":"Europe & Central Asia","lb":0},{"c":"IS","n":"Iceland","a":3.7,"s":77.9,"r":"Europe & Central Asia","lb":0},{"c":"IN","n":"India","a":42.4,"s":32.3,"r":"South Asia","lb":1},{"c":"ID","n":"Indonesia","a":28,"s":49.8,"r":"East Asia & Pacific","lb":1},{"c":"IR","n":"Iran, Islamic Rep.","a":13.8,"s":51.3,"r":"Middle East & North Africa","lb":0},{"c":"IQ","n":"Iraq","a":8.2,"s":65.1,"r":"Middle East & North Africa","lb":0},{"c":"IE","n":"Ireland","a":4,"s":77.6,"r":"Europe & Central Asia","lb":0},{"c":"IL","n":"Israel","a":0.8,"s":83.9,"r":"Middle East & North Africa","lb":1},{"c":"IT","n":"Italy","a":3.4,"s":69.9,"r":"Europe & Central Asia","lb":0},{"c":"JM","n":"Jamaica","a":14.2,"s":68.6,"r":"Latin America & Caribbean","lb":0},{"c":"JP","n":"Japan","a":2.9,"s":73.8,"r":"East Asia & Pacific","lb":1},{"c":"JO","n":"Jordan","a":3.2,"s":80.5,"r":"Middle East & North Africa","lb":0},{"c":"KZ","n":"Kazakhstan","a":11.6,"s":68.5,"r":"Europe & Central Asia","lb":0},{"c":"KE","n":"Kenya","a":46.5,"s":41.2,"r":"Sub-Saharan Africa","lb":0},{"c":"KP","n":"Korea, Dem. People's Rep.","a":54.3,"s":23.2,"r":"East Asia & Pacific","lb":1},{"c":"KR","n":"Korea, Rep.","a":5.2,"s":71.1,"r":"East Asia & Pacific","lb":1}];
+
+    const data = raw.map(d => ({
+      country: d.c,
+      name: d.n,
+      agriculture: d.a,
+      services: d.s,
+      region: d.r,
+      label: d.lb === 1
+    }));
+
+    const regionColors = {
+      "Sub-Saharan Africa": "#e07a3a",
+      "East Asia & Pacific": "#4c78a8",
+      "Europe & Central Asia": "#72b7b2",
+      "Latin America & Caribbean": "#eeca3b",
+      "Middle East & North Africa": "#b83f5f",
+      "North America": "#54a24b",
+      "South Asia": "#9d68c9",
+      "Other": "#999999"
+    };
+
+    const regionOrder = [
+      "Sub-Saharan Africa",
+      "South Asia",
+      "Middle East & North Africa",
+      "Latin America & Caribbean",
+      "East Asia & Pacific",
+      "Europe & Central Asia",
+      "North America",
+      "Other"
+    ];
+
+    const labeled = data.filter(d => d.label);
+
+    const chart = Plot.plot({
+      width: 740,
+      height: 540,
+      marginTop: 30,
+      marginRight: 20,
+      marginBottom: 50,
+      marginLeft: 55,
+      x: {
+        label: "Employment in agriculture (% of total)",
+        domain: [0, 90],
+        grid: true
+      },
+      y: {
+        label: "Employment in services (% of total)",
+        domain: [0, 100],
+        grid: true
+      },
+      color: {
+        domain: regionOrder,
+        range: regionOrder.map(r => regionColors[r]),
+        legend: true
+      },
+      marks: [
+        // Diagonal reference line showing where agr + srv = 100
+        // (i.e., no industry employment)
+        Plot.line([[0, 100], [100, 0]], {
+          stroke: "#e2e8f0",
+          strokeWidth: 1,
+          strokeDasharray: "6,4"
+        }),
+        Plot.text(["agr + srv = 100%\n(no industry)"], {
+          x: [38],
+          y: [66],
+          fontSize: 9,
+          fill: "#cbd5e1",
+          fontStyle: "italic",
+          rotate: -42
+        }),
+        // Scatter dots
+        Plot.dot(data, {
+          x: "agriculture",
+          y: "services",
+          fill: "region",
+          fillOpacity: 0.8,
+          stroke: "#fff",
+          strokeWidth: 0.5,
+          r: 5,
+          tip: true,
+          title: d => `${d.name}\nAgriculture: ${d.agriculture}%\nServices: ${d.services}%\n${d.region}`,
+          channels: { Region: "region" }
+        }),
+        // Labels for outliers
+        Plot.text(labeled, {
+          x: "agriculture",
+          y: "services",
+          text: d => {
+            const short = {
+              "Hong Kong SAR, China": "Hong Kong",
+              "Korea, Dem. People's Rep.": "N. Korea",
+              "Korea, Rep.": "S. Korea",
+              "Central African Republic": "C.A.R."
+            };
+            return short[d.name] || d.name;
+          },
+          fontSize: 9,
+          fontWeight: 500,
+          fill: "#334155",
+          dx: d => {
+            if (d.country === "BI") return 8;
+            if (d.country === "CF") return -8;
+            if (d.country === "TD") return 8;
+            if (d.country === "DJ") return 8;
+            if (d.country === "HK") return -8;
+            if (d.country === "IL") return -8;
+            if (d.country === "AU") return 8;
+            if (d.country === "DE") return 8;
+            if (d.country === "JP") return 8;
+            if (d.country === "KR") return 8;
+            if (d.country === "BR") return 8;
+            if (d.country === "CN") return 8;
+            if (d.country === "ID") return 8;
+            if (d.country === "IN") return 8;
+            if (d.country === "BD") return 8;
+            if (d.country === "AF") return 8;
+            if (d.country === "ET") return 8;
+            if (d.country === "KP") return -8;
+            return 8;
+          },
+          dy: d => {
+            if (d.country === "BI") return 0;
+            if (d.country === "CF") return -6;
+            if (d.country === "TD") return 0;
+            if (d.country === "DJ") return 0;
+            if (d.country === "HK") return 6;
+            if (d.country === "IL") return -6;
+            if (d.country === "AU") return -6;
+            if (d.country === "DE") return 6;
+            if (d.country === "JP") return -6;
+            if (d.country === "KR") return 6;
+            if (d.country === "BR") return -6;
+            if (d.country === "CN") return -6;
+            if (d.country === "ID") return -6;
+            if (d.country === "IN") return -6;
+            if (d.country === "BD") return 6;
+            if (d.country === "AF") return 6;
+            if (d.country === "ET") return -6;
+            if (d.country === "KP") return 6;
+            return -6;
+          },
+          textAnchor: d => {
+            if (d.country === "CF") return "end";
+            if (d.country === "HK") return "end";
+            if (d.country === "IL") return "end";
+            if (d.country === "KP") return "end";
+            return "start";
+          }
+        }),
+        Plot.ruleY([0]),
+        Plot.ruleX([0])
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

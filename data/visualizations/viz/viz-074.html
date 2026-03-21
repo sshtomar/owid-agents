@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 720px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>The Relative Poverty Gap</h1>
+<p class="subtitle">Proportion of people living below 50% of median income across 50 countries (most recent data, 2019-2024). This measure captures relative poverty -- how far the bottom of the income distribution falls from the middle. Latin American countries dominate the top of the list, while Nordic and Central Asian nations report the lowest rates.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG Indicators -- 10.2.1 / SI_POV_50MI (Proportion of people living below 50% of median income)</p>
+<script>
+const data = [
+  { name: "Honduras", value: 23.6, year: 2023 },
+  { name: "Panama", value: 22.0, year: 2023 },
+  { name: "Brazil", value: 21.9, year: 2023 },
+  { name: "Zambia", value: 21.9, year: 2022 },
+  { name: "Colombia", value: 21.4, year: 2023 },
+  { name: "Argentina", value: 20.1, year: 2023 },
+  { name: "Costa Rica", value: 19.9, year: 2024 },
+  { name: "Israel", value: 19.5, year: 2021 },
+  { name: "Guatemala", value: 19.1, year: 2023 },
+  { name: "Ecuador", value: 19.0, year: 2023 },
+  { name: "Cameroon", value: 18.9, year: 2021 },
+  { name: "United States", value: 18.7, year: 2023 },
+  { name: "N. Macedonia", value: 18.4, year: 2019 },
+  { name: "Uruguay", value: 17.8, year: 2023 },
+  { name: "Paraguay", value: 17.7, year: 2023 },
+  { name: "Romania", value: 17.6, year: 2022 },
+  { name: "Mozambique", value: 17.4, year: 2019 },
+  { name: "Peru", value: 17.2, year: 2023 },
+  { name: "Bolivia", value: 17.1, year: 2023 },
+  { name: "Jamaica", value: 17.1, year: 2021 },
+  { name: "Zimbabwe", value: 16.8, year: 2019 },
+  { name: "Turkiye", value: 16.6, year: 2022 },
+  { name: "Malaysia", value: 16.5, year: 2021 },
+  { name: "El Salvador", value: 16.2, year: 2023 },
+  { name: "Luxembourg", value: 16.1, year: 2022 },
+  { name: "Suriname", value: 16.1, year: 2022 },
+  { name: "Montenegro", value: 15.9, year: 2021 },
+  { name: "Mexico", value: 15.3, year: 2022 },
+  { name: "Central African Rep.", value: 15.3, year: 2021 },
+  { name: "DR Congo", value: 15.0, year: 2020 },
+  { name: "Dominican Republic", value: 14.9, year: 2023 },
+  { name: "Equatorial Guinea", value: 14.7, year: 2022 },
+  { name: "Palestine", value: 14.7, year: 2023 },
+  { name: "Italy", value: 14.6, year: 2022 },
+  { name: "Spain", value: 14.6, year: 2022 },
+  { name: "Uzbekistan", value: 14.4, year: 2023 },
+  { name: "Chad", value: 14.1, year: 2022 },
+  { name: "Georgia", value: 14.0, year: 2023 },
+  { name: "Serbia", value: 14.0, year: 2022 },
+  { name: "Chile", value: 13.8, year: 2022 },
+  { name: "Japan", value: 13.5, year: 2020 },
+  { name: "Uganda", value: 13.4, year: 2019 },
+  { name: "Vietnam", value: 13.4, year: 2022 },
+  { name: "Bulgaria", value: 13.3, year: 2022 },
+  { name: "Togo", value: 13.1, year: 2021 },
+  { name: "Russia", value: 13.0, year: 2021 },
+  { name: "Greece", value: 12.9, year: 2022 },
+  { name: "Vanuatu", value: 12.8, year: 2019 },
+  { name: "South Korea", value: 12.7, year: 2021 },
+  { name: "Gambia", value: 12.7, year: 2020 }
+];
+
+const W = 800;
+const rowH = 18;
+const gap = 3;
+const pad = { left: 150, right: 70, top: 40, bottom: 16 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const innerW = W - pad.left - pad.right;
+
+const maxVal = 26;
+const xScale = v => pad.left + (v / maxVal) * innerW;
+const yPos = i => pad.top + i * (rowH + gap) + rowH / 2;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Vertical grid lines
+[0, 5, 10, 15, 20, 25].forEach(function(v) {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 10);
+  line.setAttribute("y2", H - pad.bottom);
+  line.setAttribute("stroke", "#D6D4CB");
+  line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+  line.setAttribute("stroke-dasharray", v === 0 ? "none" : "3,3");
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 16);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// Color scale: interpolate from muted teal (low) to warm terracotta (high)
+function dotColor(val) {
+  var t = val / maxVal;
+  // teal (#5A9E8F) to terracotta (#C75D3A)
+  var r = Math.round(90 + t * (199 - 90));
+  var g = Math.round(158 + t * (93 - 158));
+  var b = Math.round(143 + t * (58 - 143));
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+const tip = document.getElementById("tip");
+
+data.forEach(function(d, i) {
+  var y = yPos(i);
+  var x = xScale(d.value);
+
+  // Lollipop stem
+  var stem = document.createElementNS(ns, "line");
+  stem.setAttribute("x1", xScale(0));
+  stem.setAttribute("x2", x);
+  stem.setAttribute("y1", y);
+  stem.setAttribute("y2", y);
+  stem.setAttribute("stroke", dotColor(d.value));
+  stem.setAttribute("stroke-width", "1.5");
+  stem.setAttribute("stroke-opacity", "0.35");
+  svg.appendChild(stem);
+
+  // Dot
+  var circle = document.createElementNS(ns, "circle");
+  circle.setAttribute("cx", x);
+  circle.setAttribute("cy", y);
+  circle.setAttribute("r", "4.5");
+  circle.setAttribute("fill", dotColor(d.value));
+
+  // Value label to the right of dot
+  var valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", x + 9);
+  valLabel.setAttribute("y", y + 3.5);
+  valLabel.setAttribute("font-size", "8.5");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1);
+  svg.appendChild(valLabel);
+
+  // Country label
+  var nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 10);
+  nameLabel.setAttribute("y", y + 3.5);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("font-size", "10");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Invisible hit area for hover
+  var hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y - rowH / 2);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", function(e) {
+    circle.setAttribute("r", "6");
+    circle.setAttribute("stroke", "#2B2A27");
+    circle.setAttribute("stroke-width", "1.5");
+    stem.setAttribute("stroke-opacity", "0.7");
+    stem.setAttribute("stroke-width", "2.5");
+    tip.innerHTML = "<strong>" + d.name + "</strong> (" + d.year + ")<br>" + d.value.toFixed(1) + "% below 50% of median income";
+    tip.style.opacity = "1";
+  });
+
+  hitArea.addEventListener("mousemove", function(e) {
+    var chartRect = document.getElementById("chart").getBoundingClientRect();
+    tip.style.left = (e.clientX - chartRect.left + 14) + "px";
+    tip.style.top = (e.clientY - chartRect.top - 10) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", function() {
+    circle.setAttribute("r", "4.5");
+    circle.removeAttribute("stroke");
+    circle.removeAttribute("stroke-width");
+    stem.setAttribute("stroke-opacity", "0.35");
+    stem.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(circle);
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

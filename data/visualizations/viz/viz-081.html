@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>A World Apart in Every Glass</h1>
+<p class="subtitle">Total alcohol per capita consumption among adults (15+), in litres of pure alcohol per year. Latest available data by country (2019-2022). Eastern Europe leads the world, while Muslim-majority nations report near-zero consumption. Wine and beer cultures in Western Europe cluster around 10-12 litres.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- SA_0000001688 (SDG 3.5.2)</p>
+<script>
+const data = [
+  { name: "Romania", value: 17.06, year: 2021, region: "east-europe" },
+  { name: "Georgia", value: 15.88, year: 2020, region: "east-europe" },
+  { name: "Latvia", value: 14.10, year: 2019, region: "east-europe" },
+  { name: "Czechia", value: 13.64, year: 2020, region: "east-europe" },
+  { name: "France", value: 11.20, year: 2022, region: "west-europe" },
+  { name: "Germany", value: 11.24, year: 2022, region: "west-europe" },
+  { name: "Ireland", value: 11.02, year: 2019, region: "west-europe" },
+  { name: "Russia", value: 10.51, year: 2022, region: "east-europe" },
+  { name: "United Kingdom", value: 10.74, year: 2019, region: "west-europe" },
+  { name: "Canada", value: 10.03, year: 2022, region: "americas" },
+  { name: "United States", value: 9.33, year: 2017, region: "americas" },
+  { name: "Argentina", value: 8.84, year: 2022, region: "americas" },
+  { name: "Thailand", value: 7.63, year: 2022, region: "asia" },
+  { name: "Japan", value: 6.31, year: 2022, region: "asia" },
+  { name: "India", value: 4.88, year: 2018, region: "asia" },
+  { name: "China", value: 5.84, year: 2018, region: "asia" },
+  { name: "Turkey", value: 2.07, year: 2019, region: "low" },
+  { name: "Indonesia", value: 0.11, year: 2012, region: "low" },
+  { name: "Iran", value: 0.07, year: 2019, region: "low" },
+  { name: "Pakistan", value: 0.09, year: 2022, region: "low" },
+  { name: "Kuwait", value: 0.07, year: 2022, region: "low" },
+  { name: "Afghanistan", value: 0.01, year: 2017, region: "low" }
+];
+
+data.sort((a, b) => b.value - a.value);
+
+const W = 720;
+const barH = 26;
+const gap = 4;
+const pad = { left: 130, right: 70, top: 30, bottom: 10 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = Math.ceil(data[0].value / 2) * 2;
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const regionColors = {
+  "east-europe": "#B5423A",
+  "west-europe": "#D4884A",
+  "americas": "#5B9B8A",
+  "asia": "#6B8EAD",
+  "low": "#A8A198"
+};
+
+const regionLabels = {
+  "east-europe": "Eastern Europe",
+  "west-europe": "Western Europe",
+  "americas": "Americas",
+  "asia": "Asia",
+  "low": "Low consumption"
+};
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines
+const tickStep = 4;
+for (let v = 0; v <= maxVal; v += tickStep) {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  var label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 10);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + " L";
+  svg.appendChild(label);
+}
+
+const tip = document.getElementById("tip");
+
+data.forEach(function(d, i) {
+  const y = pad.top + i * (barH + gap);
+  const barWidth = Math.max(xScale(d.value) - pad.left, 1);
+  const color = regionColors[d.region];
+
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y + 3);
+  rect.setAttribute("width", barWidth);
+  rect.setAttribute("height", barH - 6);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", Math.max(xScale(d.value) + 5, pad.left + barWidth + 5));
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1);
+
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", function(e) {
+    rect.setAttribute("opacity", "0.75");
+    tip.innerHTML = "<strong>" + d.name + "</strong>  " + d.value.toFixed(1) + " litres/year (" + d.year + ")  " + regionLabels[d.region];
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", function(e) {
+    var chartEl = document.getElementById("chart");
+    var r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 12) + "px";
+    tip.style.top = (e.clientY - r.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", function() {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Legend
+var legendDiv = document.createElement("div");
+legendDiv.style.cssText = "display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;";
+Object.keys(regionColors).forEach(function(key) {
+  var item = document.createElement("span");
+  item.style.cssText = "display:flex;align-items:center;gap:4px;font-size:10px;color:#7A786F;";
+  var dot = document.createElement("span");
+  dot.style.cssText = "width:8px;height:8px;border-radius:1px;background:" + regionColors[key] + ";display:inline-block;";
+  item.appendChild(dot);
+  item.appendChild(document.createTextNode(regionLabels[key]));
+  legendDiv.appendChild(item);
+});
+document.getElementById("chart").parentNode.insertBefore(legendDiv, document.querySelector(".source"));
+</script>
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Still Thirsty</h1>
+<p class="subtitle">Access to safely managed drinking water (% of population), 2000 vs 2024. Lines slope left for countries that went backward -- in red. Even now, many nations provide safe water to fewer than one in five people, and some are losing ground.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 6.1.1 -- SH_H2O_SAFE (Proportion of population using safely managed drinking water services)</p>
+<script>
+const data = [
+  { name: "DR Congo", y2000: 0.7, y2024: 0.5 },
+  { name: "Central African Rep.", y2000: 3.4, y2024: 6.2 },
+  { name: "Sierra Leone", y2000: 2.1, y2024: 10.9 },
+  { name: "Ethiopia", y2000: 5.4, y2024: 13.5 },
+  { name: "Togo", y2000: 23.1, y2024: 9.0 },
+  { name: "Uganda", y2000: 16.6, y2024: 9.8 },
+  { name: "Senegal", y2000: 7.3, y2024: 13.2 },
+  { name: "Nepal", y2000: 25.1, y2024: 14.4 },
+  { name: "Chad", y2000: 14.9, y2024: 17.6 },
+  { name: "Cambodia", y2000: 10.4, y2024: 20.4 },
+  { name: "Nigeria", y2000: 12.6, y2024: 29.9 },
+  { name: "Afghanistan", y2000: 21.9, y2024: 36.4 },
+  { name: "Mozambique", y2000: 30.7, y2024: 47.5 },
+  { name: "Pakistan", y2000: 41.4, y2024: 44.7 },
+  { name: "Guatemala", y2000: 61.6, y2024: 51.7 },
+  { name: "Morocco", y2000: 8.5, y2024: 58.4 },
+  { name: "Bangladesh", y2000: 42.1, y2024: 62.5 },
+  { name: "Tunisia", y2000: 87.9, y2024: 67.9 },
+  { name: "South Africa", y2000: 90.1, y2024: 75.6 },
+  { name: "El Salvador", y2000: 90.3, y2024: 75.7 },
+  { name: "India", y2000: 67.4, y2024: 83.0 },
+  { name: "Brazil", y2000: 82.3, y2024: 90.7 },
+  { name: "China", y2000: 91.7, y2024: 96.4 },
+  { name: "Japan", y2000: 97.9, y2024: 98.7 },
+  { name: "Germany", y2000: 99.8, y2024: 100.0 }
+];
+
+data.sort((a, b) => a.y2024 - b.y2024);
+
+const backwardThreshold = -1;
+data.forEach(d => {
+  d.diff = d.y2024 - d.y2000;
+  d.backward = d.diff < backwardThreshold;
+});
+
+const W = 740;
+const rowH = 26;
+const gap = 3;
+const pad = { left: 150, right: 60, top: 50, bottom: 30 };
+const colLeft = pad.left;
+const colRight = W - pad.right;
+const colWidth = colRight - colLeft;
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const xScale = v => colLeft + (v / 100) * colWidth;
+
+const colorBackward = "#D44B3F";
+const colorImproved = "#3A9E8F";
+const colorNeutral = "#8A8780";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Column headers
+const hdr2000 = document.createElementNS(ns, "text");
+hdr2000.setAttribute("x", colLeft);
+hdr2000.setAttribute("y", pad.top - 24);
+hdr2000.setAttribute("text-anchor", "start");
+hdr2000.setAttribute("font-family", "'JetBrains Mono', monospace");
+hdr2000.setAttribute("font-size", "10");
+hdr2000.setAttribute("fill", "#7A786F");
+hdr2000.setAttribute("font-weight", "500");
+hdr2000.textContent = "2000";
+svg.appendChild(hdr2000);
+
+const hdr2024 = document.createElementNS(ns, "text");
+hdr2024.setAttribute("x", colRight);
+hdr2024.setAttribute("y", pad.top - 24);
+hdr2024.setAttribute("text-anchor", "end");
+hdr2024.setAttribute("font-family", "'JetBrains Mono', monospace");
+hdr2024.setAttribute("font-size", "10");
+hdr2024.setAttribute("fill", "#7A786F");
+hdr2024.setAttribute("font-weight", "500");
+hdr2024.textContent = "2024";
+svg.appendChild(hdr2024);
+
+const hdrPct = document.createElementNS(ns, "text");
+hdrPct.setAttribute("x", (colLeft + colRight) / 2);
+hdrPct.setAttribute("y", pad.top - 24);
+hdrPct.setAttribute("text-anchor", "middle");
+hdrPct.setAttribute("font-size", "9");
+hdrPct.setAttribute("fill", "#ACA99E");
+hdrPct.textContent = "% of population with safely managed drinking water";
+svg.appendChild(hdrPct);
+
+// Grid lines at 0, 25, 50, 75, 100
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 8);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 || v === 100 ? 0.8 : 0.4);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 12);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "8");
+  label.setAttribute("fill", "#ACA99E");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap);
+  const cy = y + rowH / 2;
+  const color = d.backward ? colorBackward : (d.diff > 1 ? colorImproved : colorNeutral);
+
+  const x0 = xScale(d.y2000);
+  const x1 = xScale(d.y2024);
+
+  // Slope line
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x0);
+  line.setAttribute("y1", cy);
+  line.setAttribute("x2", x1);
+  line.setAttribute("y2", cy);
+  line.setAttribute("stroke", color);
+  line.setAttribute("stroke-width", 1.8);
+  line.setAttribute("stroke-opacity", d.backward ? 0.7 : 0.4);
+  svg.appendChild(line);
+
+  // Arrow head for backward countries
+  if (d.backward) {
+    const arrowSize = 4;
+    const ax = x1;
+    const arrow = document.createElementNS(ns, "polygon");
+    arrow.setAttribute("points",
+      `${ax},${cy} ${ax + arrowSize + 1},${cy - arrowSize} ${ax + arrowSize + 1},${cy + arrowSize}`
+    );
+    arrow.setAttribute("fill", color);
+    arrow.setAttribute("opacity", "0.7");
+    svg.appendChild(arrow);
+  }
+
+  // Dot for 2000
+  const dot0 = document.createElementNS(ns, "circle");
+  dot0.setAttribute("cx", x0);
+  dot0.setAttribute("cy", cy);
+  dot0.setAttribute("r", 3.5);
+  dot0.setAttribute("fill", "#F6F5EE");
+  dot0.setAttribute("stroke", color);
+  dot0.setAttribute("stroke-width", 1.5);
+  svg.appendChild(dot0);
+
+  // Dot for 2024
+  const dot1 = document.createElementNS(ns, "circle");
+  dot1.setAttribute("cx", x1);
+  dot1.setAttribute("cy", cy);
+  dot1.setAttribute("r", 3.5);
+  dot1.setAttribute("fill", color);
+  dot1.setAttribute("stroke", color);
+  dot1.setAttribute("stroke-width", 1.5);
+  svg.appendChild(dot1);
+
+  // Country label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", cy + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "10.5");
+  nameLabel.setAttribute("fill", d.backward ? colorBackward : "#2B2A27");
+  nameLabel.setAttribute("font-weight", d.backward ? "600" : "400");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Value label on the right (2024 value)
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", colRight + 8);
+  valLabel.setAttribute("y", cy + 1);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", d.backward ? colorBackward : "#7A786F");
+  valLabel.setAttribute("font-weight", d.backward ? "500" : "400");
+  valLabel.textContent = d.y2024.toFixed(1) + "%";
+  svg.appendChild(valLabel);
+
+  // Hit area for tooltip
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    dot0.setAttribute("r", 5);
+    dot1.setAttribute("r", 5);
+    line.setAttribute("stroke-width", 2.8);
+    line.setAttribute("stroke-opacity", 1);
+    const sign = d.diff >= 0 ? "+" : "";
+    const direction = d.backward ? "went backward" : "improved";
+    tip.innerHTML = `<strong>${d.name}</strong>&nbsp;&nbsp;${d.y2000.toFixed(1)}% &rarr; ${d.y2024.toFixed(1)}%&nbsp;&nbsp;(${sign}${d.diff.toFixed(1)} pp, ${direction})`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 14) + "px";
+    tip.style.top = (e.clientY - r.top - 24) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    dot0.setAttribute("r", 3.5);
+    dot1.setAttribute("r", 3.5);
+    line.setAttribute("stroke-width", 1.8);
+    line.setAttribute("stroke-opacity", d.backward ? 0.7 : 0.4);
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitArea);
+});
+
+// Legend
+const legY = pad.top + chartH + 16;
+
+function addLegendItem(x, color, label, filled) {
+  const c = document.createElementNS(ns, "circle");
+  c.setAttribute("cx", x);
+  c.setAttribute("cy", legY);
+  c.setAttribute("r", 4);
+  c.setAttribute("fill", filled ? color : "#F6F5EE");
+  c.setAttribute("stroke", color);
+  c.setAttribute("stroke-width", 1.5);
+  svg.appendChild(c);
+
+  const t = document.createElementNS(ns, "text");
+  t.setAttribute("x", x + 8);
+  t.setAttribute("y", legY + 1);
+  t.setAttribute("dominant-baseline", "middle");
+  t.setAttribute("font-size", "9");
+  t.setAttribute("fill", "#7A786F");
+  t.textContent = label;
+  svg.appendChild(t);
+}
+
+addLegendItem(colLeft, "#ACA99E", "2000 value (open dot)", false);
+addLegendItem(colLeft + 140, "#ACA99E", "2024 value (filled dot)", true);
+
+const legLine = document.createElementNS(ns, "line");
+legLine.setAttribute("x1", colLeft + 300);
+legLine.setAttribute("y1", legY);
+legLine.setAttribute("x2", colLeft + 320);
+legLine.setAttribute("y2", legY);
+legLine.setAttribute("stroke", colorBackward);
+legLine.setAttribute("stroke-width", 2);
+svg.appendChild(legLine);
+
+const legBackLabel = document.createElementNS(ns, "text");
+legBackLabel.setAttribute("x", colLeft + 326);
+legBackLabel.setAttribute("y", legY + 1);
+legBackLabel.setAttribute("dominant-baseline", "middle");
+legBackLabel.setAttribute("font-size", "9");
+legBackLabel.setAttribute("fill", colorBackward);
+legBackLabel.setAttribute("font-weight", "500");
+legBackLabel.textContent = "Went backward";
+svg.appendChild(legBackLabel);
+
+const legLine2 = document.createElementNS(ns, "line");
+legLine2.setAttribute("x1", colLeft + 420);
+legLine2.setAttribute("y1", legY);
+legLine2.setAttribute("x2", colLeft + 440);
+legLine2.setAttribute("y2", legY);
+legLine2.setAttribute("stroke", colorImproved);
+legLine2.setAttribute("stroke-width", 2);
+svg.appendChild(legLine2);
+
+const legImpLabel = document.createElementNS(ns, "text");
+legImpLabel.setAttribute("x", colLeft + 446);
+legImpLabel.setAttribute("y", legY + 1);
+legImpLabel.setAttribute("dominant-baseline", "middle");
+legImpLabel.setAttribute("font-size", "9");
+legImpLabel.setAttribute("fill", colorImproved);
+legImpLabel.setAttribute("font-weight", "500");
+legImpLabel.textContent = "Improved";
+svg.appendChild(legImpLabel);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

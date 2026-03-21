@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>When Health Costs Crush Households</h1>
+<p class="subtitle">Share of population spending more than 40% of discretionary income on out-of-pocket health care. Slope chart comparing each country's earliest available observation (2000-2005) with its most recent (2019-2024). Some nations dramatically reduced catastrophic spending while others saw sharp increases.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN Sustainable Development Goals -- SDG 3.8.2 / SH_OOP_XPD_EARNNET40</p>
+<script>
+const slopeData = [
+  { country: "Senegal", early: 95.12, earlyYear: 2001, late: 0.26, lateYear: 2021 },
+  { country: "Malawi", early: 63.94, earlyYear: 2004, late: 18.42, lateYear: 2019 },
+  { country: "Madagascar", early: 44.35, earlyYear: 2005, late: 1.10, lateYear: 2021 },
+  { country: "Cameroon", early: 46.03, earlyYear: 2001, late: 6.29, lateYear: 2022 },
+  { country: "India", early: 44.27, earlyYear: 2000, late: 15.61, lateYear: 2022 },
+  { country: "Indonesia", early: 58.77, earlyYear: 2000, late: 21.63, lateYear: 2023 },
+  { country: "Nepal", early: 47.54, earlyYear: 2003, late: 24.98, lateYear: 2022 },
+  { country: "Niger", early: 46.81, earlyYear: 2005, late: 15.28, lateYear: 2021 },
+  { country: "Bolivia", early: 27.78, earlyYear: 2000, late: 2.46, lateYear: 2021 },
+  { country: "Bosnia & Herz.", early: 17.40, earlyYear: 2001, late: 0.30, lateYear: 2022 },
+  { country: "Mongolia", early: 22.07, earlyYear: 2002, late: 3.39, lateYear: 2023 },
+  { country: "Benin", early: 55.70, earlyYear: 2003, late: 35.65, lateYear: 2021 },
+  { country: "Iran", early: 21.27, earlyYear: 2005, late: 51.69, lateYear: 2022 },
+  { country: "Bhutan", early: 6.71, earlyYear: 2003, late: 43.59, lateYear: 2022 },
+  { country: "Bangladesh", early: 19.14, earlyYear: 2000, late: 41.70, lateYear: 2022 },
+  { country: "Portugal", early: 3.21, earlyYear: 2000, late: 27.08, lateYear: 2022 },
+  { country: "Philippines", early: 33.47, earlyYear: 2000, late: 44.89, lateYear: 2023 },
+  { country: "Georgia", early: 16.13, earlyYear: 2000, late: 29.92, lateYear: 2024 },
+  { country: "Belarus", early: 0.06, earlyYear: 2002, late: 22.39, lateYear: 2020 },
+  { country: "Bulgaria", early: 0.41, earlyYear: 2001, late: 20.60, lateYear: 2023 },
+  { country: "Nigeria", early: 18.35, earlyYear: 2003, late: 33.66, lateYear: 2022 },
+  { country: "Ethiopia", early: 11.62, earlyYear: 2004, late: 24.18, lateYear: 2021 }
+];
+
+const W = 780;
+const rowH = 28;
+const gap = 3;
+const pad = { left: 120, right: 120, top: 60, bottom: 20 };
+
+// Sort by change magnitude (biggest decreases first, then biggest increases)
+slopeData.forEach(d => { d.change = d.late - d.early; });
+const decreased = slopeData.filter(d => d.change < 0).sort((a, b) => a.change - b.change);
+const increased = slopeData.filter(d => d.change >= 0).sort((a, b) => b.change - a.change);
+const sorted = [...decreased, ...increased];
+
+const chartH = sorted.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = Math.max(...sorted.map(d => Math.max(d.early, d.late)));
+const domainMax = Math.ceil(maxVal / 10) * 10;
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / domainMax) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Color palette
+const decreaseColor = "#3A9E8F";
+const increaseColor = "#D35F5F";
+const neutralText = "#7A786F";
+
+// Column headers
+function addText(x, y, text, opts) {
+  const t = document.createElementNS(ns, "text");
+  t.setAttribute("x", x);
+  t.setAttribute("y", y);
+  t.textContent = text;
+  t.style.fontSize = (opts.size || 10) + "px";
+  t.style.fontWeight = opts.weight || "400";
+  t.style.fill = opts.fill || "#2B2A27";
+  t.style.textAnchor = opts.anchor || "start";
+  if (opts.fontFamily) t.style.fontFamily = opts.fontFamily;
+  svg.appendChild(t);
+  return t;
+}
+
+addText(pad.left, pad.top - 32, "EARLIEST", { size: 9, weight: "600", fill: neutralText, fontFamily: "'JetBrains Mono', monospace" });
+addText(pad.left, pad.top - 20, "(2000-2005)", { size: 8, weight: "400", fill: neutralText, fontFamily: "'JetBrains Mono', monospace" });
+addText(pad.left + chartW, pad.top - 32, "LATEST", { size: 9, weight: "600", fill: neutralText, anchor: "end", fontFamily: "'JetBrains Mono', monospace" });
+addText(pad.left + chartW, pad.top - 20, "(2019-2024)", { size: 8, weight: "400", fill: neutralText, anchor: "end", fontFamily: "'JetBrains Mono', monospace" });
+
+// Vertical gridlines
+const ticks = [];
+for (let v = 0; v <= domainMax; v += 10) ticks.push(v);
+ticks.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 8);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#D8D6CD");
+  line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+  svg.appendChild(line);
+
+  addText(x, pad.top - 10, v + "%", { size: 8, fill: neutralText, anchor: "middle", fontFamily: "'JetBrains Mono', monospace" });
+});
+
+// Separator between decrease and increase groups
+const sepIdx = decreased.length;
+if (sepIdx > 0 && sepIdx < sorted.length) {
+  const sepY = pad.top + sepIdx * (rowH + gap) - gap / 2 - 1;
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", 10);
+  line.setAttribute("x2", W - 10);
+  line.setAttribute("y1", sepY);
+  line.setAttribute("y2", sepY);
+  line.setAttribute("stroke", "#C5C3BA");
+  line.setAttribute("stroke-width", "0.5");
+  line.setAttribute("stroke-dasharray", "3,3");
+  svg.appendChild(line);
+
+  // Labels for sections
+  addText(12, sepY - 6, "DECREASED", { size: 8, weight: "600", fill: decreaseColor, fontFamily: "'JetBrains Mono', monospace" });
+  addText(12, sepY + 12, "INCREASED", { size: 8, weight: "600", fill: increaseColor, fontFamily: "'JetBrains Mono', monospace" });
+}
+
+const tip = document.getElementById("tip");
+
+sorted.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap);
+  const midY = y + rowH / 2;
+  const x1 = xScale(d.early);
+  const x2 = xScale(d.late);
+  const color = d.change < 0 ? decreaseColor : increaseColor;
+
+  // Country label
+  addText(pad.left - 8, midY + 3.5, d.country, { size: 10, fill: "#2B2A27", anchor: "end", weight: "500" });
+
+  // Background row band
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", chartW);
+  rect.setAttribute("height", rowH);
+  rect.setAttribute("fill", i % 2 === 0 ? "rgba(0,0,0,0.02)" : "transparent");
+  rect.setAttribute("rx", "2");
+  svg.appendChild(rect);
+
+  // Connecting line (slope)
+  const slopeLine = document.createElementNS(ns, "line");
+  slopeLine.setAttribute("x1", x1);
+  slopeLine.setAttribute("x2", x2);
+  slopeLine.setAttribute("y1", midY);
+  slopeLine.setAttribute("y2", midY);
+  slopeLine.setAttribute("stroke", color);
+  slopeLine.setAttribute("stroke-width", "2");
+  slopeLine.setAttribute("stroke-opacity", "0.5");
+  svg.appendChild(slopeLine);
+
+  // Arrow at the end
+  const arrowSize = 5;
+  const arrowDir = x2 > x1 ? 1 : -1;
+  if (Math.abs(x2 - x1) > 10) {
+    const arrow = document.createElementNS(ns, "polygon");
+    const ax = x2;
+    const ay = midY;
+    arrow.setAttribute("points",
+      (ax) + "," + (ay) + " " +
+      (ax - arrowDir * arrowSize) + "," + (ay - arrowSize / 2) + " " +
+      (ax - arrowDir * arrowSize) + "," + (ay + arrowSize / 2)
+    );
+    arrow.setAttribute("fill", color);
+    arrow.setAttribute("fill-opacity", "0.7");
+    svg.appendChild(arrow);
+  }
+
+  // Early dot
+  const c1 = document.createElementNS(ns, "circle");
+  c1.setAttribute("cx", x1);
+  c1.setAttribute("cy", midY);
+  c1.setAttribute("r", "4");
+  c1.setAttribute("fill", color);
+  c1.setAttribute("fill-opacity", "0.8");
+  c1.setAttribute("stroke", "#F6F5EE");
+  c1.setAttribute("stroke-width", "1.5");
+  svg.appendChild(c1);
+
+  // Late dot
+  const c2 = document.createElementNS(ns, "circle");
+  c2.setAttribute("cx", x2);
+  c2.setAttribute("cy", midY);
+  c2.setAttribute("r", "4");
+  c2.setAttribute("fill", color);
+  c2.setAttribute("stroke", "#F6F5EE");
+  c2.setAttribute("stroke-width", "1.5");
+  svg.appendChild(c2);
+
+  // Value labels
+  addText(x1, midY - 8, d.early.toFixed(1) + "%", { size: 8, fill: neutralText, anchor: "middle", fontFamily: "'JetBrains Mono', monospace" });
+  addText(x2, midY - 8, d.late.toFixed(1) + "%", { size: 8, fill: color, anchor: "middle", weight: "500", fontFamily: "'JetBrains Mono', monospace" });
+
+  // Hover area
+  const hoverRect = document.createElementNS(ns, "rect");
+  hoverRect.setAttribute("x", 0);
+  hoverRect.setAttribute("y", y);
+  hoverRect.setAttribute("width", W);
+  hoverRect.setAttribute("height", rowH);
+  hoverRect.setAttribute("fill", "transparent");
+  hoverRect.style.cursor = "pointer";
+  svg.appendChild(hoverRect);
+
+  hoverRect.addEventListener("mouseenter", function(e) {
+    const sign = d.change > 0 ? "+" : "";
+    tip.innerHTML = "<strong>" + d.country + "</strong><br>" +
+      d.earlyYear + ": " + d.early.toFixed(1) + "% of population<br>" +
+      d.lateYear + ": " + d.late.toFixed(1) + "% of population<br>" +
+      "Change: " + sign + d.change.toFixed(1) + " pp";
+    tip.style.opacity = "1";
+
+    slopeLine.setAttribute("stroke-width", "3");
+    slopeLine.setAttribute("stroke-opacity", "0.9");
+    c1.setAttribute("r", "5.5");
+    c2.setAttribute("r", "5.5");
+  });
+
+  hoverRect.addEventListener("mousemove", function(e) {
+    const chartDiv = document.getElementById("chart");
+    const r = chartDiv.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 14) + "px";
+    tip.style.top = (e.clientY - r.top - 10) + "px";
+  });
+
+  hoverRect.addEventListener("mouseleave", function() {
+    tip.style.opacity = "0";
+    slopeLine.setAttribute("stroke-width", "2");
+    slopeLine.setAttribute("stroke-opacity", "0.5");
+    c1.setAttribute("r", "4");
+    c2.setAttribute("r", "4");
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

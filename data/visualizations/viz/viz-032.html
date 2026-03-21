@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Left Behind: Out-of-School Rates for Primary Education</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F6F5EE;
+    color: #2B2A27;
+    padding: 32px 40px 40px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    color: #2B2A27;
+  }
+  p.subtitle {
+    font-size: 11px;
+    color: #7A786F;
+    max-width: 600px;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  p.source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7A786F;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 20px;
+  }
+  .chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 840px;
+  }
+  svg text {
+    font-family: 'Inter', sans-serif;
+  }
+  svg .label-country {
+    font-size: 10px;
+    font-weight: 500;
+    fill: #2B2A27;
+  }
+  svg .label-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #7A786F;
+  }
+  svg .label-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    fill: #7A786F;
+    text-anchor: middle;
+  }
+  svg .axis-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    fill: #A8A69F;
+    text-anchor: end;
+  }
+  svg .grid-line {
+    stroke: #E2E0D8;
+    stroke-width: 0.5;
+    stroke-dasharray: 2,3;
+  }
+  svg .slope-line {
+    stroke-width: 1.6;
+    fill: none;
+    opacity: 0.7;
+    transition: opacity 0.15s ease, stroke-width 0.15s ease;
+  }
+  svg .slope-line.improved { stroke: #3A8F6A; }
+  svg .slope-line.worsened { stroke: #D06B5C; }
+  svg .dot {
+    stroke-width: 1.5;
+    transition: r 0.15s ease;
+    cursor: pointer;
+  }
+  svg .dot.early { fill: #F6F5EE; }
+  svg .dot.late.improved { fill: #3A8F6A; }
+  svg .dot.late.worsened { fill: #D06B5C; }
+  svg .dot.early.improved { stroke: #3A8F6A; }
+  svg .dot.early.worsened { stroke: #D06B5C; }
+  svg .country-group:hover .slope-line {
+    opacity: 1;
+    stroke-width: 2.4;
+  }
+  svg .country-group:hover .dot { r: 5; }
+  svg .country-group { cursor: pointer; }
+  .legend {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 18px;
+    align-items: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #7A786F;
+  }
+  .legend-swatch {
+    width: 16px;
+    height: 3px;
+    border-radius: 1px;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid;
+  }
+  #tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 10;
+    white-space: nowrap;
+  }
+  #tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>Left Behind: Are Children Getting Into School?</h1>
+<p class="subtitle">
+  Out-of-school rate for primary education, comparing each country's earliest
+  available data point to its most recent. Open dots mark the earliest year;
+  filled dots mark the latest. Green lines show progress; coral shows regression.
+</p>
+
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#3A8F6A;"></div>
+    <span>Improved</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-swatch" style="background:#D06B5C;"></div>
+    <span>Worsened</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#7A786F; background:transparent;"></div>
+    <span>Earliest year</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#7A786F; background:#7A786F;"></div>
+    <span>Latest year</span>
+  </div>
+</div>
+
+<div class="chart-container" id="chartContainer">
+  <svg id="chart"></svg>
+  <div id="tooltip"></div>
+</div>
+
+<p class="source">Source: UNESCO Institute for Statistics (UIS) &mdash; Out-of-School Rate, Primary (%) &mdash; data.uis.unesco.org</p>
+
+<script>
+(function() {
+  const data = [
+    { country: "Guinea",        early: 75.8, earlyYear: 1990, late: 14.7, lateYear: 2020, region: "Sub-Saharan Africa" },
+    { country: "Ethiopia",      early: 79.8, earlyYear: 1994, late: 22.5, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "Benin",         early: 63.7, earlyYear: 1990, late:  9.6, lateYear: 2022, region: "Sub-Saharan Africa" },
+    { country: "Mozambique",    early: 51.7, earlyYear: 1990, late:  1.0, lateYear: 2022, region: "Sub-Saharan Africa" },
+    { country: "Niger",         early: 77.3, earlyYear: 1990, late: 40.4, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "Burkina Faso",  early: 74.0, earlyYear: 1991, late: 34.3, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "Ghana",         early: 42.5, earlyYear: 1999, late:  4.8, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "Togo",          early: 38.3, earlyYear: 1990, late:  0.6, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "Rwanda",        early: 34.6, earlyYear: 1999, late:  1.0, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "Eritrea",       early: 59.9, earlyYear: 1992, late: 40.4, lateYear: 2022, region: "Sub-Saharan Africa" },
+    { country: "South Sudan",   early: 55.3, earlyYear: 2011, late: 64.7, lateYear: 2024, region: "Sub-Saharan Africa" },
+    { country: "India",         early: 23.4, earlyYear: 1990, late:  0.1, lateYear: 2024, region: "South Asia" },
+    { country: "Bangladesh",    early: 32.6, earlyYear: 1990, late:  5.9, lateYear: 2024, region: "South Asia" },
+    { country: "Nepal",         early: 36.5, earlyYear: 1999, late:  2.0, lateYear: 2024, region: "South Asia" },
+    { country: "Botswana",      early:  9.8, earlyYear: 1990, late:  0.5, lateYear: 2022, region: "Sub-Saharan Africa" }
+  ];
+
+  // Sort by early value descending so highest-rate countries are at top
+  data.sort((a, b) => b.early - a.early);
+
+  const margin = { top: 32, right: 75, bottom: 16, left: 115 };
+  const rowHeight = 36;
+  const width = 840;
+  const chartHeight = data.length * rowHeight;
+  const height = chartHeight + margin.top + margin.bottom;
+
+  const colLeft = margin.left;
+  const colRight = width - margin.right;
+
+  const svg = document.getElementById('chart');
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+  const maxVal = 85;
+
+  function x(val) {
+    return colLeft + (val / maxVal) * (colRight - colLeft);
+  }
+  function y(i) {
+    return margin.top + i * rowHeight + rowHeight / 2;
+  }
+
+  // Grid lines
+  const gridVals = [0, 20, 40, 60, 80];
+  gridVals.forEach(v => {
+    const gx = x(v);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', gx);
+    line.setAttribute('y1', margin.top - 8);
+    line.setAttribute('x2', gx);
+    line.setAttribute('y2', margin.top + chartHeight);
+    line.setAttribute('class', 'grid-line');
+    svg.appendChild(line);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', gx);
+    label.setAttribute('y', margin.top - 14);
+    label.setAttribute('class', 'label-year');
+    label.textContent = v + '%';
+    svg.appendChild(label);
+  });
+
+  const tooltip = document.getElementById('tooltip');
+  const container = document.getElementById('chartContainer');
+
+  data.forEach((d, i) => {
+    const improved = d.late <= d.early;
+    const cls = improved ? 'improved' : 'worsened';
+    const color = improved ? '#3A8F6A' : '#D06B5C';
+    const cy = y(i);
+    const x1 = x(d.early);
+    const x2 = x(d.late);
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'country-group');
+
+    // Invisible wider hit area for hover
+    const hitLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    hitLine.setAttribute('x1', Math.min(x1, x2) - 5);
+    hitLine.setAttribute('y1', cy);
+    hitLine.setAttribute('x2', Math.max(x1, x2) + 5);
+    hitLine.setAttribute('y2', cy);
+    hitLine.setAttribute('stroke', 'transparent');
+    hitLine.setAttribute('stroke-width', '24');
+    g.appendChild(hitLine);
+
+    // Country label
+    const countryLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    countryLabel.setAttribute('x', margin.left - 8);
+    countryLabel.setAttribute('y', cy + 4);
+    countryLabel.setAttribute('class', 'label-country');
+    countryLabel.setAttribute('text-anchor', 'end');
+    countryLabel.textContent = d.country;
+    g.appendChild(countryLabel);
+
+    // Slope line
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', cy);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', cy);
+    line.setAttribute('class', 'slope-line ' + cls);
+    g.appendChild(line);
+
+    // Early dot (open)
+    const earlyDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    earlyDot.setAttribute('cx', x1);
+    earlyDot.setAttribute('cy', cy);
+    earlyDot.setAttribute('r', 3.5);
+    earlyDot.setAttribute('class', 'dot early ' + cls);
+    g.appendChild(earlyDot);
+
+    // Late dot (filled)
+    const lateDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    lateDot.setAttribute('cx', x2);
+    lateDot.setAttribute('cy', cy);
+    lateDot.setAttribute('r', 3.5);
+    lateDot.setAttribute('class', 'dot late ' + cls);
+    g.appendChild(lateDot);
+
+    // Value labels at ends
+    const earlyVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const lateVal = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+
+    // Check if dots are too close together (would cause label overlap)
+    const tooClose = Math.abs(x1 - x2) < 50;
+
+    if (tooClose) {
+      // Stack labels: early above, late below
+      const leftX = Math.min(x1, x2);
+      const rightX = Math.max(x1, x2);
+      const midX = (leftX + rightX) / 2;
+      earlyVal.setAttribute('x', midX);
+      earlyVal.setAttribute('y', cy - 10);
+      earlyVal.setAttribute('text-anchor', 'middle');
+      lateVal.setAttribute('x', midX);
+      lateVal.setAttribute('y', cy + 16);
+      lateVal.setAttribute('text-anchor', 'middle');
+    } else {
+      // Position early value to the right of early dot if it is further right, else to left
+      if (x1 >= x2) {
+        earlyVal.setAttribute('x', x1 + 8);
+        earlyVal.setAttribute('text-anchor', 'start');
+      } else {
+        earlyVal.setAttribute('x', x1 - 8);
+        earlyVal.setAttribute('text-anchor', 'end');
+      }
+      earlyVal.setAttribute('y', cy + 3);
+
+      // Position late value
+      if (x2 <= x1) {
+        lateVal.setAttribute('x', x2 - 8);
+        lateVal.setAttribute('text-anchor', 'end');
+      } else {
+        lateVal.setAttribute('x', x2 + 8);
+        lateVal.setAttribute('text-anchor', 'start');
+      }
+      lateVal.setAttribute('y', cy + 3);
+    }
+
+    earlyVal.setAttribute('class', 'label-value');
+    earlyVal.textContent = d.early.toFixed(1) + '%';
+    g.appendChild(earlyVal);
+
+    lateVal.setAttribute('class', 'label-value');
+    lateVal.textContent = d.late.toFixed(1) + '%';
+    g.appendChild(lateVal);
+
+    // Hover events
+    g.addEventListener('mouseenter', function(e) {
+      const change = d.late - d.early;
+      const sign = change <= 0 ? '' : '+';
+      const direction = change <= 0 ? 'Improved' : 'Worsened';
+      const changeColor = change <= 0 ? '#6FCF97' : '#F2917C';
+      tooltip.innerHTML =
+        '<span style="color:#D4D3CB;font-family:Inter,sans-serif;font-weight:500;">' + d.country + '</span> <span style="color:#A8A69F;">(' + d.region + ')</span><br>' +
+        '<span style="color:#A8A69F;">' + d.earlyYear + ':</span> ' + d.early.toFixed(1) + '% out of school<br>' +
+        '<span style="color:#A8A69F;">' + d.lateYear + ':</span> ' + d.late.toFixed(1) + '% out of school<br>' +
+        '<span style="color:' + changeColor + ';">' + sign + change.toFixed(1) + ' pp ' + direction + '</span>';
+      tooltip.classList.add('visible');
+    });
+
+    g.addEventListener('mousemove', function(e) {
+      const rect = container.getBoundingClientRect();
+      let tx = e.clientX - rect.left + 14;
+      let ty = e.clientY - rect.top - 10;
+      const tw = tooltip.offsetWidth;
+      const th = tooltip.offsetHeight;
+      if (tx + tw > rect.width) tx = e.clientX - rect.left - tw - 14;
+      if (ty + th > rect.height) ty = ty - th;
+      tooltip.style.left = tx + 'px';
+      tooltip.style.top = ty + 'px';
+    });
+
+    g.addEventListener('mouseleave', function() {
+      tooltip.classList.remove('visible');
+    });
+
+    svg.appendChild(g);
+  });
+
+  // Arrow annotation for South Sudan
+  const ssIdx = data.findIndex(d => d.country === 'South Sudan');
+  if (ssIdx >= 0) {
+    const d = data[ssIdx];
+    const cy = y(ssIdx);
+    const annotX = x(d.late) + 28;
+    const annotY = cy - 2;
+
+    // Small annotation text
+    const annot = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    annot.setAttribute('x', annotX + 12);
+    annot.setAttribute('y', annotY + 3);
+    annot.setAttribute('font-family', 'Inter, sans-serif');
+    annot.setAttribute('font-size', '9px');
+    annot.setAttribute('fill', '#D06B5C');
+    annot.setAttribute('font-weight', '500');
+    annot.textContent = 'Only country that worsened';
+    svg.appendChild(annot);
+  }
+})();
+</script>
+</body>
+</html>

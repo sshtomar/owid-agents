@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Gaining Ground, Losing Ground</h1>
+<p class="subtitle">Forest area as a percentage of land, 1990 vs 2023. While Cambodia, Indonesia and DR Congo have lost vast swaths of forest, China and France have expanded tree cover through large-scale planting programs. Costa Rica reversed decades of deforestation through policy reform.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank AG.LND.FRST.ZS</p>
+<script>
+// Countries sorted by 2023 forest % (descending)
+// Fields: n=name, a=1990 value, b=2023 value
+// Selected for narrative diversity: dramatic losers, notable gainers, stable anchors
+const data = [
+  { n: "Gabon",       a: 92.2, b: 91.2 },
+  { n: "Finland",     a: 71.8, b: 73.7 },
+  { n: "Brazil",      a: 70.5, b: 59.0 },
+  { n: "Japan",       a: 68.4, b: 68.4 },
+  { n: "Korea",       a: 67.9, b: 64.1 },
+  { n: "Indonesia",   a: 65.4, b: 47.7 },
+  { n: "DR Congo",    a: 66.4, b: 54.2 },
+  { n: "Cambodia",    a: 62.3, b: 43.1 },
+  { n: "Costa Rica",  a: 56.9, b: 60.4 },
+  { n: "Colombia",    a: 58.5, b: 52.8 },
+  { n: "Angola",      a: 63.6, b: 52.1 },
+  { n: "Bolivia",     a: 53.4, b: 46.3 },
+  { n: "Ecuador",     a: 52.9, b: 49.5 },
+  { n: "Ghana",       a: 43.6, b: 35.2 },
+  { n: "Canada",      a: 38.8, b: 39.5 },
+  { n: "Germany",     a: 32.4, b: 32.7 },
+  { n: "France",      a: 26.8, b: 32.5 },
+  { n: "Chile",       a: 20.5, b: 25.0 },
+  { n: "India",       a: 21.5, b: 24.5 },
+  { n: "China",       a: 16.7, b: 24.0 },
+  { n: "Australia",   a: 17.4, b: 17.4 },
+  { n: "Kenya",       a: 6.8,  b: 6.2  }
+];
+
+// Sort by 2023 value descending
+data.sort((a, b) => b.b - a.b);
+
+const W = 720, H = 620;
+const pad = { left: 130, right: 140, top: 44, bottom: 48 };
+const minV = 0, maxV = 96;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+// Color logic: green for gainers, orange/red for losers, neutral for ~stable
+const colorFor = d => {
+  const ch = d.b - d.a;
+  if (ch >= 3.0)  return "#5A8A5A";   // clear gainer: forest green
+  if (ch >= 0.5)  return "#7FAF7F";   // modest gainer: lighter green
+  if (ch >= -0.5) return "#B5AFA0";   // stable: warm gray
+  if (ch >= -5.0) return "#D4894A";   // moderate loss: amber
+  if (ch >= -12)  return "#C85F3A";   // significant loss: burnt orange
+  return "#A83020";                    // severe loss: deep red
+};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+// Year header labels
+const hdr = (x, txt) => {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", 22);
+  t.setAttribute("text-anchor", "middle");
+  t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.setAttribute("font-size", "10"); t.setAttribute("fill", "#7A786F");
+  t.setAttribute("letter-spacing", "0.5");
+  t.textContent = txt;
+  svg.appendChild(t);
+};
+hdr(pad.left, "1990");
+hdr(W - pad.right, "2023");
+
+// Subtle vertical axis tick marks
+[0, 20, 40, 60, 80].forEach(v => {
+  const y = scale(v);
+  [pad.left, W - pad.right].forEach(x => {
+    const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    tick.setAttribute("x1", x - 3); tick.setAttribute("y1", y);
+    tick.setAttribute("x2", x + 3); tick.setAttribute("y2", y);
+    tick.setAttribute("stroke", "#C8C5BC"); tick.setAttribute("stroke-width", "1");
+    svg.appendChild(tick);
+  });
+});
+
+// Label collision resolver
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const leftLabels  = data.map(d => ({ n: d.n, y: scale(d.a), orig: scale(d.a), d }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b), orig: scale(d.b), d }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const rows = [];
+
+data.forEach((d, i) => {
+  const x1 = pad.left + 5;
+  const x2 = W - pad.right - 5;
+  const y1 = scale(d.a);
+  const y2 = scale(d.b);
+  const col = colorFor(d);
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.setAttribute("data-idx", i);
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+  line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+  line.setAttribute("stroke", col); line.setAttribute("stroke-width", "1.5");
+  line.setAttribute("opacity", "0.72");
+  g.appendChild(line);
+
+  [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", p.x); c.setAttribute("cy", p.y); c.setAttribute("r", "2.5");
+    c.setAttribute("fill", col);
+    g.appendChild(c);
+  });
+
+  // Left label
+  const ll = leftLabels.find(l => l.n === d.n);
+  const lt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  lt.setAttribute("x", x1 - 8); lt.setAttribute("y", ll.y + 3.5);
+  lt.setAttribute("text-anchor", "end"); lt.setAttribute("font-size", "9.5");
+  lt.setAttribute("fill", "#2B2A27");
+  lt.textContent = `${d.n} ${d.a.toFixed(1)}`;
+  g.appendChild(lt);
+
+  // Right label
+  const rl = rightLabels.find(l => l.n === d.n);
+  const rt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  rt.setAttribute("x", x2 + 8); rt.setAttribute("y", rl.y + 3.5);
+  rt.setAttribute("text-anchor", "start"); rt.setAttribute("font-size", "9.5");
+  rt.setAttribute("fill", "#2B2A27");
+  rt.textContent = `${d.b.toFixed(1)} ${d.n}`;
+  g.appendChild(rt);
+
+  // Invisible wide hit area
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  hit.setAttribute("x1", x1); hit.setAttribute("y1", y1);
+  hit.setAttribute("x2", x2); hit.setAttribute("y2", y2);
+  hit.setAttribute("stroke", "transparent"); hit.setAttribute("stroke-width", "14");
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, col, y1, y2 });
+});
+
+// Legend
+const legendData = [
+  { col: "#5A8A5A",  label: "Gained > 3pp" },
+  { col: "#7FAF7F",  label: "Gained 0.5-3pp" },
+  { col: "#B5AFA0",  label: "Stable" },
+  { col: "#D4894A",  label: "Lost 0.5-5pp" },
+  { col: "#C85F3A",  label: "Lost 5-12pp" },
+  { col: "#A83020",  label: "Lost > 12pp" },
+];
+const legY = H - 10;
+const legStartX = 0;
+const legSpacing = 112;
+legendData.forEach((l, i) => {
+  const x = legStartX + i * legSpacing;
+  const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r.setAttribute("x", x); r.setAttribute("y", legY - 6);
+  r.setAttribute("width", 12); r.setAttribute("height", 3);
+  r.setAttribute("fill", l.col); r.setAttribute("rx", 1);
+  svg.appendChild(r);
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x + 16); t.setAttribute("y", legY);
+  t.setAttribute("font-size", "9"); t.setAttribute("fill", "#7A786F");
+  t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "1.5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "3");
+    } else {
+      row.g.style.opacity = "0.15";
+      row.line.setAttribute("stroke-width", "1");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+
+  let best = -1, bestDist = 20;
+  rows.forEach((row, i) => {
+    const t = Math.max(0, Math.min(1, (sx - pad.left) / (W - pad.left - pad.right)));
+    const lineY = row.y1 + (row.y2 - row.y1) * t;
+    const dist = Math.abs(sy - lineY);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  highlight(best);
+
+  if (best >= 0) {
+    const d = rows[best].d;
+    const ch = d.b - d.a;
+    const sign = ch >= 0 ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a.toFixed(1)}% \u2192 ${d.b.toFixed(1)}% (${sign}${ch.toFixed(1)} pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  highlight(-1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>

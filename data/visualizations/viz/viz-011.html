@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Inequality Spectrum</h1>
+<p class="subtitle">Gini index by country, most recent year (2020-2024). A score of 0 means perfect equality; 100 means one person holds all income. Latin America dominates the high end while Northern Europe clusters at the low end.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SI.POV.GINI</p>
+<script>
+const data = [
+  {n:"Colombia",        v:53.9, y:2023},
+  {n:"Brazil",          v:51.6, y:2023},
+  {n:"Costa Rica",      v:45.8, y:2024},
+  {n:"Honduras",        v:45.7, y:2024},
+  {n:"Ecuador",         v:45.2, y:2024},
+  {n:"Guatemala",       v:45.2, y:2023},
+  {n:"DR Congo",        v:44.7, y:2020},
+  {n:"Chile",           v:43.0, y:2022},
+  {n:"Cent. Afr. Rep.", v:43.0, y:2021},
+  {n:"Argentina",       v:42.4, y:2024},
+  {n:"Cameroon",        v:42.2, y:2021},
+  {n:"Bolivia",         v:42.1, y:2023},
+  {n:"Jamaica",         v:39.9, y:2021},
+  {n:"El Salvador",     v:39.8, y:2023},
+  {n:"Bulgaria",        v:39.5, y:2023},
+  {n:"Dominican Rep.",  v:39.0, y:2024},
+  {n:"Israel",          v:37.9, y:2021},
+  {n:"Kenya",           v:37.7, y:2022},
+  {n:"China",           v:36.0, y:2022},
+  {n:"Iran",            v:35.9, y:2023},
+  {n:"Italy",           v:34.3, y:2023},
+  {n:"Australia",       v:33.8, y:2020},
+  {n:"Germany",         v:32.4, y:2020},
+  {n:"France",          v:31.8, y:2023},
+  {n:"Denmark",         v:29.9, y:2023}
+];
+
+const W = 680, rowH = 28, pad = { left: 130, right: 80, top: 20, bottom: 60 };
+const H = data.length * rowH + pad.top + pad.bottom;
+const minV = 24, maxV = 58;
+
+function xScale(v) {
+  return pad.left + (v - minV) / (maxV - minV) * (W - pad.left - pad.right);
+}
+
+function colorForGini(v) {
+  // High inequality = warm red, medium = amber/yellow, low = cool green
+  if (v >= 48) return "#C0392B";
+  if (v >= 42) return "#E05A30";
+  if (v >= 37) return "#E8894A";
+  if (v >= 33) return "#D4A853";
+  if (v >= 30) return "#8FAF80";
+  return "#5B9E72";
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+
+// Grid lines and axis labels
+const ticks = [25, 30, 35, 40, 45, 50, 55];
+ticks.forEach(t => {
+  const x = xScale(t);
+  const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  gridLine.setAttribute("x1", x); gridLine.setAttribute("y1", pad.top - 8);
+  gridLine.setAttribute("x2", x); gridLine.setAttribute("y2", H - pad.bottom + 8);
+  gridLine.setAttribute("stroke", t === 25 ? "#C4C2BB" : "#E0DED8");
+  gridLine.setAttribute("stroke-width", "1");
+  gridLine.setAttribute("stroke-dasharray", t === 25 ? "none" : "2,3");
+  svg.appendChild(gridLine);
+
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", H - pad.bottom + 22);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = t;
+  svg.appendChild(label);
+});
+
+// Axis label
+const axisLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+axisLabel.setAttribute("x", xScale(25));
+axisLabel.setAttribute("y", H - pad.bottom + 36);
+axisLabel.setAttribute("text-anchor", "start");
+axisLabel.setAttribute("font-size", "9");
+axisLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+axisLabel.setAttribute("fill", "#7A786F");
+axisLabel.setAttribute("letter-spacing", "0.4");
+axisLabel.textContent = "GINI INDEX";
+svg.appendChild(axisLabel);
+
+// Legend
+const legendItems = [
+  { col: "#C0392B", label: ">= 48  Very high" },
+  { col: "#E05A30", label: "42-47  High" },
+  { col: "#E8894A", label: "37-41  Moderate-high" },
+  { col: "#D4A853", label: "33-36  Moderate" },
+  { col: "#5B9E72", label: "< 33   Low" },
+];
+legendItems.forEach((item, i) => {
+  const lx = pad.left + i * 124;
+  const ly = H - 14;
+  const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  dot.setAttribute("cx", lx); dot.setAttribute("cy", ly - 2);
+  dot.setAttribute("r", "4"); dot.setAttribute("fill", item.col);
+  svg.appendChild(dot);
+  const lt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  lt.setAttribute("x", lx + 10); lt.setAttribute("y", ly + 2);
+  lt.setAttribute("font-size", "9");
+  lt.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lt.setAttribute("fill", "#7A786F");
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+});
+
+// Rows
+const rows = [];
+
+data.forEach((d, i) => {
+  const y = pad.top + i * rowH;
+  const cx = xScale(d.v);
+  const barY = y + rowH / 2;
+  const col = colorForGini(d.v);
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.style.cursor = "pointer";
+
+  // Row background (for hover)
+  const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bg.setAttribute("x", 0); bg.setAttribute("y", y + 2);
+  bg.setAttribute("width", W); bg.setAttribute("height", rowH - 4);
+  bg.setAttribute("fill", "transparent");
+  g.appendChild(bg);
+
+  // Horizontal bar from baseline to dot
+  const bar = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  bar.setAttribute("x1", xScale(minV)); bar.setAttribute("y1", barY);
+  bar.setAttribute("x2", cx); bar.setAttribute("y2", barY);
+  bar.setAttribute("stroke", col); bar.setAttribute("stroke-width", "2");
+  bar.setAttribute("opacity", "0.35");
+  g.appendChild(bar);
+
+  // Dot
+  const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  dot.setAttribute("cx", cx); dot.setAttribute("cy", barY);
+  dot.setAttribute("r", "5"); dot.setAttribute("fill", col);
+  g.appendChild(dot);
+
+  // Country name label (left)
+  const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  nameText.setAttribute("x", pad.left - 8); nameText.setAttribute("y", barY + 3.5);
+  nameText.setAttribute("text-anchor", "end");
+  nameText.setAttribute("font-size", "10.5");
+  nameText.setAttribute("fill", "#2B2A27");
+  nameText.textContent = d.n;
+  g.appendChild(nameText);
+
+  // Value label (right of dot)
+  const valText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  valText.setAttribute("x", cx + 10); valText.setAttribute("y", barY + 3.5);
+  valText.setAttribute("text-anchor", "start");
+  valText.setAttribute("font-size", "9.5");
+  valText.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valText.setAttribute("fill", col);
+  valText.textContent = d.v.toFixed(1);
+  g.appendChild(valText);
+
+  // Year label
+  const yrText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  yrText.setAttribute("x", W - pad.right + 4); yrText.setAttribute("y", barY + 3.5);
+  yrText.setAttribute("text-anchor", "start");
+  yrText.setAttribute("font-size", "9");
+  yrText.setAttribute("font-family", "'JetBrains Mono', monospace");
+  yrText.setAttribute("fill", "#9A9890");
+  yrText.textContent = d.y;
+  g.appendChild(yrText);
+
+  svg.appendChild(g);
+  rows.push({ g, bg, bar, dot, nameText, valText, d, col });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.dot.setAttribute("r", "5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.dot.setAttribute("r", "7");
+      row.bg.setAttribute("fill", "rgba(43,42,39,0.04)");
+    } else {
+      row.g.style.opacity = "0.25";
+      row.dot.setAttribute("r", "5");
+      row.bg.setAttribute("fill", "transparent");
+    }
+    if (i !== idx) row.bg.setAttribute("fill", "transparent");
+  });
+}
+
+rows.forEach((row, i) => {
+  row.g.addEventListener("mouseenter", e => {
+    highlight(i);
+    const d = row.d;
+    tip.textContent = `${d.n}: Gini ${d.v.toFixed(1)}  (${d.y})`;
+    tip.style.opacity = "1";
+  });
+  row.g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  row.g.addEventListener("mouseleave", () => {
+    highlight(-1);
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

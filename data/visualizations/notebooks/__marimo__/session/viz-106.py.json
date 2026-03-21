@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "67e660a119679eac434bc6e41f5dd78a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"under-the-surface\">Under the Surface</h1>\n<span class=\"paragraph\">Nitrate in groundwater across EU countries. Spain has the highest levels; Latvia and Sweden the cleanest. Bulgaria's rising trend is concerning.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "3efd328cff7c7957192b535dbdf93eba",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Nitrate in groundwater** (eurostat)\n</code></pre></div>\n<span class=\"paragraph\">Nitrate in groundwater from eurostat\nSource: <a href=\"https://ec.europa.eu/eurostat/databrowser/view/sdg_06_40/default/table\" rel=\"noopener noreferrer\" target=\"_blank\">https://ec.europa.eu/eurostat/databrowser/view/sdg_06_40/default/table</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "f18a9857ade6cfb20d0e433b6bac879d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='417b9fd0-5efe-39a6-dfb5-a370e318140e'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;BE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Belgium&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:32.61},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;BG&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Bulgaria&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:23.84},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;CZ&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Czechia&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:20.62},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;DK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Denmark&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:23.39},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;DE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Germany&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:24.23},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;EE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Estonia&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:7.43},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;IE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Ireland&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:13.12},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;ES&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Spain&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:38.55},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;FR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;France&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:17.85},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;IT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Italy&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:23.59}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "d39d0db5cc236f017a97e4af08fbff18",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a time-series view we filter to the top countries by data completeness, then plot each country as a separate line over time.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "e815583f1a8fa136e0571e4501ed4371",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='08963b98-36a2-de1f-8406-599220c9ba6b'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:14,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2007,&#92;&quot;value&#92;&quot;:26.12},{&#92;&quot;&#92;&quot;:38,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2008,&#92;&quot;value&#92;&quot;:26.14},{&#92;&quot;&#92;&quot;:62,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2009,&#92;&quot;value&#92;&quot;:26.12},{&#92;&quot;&#92;&quot;:86,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2010,&#92;&quot;value&#92;&quot;:26.05},{&#92;&quot;&#92;&quot;:110,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2011,&#92;&quot;value&#92;&quot;:25.92},{&#92;&quot;&#92;&quot;:134,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2012,&#92;&quot;value&#92;&quot;:25.54},{&#92;&quot;&#92;&quot;:158,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2013,&#92;&quot;value&#92;&quot;:25.1},{&#92;&quot;&#92;&quot;:182,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2014,&#92;&quot;value&#92;&quot;:24.6},{&#92;&quot;&#92;&quot;:206,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2015,&#92;&quot;value&#92;&quot;:24.05},{&#92;&quot;&#92;&quot;:230,&#92;&quot;country&#92;&quot;:&#92;&quot;AT&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2016,&#92;&quot;value&#92;&quot;:23.47}]&quot;' data-total-rows='136' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "9562426e0ccc31c7b6523158c81106cc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='de6a8d0e-8712-2853-0ca4-6a140e33b8f9'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////2AQAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAAhAMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAAFwDAAAEAAAATQMAAHsiaW5kZXhfY29sdW1ucyI6IFsiX19pbmRleF9sZXZlbF8wX18iXSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnkiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5IiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInZhbHVlIiwgImZpZWxkX25hbWUiOiAidmFsdWUiLCAicGFuZGFzX3R5cGUiOiAiZmxvYXQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiBudWxsLCAiZmllbGRfbmFtZSI6ICJfX2luZGV4X2xldmVsXzBfXyIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogImludDY0IiwgIm1ldGFkYXRhIjogbnVsbH1dLCAiY3JlYXRvciI6IHsibGlicmFyeSI6ICJweWFycm93IiwgInZl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vgEAAMQBAADKAQAA0AEAANYBAADcAQAA4wEAAOoBAADxAQAA+AEAAP8BAAAGAgAADQIAABQCAAAbAgAAIgIAACkCAAAwAgAANwIAAD4CAABFAgAATAIAAFMCAABaAgAAYQIAAGgCAABvAgAAdgIAAH0CAACEAgAAiwIAAJICAACZAgAAoAIAAKcCAACuAgAAtQIAALwCAADDAgAAygIAANECAADYAgAA3wIAAOYCAADtAgAA9AIAAPsCAAACAwAACQMAABADAAAXAwAAHgMAACUDAAAsAwAAMwMAADoDAABBAwAASAMAAE8DAABWAwAAXQMAAGQDAABrAwAAcgMAAHkDAACAAwAAhwMAAI4DAACVAwAAnAMAAKMDAACqAwAAsQMAALgDAAAAAAAAQXVzdHJpYUF1c3RyaWFBdXN0cmlhQXVzdHJpYUF1c3RyaWFBdXN0cmlhQXVzdHJpYUF1c3RyaWFBdXN0cmlhQXVzdHJpYUF1c3RyaWFBdXN0cmlhQXVzdHJpYUF1c3RyaWFBdXN0cmlhQXVzdHJpYUF1c3RyaWFCZWxnaXVtQmVsZ2l1bUJlbGdpdW1CZWxnaXVtQmVsZ2l1bUJlbGdpdW1CZWxnaXVtQmVsZ2l1bUJlbGdpdW1CZWxnaXVtQmVsZ2l1bUJlbGdpdW1CZWxnaXVtQmVsZ2l1bUJlbGdpdW1CZWxnaXVtQmVsZ2l1bUJ1bGdhcmlhQnVsZ2FyaWFCdWxnYXJpYUJ1bGdhcmlhQnVsZ2FyaWFCdWxnYXJpYUJ1bGdhcmlhQnVsZ2FyaWFCdWxnYXJpYUJ1bGdhcmlhQnVsZ2FyaWFCdWxnYXJpYUJ1bGdhcmlhQnVsZ2FyaWFCdWxnYXJpYUJ1bGdhcmlhQnVsZ2FyaWFDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDeXBydXNDemVjaGlhQ3plY2hpYUN6ZWNoaWFDemVjaGlhQ3plY2hpYUN6ZWNoaWFDemVjaGlhQ3plY2hpYUN6ZWNoaWFDemVjaGlhQ3plY2hpYUN6ZWNoaWFDemVjaGlhQ3plY2hpYUN6ZWNoaWFDemVjaGlhQ3plY2hpYURlbm1hcmtEZW5tYXJrRGVubWFya0Rlbm1hcmtEZW5tYXJrRGVubWFya0Rlbm1hcmtEZW5tYXJrRGVubWFya0Rlbm1hcmtEZW5tYXJrRGVubWFya0Rlbm1hcmtEZW5tYXJrRGVubWFya0Rlbm1hcmtEZW5tYXJrRXN0b25pYUVzdG9uaWFFc3RvbmlhRXN0b25pYUVzdG9uaWFFc3RvbmlhRXN0b25pYUVzdG9uaWFFc3RvbmlhRXN0b25pYUVzdG9uaWFFc3RvbmlhRXN0b25pYUVzdG9uaWFFc3RvbmlhRXN0b25pYUVzdG9uaWFGaW5sYW5kRmlubGFuZEZpbmxhbmRGaW5sYW5kRmlubGFuZEZpbmxhbmRGaW5sYW5kRmlubGFuZEZpbmxhbmRGaW5sYW5kRmlubGFuZEZpbmxhbmRGaW5sYW5kRmlubGFuZEZpbmxhbmRGaW5sYW5kRmlubGFuZNcHAAAAAAAA2AcAAAAAAADZBwAAAAAAANoHAAAAAAAA2wcAAAAAAADcBwAAAAAAAN0HAAAAAAAA3gcAAAAAAADfBwAAAAAAAOAHAAAAAAAA4QcAAAAAAADiBwAAAAAAAOMHAAAAAAAA5AcAAAAAAADlBwAAAAAAAOYHAAAAAAAA5wcAAAAAAADXBwAAAAAAANgHAAAAAAAA2QcAAAAAAADaBwAAAAAAANsHAAAAAAAA3AcAAAAAAADdBwAAAAAAAN4HAAAAAAAA3wcAAAAAAADgBwAAAAAAAOEHAAAAAAAA4gcAAAAAAADjBwAAAAAAAOQHAAAAAAAA5QcAAAAAAADmBwAAAAAAAOcHAAAAAAAA1wcAAAAAAADYBwAAAAAAANkHAAAAAAAA2gcAAAAAAADbBwAAAAAAANwHAAAAAAAA3QcAAAAAAADeBwAAAAAAAN8HAAAAAAAA4AcAAAAAAADhBwAAAAAAAOIHAAAAAAAA4wcAAAAAAADkBwAAAAAAAOUHAAAAAAAA5gcAAAAAAADnBwAAAAAAANcHAAAAAAAA2AcAAAAAAADZBwAAAAAAANoHAAAAAAAA2wcAAAAAAADcBwAAAAAAAN0HAAAAAAAA3gcAAAAAAADfBwAAAAAAAOAHAAAAAAAA4QcAAAAAAADiBwAAAAAAAOMHAAAAAAAA5AcAAAAAAADlBwAAAAAAAOYHAAAAAAAA5wcAAAAAAADXBwAAAAAAANgHAAAAAAAA2QcAAAAAAADaBwAAAAAAANsHAAAAAAAA3AcAAAAAAADdBwAAAAAAAN4HAAAAAAAA3wcAAAAAAADgBwAAAAAAAOEHAAAAAAAA4gcAAAAAAADjBwAAAAAAAOQHAAAAAAAA5QcAAAAAAADmBwAAAAAAAOcHAAAAAAAA1wcAAAAAAADYBwAAAAAAANkHAAAAAAAA2gcAAAAAAADbBwAAAAAAANwHAAAAAAAA3QcAAAAAAADeBwAAAAAAAN8HAAAAAAAA4AcAAAAAAADhBwAAAAAAAOIHAAAAAAAA4wcAAAAAAADkBwAAAAAAAOUHAAAAAAAA5gcAAAAAAADnBwAAAAAAANcHAAAAAAAA2AcAAAAAAADZBwAAAAAAANoHAAAAAAAA2wcAAAAAAADcBwAAAAAAAN0HAAAAAAAA3gcAAAAAAADfBwAAAAAAAOAHAAAAAAAA4QcAAAAAAADiBwAAAAAAAOMHAAAAAAAA5AcAAAAAAADlBwAAAAAAAOYHAAAAAAAA5wcAAAAAAADXBwAAAAAAANgHAAAAAAAA2QcAAAAAAADaBwAAAAAAANsHAAAAAAAA3AcAAAAAAADdBwAAAAAAAN4HAAAAAAAA3wcAAAAAAADgBwAAAAAAAOEHAAAAAAAA4gcAAAAAAADjBwAAAAAAAOQHAAAAAAAA5QcAAAAAAADmBwAAAAAAAOcHAAAAAAAAH4XrUbgeOkCkcD0K1yM6QB+F61G4HjpAzczMzMwMOkDsUbgehes5QArXo3A9ijlAmpmZmZkZOUCamZmZmZk4QM3MzMzMDDhAuB6F61F4N0BmZmZmZuY2QB+F61G4XjZAKVyPwvXoNUBI4XoUroc1QAAAAAAAQDVAzczMzMwMNUApXI/C9eg0QK5H4XoUTkBAPQrXo3B9QEAfhetRuH5AQPYoXI/CVUBAMzMzMzMTQEBSuB6F65E/QM3MzMzMDD9AZmZmZmamPkApXI/C9Wg+QBSuR+F6VD5AXI/C9ShcPkCuR+F6FG4+QHsUrkfhej5A9ihcj8J1PkDXo3A9Clc+QGZmZmZmJj5A9ihcj8L1PUDXo3A9Ctc3QAAAAAAAwDdAMzMzMzOzN0CamZmZmdk3QEjhehSuRzhACtejcD3KOEAK16NwPUo5QD0K16NwvTlAcT0K16MwOkBmZmZmZqY6QJqZmZmZGTtAAAAAAACAO0BSuB6F69E7QBSuR+F6FDxAmpmZmZlZPEAzMzMzM7M8QK5H4XoULj1Aj8L1KFzPPEDXo3A9Chc9QKRwPQrXIz1AFK5H4XpUPkBcj8L1KJxAQK5H4XoUTkNAcT0K16NwR0AzMzMzM7NMQD0K16Nw3VBAXI/C9SjMUUApXI/C9ahPQDMzMzMzU0dAzczMzMxMPkCPwvUoXE8zQI/C9ShcTzNAj8L1KFxPM0CPwvUoXE8zQB+F61G4njRAUrgehetRNEDNzMzMzEw0QAAAAAAAQDRA16NwPQpXNECPwvUoXI80QNejcD0K1zRAzczMzMwMNUDD9ShcjwI1QOxRuB6FqzRAuB6F61E4NEBSuB6F69EzQIXrUbgehTNA4XoUrkdhM0DsUbgehWszQJqZmZmZmTNAmpmZmZmZM0CkcD0K12M3QPYoXI/C9TZAXI/C9SicNkCkcD0K12M2QArXo3A9SjZAj8L1KFxPNkBxPQrXo3A2QClcj8L1qDZArkfhehTuNkC4HoXrUTg3QD0K16NwfTdAMzMzMzOzN0CamZmZmdk3QClcj8L16DdA7FG4HoXrN0ApXI/C9eg3QKRwPQrX4zdAuB6F61G4HUAK16NwPQoeQD0K16NwPR5ASOF6FK5HHkBmZmZmZmYeQGZmZmZmZh5AFK5H4XoUHkB7FK5H4XodQMP1KFyPwhxAFK5H4XoUHECPwvUoXI8bQD0K16NwPRtAFK5H4XoUG0AfhetRuB4bQD0K16NwPRtAmpmZmZmZG0AAAAAAAAAcQFyPwvUoXB5AXI/C9ShcHkBmZmZmZmYeQGZmZmZmZh5AAAAAAAAAHECamZmZmZkZQHE9CtejcBdA4XoUrkfhFUD2KFyPwvUUQHE9CtejcBRAFK5H4XoUFECamZmZmZkTQBSuR+F6FBNAzczMzMzMEkCF61G4HoUTQIXrUbgehRNAhetRuB6FE0AOAAAAAAAAACYAAAAAAAAAPgAAAAAAAABWAAAAAAAAAG4AAAAAAAAAhgAAAAAAAACeAAAAAAAAALYAAAAAAAAAzgAAAAAAAADmAAAAAAAAAP4AAAAAAAAAFgEAAAAAAAAuAQAAAAAAAEYBAAAAAAAAXgEAAAAAAAB2AQAAAAAAAI4BAAAAAAAAAAAAAAAAAAAYAAAAAAAAADAAAAAAAAAASAAAAAAAAABgAAAAAAAAAHgAAAAAAAAAkAAAAAAAAACoAAAAAAAAAMAAAAAAAAAA2AAAAAAAAADwAAAAAAAAAAgBAAAAAAAAIAEAAAAAAAA4AQAAAAAAAFABAAAAAAAAaAEAAAAAAACAAQAAAAAAAAEAAAAAAAAAGQAAAAAAAAAxAAAAAAAAAEkAAAAAAAAAYQAAAAAAAAB5AAAAAAAAAJEAAAAAAAAAqQAAAAAAAADBAAAAAAAAANkAAAAAAAAA8QAAAAAAAAAJAQAAAAAAACEBAAAAAAAAOQEAAAAAAABRAQAAAAAAAGkBAAAAAAAAgQEAAAAAAAAKAAAAAAAAACIAAAAAAAAAOgAAAAAAAABSAAAAAAAAAGoAAAAAAAAAggAAAAAAAACaAAAAAAAAALIAAAAAAAAAygAAAAAAAADiAAAAAAAAAPoAAAAAAAAAEgEAAAAAAAAqAQAAAAAAAEIBAAAAAAAAWgEAAAAAAAByAQAAAAAAAIoBAAAAAAAAAgAAAAAAAAAaAAAAAAAAADIAAAAAAAAASgAAAAAAAABiAAAAAAAAAHoAAAAAAAAAkgAAAAAAAACqAAAAAAAAAMIAAAAAAAAA2gAAAAAAAADyAAAAAAAAAAoBAAAAAAAAIgEAAAAAAAA6AQAAAAAAAFIBAAAAAAAAagEAAAAAAACCAQAAAAAAAAMAAAAAAAAAGwAAAAAAAAAzAAAAAAAAAEsAAAAAAAAAYwAAAAAAAAB7AAAAAAAAAJMAAAAAAAAAqwAAAAAAAADDAAAAAAAAANsAAAAAAAAA8wAAAAAAAAALAQAAAAAAACMBAAAAAAAAOwEAAAAAAABTAQAAAAAAAGsBAAAAAAAAgwEAAAAAAAAFAAAAAAAAAB0AAAAAAAAANQAAAAAAAABNAAAAAAAAAGUAAAAAAAAAfQAAAAAAAACVAAAAAAAAAK0AAAAAAAAAxQAAAAAAAADdAAAAAAAAAPUAAAAAAAAADQEAAAAAAAAlAQAAAAAAAD0BAAAAAAAAVQEAAAAAAABtAQAAAAAAAIUBAAAAAAAAFAAAAAAAAAAsAAAAAAAAAEQAAAAAAAAAXAAAAAAAAAB0AAAAAAAAAIwAAAAAAAAApAAAAAAAAAC8AAAAAAAAANQAAAAAAAAA7AAAAAAAAAAEAQAAAAAAABwBAAAAAAAANAEAAAAAAABMAQAAAAAAAGQBAAAAAAAAfAEAAAAAAACUAQAAAAAAAP////8AAAAAEAAAAAwAFAAGAAgADAAQAAwAAAAAAAQAPAAAACgAAAAEAAAAAQAAAOgEAAAAAAAAcAEAAAAAAADYFQAAAAAAAAAAAAAAAAAAAAAKAAwAAAAEAAgACgAAAIQDAAAEAAAAAQAAAAwAAAAIAAwABAAIAAgAAABcAwAABAAAAE0DAAB7ImluZGV4X2NvbHVtbnMiOiBbIl9faW5kZXhfbGV2ZWxfMF9fIl0sICJjb2x1bW5faW5kZXhlcyI6IFt7Im5hbWUiOiBudWxsLCAiZmllbGRfbmFtZSI6IG51bGwsICJwYW5kYXNfdHlwZSI6ICJ1bmljb2RlIiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogeyJlbmNvZGluZyI6ICJVVEYtOCJ9fV0sICJjb2x1bW5zIjogW3sibmFtZSI6ICJjb3VudHJ5IiwgImZpZWxkX25hbWUiOiAiY291bnRyeSIsICJwYW5kYXNfdHlwZSI6ICJ1bmljb2RlIiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJjb3VudHJ5TmFtZSIsICJmaWVsZF9uYW1lIjogImNvdW50cnlOYW1lIiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInllYXIiLCAiZmllbGRfbmFtZSI6ICJ5ZWFyIiwgInBhbmRhc190eXBlIjogImludDY0IiwgIm51bXB5X3R5cGUiOiAib2JqZWN0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ2YWx1ZSIsICJmaWVsZF9uYW1lIjogInZhbHVlIiwgInBhbmRhc190eXBlIjogImZsb2F0NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiAiX19pbmRleF9sZXZlbF8wX18iLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJpbnQ2NCIsICJtZXRhZGF0YSI6IG51bGx9XSwgImNyZWF0b3IiOiB7ImxpYnJhcnkiOiAicHlhcnJvdyIsICJ2ZXJzaW9uIjogIjIxLjAuMCJ9LCAicGFuZGFzX3ZlcnNpb24iOiAiMi4yLjMifQAAAAYAAABwYW5kYXMAAAUAAAD0AAAAtAAAAHgAAABEAAAABAAAADD///8AAAECEAAAACQAAAAEAAAAAAAAABEAAABfX2luZGV4X2xldmVsXzBfXwAAAKD///8AAAABQAAAAGz///8AAAEDEAAAABwAAAAEAAAAAAAAAAUAAAB2YWx1ZQAGAAgABgAGAAAAAAACAJz///8AAAECEAAAACAAAAAEAAAAAAAAAAQAAAB5ZWFyAAAAAAgADAAIAAcACAAAAAAAAAFAAAAA1P///wAAAQUQAAAAHAAAAAQAAAAAAAAACwAAAGNvdW50cnlOYW1lAMj///8QABQACAAGAAcADAAAABAAEAAAAAAAAQUQAAAAHAAAAAQAAAAAAAAABwAAAGNvdW50cnkABAAEAAQAAAAABQAAQVJST1cx&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;point&quot;:true},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;year&quot;,&quot;title&quot;:&quot;Year&quot;,&quot;type&quot;:&quot;ordinal&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;}},&quot;height&quot;:400,&quot;width&quot;:700,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "cc368f9126921d81815c46462d14115f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Spain highest nitrate at 31.7 mg/L</li>\n<li>Bulgaria rising trend most concerning in EU</li>\n<li>Latvia and Sweden cleanest groundwater</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

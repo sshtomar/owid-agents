@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Red Ink</h1>
+<p class="subtitle">Government fiscal balance as a share of GDP, 2025 (IMF estimate). Countries to the right run surpluses; those to the left spend more than they earn. Oil exporters and small disciplined economies lead the surplus side, while major economies carry persistent deficits.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: IMF World Economic Outlook -- GGXCNL_NGDP (Net Lending/Borrowing, % of GDP)</p>
+<script>
+const data = [
+  { name: "Norway", value: 12.7 },
+  { name: "Kuwait", value: 26.8 },
+  { name: "UAE", value: 5.1 },
+  { name: "Singapore", value: 3.1 },
+  { name: "Denmark", value: 1.8 },
+  { name: "Ireland", value: 1.0 },
+  { name: "Switzerland", value: 0.3 },
+  { name: "South Korea", value: -1.5 },
+  { name: "Sweden", value: -1.4 },
+  { name: "Canada", value: -2.2 },
+  { name: "Germany", value: -2.5 },
+  { name: "Spain", value: -2.7 },
+  { name: "Italy", value: -3.3 },
+  { name: "Saudi Arabia", value: -3.7 },
+  { name: "Mexico", value: -4.3 },
+  { name: "United Kingdom", value: -4.3 },
+  { name: "France", value: -5.4 },
+  { name: "South Africa", value: -6.0 },
+  { name: "India", value: -7.1 },
+  { name: "United States", value: -7.4 },
+  { name: "Poland", value: -7.0 },
+  { name: "Brazil", value: -8.4 },
+  { name: "China", value: -8.6 }
+];
+
+data.sort((a, b) => b.value - a.value);
+
+const W = 720;
+const barH = 24;
+const gap = 4;
+const pad = { left: 130, right: 60, top: 30, bottom: 30 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxAbs = Math.max(...data.map(d => Math.abs(d.value)));
+const domainMax = Math.ceil(maxAbs / 5) * 5;
+
+const chartW = W - pad.left - pad.right;
+const zeroX = pad.left + (domainMax / (2 * domainMax)) * chartW;
+
+const xScale = v => pad.left + ((v + domainMax) / (2 * domainMax)) * chartW;
+
+const surplusColor = "#3A9E8F";
+const deficitColor = "#E06050";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+const ticks = [];
+for (let v = -domainMax; v <= domainMax; v += 5) {
+  ticks.push(v);
+}
+
+ticks.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1.5 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 10);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = (v > 0 ? "+" : "") + v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const isPositive = d.value >= 0;
+  const barStart = isPositive ? zeroX : xScale(d.value);
+  const barWidth = Math.abs(xScale(d.value) - zeroX);
+  const color = isPositive ? surplusColor : deficitColor;
+
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", barStart);
+  rect.setAttribute("y", y + 2);
+  rect.setAttribute("width", Math.max(barWidth, 1));
+  rect.setAttribute("height", barH - 4);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  const valLabel = document.createElementNS(ns, "text");
+  const valX = isPositive ? xScale(d.value) + 5 : xScale(d.value) - 5;
+  valLabel.setAttribute("x", valX);
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", isPositive ? "start" : "end");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = (d.value > 0 ? "+" : "") + d.value.toFixed(1) + "%";
+
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", e => {
+    rect.setAttribute("opacity", "0.8");
+    const sign = d.value >= 0 ? "Surplus" : "Deficit";
+    tip.innerHTML = `<strong>${d.name}</strong>  ${(d.value > 0 ? "+" : "")}${d.value.toFixed(1)}% of GDP  (${sign})`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const rect2 = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - rect2.left + 12) + "px";
+    tip.style.top = (e.clientY - rect2.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+const defLabel = document.createElementNS(ns, "text");
+defLabel.setAttribute("x", xScale(-domainMax / 2));
+defLabel.setAttribute("y", pad.top + chartH + 18);
+defLabel.setAttribute("text-anchor", "middle");
+defLabel.setAttribute("font-size", "9");
+defLabel.setAttribute("fill", deficitColor);
+defLabel.setAttribute("font-weight", "500");
+defLabel.setAttribute("letter-spacing", "1");
+defLabel.textContent = "DEFICIT";
+svg.appendChild(defLabel);
+
+const surLabel = document.createElementNS(ns, "text");
+surLabel.setAttribute("x", xScale(domainMax / 2));
+surLabel.setAttribute("y", pad.top + chartH + 18);
+surLabel.setAttribute("text-anchor", "middle");
+surLabel.setAttribute("font-size", "9");
+surLabel.setAttribute("fill", surplusColor);
+surLabel.setAttribute("font-weight", "500");
+surLabel.setAttribute("letter-spacing", "1");
+surLabel.textContent = "SURPLUS";
+svg.appendChild(surLabel);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

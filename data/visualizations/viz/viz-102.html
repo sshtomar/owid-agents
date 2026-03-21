@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 660px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 18px; margin: 0 0 16px; font-size: 10px; color: #7A786F; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 1px; }
+</style></head><body>
+<h1>Left Behind</h1>
+<p class="subtitle">Share of 18-24 year-olds who left education and training early, 2024. The EU 2030 target is below 9%. Lollipop markers show each country's rate in 2000 where data is available, revealing how far countries have come.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#D35B48;"></div> 2024 rate</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#2B2A27; opacity:0.25; border-radius:50%;"></div> 2000 rate</div>
+  <div class="legend-item" style="color:#3A9E8F; font-family:'JetBrains Mono',monospace; font-size:9px;">&#9660; EU 2030 target (9%)</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat -- SDG 04.10 (Early leavers from education and training, % of 18-24 year-olds)</p>
+<script>
+const data = [
+  { name: "Turkey", code: "TR", value: 18.7, y2000: null },
+  { name: "Romania", code: "RO", value: 16.8, y2000: 22.9 },
+  { name: "Iceland", code: "IS", value: 15.3, y2000: 29.8 },
+  { name: "Spain", code: "ES", value: 13.0, y2000: 29.1 },
+  { name: "Norway", code: "NO", value: 13.0, y2000: null },
+  { name: "Germany", code: "DE", value: 12.9, y2000: 14.6 },
+  { name: "Cyprus", code: "CY", value: 11.3, y2000: 18.5 },
+  { name: "Estonia", code: "EE", value: 11.0, y2000: 15.1 },
+  { name: "Denmark", code: "DK", value: 10.4, y2000: 11.7 },
+  { name: "Hungary", code: "HU", value: 10.3, y2000: 13.9 },
+  { name: "Italy", code: "IT", value: 9.8, y2000: 25.1 },
+  { name: "Finland", code: "FI", value: 9.6, y2000: 9.0 },
+  { name: "Malta", code: "MT", value: 9.5, y2000: 54.2 },
+  { name: "Lithuania", code: "LT", value: 8.4, y2000: 16.5 },
+  { name: "Bulgaria", code: "BG", value: 8.2, y2000: null },
+  { name: "Austria", code: "AT", value: 8.1, y2000: 10.2 },
+  { name: "N. Macedonia", code: "MK", value: 8.0, y2000: null },
+  { name: "Latvia", code: "LV", value: 7.9, y2000: null },
+  { name: "Luxembourg", code: "LU", value: 7.8, y2000: 16.8 },
+  { name: "France", code: "FR", value: 7.7, y2000: 13.3 },
+  { name: "Slovakia", code: "SK", value: 7.5, y2000: null },
+  { name: "Sweden", code: "SE", value: 7.2, y2000: 7.3 },
+  { name: "Belgium", code: "BE", value: 7.0, y2000: 13.8 },
+  { name: "Netherlands", code: "NL", value: 7.0, y2000: 15.4 },
+  { name: "Portugal", code: "PT", value: 6.6, y2000: 43.7 },
+  { name: "Serbia", code: "RS", value: 6.2, y2000: null },
+  { name: "Switzerland", code: "CH", value: 5.7, y2000: 7.3 },
+  { name: "Czechia", code: "CZ", value: 5.4, y2000: null },
+  { name: "Slovenia", code: "SI", value: 5.0, y2000: null },
+  { name: "Poland", code: "PL", value: 4.1, y2000: null },
+  { name: "Bosnia & Herz.", code: "BA", value: 3.8, y2000: null },
+  { name: "Greece", code: "EL", value: 3.0, y2000: 18.2 },
+  { name: "Ireland", code: "IE", value: 2.8, y2000: null },
+  { name: "Croatia", code: "HR", value: 2.0, y2000: null }
+];
+
+const W = 740;
+const barH = 19;
+const gap = 3;
+const pad = { left: 120, right: 70, top: 24, bottom: 20 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = 56;
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const barColor = "#D35B48";
+const barColorHover = "#B84535";
+const targetVal = 9;
+const targetColor = "#3A9E8F";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// gridlines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#D6D4CB");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 8);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// target line
+const targetX = xScale(targetVal);
+const tLine = document.createElementNS(ns, "line");
+tLine.setAttribute("x1", targetX);
+tLine.setAttribute("x2", targetX);
+tLine.setAttribute("y1", pad.top);
+tLine.setAttribute("y2", pad.top + chartH);
+tLine.setAttribute("stroke", targetColor);
+tLine.setAttribute("stroke-width", 1.2);
+tLine.setAttribute("stroke-dasharray", "4,3");
+svg.appendChild(tLine);
+
+const tLabel = document.createElementNS(ns, "text");
+tLabel.setAttribute("x", targetX + 3);
+tLabel.setAttribute("y", pad.top + chartH + 14);
+tLabel.setAttribute("fill", targetColor);
+tLabel.setAttribute("font-size", "8px");
+tLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+tLabel.textContent = "9% target";
+svg.appendChild(tLabel);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+
+  // country label
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + barH / 2 + 3.5);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("fill", "#2B2A27");
+  label.setAttribute("font-size", "10px");
+  label.setAttribute("font-weight", "400");
+  label.textContent = d.name;
+  svg.appendChild(label);
+
+  // 2024 bar
+  const bar = document.createElementNS(ns, "rect");
+  bar.setAttribute("x", xScale(0));
+  bar.setAttribute("y", y);
+  bar.setAttribute("width", Math.max(0, xScale(d.value) - xScale(0)));
+  bar.setAttribute("height", barH);
+  bar.setAttribute("fill", barColor);
+  bar.setAttribute("rx", 1);
+  bar.style.transition = "fill 0.12s";
+  svg.appendChild(bar);
+
+  // value label at end of bar
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", xScale(d.value) + 5);
+  valLabel.setAttribute("y", y + barH / 2 + 3.5);
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.setAttribute("font-size", "9px");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.textContent = d.value.toFixed(1);
+  svg.appendChild(valLabel);
+
+  // 2000 dot (lollipop marker) if available
+  if (d.y2000 !== null) {
+    const dotX = xScale(d.y2000);
+    const dotY = y + barH / 2;
+
+    // connector line from bar end to dot
+    const conn = document.createElementNS(ns, "line");
+    conn.setAttribute("x1", xScale(d.value));
+    conn.setAttribute("x2", dotX);
+    conn.setAttribute("y1", dotY);
+    conn.setAttribute("y2", dotY);
+    conn.setAttribute("stroke", "#2B2A27");
+    conn.setAttribute("stroke-opacity", 0.15);
+    conn.setAttribute("stroke-width", 1);
+    svg.appendChild(conn);
+
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", dotX);
+    dot.setAttribute("cy", dotY);
+    dot.setAttribute("r", 3.5);
+    dot.setAttribute("fill", "#2B2A27");
+    dot.setAttribute("fill-opacity", 0.25);
+    svg.appendChild(dot);
+  }
+
+  // invisible hit area for hover
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+  svg.appendChild(hitArea);
+
+  hitArea.addEventListener("mouseenter", e => {
+    bar.setAttribute("fill", barColorHover);
+    let text = `${d.name}: ${d.value}% (2024)`;
+    if (d.y2000 !== null) {
+      const change = (d.value - d.y2000).toFixed(1);
+      const sign = change > 0 ? "+" : "";
+      text += ` | ${d.y2000}% (2000) | ${sign}${change} pp`;
+    }
+    tip.textContent = text;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const rect = document.getElementById("chart").getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 12) + "px";
+    tip.style.top = (e.clientY - rect.top - 24) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    bar.setAttribute("fill", barColor);
+    tip.style.opacity = 0;
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: pointer; user-select: none; }
+  .legend-item:hover { color: #2B2A27; }
+  .legend-line { width: 14px; height: 2px; border-radius: 1px; }
+  #tooltip {
+    position: fixed;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 11px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 10;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+</style>
+</head><body>
+<h1>The Price of Prices</h1>
+<p class="subtitle">Inflation rate (annual % change in consumer prices) for 10 economies, 2000-2030. Includes IMF projections from 2025 onward. A symlog scale reveals both the quiet stability of advanced economies and the violent surges of hyperinflation.</p>
+<div class="legend" id="legend"></div>
+<svg id="chart"></svg>
+<p class="source">Source: IMF World Economic Outlook -- Inflation Rate, annual % change in consumer prices</p>
+<div id="tooltip"></div>
+
+<script>
+const DATA = {
+  "Argentina": {color:"#C2553A", data:[[2000,-0.9],[2001,-1.1],[2002,25.9],[2003,13.4],[2004,4.4],[2005,9.6],[2006,10.9],[2007,8.8],[2008,8.6],[2009,6.3],[2010,10.5],[2011,9.8],[2012,10],[2013,10.6],[2017,25.7],[2018,34.3],[2019,53.5],[2020,42],[2021,48.4],[2022,72.4],[2023,133.5],[2024,219.9],[2025,41.3],[2026,16.4],[2027,8.5],[2028,7.5],[2029,7.5],[2030,7.5]]},
+  "Turkiye": {color:"#D4883E", data:[[2000,55],[2001,54.2],[2002,45.1],[2003,25.3],[2004,8.6],[2005,8.2],[2006,9.6],[2007,8.8],[2008,10.4],[2009,6.3],[2010,8.6],[2011,6.5],[2012,8.9],[2013,7.5],[2014,8.9],[2015,7.7],[2016,7.8],[2017,11.1],[2018,16.3],[2019,15.2],[2020,12.3],[2021,19.6],[2022,72.3],[2023,53.9],[2024,58.5],[2025,34.9],[2026,24.7],[2027,19.5],[2028,16.2],[2029,15],[2030,15]]},
+  "Venezuela": {color:"#8B3A3A", data:[[2000,16.2],[2001,12.5],[2002,22.4],[2003,31.1],[2004,21.7],[2005,16],[2006,13.7],[2007,18.7],[2008,31.4],[2009,26],[2010,28.2],[2011,26.1],[2012,21.1],[2013,40.6],[2014,62.2],[2015,121.7],[2016,254.9],[2017,438.1],[2018,65374.1],[2019,19906],[2020,2355.1],[2021,1588.5],[2022,186.5],[2023,337.5],[2024,49],[2025,269.9],[2026,682.1]]},
+  "Nigeria": {color:"#7A8B5C", data:[[2000,6.9],[2001,18.9],[2002,12.9],[2003,14],[2004,15],[2005,17.9],[2006,8.2],[2007,5.4],[2008,11.6],[2009,12.5],[2010,13.7],[2011,10.8],[2012,12.2],[2013,8.5],[2014,8],[2015,9],[2016,15.7],[2017,16.5],[2018,12.1],[2019,11.4],[2020,13.2],[2021,17],[2022,18.8],[2023,24.7],[2024,31.4],[2025,23],[2026,22],[2027,17],[2028,15],[2029,12],[2030,10]]},
+  "Brazil": {color:"#5C8B7A", data:[[2000,7],[2001,6.8],[2002,8.4],[2003,14.7],[2004,6.6],[2005,6.9],[2006,4.2],[2007,3.6],[2008,5.7],[2009,4.9],[2010,5],[2011,6.6],[2012,5.4],[2013,6.2],[2014,6.3],[2015,9],[2016,8.7],[2017,3.4],[2018,3.7],[2019,3.7],[2020,3.2],[2021,8.3],[2022,9.3],[2023,4.6],[2024,4.4],[2025,5.2],[2026,4],[2027,3.3],[2028,2.9],[2029,2.9],[2030,2.9]]},
+  "India": {color:"#B8926A", data:[[2000,3.8],[2001,4.4],[2002,5],[2003,4.1],[2004,4],[2005,3.7],[2006,6.7],[2007,5.9],[2008,9.2],[2009,10.6],[2010,9.4],[2011,8.1],[2012,10],[2013,9.4],[2014,5.8],[2015,4.9],[2016,4.5],[2017,3.6],[2018,3.4],[2019,4.8],[2020,6.2],[2021,5.5],[2022,6.7],[2023,5.4],[2024,4.6],[2025,2.8],[2026,4],[2027,4],[2028,4],[2029,4],[2030,4]]},
+  "United Kingdom": {color:"#6A7F99", data:[[2000,0.8],[2001,1.2],[2002,1.3],[2003,1.4],[2004,1.3],[2005,2.1],[2006,2.3],[2007,2.3],[2008,3.6],[2009,2.2],[2010,3.3],[2011,4.5],[2012,2.8],[2013,2.6],[2014,1.5],[2015,0],[2016,0.7],[2017,2.7],[2018,2.5],[2019,1.8],[2020,0.9],[2021,2.6],[2022,9.1],[2023,7.3],[2024,2.5],[2025,3.4],[2026,2.5],[2027,2],[2028,2],[2029,2],[2030,2]]},
+  "United States": {color:"#5B7A8B", data:[[2000,3.4],[2001,2.8],[2002,1.6],[2003,2.3],[2004,2.7],[2005,3.4],[2006,3.2],[2007,2.9],[2008,3.8],[2009,-0.3],[2010,1.6],[2011,3.1],[2012,2.1],[2013,1.5],[2014,1.6],[2015,0.1],[2016,1.3],[2017,2.1],[2018,2.4],[2019,1.8],[2020,1.3],[2021,4.7],[2022,8],[2023,4.1],[2024,3],[2025,2.7],[2026,2.4],[2027,2.2],[2028,2.2],[2029,2.2],[2030,2.2]]},
+  "Germany": {color:"#8B7A6A", data:[[2000,1.4],[2001,1.9],[2002,1.3],[2003,1.1],[2004,1.8],[2005,1.9],[2006,1.8],[2007,2.3],[2008,2.8],[2009,0.2],[2010,1.1],[2011,2.5],[2012,2.2],[2013,1.6],[2014,0.8],[2015,0.7],[2016,0.4],[2017,1.7],[2018,1.9],[2019,1.4],[2020,0.4],[2021,3.2],[2022,8.7],[2023,6],[2024,2.5],[2025,2.1],[2026,1.8],[2027,2],[2028,2.1],[2029,2.2],[2030,2.2]]},
+  "Japan": {color:"#9A8B99", data:[[2000,-0.7],[2001,-0.7],[2002,-0.9],[2003,-0.3],[2004,0],[2005,-0.3],[2006,0.3],[2007,0],[2008,1.4],[2009,-1.3],[2010,-0.7],[2011,-0.3],[2012,0],[2013,0.3],[2014,2.8],[2015,0.8],[2016,-0.1],[2017,0.5],[2018,1],[2019,0.5],[2020,0],[2021,-0.2],[2022,2.5],[2023,3.3],[2024,2.7],[2025,3.3],[2026,2.1],[2027,2],[2028,2],[2029,2],[2030,2]]}
+};
+
+const W = 900, H = 480;
+const margin = { top: 20, right: 100, bottom: 36, left: 56 };
+const plotW = W - margin.left - margin.right;
+const plotH = H - margin.top - margin.bottom;
+
+const yearMin = 2000, yearMax = 2030;
+const projectionStart = 2025;
+
+// Symlog scale: sign(x) * log10(1 + |x|)
+// This handles negative values and compresses huge values while preserving detail near zero
+function symlog(v) {
+  return Math.sign(v) * Math.log10(1 + Math.abs(v));
+}
+
+// Inverse for ticks
+function symexp(v) {
+  return Math.sign(v) * (Math.pow(10, Math.abs(v)) - 1);
+}
+
+// Determine y range in symlog space
+let allVals = [];
+Object.values(DATA).forEach(s => s.data.forEach(d => allVals.push(d[1])));
+const symMin = symlog(Math.min(...allVals));
+const symMax = symlog(Math.max(...allVals));
+const yPadding = (symMax - symMin) * 0.06;
+const ySymMin = symMin - yPadding;
+const ySymMax = symMax + yPadding;
+
+function xScale(year) {
+  return margin.left + ((year - yearMin) / (yearMax - yearMin)) * plotW;
+}
+
+function yScale(value) {
+  const sy = symlog(value);
+  return margin.top + plotH - ((sy - ySymMin) / (ySymMax - ySymMin)) * plotH;
+}
+
+// Build SVG
+const svg = document.getElementById('chart');
+svg.setAttribute('width', W);
+svg.setAttribute('height', H);
+svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+svg.style.display = 'block';
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  if (attrs) Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+  return el;
+}
+
+// Defs for projection dash pattern and clip
+const defs = svgEl('defs');
+svg.appendChild(defs);
+
+// Grid and axes
+const gridGroup = svgEl('g');
+svg.appendChild(gridGroup);
+
+// Y-axis ticks: hand-picked values that make sense on symlog
+const yTickValues = [-1, 0, 2, 5, 10, 20, 50, 100, 500, 1000, 10000, 65000];
+yTickValues.forEach(v => {
+  const y = yScale(v);
+  if (y < margin.top || y > margin.top + plotH) return;
+  const line = svgEl('line', {
+    x1: margin.left, x2: margin.left + plotW,
+    y1: y, y2: y,
+    stroke: '#E0DFD8', 'stroke-width': 0.5
+  });
+  gridGroup.appendChild(line);
+  let label;
+  if (v >= 1000) label = (v/1000) + 'k%';
+  else label = v + '%';
+  const text = svgEl('text', {
+    x: margin.left - 8, y: y + 3,
+    fill: '#7A786F', 'font-size': '9px', 'text-anchor': 'end',
+    'font-family': "'JetBrains Mono', monospace"
+  });
+  text.textContent = label;
+  gridGroup.appendChild(text);
+});
+
+// X-axis ticks
+for (let yr = 2000; yr <= 2030; yr += 5) {
+  const x = xScale(yr);
+  const line = svgEl('line', {
+    x1: x, x2: x,
+    y1: margin.top, y2: margin.top + plotH,
+    stroke: '#E0DFD8', 'stroke-width': 0.5
+  });
+  gridGroup.appendChild(line);
+  const text = svgEl('text', {
+    x: x, y: margin.top + plotH + 16,
+    fill: '#7A786F', 'font-size': '9px', 'text-anchor': 'middle',
+    'font-family': "'JetBrains Mono', monospace"
+  });
+  text.textContent = yr;
+  gridGroup.appendChild(text);
+}
+
+// Projection zone shading
+const projX = xScale(projectionStart);
+const projRect = svgEl('rect', {
+  x: projX, y: margin.top,
+  width: xScale(yearMax) - projX, height: plotH,
+  fill: '#EDECE4', opacity: 0.7
+});
+gridGroup.appendChild(projRect);
+const projLabel = svgEl('text', {
+  x: projX + 4, y: margin.top + 12,
+  fill: '#7A786F', 'font-size': '8px', 'font-style': 'italic',
+  'font-family': "'Inter', sans-serif"
+});
+projLabel.textContent = 'IMF projections';
+gridGroup.appendChild(projLabel);
+
+// Zero line
+const zeroY = yScale(0);
+if (zeroY >= margin.top && zeroY <= margin.top + plotH) {
+  const zeroLine = svgEl('line', {
+    x1: margin.left, x2: margin.left + plotW,
+    y1: zeroY, y2: zeroY,
+    stroke: '#B5B3AA', 'stroke-width': 1, 'stroke-dasharray': '3,3'
+  });
+  gridGroup.appendChild(zeroLine);
+}
+
+// Draw lines
+const linesGroup = svgEl('g');
+svg.appendChild(linesGroup);
+
+const dotsGroup = svgEl('g');
+svg.appendChild(dotsGroup);
+
+const seriesNames = Object.keys(DATA);
+const lineElements = {};
+const dotElements = {};
+const labelElements = {};
+
+seriesNames.forEach(name => {
+  const series = DATA[name];
+  const pts = series.data;
+  const color = series.color;
+
+  // Split into solid (historical) and dashed (projection)
+  const historical = pts.filter(d => d[0] < projectionStart);
+  const projection = pts.filter(d => d[0] >= projectionStart);
+  // Bridge: last historical point + first projection point
+  const bridgePt = historical.length > 0 ? historical[historical.length - 1] : null;
+
+  function buildPath(points) {
+    return points.map((d, i) => {
+      const cmd = i === 0 ? 'M' : 'L';
+      return `${cmd}${xScale(d[0]).toFixed(1)},${yScale(d[1]).toFixed(1)}`;
+    }).join('');
+  }
+
+  const gLine = svgEl('g');
+  gLine.setAttribute('data-series', name);
+
+  if (historical.length > 1) {
+    const path = svgEl('path', {
+      d: buildPath(historical),
+      stroke: color, 'stroke-width': 1.8, fill: 'none',
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+    });
+    gLine.appendChild(path);
+  }
+
+  if (projection.length > 0) {
+    const projPts = bridgePt ? [bridgePt, ...projection] : projection;
+    const path = svgEl('path', {
+      d: buildPath(projPts),
+      stroke: color, 'stroke-width': 1.2, fill: 'none',
+      'stroke-dasharray': '4,3',
+      'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+      opacity: 0.7
+    });
+    gLine.appendChild(path);
+  }
+
+  linesGroup.appendChild(gLine);
+  lineElements[name] = gLine;
+
+  // End label at the right side
+  const lastPt = pts[pts.length - 1];
+  const labelText = svgEl('text', {
+    x: xScale(lastPt[0]) + 6,
+    y: yScale(lastPt[1]) + 3,
+    fill: color, 'font-size': '9px', 'font-weight': '500',
+    'font-family': "'Inter', sans-serif"
+  });
+  labelText.textContent = name === 'United Kingdom' ? 'UK' : name === 'United States' ? 'US' : name;
+  linesGroup.appendChild(labelText);
+  labelElements[name] = labelText;
+
+  // Invisible dots for hover detection
+  pts.forEach(d => {
+    const dot = svgEl('circle', {
+      cx: xScale(d[0]), cy: yScale(d[1]), r: 12,
+      fill: 'transparent', 'data-name': name, 'data-year': d[0], 'data-value': d[1],
+      'data-color': color
+    });
+    dotsGroup.appendChild(dot);
+  });
+
+  // Visible hover dots (hidden by default)
+  pts.forEach(d => {
+    const dot = svgEl('circle', {
+      cx: xScale(d[0]), cy: yScale(d[1]), r: 3,
+      fill: color, opacity: 0, 'data-series-dot': name
+    });
+    dotsGroup.appendChild(dot);
+  });
+});
+
+// Axis border lines
+const axisBottom = svgEl('line', {
+  x1: margin.left, x2: margin.left + plotW,
+  y1: margin.top + plotH, y2: margin.top + plotH,
+  stroke: '#B5B3AA', 'stroke-width': 0.8
+});
+gridGroup.appendChild(axisBottom);
+
+const axisLeft = svgEl('line', {
+  x1: margin.left, x2: margin.left,
+  y1: margin.top, y2: margin.top + plotH,
+  stroke: '#B5B3AA', 'stroke-width': 0.8
+});
+gridGroup.appendChild(axisLeft);
+
+// Y-axis label
+const yLabel = svgEl('text', {
+  x: 14, y: margin.top + plotH / 2,
+  fill: '#7A786F', 'font-size': '9px',
+  'font-family': "'JetBrains Mono', monospace",
+  'text-anchor': 'middle',
+  transform: `rotate(-90, 14, ${margin.top + plotH / 2})`
+});
+yLabel.textContent = 'INFLATION RATE (SYMLOG SCALE)';
+svg.appendChild(yLabel);
+
+// Legend
+const legendDiv = document.getElementById('legend');
+seriesNames.forEach(name => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `<div class="legend-line" style="background:${DATA[name].color}"></div>${name === 'United Kingdom' ? 'UK' : name === 'United States' ? 'US' : name}`;
+  item.setAttribute('data-legend', name);
+  legendDiv.appendChild(item);
+});
+
+// Tooltip logic
+const tooltip = document.getElementById('tooltip');
+
+// Build a crosshair line
+const crosshair = svgEl('line', {
+  x1: 0, x2: 0, y1: margin.top, y2: margin.top + plotH,
+  stroke: '#B5B3AA', 'stroke-width': 0.5, 'stroke-dasharray': '3,2',
+  opacity: 0, 'pointer-events': 'none'
+});
+svg.appendChild(crosshair);
+
+// Highlight dot
+const highlightDot = svgEl('circle', {
+  cx: 0, cy: 0, r: 4, fill: 'none', stroke: '#2B2A27',
+  'stroke-width': 1.5, opacity: 0, 'pointer-events': 'none'
+});
+svg.appendChild(highlightDot);
+
+// Hover overlay for detecting mouse position
+const overlay = svgEl('rect', {
+  x: margin.left, y: margin.top, width: plotW, height: plotH,
+  fill: 'transparent', 'pointer-events': 'all'
+});
+svg.appendChild(overlay);
+
+function formatValue(v) {
+  if (Math.abs(v) >= 1000) return v.toLocaleString('en-US', {maximumFractionDigits: 0}) + '%';
+  if (Math.abs(v) >= 100) return v.toFixed(1) + '%';
+  return v.toFixed(1) + '%';
+}
+
+let activeHighlight = null;
+
+overlay.addEventListener('mousemove', function(e) {
+  const rect = svg.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  // Find nearest year
+  const yearFrac = yearMin + ((mx - margin.left) / plotW) * (yearMax - yearMin);
+  const year = Math.round(yearFrac);
+  if (year < yearMin || year > yearMax) {
+    hideTooltip();
+    return;
+  }
+
+  const x = xScale(year);
+  crosshair.setAttribute('x1', x);
+  crosshair.setAttribute('x2', x);
+  crosshair.setAttribute('opacity', 0.6);
+
+  // Find nearest series at this year
+  let bestDist = Infinity;
+  let bestSeries = null;
+  let bestVal = null;
+  seriesNames.forEach(name => {
+    const pt = DATA[name].data.find(d => d[0] === year);
+    if (!pt) return;
+    const py = yScale(pt[1]);
+    const dist = Math.abs(py - my);
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestSeries = name;
+      bestVal = pt[1];
+    }
+  });
+
+  if (bestSeries && bestDist < 60) {
+    const cy = yScale(bestVal);
+    highlightDot.setAttribute('cx', x);
+    highlightDot.setAttribute('cy', cy);
+    highlightDot.setAttribute('stroke', DATA[bestSeries].color);
+    highlightDot.setAttribute('opacity', 1);
+
+    const projected = year >= projectionStart ? ' (proj.)' : '';
+    tooltip.innerHTML = `<div style="color:${DATA[bestSeries].color};margin-bottom:2px">${bestSeries}</div>${year}${projected}: ${formatValue(bestVal)}`;
+    tooltip.style.opacity = 1;
+
+    // Position tooltip
+    const ttW = tooltip.offsetWidth;
+    const ttH = tooltip.offsetHeight;
+    let tx = e.clientX + 14;
+    let ty = e.clientY - ttH - 10;
+    if (tx + ttW > window.innerWidth - 10) tx = e.clientX - ttW - 14;
+    if (ty < 4) ty = e.clientY + 14;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+
+    // Dim other lines
+    if (activeHighlight !== bestSeries) {
+      activeHighlight = bestSeries;
+      seriesNames.forEach(n => {
+        const el = lineElements[n];
+        const lb = labelElements[n];
+        if (n === bestSeries) {
+          el.style.opacity = 1;
+          lb.style.opacity = 1;
+          el.querySelectorAll('path').forEach(p => p.setAttribute('stroke-width', n === bestSeries ? '2.5' : '1.2'));
+        } else {
+          el.style.opacity = 0.15;
+          lb.style.opacity = 0.15;
+        }
+      });
+    }
+  } else {
+    hideTooltip();
+  }
+});
+
+overlay.addEventListener('mouseleave', function() {
+  hideTooltip();
+});
+
+function hideTooltip() {
+  tooltip.style.opacity = 0;
+  crosshair.setAttribute('opacity', 0);
+  highlightDot.setAttribute('opacity', 0);
+  activeHighlight = null;
+  seriesNames.forEach(n => {
+    lineElements[n].style.opacity = 1;
+    labelElements[n].style.opacity = 1;
+    lineElements[n].querySelectorAll('path').forEach(p => {
+      p.setAttribute('stroke-width', p.getAttribute('stroke-dasharray') ? '1.2' : '1.8');
+    });
+  });
+}
+
+// Annotation for Venezuela peak
+const venPeak = DATA["Venezuela"].data.find(d => d[0] === 2018);
+if (venPeak) {
+  const px = xScale(2018);
+  const py = yScale(venPeak[1]);
+  const annG = svgEl('g', {'pointer-events': 'none'});
+
+  // Small callout line
+  const annLine = svgEl('line', {
+    x1: px, y1: py + 4,
+    x2: px + 24, y2: py + 28,
+    stroke: '#8B3A3A', 'stroke-width': 0.8
+  });
+  annG.appendChild(annLine);
+
+  const annText = svgEl('text', {
+    x: px + 26, y: py + 33,
+    fill: '#8B3A3A', 'font-size': '8px',
+    'font-family': "'JetBrains Mono', monospace"
+  });
+  annText.textContent = '65,374%';
+  annG.appendChild(annText);
+
+  svg.appendChild(annG);
+}
+
+// Annotation for Argentina 2024 peak
+const argPeak = DATA["Argentina"].data.find(d => d[0] === 2024);
+if (argPeak) {
+  const px = xScale(2024);
+  const py = yScale(argPeak[1]);
+  const annG = svgEl('g', {'pointer-events': 'none'});
+
+  const annLine = svgEl('line', {
+    x1: px, y1: py - 4,
+    x2: px - 20, y2: py - 22,
+    stroke: '#C2553A', 'stroke-width': 0.8
+  });
+  annG.appendChild(annLine);
+
+  const annText = svgEl('text', {
+    x: px - 22, y: py - 26,
+    fill: '#C2553A', 'font-size': '8px',
+    'text-anchor': 'end',
+    'font-family': "'JetBrains Mono', monospace"
+  });
+  annText.textContent = '220%';
+  annG.appendChild(annText);
+
+  svg.appendChild(annG);
+}
+
+</script>
+</body></html>

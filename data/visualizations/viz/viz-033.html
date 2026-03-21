@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #tooltip {
+    position: fixed;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 10;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+</style>
+</head><body>
+<h1>The University Boom</h1>
+<p class="subtitle">Gross enrollment ratio in tertiary education (%) for selected countries, 1990 to latest available year. Values above 100% indicate significant enrollment of students outside the typical age cohort. Over the past three decades, countries like Turkey, South Korea, and China have seen dramatic university expansion.</p>
+<svg id="chart"></svg>
+<p class="source">Source: UNESCO Institute for Statistics &middot; Gross Enrollment Ratio, Tertiary (%)</p>
+<div id="tooltip"></div>
+
+<script>
+const SERIES = [
+  { code: "KOR", name: "South Korea", color: "#B44D2E",
+    data: [[2000,74.7],[2001,77.3],[2002,80.7],[2003,84.5],[2004,89.8],[2005,95.4],[2006,99.9],[2007,102.9],[2008,103.1],[2009,102.7],[2010,101.7],[2011,100.8],[2012,98.3],[2013,96.3],[2014,94.4],[2015,94.0],[2016,93.7],[2017,93.7],[2018,93.3],[2019,94.0],[2020,96.9],[2021,100.4],[2022,102.8],[2023,106.7],[2024,111.9]]
+  },
+  { code: "TUR", name: "Turkey", color: "#C47A2B",
+    data: [[1990,12.0],[1991,12.9],[1992,13.8],[1993,15.5],[1994,18.9],[1995,19.2],[1997,22.8],[1998,22.0],[1999,22.5],[2001,25.0],[2002,25.9],[2003,29.7],[2004,30.8],[2005,33.2],[2006,37.3],[2007,39.4],[2008,40.8],[2009,46.9],[2010,56.8],[2011,61.5],[2012,70.1],[2013,79.6],[2014,87.0],[2015,95.6],[2016,103.7],[2017,110.5],[2018,115.5],[2019,117.0],[2020,118.9],[2021,125.8],[2022,127.6],[2023,105.9]]
+  },
+  { code: "CHN", name: "China", color: "#D4594E",
+    data: [[1990,3.0],[1991,2.9],[1992,2.8],[1993,2.9],[1994,3.8],[1995,4.7],[1996,5.3],[1997,5.8],[1998,6.3],[1999,6.6],[2000,7.6],[2001,9.3],[2002,11.8],[2003,14.5],[2004,16.9],[2005,18.7],[2006,20.6],[2007,21.5],[2008,21.9],[2009,23.3],[2010,25.3],[2011,26.8],[2012,29.3],[2013,32.7],[2014,43.7],[2015,47.1],[2016,49.3],[2017,51.1],[2018,53.4],[2019,56.6],[2020,61.6],[2021,66.8],[2022,71.6],[2023,74.6],[2024,76.9]]
+  },
+  { code: "IRN", name: "Iran", color: "#8E6B3E",
+    data: [[1995,17.3],[1996,19.0],[1999,18.8],[2000,18.8],[2001,19.5],[2002,18.3],[2003,19.4],[2004,21.4],[2005,22.7],[2006,25.3],[2007,29.8],[2008,36.2],[2009,36.5],[2010,42.5],[2011,48.1],[2012,53.9],[2013,56.5],[2014,64.5],[2015,70.7],[2016,67.9],[2017,66.4],[2018,60.9],[2019,58.1],[2020,55.6],[2021,54.3],[2022,58.7]]
+  },
+  { code: "BRA", name: "Brazil", color: "#5A8F6B",
+    data: [[2012,43.8],[2013,45.0],[2014,47.8],[2015,49.1],[2016,49.0],[2017,50.7],[2018,52.1],[2019,53.6],[2020,55.5],[2021,57.6],[2022,61.0],[2024,69.7]]
+  },
+  { code: "USA", name: "United States", color: "#3A6B8C",
+    data: [[1990,71.5],[1991,72.8],[1992,77.1],[1993,78.7],[1994,79.5],[1995,80.3],[1996,79.3],[1998,70.9],[1999,71.4],[2005,80.6],[2013,88.7],[2014,88.6],[2015,88.9],[2016,88.8],[2017,88.2],[2018,88.3],[2019,87.9],[2020,87.6],[2021,84.9],[2022,79.4]]
+  },
+  { code: "FIN", name: "Finland", color: "#4D7A9E",
+    data: [[2001,86.0],[2002,86.8],[2003,88.3],[2004,90.1],[2005,91.9],[2006,93.4],[2007,95.1],[2008,95.9],[2009,92.0],[2010,93.2],[2011,93.3],[2012,91.6],[2013,91.2],[2014,90.0],[2015,89.7],[2016,89.3],[2017,90.7],[2018,92.4],[2019,94.6],[2020,96.5],[2021,100.9],[2022,104.9],[2023,108.1],[2024,110.3]]
+  },
+  { code: "GBR", name: "United Kingdom", color: "#6B7F5A",
+    data: [[2000,57.4],[2001,57.5],[2002,61.1],[2003,61.5],[2004,59.5],[2005,59.3],[2006,59.2],[2007,58.8],[2008,57.4],[2009,59.1],[2010,59.8],[2011,59.3],[2012,59.2],[2013,56.8],[2014,56.5],[2015,56.4],[2016,58.1],[2017,59.6],[2018,61.1],[2019,65.5],[2020,69.4],[2021,76.8],[2022,79.8],[2023,80.4]]
+  },
+  { code: "IND", name: "India", color: "#9E7B5A",
+    data: [[1990,5.9],[1991,6.0],[1995,5.5],[1996,6.2],[1997,6.5],[2000,9.9],[2001,10.0],[2002,10.6],[2003,11.1],[2004,11.4],[2005,11.1],[2006,12.0],[2007,13.7],[2008,15.6],[2009,16.7],[2010,18.7],[2011,23.8],[2012,24.9],[2013,24.4],[2014,26.0],[2015,27.3],[2016,27.3],[2017,27.9],[2018,28.5],[2019,29.0],[2020,29.8],[2021,31.6],[2022,32.7],[2023,34.2],[2024,34.4]]
+  },
+  { code: "ETH", name: "Ethiopia", color: "#7A786F",
+    data: [[1990,0.8],[1991,0.8],[1994,0.6],[1995,0.7],[1996,0.7],[1997,0.8],[1998,0.8],[1999,0.9],[2000,1.2],[2001,1.5],[2002,1.7],[2003,2.4],[2004,2.7],[2005,2.9],[2008,3.5],[2009,5.1],[2010,7.0],[2011,7.3],[2012,7.6],[2014,5.9]]
+  }
+];
+
+const W = 860, H = 500;
+const marginTop = 20, marginRight = 120, marginBottom = 40, marginLeft = 48;
+const plotW = W - marginLeft - marginRight;
+const plotH = H - marginTop - marginBottom;
+
+const YEAR_MIN = 1990, YEAR_MAX = 2024;
+const VAL_MIN = 0, VAL_MAX = 140;
+
+function xScale(year) {
+  return marginLeft + (year - YEAR_MIN) / (YEAR_MAX - YEAR_MIN) * plotW;
+}
+function yScale(val) {
+  return marginTop + plotH - (val - VAL_MIN) / (VAL_MAX - VAL_MIN) * plotH;
+}
+
+const svg = document.getElementById("chart");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.style.display = "block";
+svg.style.maxWidth = "100%";
+svg.style.overflow = "visible";
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// Background
+el("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }, svg);
+
+// Grid lines and Y-axis ticks
+const yTicks = [0, 20, 40, 60, 80, 100, 120, 140];
+for (const t of yTicks) {
+  const y = yScale(t);
+  el("line", { x1: marginLeft, y1: y, x2: marginLeft + plotW, y2: y,
+    stroke: "#E2E0D5", "stroke-width": 1 }, svg);
+  el("text", { x: marginLeft - 8, y: y + 4, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": 9, fill: "#7A786F" }, svg)
+    .textContent = t + "%";
+}
+
+// 100% reference line
+const refY = yScale(100);
+el("line", { x1: marginLeft, y1: refY, x2: marginLeft + plotW, y2: refY,
+  stroke: "#9E9D89", "stroke-width": 1.5, "stroke-dasharray": "5 3" }, svg);
+const refLabel = el("text", { x: marginLeft + plotW + 6, y: refY + 4,
+  "font-family": "JetBrains Mono, monospace", "font-size": 8, fill: "#9E9D89" }, svg);
+refLabel.textContent = "100% ref";
+
+// X-axis ticks
+const xTicks = [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024];
+for (const t of xTicks) {
+  const x = xScale(t);
+  el("line", { x1: x, y1: marginTop + plotH, x2: x, y2: marginTop + plotH + 5,
+    stroke: "#9E9D89", "stroke-width": 1 }, svg);
+  el("text", { x: x, y: marginTop + plotH + 16, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": 9, fill: "#7A786F" }, svg)
+    .textContent = t;
+}
+
+// Axis border
+el("line", { x1: marginLeft, y1: marginTop, x2: marginLeft, y2: marginTop + plotH,
+  stroke: "#C5C3B8", "stroke-width": 1 }, svg);
+el("line", { x1: marginLeft, y1: marginTop + plotH, x2: marginLeft + plotW, y2: marginTop + plotH,
+  stroke: "#C5C3B8", "stroke-width": 1 }, svg);
+
+// Draw lines
+const paths = [];
+for (const s of SERIES) {
+  const pts = s.data.filter(([y]) => y >= YEAR_MIN && y <= YEAR_MAX);
+  const d = pts.map(([yr, val], i) => `${i === 0 ? "M" : "L"}${xScale(yr).toFixed(1)},${yScale(val).toFixed(1)}`).join(" ");
+  const path = el("path", {
+    d,
+    fill: "none",
+    stroke: s.color,
+    "stroke-width": 1.8,
+    "stroke-linejoin": "round",
+    "stroke-linecap": "round",
+    opacity: 0.9
+  }, svg);
+  paths.push({ path, series: s });
+}
+
+// End-of-line labels (collision-aware vertical placement)
+const labelData = SERIES.map(s => {
+  const last = s.data[s.data.length - 1];
+  return { series: s, year: last[0], val: last[1], x: xScale(last[0]) + 6, yIdeal: yScale(last[1]) };
+}).sort((a, b) => a.yIdeal - b.yIdeal);
+
+const MIN_GAP = 12;
+for (let i = 1; i < labelData.length; i++) {
+  if (labelData[i].yIdeal - labelData[i - 1].yIdeal < MIN_GAP) {
+    labelData[i].yIdeal = labelData[i - 1].yIdeal + MIN_GAP;
+  }
+}
+
+for (const ld of labelData) {
+  const baseX = xScale(ld.year);
+  const labelX = baseX + 6;
+  const idealY = yScale(ld.val);
+
+  if (Math.abs(ld.yIdeal - idealY) > 2) {
+    el("line", { x1: baseX + 2, y1: idealY, x2: labelX, y2: ld.yIdeal,
+      stroke: ld.series.color, "stroke-width": 0.8, opacity: 0.5 }, svg);
+  }
+
+  // Dot at last data point
+  el("circle", { cx: baseX, cy: idealY, r: 2.5, fill: ld.series.color }, svg);
+
+  el("text", {
+    x: labelX + 2,
+    y: ld.yIdeal + 4,
+    "font-family": "Inter, sans-serif",
+    "font-size": 10,
+    "font-weight": 500,
+    fill: ld.series.color
+  }, svg).textContent = ld.series.name;
+}
+
+// Invisible hover overlay
+const overlay = el("rect", {
+  x: marginLeft, y: marginTop,
+  width: plotW, height: plotH,
+  fill: "transparent",
+  cursor: "crosshair"
+}, svg);
+
+// Vertical crosshair line
+const crosshair = el("line", {
+  x1: 0, y1: marginTop, x2: 0, y2: marginTop + plotH,
+  stroke: "#2B2A27", "stroke-width": 1,
+  "stroke-dasharray": "3 2",
+  opacity: 0
+}, svg);
+
+// Hover dots group
+const dotsGroup = el("g", {}, svg);
+
+const tooltip = document.getElementById("tooltip");
+
+overlay.addEventListener("mousemove", (e) => {
+  const rect = svg.getBoundingClientRect();
+  const svgX = (e.clientX - rect.left) * (W / rect.width);
+  const year = Math.round(YEAR_MIN + (svgX - marginLeft) / plotW * (YEAR_MAX - YEAR_MIN));
+  const clampedYear = Math.max(YEAR_MIN, Math.min(YEAR_MAX, year));
+
+  crosshair.setAttribute("x1", xScale(clampedYear));
+  crosshair.setAttribute("x2", xScale(clampedYear));
+  crosshair.setAttribute("opacity", 0.4);
+
+  // Clear previous dots
+  while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+
+  // Build tooltip content
+  const rows = SERIES.map(s => {
+    // Find closest year for this series
+    let entry = s.data.find(([y]) => y === clampedYear);
+    if (!entry) {
+      // Find nearest year within 1 year
+      const nearby = s.data.filter(([y]) => Math.abs(y - clampedYear) <= 1);
+      if (nearby.length > 0) {
+        nearby.sort((a, b) => Math.abs(a[0] - clampedYear) - Math.abs(b[0] - clampedYear));
+        entry = nearby[0];
+      }
+    }
+    return entry ? { name: s.name, val: entry[1], color: s.color } : null;
+  }).filter(Boolean).sort((a, b) => b.val - a.val);
+
+  // Draw hover dots
+  for (const r of rows) {
+    el("circle", {
+      cx: xScale(clampedYear), cy: yScale(r.val), r: 3,
+      fill: r.color, stroke: "#F6F5EE", "stroke-width": 1.5
+    }, dotsGroup);
+  }
+
+  const lines = rows.map(r =>
+    `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.color};margin-right:5px;vertical-align:middle"></span><span style="color:${r.color};font-weight:500">${r.name}</span> <span style="float:right;margin-left:14px">${r.val.toFixed(1)}%</span>`
+  );
+
+  tooltip.innerHTML = `<div style="font-weight:600;margin-bottom:4px;color:#F6F5EE;border-bottom:1px solid #4A4940;padding-bottom:3px">${clampedYear}</div>` + lines.join("<br>");
+  tooltip.style.opacity = "1";
+
+  // Position tooltip, keeping it within viewport
+  let tx = e.clientX + 16;
+  let ty = e.clientY - 40;
+  const tw = 220;
+  if (tx + tw > window.innerWidth) tx = e.clientX - tw - 16;
+  if (ty < 0) ty = 8;
+  tooltip.style.left = tx + "px";
+  tooltip.style.top = ty + "px";
+});
+
+overlay.addEventListener("mouseleave", () => {
+  crosshair.setAttribute("opacity", 0);
+  tooltip.style.opacity = "0";
+  while (dotsGroup.firstChild) dotsGroup.removeChild(dotsGroup.firstChild);
+});
+</script>
+</body></html>

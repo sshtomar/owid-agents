@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 18px; margin-bottom: 16px; font-size: 10px; color: #7A786F; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 16px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>The Hunger Divide</h1>
+<p class="subtitle">Prevalence of undernourishment (% of population) from 2001 to 2023. Some nations have dramatically cut hunger; others have seen it rise or barely budge. Values at or below 2.5% are reported as "&lt;2.5%" by the World Bank.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#2D936C;"></div> Improving</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#D45D5D;"></div> Worsening</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#A89F91;"></div> Stagnant</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- SN.ITK.DEFC.ZS (Prevalence of undernourishment, % of population)</p>
+<script>
+const raw = [{"c":"BJ","n":"Benin","y":2001,"v":14.3},{"c":"BJ","n":"Benin","y":2002,"v":12.8},{"c":"BJ","n":"Benin","y":2003,"v":11.2},{"c":"BJ","n":"Benin","y":2004,"v":10.4},{"c":"BJ","n":"Benin","y":2005,"v":9.2},{"c":"BJ","n":"Benin","y":2006,"v":8.9},{"c":"BJ","n":"Benin","y":2007,"v":8.5},{"c":"BJ","n":"Benin","y":2008,"v":8.2},{"c":"BJ","n":"Benin","y":2009,"v":8.7},{"c":"BJ","n":"Benin","y":2010,"v":9.1},{"c":"BJ","n":"Benin","y":2011,"v":9.6},{"c":"BJ","n":"Benin","y":2012,"v":9.4},{"c":"BJ","n":"Benin","y":2013,"v":9.2},{"c":"BJ","n":"Benin","y":2014,"v":9.2},{"c":"BJ","n":"Benin","y":2015,"v":9.1},{"c":"BJ","n":"Benin","y":2016,"v":9.7},{"c":"BJ","n":"Benin","y":2017,"v":10.5},{"c":"BJ","n":"Benin","y":2018,"v":11.4},{"c":"BJ","n":"Benin","y":2019,"v":11.8},{"c":"BJ","n":"Benin","y":2020,"v":11.7},{"c":"BJ","n":"Benin","y":2021,"v":12.5},{"c":"BJ","n":"Benin","y":2022,"v":13.3},{"c":"BJ","n":"Benin","y":2023,"v":14.3},{"c":"BR","n":"Brazil","y":2001,"v":10.5},{"c":"BR","n":"Brazil","y":2002,"v":9.1},{"c":"BR","n":"Brazil","y":2003,"v":7.6},{"c":"BR","n":"Brazil","y":2004,"v":6.3},{"c":"BR","n":"Brazil","y":2005,"v":5.7},{"c":"BR","n":"Brazil","y":2006,"v":5.1},{"c":"BR","n":"Brazil","y":2007,"v":4.5},{"c":"BR","n":"Brazil","y":2008,"v":4},{"c":"BR","n":"Brazil","y":2009,"v":3.5},{"c":"BR","n":"Brazil","y":2010,"v":3},{"c":"BR","n":"Brazil","y":2011,"v":2.7},{"c":"BR","n":"Brazil","y":2012,"v":2.5},{"c":"BR","n":"Brazil","y":2013,"v":2.5},{"c":"BR","n":"Brazil","y":2014,"v":2.5},{"c":"BR","n":"Brazil","y":2015,"v":2.5},{"c":"BR","n":"Brazil","y":2016,"v":2.5},{"c":"BR","n":"Brazil","y":2017,"v":2.5},{"c":"BR","n":"Brazil","y":2018,"v":2.5},{"c":"BR","n":"Brazil","y":2019,"v":2.5},{"c":"BR","n":"Brazil","y":2020,"v":2.8},{"c":"BR","n":"Brazil","y":2021,"v":3.4},{"c":"BR","n":"Brazil","y":2022,"v":3.2},{"c":"BR","n":"Brazil","y":2023,"v":2.5},{"c":"KH","n":"Cambodia","y":2001,"v":19.7},{"c":"KH","n":"Cambodia","y":2002,"v":17.8},{"c":"KH","n":"Cambodia","y":2003,"v":16.6},{"c":"KH","n":"Cambodia","y":2004,"v":16.3},{"c":"KH","n":"Cambodia","y":2005,"v":15.5},{"c":"KH","n":"Cambodia","y":2006,"v":14.4},{"c":"KH","n":"Cambodia","y":2007,"v":13.3},{"c":"KH","n":"Cambodia","y":2008,"v":12.1},{"c":"KH","n":"Cambodia","y":2009,"v":11.2},{"c":"KH","n":"Cambodia","y":2010,"v":10},{"c":"KH","n":"Cambodia","y":2011,"v":9.2},{"c":"KH","n":"Cambodia","y":2012,"v":8.5},{"c":"KH","n":"Cambodia","y":2013,"v":8.4},{"c":"KH","n":"Cambodia","y":2014,"v":8.1},{"c":"KH","n":"Cambodia","y":2015,"v":7.5},{"c":"KH","n":"Cambodia","y":2016,"v":6.8},{"c":"KH","n":"Cambodia","y":2017,"v":6.3},{"c":"KH","n":"Cambodia","y":2018,"v":5.6},{"c":"KH","n":"Cambodia","y":2019,"v":5.4},{"c":"KH","n":"Cambodia","y":2020,"v":5.6},{"c":"KH","n":"Cambodia","y":2021,"v":6.1},{"c":"KH","n":"Cambodia","y":2022,"v":5.8},{"c":"KH","n":"Cambodia","y":2023,"v":5.2},{"c":"TD","n":"Chad","y":2001,"v":34.4},{"c":"TD","n":"Chad","y":2002,"v":33.4},{"c":"TD","n":"Chad","y":2003,"v":33.9},{"c":"TD","n":"Chad","y":2004,"v":32.4},{"c":"TD","n":"Chad","y":2005,"v":30.9},{"c":"TD","n":"Chad","y":2006,"v":28.6},{"c":"TD","n":"Chad","y":2007,"v":26.6},{"c":"TD","n":"Chad","y":2008,"v":24.7},{"c":"TD","n":"Chad","y":2009,"v":24.1},{"c":"TD","n":"Chad","y":2010,"v":24.1},{"c":"TD","n":"Chad","y":2011,"v":24},{"c":"TD","n":"Chad","y":2012,"v":23.5},{"c":"TD","n":"Chad","y":2013,"v":23.8},{"c":"TD","n":"Chad","y":2014,"v":25.2},{"c":"TD","n":"Chad","y":2015,"v":25.9},{"c":"TD","n":"Chad","y":2016,"v":26.1},{"c":"TD","n":"Chad","y":2017,"v":26.7},{"c":"TD","n":"Chad","y":2018,"v":28.1},{"c":"TD","n":"Chad","y":2019,"v":29.8},{"c":"TD","n":"Chad","y":2020,"v":30.1},{"c":"TD","n":"Chad","y":2021,"v":30.1},{"c":"TD","n":"Chad","y":2022,"v":30.5},{"c":"TD","n":"Chad","y":2023,"v":32},{"c":"CN","n":"China","y":2001,"v":10},{"c":"CN","n":"China","y":2002,"v":9.3},{"c":"CN","n":"China","y":2003,"v":8.6},{"c":"CN","n":"China","y":2004,"v":7.8},{"c":"CN","n":"China","y":2005,"v":6.9},{"c":"CN","n":"China","y":2006,"v":6},{"c":"CN","n":"China","y":2007,"v":4.9},{"c":"CN","n":"China","y":2008,"v":3.9},{"c":"CN","n":"China","y":2009,"v":2.9},{"c":"CN","n":"China","y":2010,"v":2.5},{"c":"CN","n":"China","y":2011,"v":2.5},{"c":"CN","n":"China","y":2012,"v":2.5},{"c":"CN","n":"China","y":2013,"v":2.5},{"c":"CN","n":"China","y":2014,"v":2.5},{"c":"CN","n":"China","y":2015,"v":2.5},{"c":"CN","n":"China","y":2016,"v":2.5},{"c":"CN","n":"China","y":2017,"v":2.5},{"c":"CN","n":"China","y":2018,"v":2.5},{"c":"CN","n":"China","y":2019,"v":2.5},{"c":"CN","n":"China","y":2020,"v":2.5},{"c":"CN","n":"China","y":2021,"v":2.5},{"c":"CN","n":"China","y":2022,"v":2.5},{"c":"CN","n":"China","y":2023,"v":2.5},{"c":"CD","n":"Congo, Dem. Rep.","y":2001,"v":26.8},{"c":"CD","n":"Congo, Dem. Rep.","y":2002,"v":27.2},{"c":"CD","n":"Congo, Dem. Rep.","y":2003,"v":27.2},{"c":"CD","n":"Congo, Dem. Rep.","y":2004,"v":27.3},{"c":"CD","n":"Congo, Dem. Rep.","y":2005,"v":27.3},{"c":"CD","n":"Congo, Dem. Rep.","y":2006,"v":27.4},{"c":"CD","n":"Congo, Dem. Rep.","y":2007,"v":27.6},{"c":"CD","n":"Congo, Dem. Rep.","y":2008,"v":27.7},{"c":"CD","n":"Congo, Dem. Rep.","y":2009,"v":28.4},{"c":"CD","n":"Congo, Dem. Rep.","y":2010,"v":28.7},{"c":"CD","n":"Congo, Dem. Rep.","y":2011,"v":29.6},{"c":"CD","n":"Congo, Dem. Rep.","y":2012,"v":30.5},{"c":"CD","n":"Congo, Dem. Rep.","y":2013,"v":30.8},{"c":"CD","n":"Congo, Dem. Rep.","y":2014,"v":31.1},{"c":"CD","n":"Congo, Dem. Rep.","y":2015,"v":31.7},{"c":"CD","n":"Congo, Dem. Rep.","y":2016,"v":32.3},{"c":"CD","n":"Congo, Dem. Rep.","y":2017,"v":32.7},{"c":"CD","n":"Congo, Dem. Rep.","y":2018,"v":32.5},{"c":"CD","n":"Congo, Dem. Rep.","y":2019,"v":34.1},{"c":"CD","n":"Congo, Dem. Rep.","y":2020,"v":35.2},{"c":"CD","n":"Congo, Dem. Rep.","y":2021,"v":36.6},{"c":"CD","n":"Congo, Dem. Rep.","y":2022,"v":37.3},{"c":"CD","n":"Congo, Dem. Rep.","y":2023,"v":38.5},{"c":"ET","n":"Ethiopia","y":2001,"v":46.1},{"c":"ET","n":"Ethiopia","y":2002,"v":43.2},{"c":"ET","n":"Ethiopia","y":2003,"v":41.6},{"c":"ET","n":"Ethiopia","y":2004,"v":39.1},{"c":"ET","n":"Ethiopia","y":2005,"v":36.4},{"c":"ET","n":"Ethiopia","y":2006,"v":32.7},{"c":"ET","n":"Ethiopia","y":2007,"v":29.4},{"c":"ET","n":"Ethiopia","y":2008,"v":26.3},{"c":"ET","n":"Ethiopia","y":2009,"v":23.9},{"c":"ET","n":"Ethiopia","y":2010,"v":22.4},{"c":"ET","n":"Ethiopia","y":2011,"v":21.2},{"c":"ET","n":"Ethiopia","y":2012,"v":19.8},{"c":"ET","n":"Ethiopia","y":2013,"v":17.7},{"c":"ET","n":"Ethiopia","y":2014,"v":15.2},{"c":"ET","n":"Ethiopia","y":2015,"v":13.6},{"c":"ET","n":"Ethiopia","y":2016,"v":13},{"c":"ET","n":"Ethiopia","y":2017,"v":14.1},{"c":"ET","n":"Ethiopia","y":2018,"v":16.1},{"c":"ET","n":"Ethiopia","y":2019,"v":18.5},{"c":"ET","n":"Ethiopia","y":2020,"v":20.3},{"c":"ET","n":"Ethiopia","y":2021,"v":20.6},{"c":"ET","n":"Ethiopia","y":2022,"v":20.2},{"c":"ET","n":"Ethiopia","y":2023,"v":19.7},{"c":"GA","n":"Gabon","y":2001,"v":10.6},{"c":"GA","n":"Gabon","y":2002,"v":12},{"c":"GA","n":"Gabon","y":2003,"v":13.1},{"c":"GA","n":"Gabon","y":2004,"v":13.8},{"c":"GA","n":"Gabon","y":2005,"v":14.3},{"c":"GA","n":"Gabon","y":2006,"v":14.5},{"c":"GA","n":"Gabon","y":2007,"v":14.4},{"c":"GA","n":"Gabon","y":2008,"v":14.3},{"c":"GA","n":"Gabon","y":2009,"v":14.4},{"c":"GA","n":"Gabon","y":2010,"v":14},{"c":"GA","n":"Gabon","y":2011,"v":13.5},{"c":"GA","n":"Gabon","y":2012,"v":13},{"c":"GA","n":"Gabon","y":2013,"v":13.1},{"c":"GA","n":"Gabon","y":2014,"v":13.3},{"c":"GA","n":"Gabon","y":2015,"v":14.1},{"c":"GA","n":"Gabon","y":2016,"v":15.3},{"c":"GA","n":"Gabon","y":2017,"v":16.4},{"c":"GA","n":"Gabon","y":2018,"v":17.5},{"c":"GA","n":"Gabon","y":2019,"v":18.6},{"c":"GA","n":"Gabon","y":2020,"v":19.7},{"c":"GA","n":"Gabon","y":2021,"v":21.3},{"c":"GA","n":"Gabon","y":2022,"v":23.5},{"c":"GA","n":"Gabon","y":2023,"v":25.3},{"c":"HT","n":"Haiti","y":2001,"v":48},{"c":"HT","n":"Haiti","y":2002,"v":50.1},{"c":"HT","n":"Haiti","y":2003,"v":50.2},{"c":"HT","n":"Haiti","y":2004,"v":49.7},{"c":"HT","n":"Haiti","y":2005,"v":47.7},{"c":"HT","n":"Haiti","y":2006,"v":45.9},{"c":"HT","n":"Haiti","y":2007,"v":44},{"c":"HT","n":"Haiti","y":2008,"v":42.2},{"c":"HT","n":"Haiti","y":2009,"v":40.4},{"c":"HT","n":"Haiti","y":2010,"v":39.5},{"c":"HT","n":"Haiti","y":2011,"v":39.7},{"c":"HT","n":"Haiti","y":2012,"v":39.8},{"c":"HT","n":"Haiti","y":2013,"v":39},{"c":"HT","n":"Haiti","y":2014,"v":37.8},{"c":"HT","n":"Haiti","y":2015,"v":37.9},{"c":"HT","n":"Haiti","y":2016,"v":38.7},{"c":"HT","n":"Haiti","y":2017,"v":40.3},{"c":"HT","n":"Haiti","y":2018,"v":41.2},{"c":"HT","n":"Haiti","y":2019,"v":42.6},{"c":"HT","n":"Haiti","y":2020,"v":43.6},{"c":"HT","n":"Haiti","y":2021,"v":47.8},{"c":"HT","n":"Haiti","y":2022,"v":51.1},{"c":"HT","n":"Haiti","y":2023,"v":54.2},{"c":"IN","n":"India","y":2001,"v":18.1},{"c":"IN","n":"India","y":2002,"v":19.7},{"c":"IN","n":"India","y":2003,"v":21.2},{"c":"IN","n":"India","y":2004,"v":21.7},{"c":"IN","n":"India","y":2005,"v":21.1},{"c":"IN","n":"India","y":2006,"v":18.9},{"c":"IN","n":"India","y":2007,"v":16.6},{"c":"IN","n":"India","y":2008,"v":15.3},{"c":"IN","n":"India","y":2009,"v":15},{"c":"IN","n":"India","y":2010,"v":14.6},{"c":"IN","n":"India","y":2011,"v":14.2},{"c":"IN","n":"India","y":2012,"v":13.4},{"c":"IN","n":"India","y":2013,"v":12.8},{"c":"IN","n":"India","y":2014,"v":12.6},{"c":"IN","n":"India","y":2015,"v":12.1},{"c":"IN","n":"India","y":2016,"v":11.6},{"c":"IN","n":"India","y":2017,"v":10.6},{"c":"IN","n":"India","y":2018,"v":10.5},{"c":"IN","n":"India","y":2019,"v":11.8},{"c":"IN","n":"India","y":2020,"v":13.4},{"c":"IN","n":"India","y":2021,"v":14.3},{"c":"IN","n":"India","y":2022,"v":13.5},{"c":"IN","n":"India","y":2023,"v":12},{"c":"ID","n":"Indonesia","y":2001,"v":18.1},{"c":"ID","n":"Indonesia","y":2002,"v":18.1},{"c":"ID","n":"Indonesia","y":2003,"v":18},{"c":"ID","n":"Indonesia","y":2004,"v":18.2},{"c":"ID","n":"Indonesia","y":2005,"v":18.4},{"c":"ID","n":"Indonesia","y":2006,"v":18.1},{"c":"ID","n":"Indonesia","y":2007,"v":17.5},{"c":"ID","n":"Indonesia","y":2008,"v":16.5},{"c":"ID","n":"Indonesia","y":2009,"v":15},{"c":"ID","n":"Indonesia","y":2010,"v":12.9},{"c":"ID","n":"Indonesia","y":2011,"v":10.9},{"c":"ID","n":"Indonesia","y":2012,"v":9.5},{"c":"ID","n":"Indonesia","y":2013,"v":8.3},{"c":"ID","n":"Indonesia","y":2014,"v":7.8},{"c":"ID","n":"Indonesia","y":2015,"v":7.1},{"c":"ID","n":"Indonesia","y":2016,"v":6.6},{"c":"ID","n":"Indonesia","y":2017,"v":6},{"c":"ID","n":"Indonesia","y":2018,"v":6},{"c":"ID","n":"Indonesia","y":2019,"v":6.4},{"c":"ID","n":"Indonesia","y":2020,"v":6.6},{"c":"ID","n":"Indonesia","y":2021,"v":6.6},{"c":"ID","n":"Indonesia","y":2022,"v":6.6},{"c":"ID","n":"Indonesia","y":2023,"v":6.3},{"c":"KE","n":"Kenya","y":2001,"v":31.8},{"c":"KE","n":"Kenya","y":2002,"v":33.3},{"c":"KE","n":"Kenya","y":2003,"v":34.5},{"c":"KE","n":"Kenya","y":2004,"v":31.6},{"c":"KE","n":"Kenya","y":2005,"v":28},{"c":"KE","n":"Kenya","y":2006,"v":25.8},{"c":"KE","n":"Kenya","y":2007,"v":26.8},{"c":"KE","n":"Kenya","y":2008,"v":26.7},{"c":"KE","n":"Kenya","y":2009,"v":24.3},{"c":"KE","n":"Kenya","y":2010,"v":21.7},{"c":"KE","n":"Kenya","y":2011,"v":19.9},{"c":"KE","n":"Kenya","y":2012,"v":19.1},{"c":"KE","n":"Kenya","y":2013,"v":18.9},{"c":"KE","n":"Kenya","y":2014,"v":19},{"c":"KE","n":"Kenya","y":2015,"v":20.8},{"c":"KE","n":"Kenya","y":2016,"v":22.2},{"c":"KE","n":"Kenya","y":2017,"v":23.6},{"c":"KE","n":"Kenya","y":2018,"v":22.9},{"c":"KE","n":"Kenya","y":2019,"v":23.7},{"c":"KE","n":"Kenya","y":2020,"v":26.3},{"c":"KE","n":"Kenya","y":2021,"v":31.6},{"c":"KE","n":"Kenya","y":2022,"v":35.3},{"c":"KE","n":"Kenya","y":2023,"v":36.8}];
+
+// Group by country and classify trend
+const countries = {};
+raw.forEach(d => {
+  if (!countries[d.n]) countries[d.n] = [];
+  countries[d.n].push(d);
+});
+
+const countryNames = Object.keys(countries).sort();
+
+// Classify each country
+const classify = (name) => {
+  const pts = countries[name];
+  const first = pts[0].v;
+  const last = pts[pts.length - 1].v;
+  const change = last - first;
+  if (change < -5) return "improving";
+  if (change > 3) return "worsening";
+  return "stagnant";
+};
+
+const colorMap = {
+  improving: "#2D936C",
+  worsening: "#D45D5D",
+  stagnant: "#A89F91"
+};
+
+// Shorten long names for labels
+const shortName = (n) => {
+  if (n === "Congo, Dem. Rep.") return "DR Congo";
+  return n;
+};
+
+// Chart dimensions
+const W = 740;
+const H = 440;
+const pad = { left: 48, right: 86, top: 20, bottom: 36 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+// Scales
+const yearMin = 2001, yearMax = 2023;
+const valMax = 60;
+const xScale = y => pad.left + ((y - yearMin) / (yearMax - yearMin)) * chartW;
+const yScale = v => pad.top + (1 - v / valMax) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Y gridlines and labels
+const yTicks = [0, 10, 20, 30, 40, 50, 60];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#C8C4BA" : "#E2DFD6");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 3);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("fill", "#A89F91");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// X axis labels
+for (let yr = 2001; yr <= 2023; yr += 2) {
+  const x = xScale(yr);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", H - pad.bottom + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("fill", "#A89F91");
+  label.textContent = yr;
+  svg.appendChild(label);
+}
+
+// Draw lines for each country
+const linePaths = {};
+countryNames.forEach(name => {
+  const pts = countries[name];
+  const cat = classify(name);
+  const color = colorMap[cat];
+
+  // Build path
+  let d = "";
+  pts.forEach((p, i) => {
+    const x = xScale(p.y);
+    const y = yScale(p.v);
+    d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+  });
+
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", color);
+  path.setAttribute("stroke-width", 1.8);
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("opacity", 0.75);
+  path.dataset.country = name;
+  svg.appendChild(path);
+  linePaths[name] = path;
+
+  // End label
+  const last = pts[pts.length - 1];
+  const labelEl = document.createElementNS(ns, "text");
+  labelEl.setAttribute("x", xScale(last.y) + 6);
+  labelEl.setAttribute("y", yScale(last.v) + 3);
+  labelEl.setAttribute("font-size", "9px");
+  labelEl.setAttribute("font-weight", "500");
+  labelEl.setAttribute("fill", color);
+  labelEl.textContent = shortName(name);
+  labelEl.dataset.countryLabel = name;
+  svg.appendChild(labelEl);
+});
+
+// Resolve label overlaps with a simple nudge
+const labels = svg.querySelectorAll("text[data-country-label]");
+const labelArr = Array.from(labels).map(el => ({
+  el,
+  baseY: parseFloat(el.getAttribute("y")),
+  y: parseFloat(el.getAttribute("y"))
+}));
+labelArr.sort((a, b) => a.baseY - b.baseY);
+for (let i = 1; i < labelArr.length; i++) {
+  const prev = labelArr[i - 1];
+  const curr = labelArr[i];
+  if (curr.y - prev.y < 10) {
+    curr.y = prev.y + 10;
+    curr.el.setAttribute("y", curr.y);
+  }
+}
+
+// Invisible hover circles for each data point
+const tip = document.getElementById("tip");
+const allDots = [];
+countryNames.forEach(name => {
+  const pts = countries[name];
+  const cat = classify(name);
+  const color = colorMap[cat];
+
+  pts.forEach(p => {
+    const cx = xScale(p.y);
+    const cy = yScale(p.v);
+
+    // Visible dot (hidden by default)
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", cx);
+    dot.setAttribute("cy", cy);
+    dot.setAttribute("r", 3);
+    dot.setAttribute("fill", color);
+    dot.setAttribute("stroke", "#F6F5EE");
+    dot.setAttribute("stroke-width", 1.5);
+    dot.setAttribute("opacity", 0);
+    dot.dataset.country = name;
+    svg.appendChild(dot);
+    allDots.push(dot);
+
+    // Hit area
+    const hit = document.createElementNS(ns, "circle");
+    hit.setAttribute("cx", cx);
+    hit.setAttribute("cy", cy);
+    hit.setAttribute("r", 8);
+    hit.setAttribute("fill", "transparent");
+    hit.style.cursor = "pointer";
+
+    hit.addEventListener("mouseenter", (e) => {
+      // Highlight this country
+      Object.values(linePaths).forEach(lp => {
+        if (lp.dataset.country === name) {
+          lp.setAttribute("stroke-width", 3);
+          lp.setAttribute("opacity", 1);
+        } else {
+          lp.setAttribute("opacity", 0.2);
+        }
+      });
+      // Show dots for this country
+      allDots.forEach(d => {
+        d.setAttribute("opacity", d.dataset.country === name ? 1 : 0);
+      });
+      // Show label
+      labels.forEach(l => {
+        l.setAttribute("opacity", l.dataset.countryLabel === name ? 1 : 0.15);
+      });
+      // Show tooltip
+      const rect = document.getElementById("chart").getBoundingClientRect();
+      tip.style.opacity = 1;
+      tip.innerHTML = `<strong>${shortName(name)}</strong> ${p.y}: ${p.v}%`;
+      tip.style.left = (e.clientX - rect.left + 12) + "px";
+      tip.style.top = (e.clientY - rect.top - 10) + "px";
+    });
+
+    hit.addEventListener("mousemove", (e) => {
+      const rect = document.getElementById("chart").getBoundingClientRect();
+      tip.style.left = (e.clientX - rect.left + 12) + "px";
+      tip.style.top = (e.clientY - rect.top - 10) + "px";
+    });
+
+    hit.addEventListener("mouseleave", () => {
+      Object.values(linePaths).forEach(lp => {
+        lp.setAttribute("stroke-width", 1.8);
+        lp.setAttribute("opacity", 0.75);
+      });
+      allDots.forEach(d => d.setAttribute("opacity", 0));
+      labels.forEach(l => l.setAttribute("opacity", 1));
+      tip.style.opacity = 0;
+    });
+
+    svg.appendChild(hit);
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

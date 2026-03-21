@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Out of the Smoke</h1>
+<p class="subtitle">Access to clean fuels and technologies for cooking, 2000-2023 (% of population). Indonesia and China have nearly completed the transition, lifting hundreds of millions out of household air pollution. But in the DRC, Haiti, and Ethiopia, wood and charcoal still dominate -- progress barely registers.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- EG.CFT.ACCS.ZS (Access to clean fuels and technologies for cooking)</p>
+<script>
+const data = [
+  { c: "ID", n: "Indonesia", d: [[2000,6.7],[2001,7.7],[2002,9.2],[2003,11],[2004,13.3],[2005,16.3],[2006,20],[2007,24.6],[2008,29.4],[2009,34.9],[2010,40.3],[2011,46.1],[2012,51.5],[2013,57],[2014,61.9],[2015,66.8],[2016,71.3],[2017,75.3],[2018,78.7],[2019,81.85],[2020,84.6],[2021,86.9],[2022,88.8],[2023,90.6]] },
+  { c: "CN", n: "China", d: [[2000,40.3],[2001,41.6],[2002,42.8],[2003,44.1],[2004,45.7],[2005,47.4],[2006,49.1],[2007,51.2],[2008,53.2],[2009,55.3],[2010,57.9],[2011,60.3],[2012,63.1],[2013,65.9],[2014,69],[2015,71.6],[2016,74.2],[2017,76.9],[2018,79.5],[2019,81.6],[2020,83.8],[2021,85.6],[2022,87.2],[2023,88.7]] },
+  { c: "CO", n: "Colombia", d: [[2000,78],[2001,78.9],[2002,79.8],[2003,80.6],[2004,81.2],[2005,81.9],[2006,82.5],[2007,83.1],[2008,83.7],[2009,84.5],[2010,85],[2011,85.8],[2012,86.5],[2013,87.1],[2014,88.1],[2015,88.7],[2016,89.2],[2017,89.7],[2018,90.1],[2019,90.6],[2020,90.9],[2021,91.4],[2022,91.5],[2023,91.8]] },
+  { c: "IN", n: "India", d: [[2000,22.7],[2001,23.8],[2002,24.9],[2003,26.2],[2004,27.3],[2005,28.3],[2006,29.3],[2007,30.7],[2008,31.9],[2009,33.6],[2010,35],[2011,36.95],[2012,39.3],[2013,42.4],[2014,44.8],[2015,48.4],[2016,51.8],[2017,55.3],[2018,59],[2019,62.7],[2020,66.5],[2021,70.2],[2022,73.4],[2023,76.7]] },
+  { c: "KH", n: "Cambodia", d: [[2000,3.4],[2001,4],[2002,4.6],[2003,5.2],[2004,5.9],[2005,6.6],[2006,7.5],[2007,8.4],[2008,9.2],[2009,10.3],[2010,11.7],[2011,13.1],[2012,14.7],[2013,16.4],[2014,18.5],[2015,21.1],[2016,23.8],[2017,27.1],[2018,31.1],[2019,35.5],[2020,40.6],[2021,46.3],[2022,52.15],[2023,58]] },
+  { c: "AF", n: "Afghanistan", d: [[2000,6.2],[2001,7.1],[2002,8.3],[2003,9.35],[2004,10.8],[2005,12.1],[2006,13.6],[2007,15.3],[2008,16.7],[2009,18.3],[2010,19.8],[2011,21.3],[2012,22.9],[2013,24.4],[2014,25.8],[2015,27.5],[2016,28.9],[2017,30.15],[2018,31.7],[2019,33.3],[2020,34.6],[2021,35.9],[2022,37.1],[2023,38.6]] },
+  { c: "GH", n: "Ghana", d: [[2000,6.2],[2001,6.9],[2002,7.6],[2003,8.3],[2004,9],[2005,10],[2006,10.8],[2007,11.8],[2008,12.9],[2009,14],[2010,15.3],[2011,16.3],[2012,17.5],[2013,18.8],[2014,19.9],[2015,21.4],[2016,22.7],[2017,23.9],[2018,25.3],[2019,26.9],[2020,28.3],[2021,29.9],[2022,31.5],[2023,32.8]] },
+  { c: "KE", n: "Kenya", d: [[2000,1.7],[2001,2.1],[2002,2.5],[2003,3],[2004,3.4],[2005,3.9],[2006,4.5],[2007,5.1],[2008,5.8],[2009,6.4],[2010,7.1],[2011,7.9],[2012,8.8],[2013,9.9],[2014,11.2],[2015,12.6],[2016,14.2],[2017,16.1],[2018,18],[2019,20.6],[2020,23.05],[2021,25.8],[2022,28.5],[2023,31.6]] },
+  { c: "BD", n: "Bangladesh", d: [[2000,7.7],[2001,8],[2002,8.3],[2003,8.7],[2004,9.1],[2005,9.4],[2006,10],[2007,10.4],[2008,11],[2009,11.7],[2010,12.6],[2011,13.4],[2012,14.5],[2013,15.5],[2014,16.8],[2015,18.1],[2016,19.4],[2017,20.6],[2018,22],[2019,23.1],[2020,24.6],[2021,25.9],[2022,27.2],[2023,28.4]] },
+  { c: "ET", n: "Ethiopia", d: [[2000,0.8],[2001,0.9],[2002,1],[2003,1],[2004,1.1],[2005,1.2],[2006,1.3],[2007,1.5],[2008,1.7],[2009,1.9],[2010,2.2],[2011,2.6],[2012,3],[2013,3.4],[2014,3.8],[2015,4.3],[2016,4.7],[2017,5.2],[2018,5.6],[2019,5.9],[2020,6.2],[2021,6.5],[2022,6.9],[2023,7.1]] },
+  { c: "CD", n: "DR Congo", d: [[2000,1],[2001,1.2],[2002,1.5],[2003,1.6],[2004,1.8],[2005,2],[2006,2.3],[2007,2.4],[2008,2.7],[2009,2.9],[2010,3.1],[2011,3.3],[2012,3.4],[2013,3.6],[2014,3.8],[2015,3.9],[2016,4],[2017,4.1],[2018,4.2],[2019,4.4],[2020,4.4],[2021,4.6],[2022,4.8],[2023,5]] },
+  { c: "HT", n: "Haiti", d: [[2000,2.6],[2001,2.7],[2002,2.8],[2003,3],[2004,3.1],[2005,3.3],[2006,3.4],[2007,3.4],[2008,3.5],[2009,3.6],[2010,3.6],[2011,3.7],[2012,3.8],[2013,3.8],[2014,3.8],[2015,3.9],[2016,4],[2017,4.1],[2018,4],[2019,4.2],[2020,4.2],[2021,4.4],[2022,4.4],[2023,4.5]] }
+];
+
+const colors = {
+  ID: "#E06050",
+  CN: "#D4A24E",
+  CO: "#7A786F",
+  IN: "#3A9E8F",
+  KH: "#6B8FCC",
+  AF: "#C47AB3",
+  GH: "#8B6F47",
+  KE: "#5CAD5C",
+  BD: "#CC7A3E",
+  ET: "#9B5959",
+  CD: "#6A6A9B",
+  HT: "#8C8C8C"
+};
+
+const W = 740;
+const H = 480;
+const pad = { left: 48, right: 110, top: 30, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const xMin = 2000, xMax = 2023;
+const yMin = 0, yMax = 100;
+
+const xScale = v => pad.left + ((v - xMin) / (xMax - xMin)) * chartW;
+const yScale = v => pad.top + chartH - ((v - yMin) / (yMax - yMin)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Y-axis gridlines and labels
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", pad.left + chartW);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", v === 0 ? "#B5B2A8" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", y + 1);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("dominant-baseline", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// X-axis labels
+[2000, 2005, 2010, 2015, 2020].forEach(yr => {
+  const x = xScale(yr);
+  const tick = document.createElementNS(ns, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", yScale(0));
+  tick.setAttribute("y2", yScale(0) + 5);
+  tick.setAttribute("stroke", "#B5B2A8");
+  tick.setAttribute("stroke-width", 0.5);
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", yScale(0) + 18);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = yr;
+  svg.appendChild(label);
+});
+
+// Tooltip
+const tip = document.getElementById("tip");
+const chartEl = document.getElementById("chart");
+
+// Track highlight state
+let highlighted = null;
+
+function setHighlight(code) {
+  highlighted = code;
+  data.forEach(s => {
+    const pathEl = document.querySelector(`[data-line="${s.c}"]`);
+    const dotEl = document.querySelector(`[data-dot="${s.c}"]`);
+    const labelEl = document.querySelector(`[data-label="${s.c}"]`);
+    const valEl = document.querySelector(`[data-val="${s.c}"]`);
+    if (code === null) {
+      pathEl.setAttribute("opacity", "1");
+      pathEl.setAttribute("stroke-width", s.c === "ID" || s.c === "IN" || s.c === "ET" || s.c === "HT" ? "2.5" : "1.8");
+      labelEl.setAttribute("opacity", "1");
+      valEl.setAttribute("opacity", "1");
+      dotEl.setAttribute("opacity", "1");
+    } else if (s.c === code) {
+      pathEl.setAttribute("opacity", "1");
+      pathEl.setAttribute("stroke-width", "3.5");
+      labelEl.setAttribute("opacity", "1");
+      labelEl.setAttribute("font-weight", "600");
+      valEl.setAttribute("opacity", "1");
+      dotEl.setAttribute("opacity", "1");
+      dotEl.setAttribute("r", "4");
+    } else {
+      pathEl.setAttribute("opacity", "0.12");
+      pathEl.setAttribute("stroke-width", "1.5");
+      labelEl.setAttribute("opacity", "0.2");
+      valEl.setAttribute("opacity", "0.2");
+      dotEl.setAttribute("opacity", "0.15");
+      dotEl.setAttribute("r", "2.5");
+    }
+  });
+}
+
+function clearHighlight() {
+  highlighted = null;
+  data.forEach(s => {
+    const pathEl = document.querySelector(`[data-line="${s.c}"]`);
+    const dotEl = document.querySelector(`[data-dot="${s.c}"]`);
+    const labelEl = document.querySelector(`[data-label="${s.c}"]`);
+    const valEl = document.querySelector(`[data-val="${s.c}"]`);
+    const isKey = s.c === "ID" || s.c === "IN" || s.c === "ET" || s.c === "HT";
+    pathEl.setAttribute("opacity", "1");
+    pathEl.setAttribute("stroke-width", isKey ? "2.5" : "1.8");
+    labelEl.setAttribute("opacity", "1");
+    labelEl.setAttribute("font-weight", "500");
+    valEl.setAttribute("opacity", "1");
+    dotEl.setAttribute("opacity", "1");
+    dotEl.setAttribute("r", "3");
+  });
+}
+
+// Draw lines and endpoints
+data.forEach(s => {
+  const pts = s.d;
+  const color = colors[s.c];
+  const isKey = s.c === "ID" || s.c === "IN" || s.c === "ET" || s.c === "HT";
+
+  // Build path
+  let pathD = "";
+  pts.forEach((p, i) => {
+    const x = xScale(p[0]);
+    const y = yScale(p[1]);
+    pathD += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+  });
+
+  const path = document.createElementNS(ns, "path");
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", color);
+  path.setAttribute("stroke-width", isKey ? "2.5" : "1.8");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("data-line", s.c);
+  svg.appendChild(path);
+
+  // Endpoint dot
+  const lastPt = pts[pts.length - 1];
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(lastPt[0]));
+  dot.setAttribute("cy", yScale(lastPt[1]));
+  dot.setAttribute("r", "3");
+  dot.setAttribute("fill", color);
+  dot.setAttribute("data-dot", s.c);
+  svg.appendChild(dot);
+
+  // Endpoint label (country name)
+  const labelY = yScale(lastPt[1]);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", xScale(lastPt[0]) + 8);
+  label.setAttribute("y", labelY - 4);
+  label.setAttribute("font-size", "9.5");
+  label.setAttribute("font-weight", "500");
+  label.setAttribute("fill", color);
+  label.setAttribute("data-label", s.c);
+  label.textContent = s.n;
+  svg.appendChild(label);
+
+  // Value label
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", xScale(lastPt[0]) + 8);
+  valLabel.setAttribute("y", labelY + 7);
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "8");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.setAttribute("data-val", s.c);
+  valLabel.textContent = lastPt[1].toFixed(1) + "%";
+  svg.appendChild(valLabel);
+
+  // Hit area for hover (invisible wide stroke)
+  const hitPath = document.createElementNS(ns, "path");
+  hitPath.setAttribute("d", pathD);
+  hitPath.setAttribute("fill", "none");
+  hitPath.setAttribute("stroke", "transparent");
+  hitPath.setAttribute("stroke-width", "12");
+  hitPath.style.cursor = "pointer";
+
+  hitPath.addEventListener("mouseenter", () => {
+    setHighlight(s.c);
+    const first = pts[0];
+    const last = pts[pts.length - 1];
+    const change = last[1] - first[1];
+    tip.innerHTML = `<strong>${s.n}</strong>  ${first[1]}% (${first[0]}) &rarr; ${last[1]}% (${last[0]})  <span style="color:${change > 20 ? '#6FCF97' : change > 5 ? '#D4A24E' : '#E06050'}">${change > 0 ? "+" : ""}${change.toFixed(1)}pp</span>`;
+    tip.style.opacity = 1;
+  });
+
+  hitPath.addEventListener("mousemove", e => {
+    const rect = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 14) + "px";
+    tip.style.top = (e.clientY - rect.top - 24) + "px";
+  });
+
+  hitPath.addEventListener("mouseleave", () => {
+    clearHighlight();
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitPath);
+});
+
+// Fix label overlaps by nudging y positions
+// The endpoint labels at 2023 need manual adjustment for overlap
+function adjustLabels() {
+  const labelEls = [];
+  data.forEach(s => {
+    const lastVal = s.d[s.d.length - 1][1];
+    const el = document.querySelector(`[data-label="${s.c}"]`);
+    const valEl = document.querySelector(`[data-val="${s.c}"]`);
+    labelEls.push({ code: s.c, val: lastVal, el, valEl, baseY: yScale(lastVal) });
+  });
+
+  // Sort by value descending (top of chart = highest value)
+  labelEls.sort((a, b) => b.val - a.val);
+
+  // Iteratively push apart labels that are too close
+  const minGap = 14;
+  for (let pass = 0; pass < 10; pass++) {
+    for (let i = 1; i < labelEls.length; i++) {
+      const prev = labelEls[i - 1];
+      const curr = labelEls[i];
+      const prevY = parseFloat(prev.el.getAttribute("y"));
+      const currY = parseFloat(curr.el.getAttribute("y"));
+      if (currY - prevY < minGap) {
+        const mid = (prevY + currY) / 2;
+        prev.el.setAttribute("y", (mid - minGap / 2).toFixed(1));
+        prev.valEl.setAttribute("y", (mid - minGap / 2 + 11).toFixed(1));
+        curr.el.setAttribute("y", (mid + minGap / 2).toFixed(1));
+        curr.valEl.setAttribute("y", (mid + minGap / 2 + 11).toFixed(1));
+      }
+    }
+  }
+}
+
+chartEl.appendChild(svg);
+adjustLabels();
+</script>
+</body></html>

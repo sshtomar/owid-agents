@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>Under Pressure</h1>
+<p class="subtitle">Prevalence of raised blood pressure (age-standardized, %) comparing early 1990s with the late 2010s. Most countries saw declines, led by wealthy nations with better treatment access. A handful -- mostly in Central Asia and the Pacific -- saw rates climb. Lines colored by direction: blue for decline, red for increase.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- BP_04 (Raised blood pressure, SBP>=140 or DBP>=90, age-standardized)</p>
+<script>
+const allData = [
+  { name: "Luxembourg", early: 38.7, late: 16.0, earlyYear: 1990, lateYear: 2019, change: -22.7 },
+  { name: "Chile", early: 37.8, late: 19.2, earlyYear: 1991, lateYear: 2019, change: -18.6 },
+  { name: "Austria", early: 42.6, late: 24.6, earlyYear: 1991, lateYear: 2019, change: -18.0 },
+  { name: "South Korea", early: 27.4, late: 9.7, earlyYear: 1993, lateYear: 2017, change: -17.7 },
+  { name: "Andorra", early: 35.3, late: 21.6, earlyYear: 1990, lateYear: 2017, change: -13.7 },
+  { name: "Spain", early: 35.0, late: 23.6, earlyYear: 1990, lateYear: 2019, change: -11.4 },
+  { name: "Belgium", early: 25.7, late: 15.2, earlyYear: 1994, lateYear: 2017, change: -10.5 },
+  { name: "Belarus", early: 50.8, late: 40.6, earlyYear: 1990, lateYear: 2016, change: -10.2 },
+  { name: "Ireland", early: 41.4, late: 31.4, earlyYear: 1995, lateYear: 2016, change: -10.0 },
+  { name: "United States", early: 20.5, late: 13.5, earlyYear: 1991, lateYear: 2015, change: -7.0 },
+  { name: "Sweden", early: 37.6, late: 31.0, earlyYear: 1990, lateYear: 2016, change: -6.6 },
+  { name: "Serbia", early: 47.0, late: 40.6, earlyYear: 1990, lateYear: 2018, change: -6.4 },
+  { name: "Peru", early: 18.4, late: 12.7, earlyYear: 1993, lateYear: 2019, change: -5.7 },
+  { name: "Netherlands", early: 28.5, late: 23.5, earlyYear: 1990, lateYear: 2019, change: -5.0 },
+  { name: "Moldova", early: 51.5, late: 47.1, earlyYear: 1991, lateYear: 2016, change: -4.3 },
+  { name: "Bosnia & Herz.", early: 46.4, late: 42.2, earlyYear: 1990, lateYear: 2015, change: -4.3 },
+  { name: "India", early: 29.2, late: 28.1, earlyYear: 1992, lateYear: 2019, change: -1.1 },
+  { name: "Nigeria", early: 34.5, late: 33.0, earlyYear: 1994, lateYear: 2016, change: -1.5 },
+  { name: "Egypt", early: 30.7, late: 30.3, earlyYear: 1992, lateYear: 2017, change: -0.5 },
+  { name: "Croatia", early: 44.0, late: 44.0, earlyYear: 1992, lateYear: 2018, change: 0.0 },
+  { name: "Senegal", early: 37.3, late: 37.7, earlyYear: 1992, lateYear: 2016, change: 0.5 },
+  { name: "Malaysia", early: 32.8, late: 33.6, earlyYear: 1990, lateYear: 2017, change: 0.8 },
+  { name: "Jamaica", early: 34.8, late: 37.3, earlyYear: 1990, lateYear: 2018, change: 2.5 },
+  { name: "Vanuatu", early: 33.9, late: 37.6, earlyYear: 1991, lateYear: 2019, change: 3.7 },
+  { name: "Armenia", early: 41.0, late: 44.9, earlyYear: 1991, lateYear: 2019, change: 3.9 },
+  { name: "Tajikistan", early: 39.3, late: 43.4, earlyYear: 1994, lateYear: 2019, change: 4.1 },
+  { name: "Afghanistan", early: 32.5, late: 37.2, earlyYear: 1993, lateYear: 2017, change: 4.7 },
+  { name: "Tonga", early: 33.3, late: 38.1, earlyYear: 1991, lateYear: 2015, change: 4.8 },
+  { name: "Papua New Guinea", early: 21.7, late: 26.7, earlyYear: 1991, lateYear: 2019, change: 4.9 }
+];
+
+// Sort by change (most decline at top)
+allData.sort((a, b) => a.change - b.change);
+
+const W = 780;
+const rowH = 22;
+const gap = 3;
+const pad = { left: 155, right: 155, top: 44, bottom: 20 };
+const chartH = allData.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const innerW = W - pad.left - pad.right;
+
+const minVal = 0;
+const maxVal = 55;
+const xScale = v => pad.left + ((v - minVal) / (maxVal - minVal)) * innerW;
+const yPos = i => pad.top + i * (rowH + gap) + rowH / 2;
+
+const declineColor = "#3A7FBF";
+const increaseColor = "#D45D4C";
+const neutralColor = "#999";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Background grid lines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x); line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 10);
+  line.setAttribute("y2", pad.top + chartH + 5);
+  line.setAttribute("stroke", "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1.5 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x); label.setAttribute("y", pad.top - 16);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("font-family", "JetBrains Mono, monospace");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// Column headers
+const headerEarly = document.createElementNS(ns, "text");
+headerEarly.setAttribute("x", pad.left - 8);
+headerEarly.setAttribute("y", pad.top - 26);
+headerEarly.setAttribute("text-anchor", "end");
+headerEarly.setAttribute("fill", "#7A786F");
+headerEarly.setAttribute("font-size", "9px");
+headerEarly.setAttribute("font-weight", "500");
+headerEarly.setAttribute("font-family", "JetBrains Mono, monospace");
+headerEarly.textContent = "COUNTRY";
+svg.appendChild(headerEarly);
+
+const headerPct = document.createElementNS(ns, "text");
+headerPct.setAttribute("x", W - pad.right + 8);
+headerPct.setAttribute("y", pad.top - 26);
+headerPct.setAttribute("text-anchor", "start");
+headerPct.setAttribute("fill", "#7A786F");
+headerPct.setAttribute("font-size", "9px");
+headerPct.setAttribute("font-weight", "500");
+headerPct.setAttribute("font-family", "JetBrains Mono, monospace");
+headerPct.textContent = "CHANGE (pp)";
+svg.appendChild(headerPct);
+
+// Tooltip element
+const tip = document.getElementById("tip");
+
+// Draw data rows
+allData.forEach((d, i) => {
+  const y = yPos(i);
+  const x1 = xScale(d.early);
+  const x2 = xScale(d.late);
+  const isIncrease = d.change > 0.5;
+  const isNeutral = Math.abs(d.change) <= 0.5;
+  const color = isNeutral ? neutralColor : isIncrease ? increaseColor : declineColor;
+
+  // Hit area for hover (invisible wide rect)
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0); hitArea.setAttribute("y", y - rowH / 2);
+  hitArea.setAttribute("width", W); hitArea.setAttribute("height", rowH);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.setAttribute("cursor", "pointer");
+  hitArea.dataset.idx = i;
+  svg.appendChild(hitArea);
+
+  // Connecting line
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x1); line.setAttribute("x2", x2);
+  line.setAttribute("y1", y); line.setAttribute("y2", y);
+  line.setAttribute("stroke", color);
+  line.setAttribute("stroke-width", 2);
+  line.setAttribute("stroke-opacity", 0.5);
+  line.classList.add("slope-line");
+  line.dataset.idx = i;
+  svg.appendChild(line);
+
+  // Arrow head on the line
+  const arrowSize = 4;
+  const arrowX = x2;
+  const arrowDir = x2 > x1 ? 1 : -1;
+  const arrow = document.createElementNS(ns, "polygon");
+  const ax = arrowX;
+  const points = `${ax},${y - arrowSize} ${ax + arrowDir * arrowSize * 1.3},${y} ${ax},${y + arrowSize}`;
+  arrow.setAttribute("points", points);
+  arrow.setAttribute("fill", color);
+  arrow.setAttribute("opacity", 0.7);
+  arrow.classList.add("slope-arrow");
+  arrow.dataset.idx = i;
+  svg.appendChild(arrow);
+
+  // Early dot
+  const c1 = document.createElementNS(ns, "circle");
+  c1.setAttribute("cx", x1); c1.setAttribute("cy", y);
+  c1.setAttribute("r", 3.5);
+  c1.setAttribute("fill", color);
+  c1.setAttribute("opacity", 0.8);
+  c1.classList.add("slope-dot");
+  c1.dataset.idx = i;
+  svg.appendChild(c1);
+
+  // Late dot
+  const c2 = document.createElementNS(ns, "circle");
+  c2.setAttribute("cx", x2); c2.setAttribute("cy", y);
+  c2.setAttribute("r", 3.5);
+  c2.setAttribute("fill", color);
+  c2.classList.add("slope-dot");
+  c2.dataset.idx = i;
+  svg.appendChild(c2);
+
+  // Country label (left)
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + 3.5);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.setAttribute("font-size", "10px");
+  nameLabel.setAttribute("font-weight", "400");
+  nameLabel.classList.add("slope-label");
+  nameLabel.dataset.idx = i;
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Change label (right)
+  const changeLabel = document.createElementNS(ns, "text");
+  changeLabel.setAttribute("x", W - pad.right + 8);
+  changeLabel.setAttribute("y", y + 3.5);
+  changeLabel.setAttribute("text-anchor", "start");
+  changeLabel.setAttribute("fill", color);
+  changeLabel.setAttribute("font-size", "10px");
+  changeLabel.setAttribute("font-weight", "500");
+  changeLabel.setAttribute("font-family", "JetBrains Mono, monospace");
+  changeLabel.classList.add("slope-change");
+  changeLabel.dataset.idx = i;
+  const sign = d.change > 0 ? "+" : "";
+  changeLabel.textContent = sign + d.change.toFixed(1);
+  svg.appendChild(changeLabel);
+
+  // Hover interaction
+  hitArea.addEventListener("mouseenter", (e) => {
+    // Dim all rows
+    svg.querySelectorAll(".slope-line").forEach(el => el.setAttribute("stroke-opacity", 0.15));
+    svg.querySelectorAll(".slope-dot").forEach(el => el.setAttribute("opacity", 0.2));
+    svg.querySelectorAll(".slope-arrow").forEach(el => el.setAttribute("opacity", 0.15));
+    svg.querySelectorAll(".slope-label").forEach(el => el.setAttribute("fill-opacity", 0.25));
+    svg.querySelectorAll(".slope-change").forEach(el => el.setAttribute("fill-opacity", 0.25));
+
+    // Highlight this row
+    svg.querySelectorAll(`[data-idx="${i}"].slope-line`).forEach(el => { el.setAttribute("stroke-opacity", 1); el.setAttribute("stroke-width", 3); });
+    svg.querySelectorAll(`[data-idx="${i}"].slope-dot`).forEach(el => el.setAttribute("opacity", 1));
+    svg.querySelectorAll(`[data-idx="${i}"].slope-arrow`).forEach(el => el.setAttribute("opacity", 1));
+    svg.querySelectorAll(`[data-idx="${i}"].slope-label`).forEach(el => { el.setAttribute("fill-opacity", 1); el.setAttribute("font-weight", "600"); });
+    svg.querySelectorAll(`[data-idx="${i}"].slope-change`).forEach(el => { el.setAttribute("fill-opacity", 1); el.setAttribute("font-weight", "600"); });
+
+    // Tooltip
+    const direction = d.change < -0.5 ? "Declined" : d.change > 0.5 ? "Increased" : "Unchanged";
+    tip.innerHTML =
+      `<strong>${d.name}</strong><br>` +
+      `~${d.earlyYear}: ${d.early}%<br>` +
+      `~${d.lateYear}: ${d.late}%<br>` +
+      `${direction} by ${Math.abs(d.change).toFixed(1)} pp`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", (e) => {
+    const chartRect = document.getElementById("chart").getBoundingClientRect();
+    let tx = e.clientX - chartRect.left + 14;
+    let ty = e.clientY - chartRect.top - 10;
+    if (tx + 180 > chartRect.width) tx = e.clientX - chartRect.left - 180;
+    tip.style.left = tx + "px";
+    tip.style.top = ty + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    svg.querySelectorAll(".slope-line").forEach(el => { el.setAttribute("stroke-opacity", 0.5); el.setAttribute("stroke-width", 2); });
+    svg.querySelectorAll(".slope-dot").forEach(el => el.setAttribute("opacity", 0.8));
+    svg.querySelectorAll(".slope-arrow").forEach(el => el.setAttribute("opacity", 0.7));
+    svg.querySelectorAll(".slope-label").forEach(el => { el.setAttribute("fill-opacity", 1); el.setAttribute("font-weight", "400"); });
+    svg.querySelectorAll(".slope-change").forEach(el => { el.setAttribute("fill-opacity", 1); el.setAttribute("font-weight", "500"); });
+    tip.style.opacity = 0;
+  });
+});
+
+// Legend
+const legendY = pad.top + chartH + 14;
+const legendItems = [
+  { label: "Early 1990s value", type: "dot" },
+  { label: "Late 2010s value", type: "dot" },
+  { label: "Decline", color: declineColor },
+  { label: "Increase", color: increaseColor }
+];
+
+let legendX = pad.left;
+// Draw a small legend at the bottom
+const legG = document.createElementNS(ns, "g");
+
+// Dot for "Early 1990s"
+const dot1 = document.createElementNS(ns, "circle");
+dot1.setAttribute("cx", legendX); dot1.setAttribute("cy", legendY);
+dot1.setAttribute("r", 3); dot1.setAttribute("fill", "#7A786F");
+legG.appendChild(dot1);
+const lab1 = document.createElementNS(ns, "text");
+lab1.setAttribute("x", legendX + 7); lab1.setAttribute("y", legendY + 3);
+lab1.setAttribute("fill", "#7A786F"); lab1.setAttribute("font-size", "9px");
+lab1.textContent = "Early 1990s";
+legG.appendChild(lab1);
+
+legendX += 85;
+const arrLine = document.createElementNS(ns, "line");
+arrLine.setAttribute("x1", legendX); arrLine.setAttribute("x2", legendX + 20);
+arrLine.setAttribute("y1", legendY); arrLine.setAttribute("y2", legendY);
+arrLine.setAttribute("stroke", "#7A786F"); arrLine.setAttribute("stroke-width", 2);
+legG.appendChild(arrLine);
+const arrHead = document.createElementNS(ns, "polygon");
+arrHead.setAttribute("points", `${legendX + 20},${legendY - 3} ${legendX + 24},${legendY} ${legendX + 20},${legendY + 3}`);
+arrHead.setAttribute("fill", "#7A786F");
+legG.appendChild(arrHead);
+const dot2 = document.createElementNS(ns, "circle");
+dot2.setAttribute("cx", legendX + 28); dot2.setAttribute("cy", legendY);
+dot2.setAttribute("r", 3); dot2.setAttribute("fill", "#7A786F");
+legG.appendChild(dot2);
+const lab2 = document.createElementNS(ns, "text");
+lab2.setAttribute("x", legendX + 35); lab2.setAttribute("y", legendY + 3);
+lab2.setAttribute("fill", "#7A786F"); lab2.setAttribute("font-size", "9px");
+lab2.textContent = "Late 2010s";
+legG.appendChild(lab2);
+
+legendX += 110;
+const decRect = document.createElementNS(ns, "rect");
+decRect.setAttribute("x", legendX); decRect.setAttribute("y", legendY - 4);
+decRect.setAttribute("width", 12); decRect.setAttribute("height", 8);
+decRect.setAttribute("rx", 1); decRect.setAttribute("fill", declineColor);
+legG.appendChild(decRect);
+const lab3 = document.createElementNS(ns, "text");
+lab3.setAttribute("x", legendX + 16); lab3.setAttribute("y", legendY + 3);
+lab3.setAttribute("fill", "#7A786F"); lab3.setAttribute("font-size", "9px");
+lab3.textContent = "Declined";
+legG.appendChild(lab3);
+
+legendX += 65;
+const incRect = document.createElementNS(ns, "rect");
+incRect.setAttribute("x", legendX); incRect.setAttribute("y", legendY - 4);
+incRect.setAttribute("width", 12); incRect.setAttribute("height", 8);
+incRect.setAttribute("rx", 1); incRect.setAttribute("fill", increaseColor);
+legG.appendChild(incRect);
+const lab4 = document.createElementNS(ns, "text");
+lab4.setAttribute("x", legendX + 16); lab4.setAttribute("y", legendY + 3);
+lab4.setAttribute("fill", "#7A786F"); lab4.setAttribute("font-size", "9px");
+lab4.textContent = "Increased";
+legG.appendChild(lab4);
+
+svg.appendChild(legG);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

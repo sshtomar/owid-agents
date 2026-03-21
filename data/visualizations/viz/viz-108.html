@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11.5px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.55; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 3px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.6; }
+  .tooltip .tt-year { font-weight: 600; font-size: 11px; margin-bottom: 4px; font-family: 'Inter', sans-serif; }
+  .tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+  .tooltip .tt-swatch { width: 8px; height: 8px; border-radius: 1px; flex-shrink: 0; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: #5A5850; cursor: default; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .note { font-size: 10px; color: #7A786F; margin-top: 8px; font-style: italic; max-width: 680px; line-height: 1.5; }
+</style></head><body>
+<h1>Divergent Destinies: European Population Since 1990</h1>
+<p class="subtitle">Population indexed to 1991 = 100. Ireland and Spain grew through immigration; Eastern European nations -- Latvia, Bulgaria, Lithuania, Romania, Croatia -- lost a quarter or more of their people to emigration and low birth rates. Germany is indexed to its first reunified figure (1991).</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="note">Germany 1990 value reflects only the former West Germany; the 1991 figure is the first post-reunification count and is used as the index base.</p>
+<p class="source">Source: Eurostat -- Population on 1 January (demo_pjan)</p>
+<script>
+const raw = [{"c":"Bulgaria","y":1990,"i":100,"p":8767308},{"c":"Bulgaria","y":1991,"i":98.9,"p":8669269},{"c":"Bulgaria","y":1992,"i":98,"p":8595465},{"c":"Bulgaria","y":1993,"i":96.8,"p":8484863},{"c":"Bulgaria","y":1994,"i":96.5,"p":8459763},{"c":"Bulgaria","y":1995,"i":96.1,"p":8427418},{"c":"Bulgaria","y":1996,"i":95.6,"p":8384715},{"c":"Bulgaria","y":1997,"i":95.1,"p":8340936},{"c":"Bulgaria","y":1998,"i":94.5,"p":8283200},{"c":"Bulgaria","y":1999,"i":93.9,"p":8230371},{"c":"Bulgaria","y":2000,"i":93.4,"p":8190876},{"c":"Bulgaria","y":2001,"i":93,"p":8149468},{"c":"Bulgaria","y":2002,"i":89.8,"p":7868815},{"c":"Bulgaria","y":2003,"i":89,"p":7805506},{"c":"Bulgaria","y":2004,"i":88.3,"p":7745147},{"c":"Bulgaria","y":2005,"i":87.7,"p":7688573},{"c":"Bulgaria","y":2006,"i":87,"p":7629371},{"c":"Bulgaria","y":2007,"i":86.4,"p":7572673},{"c":"Bulgaria","y":2008,"i":85.8,"p":7518002},{"c":"Bulgaria","y":2009,"i":85.2,"p":7467119},{"c":"Bulgaria","y":2010,"i":84.7,"p":7421766},{"c":"Bulgaria","y":2011,"i":84.1,"p":7369431},{"c":"Bulgaria","y":2012,"i":83.6,"p":7327224},{"c":"Bulgaria","y":2013,"i":82.2,"p":7202556},{"c":"Bulgaria","y":2014,"i":81.2,"p":7117453},{"c":"Bulgaria","y":2015,"i":80.2,"p":7029690},{"c":"Bulgaria","y":2016,"i":79.1,"p":6938759},{"c":"Bulgaria","y":2017,"i":78.1,"p":6849518},{"c":"Bulgaria","y":2018,"i":77.1,"p":6757418},{"c":"Bulgaria","y":2019,"i":76,"p":6664177},{"c":"Bulgaria","y":2020,"i":74.9,"p":6569275},{"c":"Bulgaria","y":2021,"i":74.5,"p":6532117},{"c":"Bulgaria","y":2022,"i":73.9,"p":6482484},{"c":"Bulgaria","y":2023,"i":73.5,"p":6447710},{"c":"Bulgaria","y":2024,"i":73.5,"p":6445481},{"c":"Bulgaria","y":2025,"i":73.4,"p":6437360},{"c":"Germany","y":1990,"i":100,"p":62679035},{"c":"Germany","y":1991,"i":127.2,"p":79753227},{"c":"Germany","y":1992,"i":128.1,"p":80274564},{"c":"Germany","y":1993,"i":129.2,"p":80974632},{"c":"Germany","y":1994,"i":129.8,"p":81338093},{"c":"Germany","y":1995,"i":130.1,"p":81538603},{"c":"Germany","y":1996,"i":130.5,"p":81817499},{"c":"Germany","y":1997,"i":130.8,"p":82012162},{"c":"Germany","y":1998,"i":130.9,"p":82057379},{"c":"Germany","y":1999,"i":130.9,"p":82037011},{"c":"Germany","y":2000,"i":131.1,"p":82163475},{"c":"Germany","y":2001,"i":131.2,"p":82259540},{"c":"Germany","y":2002,"i":131.5,"p":82440309},{"c":"Germany","y":2003,"i":131.7,"p":82536680},{"c":"Germany","y":2004,"i":131.7,"p":82531671},{"c":"Germany","y":2005,"i":131.6,"p":82500849},{"c":"Germany","y":2006,"i":131.5,"p":82437995},{"c":"Germany","y":2007,"i":131.3,"p":82314906},{"c":"Germany","y":2008,"i":131.2,"p":82217837},{"c":"Germany","y":2009,"i":130.8,"p":82002356},{"c":"Germany","y":2010,"i":130.5,"p":81802257},{"c":"Germany","y":2011,"i":128,"p":80222065},{"c":"Germany","y":2012,"i":128.2,"p":80327900},{"c":"Germany","y":2013,"i":128.5,"p":80523746},{"c":"Germany","y":2014,"i":128.9,"p":80767463},{"c":"Germany","y":2015,"i":129.5,"p":81197537},{"c":"Germany","y":2016,"i":131.1,"p":82175684},{"c":"Germany","y":2017,"i":131.7,"p":82521653},{"c":"Germany","y":2018,"i":132.1,"p":82792351},{"c":"Germany","y":2019,"i":132.5,"p":83019213},{"c":"Germany","y":2020,"i":132.7,"p":83166711},{"c":"Germany","y":2021,"i":132.7,"p":83155031},{"c":"Germany","y":2022,"i":132.8,"p":83237124},{"c":"Germany","y":2023,"i":132.6,"p":83118501},{"c":"Germany","y":2024,"i":133.1,"p":83456045},{"c":"Germany","y":2025,"i":133.3,"p":83577140},{"c":"Ireland","y":1990,"i":100,"p":3506970},{"c":"Ireland","y":1991,"i":100.4,"p":3520977},{"c":"Ireland","y":1992,"i":101.2,"p":3547492},{"c":"Ireland","y":1993,"i":101.8,"p":3569367},{"c":"Ireland","y":1994,"i":102.2,"p":3583154},{"c":"Ireland","y":1995,"i":102.6,"p":3597617},{"c":"Ireland","y":1996,"i":103.2,"p":3620065},{"c":"Ireland","y":1997,"i":104.2,"p":3654955},{"c":"Ireland","y":1998,"i":105.3,"p":3693386},{"c":"Ireland","y":1999,"i":106.4,"p":3732006},{"c":"Ireland","y":2000,"i":107.7,"p":3777565},{"c":"Ireland","y":2001,"i":109.3,"p":3832783},{"c":"Ireland","y":2002,"i":111.2,"p":3899702},{"c":"Ireland","y":2003,"i":113,"p":3964191},{"c":"Ireland","y":2004,"i":114.9,"p":4028851},{"c":"Ireland","y":2005,"i":117.2,"p":4111672},{"c":"Ireland","y":2006,"i":120,"p":4208156},{"c":"Ireland","y":2007,"i":123.8,"p":4340118},{"c":"Ireland","y":2008,"i":127.1,"p":4457765},{"c":"Ireland","y":2009,"i":128.9,"p":4521322},{"c":"Ireland","y":2010,"i":129.7,"p":4549428},{"c":"Ireland","y":2011,"i":130.3,"p":4570881},{"c":"Ireland","y":2012,"i":130.9,"p":4589287},{"c":"Ireland","y":2013,"i":131.4,"p":4609779},{"c":"Ireland","y":2014,"i":132.2,"p":4637852},{"c":"Ireland","y":2015,"i":133.4,"p":4677627},{"c":"Ireland","y":2016,"i":134.8,"p":4726286},{"c":"Ireland","y":2017,"i":136.8,"p":4799157},{"c":"Ireland","y":2018,"i":138.5,"p":4855733},{"c":"Ireland","y":2019,"i":140.9,"p":4940311},{"c":"Ireland","y":2020,"i":142.9,"p":5012600},{"c":"Ireland","y":2021,"i":144.5,"p":5066893},{"c":"Ireland","y":2022,"i":147,"p":5154277},{"c":"Ireland","y":2023,"i":150.3,"p":5271395},{"c":"Ireland","y":2024,"i":152.6,"p":5351681},{"c":"Ireland","y":2025,"i":155.1,"p":5440278},{"c":"Spain","y":1990,"i":100,"p":38853227},{"c":"Spain","y":1991,"i":100.1,"p":38881416},{"c":"Spain","y":1992,"i":100.5,"p":39051336},{"c":"Spain","y":1993,"i":101.1,"p":39264034},{"c":"Spain","y":1994,"i":101.6,"p":39458489},{"c":"Spain","y":1995,"i":102,"p":39639726},{"c":"Spain","y":1996,"i":102.5,"p":39808374},{"c":"Spain","y":1997,"i":102.9,"p":39971329},{"c":"Spain","y":1998,"i":103.3,"p":40143449},{"c":"Spain","y":1999,"i":103.7,"p":40303568},{"c":"Spain","y":2000,"i":104.2,"p":40470182},{"c":"Spain","y":2001,"i":104.7,"p":40665545},{"c":"Spain","y":2002,"i":105.6,"p":41035278},{"c":"Spain","y":2003,"i":107.7,"p":41827838},{"c":"Spain","y":2004,"i":109.5,"p":42547451},{"c":"Spain","y":2005,"i":111.4,"p":43296338},{"c":"Spain","y":2006,"i":113.3,"p":44009971},{"c":"Spain","y":2007,"i":115.3,"p":44784666},{"c":"Spain","y":2008,"i":117.5,"p":45668939},{"c":"Spain","y":2009,"i":119,"p":46239273},{"c":"Spain","y":2010,"i":119.6,"p":46486619},{"c":"Spain","y":2011,"i":120.1,"p":46667174},{"c":"Spain","y":2012,"i":120.5,"p":46818219},{"c":"Spain","y":2013,"i":120.2,"p":46712650},{"c":"Spain","y":2014,"i":119.7,"p":46495744},{"c":"Spain","y":2015,"i":119.5,"p":46425722},{"c":"Spain","y":2016,"i":119.5,"p":46418884},{"c":"Spain","y":2017,"i":119.7,"p":46497393},{"c":"Spain","y":2018,"i":120.1,"p":46645070},{"c":"Spain","y":2019,"i":120.8,"p":46918951},{"c":"Spain","y":2020,"i":121.8,"p":47318050},{"c":"Spain","y":2021,"i":122,"p":47400798},{"c":"Spain","y":2022,"i":122.2,"p":47486843},{"c":"Spain","y":2023,"i":123.8,"p":48085361},{"c":"Spain","y":2024,"i":125.1,"p":48619695},{"c":"Spain","y":2025,"i":126.4,"p":49128297},{"c":"Croatia","y":1990,"i":100,"p":4772556},{"c":"Croatia","y":1991,"i":100.2,"p":4782179},{"c":"Croatia","y":1992,"i":96.3,"p":4595865},{"c":"Croatia","y":1993,"i":95.5,"p":4555771},{"c":"Croatia","y":1994,"i":97.3,"p":4645155},{"c":"Croatia","y":1995,"i":97.6,"p":4658893},{"c":"Croatia","y":1996,"i":96,"p":4581167},{"c":"Croatia","y":1997,"i":95,"p":4533028},{"c":"Croatia","y":1998,"i":95.1,"p":4536812},{"c":"Croatia","y":1999,"i":94.9,"p":4527460},{"c":"Croatia","y":2000,"i":94.2,"p":4497735},{"c":"Croatia","y":2001,"i":90,"p":4295406},{"c":"Croatia","y":2002,"i":90.2,"p":4305494},{"c":"Croatia","y":2003,"i":90.2,"p":4305384},{"c":"Croatia","y":2004,"i":90.2,"p":4305725},{"c":"Croatia","y":2005,"i":90.3,"p":4310861},{"c":"Croatia","y":2006,"i":90.4,"p":4312487},{"c":"Croatia","y":2007,"i":90.4,"p":4313530},{"c":"Croatia","y":2008,"i":90.3,"p":4311967},{"c":"Croatia","y":2009,"i":90.3,"p":4309796},{"c":"Croatia","y":2010,"i":90.2,"p":4302847},{"c":"Croatia","y":2011,"i":89.9,"p":4289857},{"c":"Croatia","y":2012,"i":89.6,"p":4275984},{"c":"Croatia","y":2013,"i":89,"p":4247803},{"c":"Croatia","y":2014,"i":88.4,"p":4217632},{"c":"Croatia","y":2015,"i":87.6,"p":4180915},{"c":"Croatia","y":2016,"i":86.6,"p":4131115},{"c":"Croatia","y":2017,"i":85.5,"p":4078769},{"c":"Croatia","y":2018,"i":84.1,"p":4014341},{"c":"Croatia","y":2019,"i":83.2,"p":3968676},{"c":"Croatia","y":2020,"i":82.4,"p":3933511},{"c":"Croatia","y":2021,"i":81.6,"p":3893026},{"c":"Croatia","y":2022,"i":80.9,"p":3862305},{"c":"Croatia","y":2023,"i":80.7,"p":3850894},{"c":"Croatia","y":2024,"i":80.9,"p":3861967},{"c":"Croatia","y":2025,"i":81.2,"p":3874350},{"c":"Latvia","y":1990,"i":100,"p":2668140},{"c":"Latvia","y":1991,"i":99.6,"p":2658161},{"c":"Latvia","y":1992,"i":99.1,"p":2643000},{"c":"Latvia","y":1993,"i":96.9,"p":2585675},{"c":"Latvia","y":1994,"i":95.2,"p":2540904},{"c":"Latvia","y":1995,"i":93.7,"p":2500580},{"c":"Latvia","y":1996,"i":92.6,"p":2469531},{"c":"Latvia","y":1997,"i":91.6,"p":2444912},{"c":"Latvia","y":1998,"i":90.7,"p":2420789},{"c":"Latvia","y":1999,"i":89.9,"p":2399248},{"c":"Latvia","y":2000,"i":89.3,"p":2381715},{"c":"Latvia","y":2001,"i":88.2,"p":2353384},{"c":"Latvia","y":2002,"i":87,"p":2320956},{"c":"Latvia","y":2003,"i":86.2,"p":2299390},{"c":"Latvia","y":2004,"i":85.3,"p":2276520},{"c":"Latvia","y":2005,"i":84.3,"p":2249724},{"c":"Latvia","y":2006,"i":83.5,"p":2227874},{"c":"Latvia","y":2007,"i":82.8,"p":2208840},{"c":"Latvia","y":2008,"i":82.1,"p":2191810},{"c":"Latvia","y":2009,"i":81.1,"p":2162834},{"c":"Latvia","y":2010,"i":79.5,"p":2120504},{"c":"Latvia","y":2011,"i":77.8,"p":2074605},{"c":"Latvia","y":2012,"i":76.6,"p":2044813},{"c":"Latvia","y":2013,"i":75.9,"p":2023825},{"c":"Latvia","y":2014,"i":75,"p":2001468},{"c":"Latvia","y":2015,"i":74.4,"p":1986096},{"c":"Latvia","y":2016,"i":73.8,"p":1968957},{"c":"Latvia","y":2017,"i":73.1,"p":1950116},{"c":"Latvia","y":2018,"i":72.5,"p":1934379},{"c":"Latvia","y":2019,"i":72,"p":1919968},{"c":"Latvia","y":2020,"i":71.5,"p":1907675},{"c":"Latvia","y":2021,"i":71,"p":1893223},{"c":"Latvia","y":2022,"i":70.3,"p":1875757},{"c":"Latvia","y":2023,"i":70.6,"p":1883008},{"c":"Latvia","y":2024,"i":70.2,"p":1871882},{"c":"Latvia","y":2025,"i":69.7,"p":1860565},{"c":"Lithuania","y":1990,"i":100,"p":3693708},{"c":"Lithuania","y":1991,"i":100.2,"p":3701968},{"c":"Lithuania","y":1992,"i":100.3,"p":3706299},{"c":"Lithuania","y":1993,"i":100,"p":3693929},{"c":"Lithuania","y":1994,"i":99.4,"p":3671296},{"c":"Lithuania","y":1995,"i":98.6,"p":3642991},{"c":"Lithuania","y":1996,"i":97.9,"p":3615212},{"c":"Lithuania","y":1997,"i":97.1,"p":3588013},{"c":"Lithuania","y":1998,"i":96.4,"p":3562261},{"c":"Lithuania","y":1999,"i":95.7,"p":3536401},{"c":"Lithuania","y":2000,"i":95.1,"p":3512074},{"c":"Lithuania","y":2001,"i":94.4,"p":3486998},{"c":"Lithuania","y":2002,"i":93.5,"p":3454637},{"c":"Lithuania","y":2003,"i":92.9,"p":3431497},{"c":"Lithuania","y":2004,"i":92,"p":3398929},{"c":"Lithuania","y":2005,"i":90.8,"p":3355220},{"c":"Lithuania","y":2006,"i":89.1,"p":3289835},{"c":"Lithuania","y":2007,"i":88,"p":3249983},{"c":"Lithuania","y":2008,"i":87,"p":3212605},{"c":"Lithuania","y":2009,"i":86.2,"p":3183856},{"c":"Lithuania","y":2010,"i":85.1,"p":3141976},{"c":"Lithuania","y":2011,"i":82.6,"p":3052588},{"c":"Lithuania","y":2012,"i":81.3,"p":3003641},{"c":"Lithuania","y":2013,"i":80.5,"p":2974637},{"c":"Lithuania","y":2014,"i":79.8,"p":2947862},{"c":"Lithuania","y":2015,"i":79.2,"p":2926644},{"c":"Lithuania","y":2016,"i":78.4,"p":2895573},{"c":"Lithuania","y":2017,"i":77.4,"p":2859077},{"c":"Lithuania","y":2018,"i":76.5,"p":2826200},{"c":"Lithuania","y":2019,"i":76.1,"p":2812200},{"c":"Lithuania","y":2020,"i":76.1,"p":2809977},{"c":"Lithuania","y":2021,"i":76.1,"p":2810761},{"c":"Lithuania","y":2022,"i":76,"p":2805998},{"c":"Lithuania","y":2023,"i":77.4,"p":2857279},{"c":"Lithuania","y":2024,"i":78.1,"p":2885891},{"c":"Lithuania","y":2025,"i":78.3,"p":2890664},{"c":"Poland","y":1990,"i":100,"p":38038403},{"c":"Poland","y":1991,"i":100.4,"p":38183160},{"c":"Poland","y":1992,"i":100.7,"p":38309226},{"c":"Poland","y":1993,"i":101,"p":38418108},{"c":"Poland","y":1994,"i":101.2,"p":38504707},{"c":"Poland","y":1995,"i":101.4,"p":38580597},{"c":"Poland","y":1996,"i":101.5,"p":38609399},{"c":"Poland","y":1997,"i":101.6,"p":38639341},{"c":"Poland","y":1998,"i":101.6,"p":38659979},{"c":"Poland","y":1999,"i":101.7,"p":38666983},{"c":"Poland","y":2000,"i":100.6,"p":38263303},{"c":"Poland","y":2001,"i":100.6,"p":38253955},{"c":"Poland","y":2002,"i":100.5,"p":38242197},{"c":"Poland","y":2003,"i":100.5,"p":38218531},{"c":"Poland","y":2004,"i":100.4,"p":38190608},{"c":"Poland","y":2005,"i":100.4,"p":38173835},{"c":"Poland","y":2006,"i":100.3,"p":38157055},{"c":"Poland","y":2007,"i":100.2,"p":38125479},{"c":"Poland","y":2008,"i":100.2,"p":38115641},{"c":"Poland","y":2009,"i":100.3,"p":38135876},{"c":"Poland","y":2010,"i":100,"p":38022869},{"c":"Poland","y":2011,"i":100.1,"p":38062718},{"c":"Poland","y":2012,"i":100.1,"p":38063792},{"c":"Poland","y":2013,"i":100.1,"p":38062535},{"c":"Poland","y":2014,"i":99.9,"p":38017856},{"c":"Poland","y":2015,"i":99.9,"p":38005614},{"c":"Poland","y":2016,"i":99.8,"p":37967209},{"c":"Poland","y":2017,"i":99.8,"p":37972964},{"c":"Poland","y":2018,"i":99.8,"p":37976687},{"c":"Poland","y":2019,"i":99.8,"p":37972812},{"c":"Poland","y":2020,"i":99.8,"p":37958138},{"c":"Poland","y":2021,"i":97.5,"p":37073357},{"c":"Poland","y":2022,"i":97,"p":36889761},{"c":"Poland","y":2023,"i":96.6,"p":36753736},{"c":"Poland","y":2024,"i":96.3,"p":36620970},{"c":"Poland","y":2025,"i":95.9,"p":36497495},{"c":"Romania","y":1990,"i":100,"p":23211395},{"c":"Romania","y":1991,"i":99.9,"p":23192274},{"c":"Romania","y":1992,"i":98.3,"p":22810035},{"c":"Romania","y":1993,"i":98.1,"p":22778533},{"c":"Romania","y":1994,"i":98,"p":22748027},{"c":"Romania","y":1995,"i":97.9,"p":22712394},{"c":"Romania","y":1996,"i":97.6,"p":22656145},{"c":"Romania","y":1997,"i":97.3,"p":22581862},{"c":"Romania","y":1998,"i":97,"p":22526093},{"c":"Romania","y":1999,"i":96.9,"p":22488595},{"c":"Romania","y":2000,"i":96.7,"p":22455485},{"c":"Romania","y":2001,"i":96.6,"p":22430457},{"c":"Romania","y":2002,"i":94.1,"p":21833483},{"c":"Romania","y":2003,"i":93.2,"p":21627509},{"c":"Romania","y":2004,"i":92.7,"p":21521142},{"c":"Romania","y":2005,"i":92.1,"p":21382354},{"c":"Romania","y":2006,"i":91.6,"p":21257016},{"c":"Romania","y":2007,"i":91,"p":21130503},{"c":"Romania","y":2008,"i":88.9,"p":20635460},{"c":"Romania","y":2009,"i":88.1,"p":20440290},{"c":"Romania","y":2010,"i":87.4,"p":20294683},{"c":"Romania","y":2011,"i":87,"p":20199059},{"c":"Romania","y":2012,"i":86.6,"p":20095996},{"c":"Romania","y":2013,"i":86.3,"p":20020074},{"c":"Romania","y":2014,"i":85.9,"p":19947311},{"c":"Romania","y":2015,"i":85.6,"p":19870647},{"c":"Romania","y":2016,"i":85.1,"p":19760585},{"c":"Romania","y":2017,"i":84.6,"p":19643949},{"c":"Romania","y":2018,"i":84.2,"p":19533481},{"c":"Romania","y":2019,"i":83.6,"p":19414458},{"c":"Romania","y":2020,"i":83.3,"p":19328838},{"c":"Romania","y":2021,"i":82.7,"p":19201662},{"c":"Romania","y":2022,"i":82,"p":19043098},{"c":"Romania","y":2023,"i":82.1,"p":19055228},{"c":"Romania","y":2024,"i":82.1,"p":19067576},{"c":"Romania","y":2025,"i":82,"p":19043151},{"c":"Sweden","y":1990,"i":100,"p":8527039},{"c":"Sweden","y":1991,"i":100.7,"p":8590630},{"c":"Sweden","y":1992,"i":101.4,"p":8644120},{"c":"Sweden","y":1993,"i":101.9,"p":8692013},{"c":"Sweden","y":1994,"i":102.6,"p":8745109},{"c":"Sweden","y":1995,"i":103.4,"p":8816381},{"c":"Sweden","y":1996,"i":103.6,"p":8837496},{"c":"Sweden","y":1997,"i":103.7,"p":8844499},{"c":"Sweden","y":1998,"i":103.8,"p":8847625},{"c":"Sweden","y":1999,"i":103.8,"p":8854322},{"c":"Sweden","y":2000,"i":103.9,"p":8861426},{"c":"Sweden","y":2001,"i":104.2,"p":8882792},{"c":"Sweden","y":2002,"i":104.5,"p":8909128},{"c":"Sweden","y":2003,"i":104.9,"p":8940788},{"c":"Sweden","y":2004,"i":105.3,"p":8975670},{"c":"Sweden","y":2005,"i":105.7,"p":9011392},{"c":"Sweden","y":2006,"i":106.1,"p":9047752},{"c":"Sweden","y":2007,"i":106.9,"p":9113257},{"c":"Sweden","y":2008,"i":107.7,"p":9182927},{"c":"Sweden","y":2009,"i":108.6,"p":9256347},{"c":"Sweden","y":2010,"i":109.5,"p":9340682},{"c":"Sweden","y":2011,"i":110.4,"p":9415570},{"c":"Sweden","y":2012,"i":111.2,"p":9482855},{"c":"Sweden","y":2013,"i":112.1,"p":9555893},{"c":"Sweden","y":2014,"i":113.1,"p":9644864},{"c":"Sweden","y":2015,"i":114.3,"p":9747355},{"c":"Sweden","y":2016,"i":115.5,"p":9851017},{"c":"Sweden","y":2017,"i":117.2,"p":9995153},{"c":"Sweden","y":2018,"i":118.7,"p":10120242},{"c":"Sweden","y":2019,"i":120,"p":10230185},{"c":"Sweden","y":2020,"i":121.1,"p":10327589},{"c":"Sweden","y":2021,"i":121.7,"p":10379295},{"c":"Sweden","y":2022,"i":122.6,"p":10452326},{"c":"Sweden","y":2023,"i":123.4,"p":10521556},{"c":"Sweden","y":2024,"i":123.7,"p":10551707},{"c":"Sweden","y":2025,"i":124.2,"p":10587710}];
+
+// Reindex: use 1991 as base for all countries (avoids West-only Germany 1990 distortion)
+const countries = [...new Set(raw.map(d => d.c))];
+const baseYear = 1991;
+const bases = {};
+countries.forEach(c => {
+  const row = raw.find(d => d.c === c && d.y === baseYear);
+  if (row) bases[c] = row.p;
+});
+
+const data = raw
+  .filter(d => d.y >= baseYear && bases[d.c])
+  .map(d => ({
+    country: d.c,
+    year: d.y,
+    index: Math.round((d.p / bases[d.c]) * 1000) / 10,
+    pop: d.p
+  }));
+
+// Sort countries by final index value for consistent ordering
+const finalValues = {};
+data.forEach(d => { if (d.year === 2025) finalValues[d.country] = d.index; });
+const sortedCountries = Object.entries(finalValues)
+  .sort((a, b) => b[1] - a[1])
+  .map(e => e[0]);
+
+const colors = {
+  "Ireland": "#2D7D3A",
+  "Spain": "#D97B2A",
+  "Sweden": "#3A7CA5",
+  "Germany": "#1A1A1A",
+  "Poland": "#8C564B",
+  "Romania": "#C44E52",
+  "Croatia": "#B07AA1",
+  "Lithuania": "#937860",
+  "Bulgaria": "#E15759",
+  "Latvia": "#6B4C9A"
+};
+
+const W = 780, H = 440;
+const pad = { top: 14, right: 82, bottom: 36, left: 52 };
+const cw = W - pad.left - pad.right;
+const ch = H - pad.top - pad.bottom;
+
+// Build legend
+const legendEl = document.getElementById("legend");
+sortedCountries.forEach(c => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = '<span class="legend-swatch" style="background:' + colors[c] + '"></span>' + c;
+  legendEl.appendChild(item);
+});
+
+// Create SVG
+const svgNS = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(svgNS, "svg");
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+document.getElementById("chart").appendChild(svg);
+
+// Scales
+const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+const allIdx = data.map(d => d.index);
+const minIdx = Math.floor(Math.min(...allIdx) / 10) * 10;
+const maxIdx = Math.ceil(Math.max(...allIdx) / 10) * 10;
+
+const xScale = function(year) { return pad.left + ((year - years[0]) / (years[years.length - 1] - years[0])) * cw; };
+const yScale = function(v) { return pad.top + ch - ((v - minIdx) / (maxIdx - minIdx)) * ch; };
+
+// Gridlines
+const yTicks = [];
+for (let t = minIdx; t <= maxIdx; t += 10) { yTicks.push(t); }
+
+yTicks.forEach(function(tick) {
+  const line = document.createElementNS(svgNS, "line");
+  line.setAttribute("x1", pad.left);
+  line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", yScale(tick));
+  line.setAttribute("y2", yScale(tick));
+  line.setAttribute("stroke", tick === 100 ? "#A8A59C" : "#DAD8CE");
+  line.setAttribute("stroke-width", tick === 100 ? "1.2" : "0.5");
+  if (tick === 100) line.setAttribute("stroke-dasharray", "4,3");
+  svg.appendChild(line);
+
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", pad.left - 8);
+  label.setAttribute("y", yScale(tick) + 3.5);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "10");
+  label.setAttribute("font-family", "JetBrains Mono, monospace");
+  label.textContent = tick;
+  svg.appendChild(label);
+});
+
+// Reference label for baseline
+const baseLabel = document.createElementNS(svgNS, "text");
+baseLabel.setAttribute("x", pad.left + 3);
+baseLabel.setAttribute("y", yScale(100) - 5);
+baseLabel.setAttribute("fill", "#A8A59C");
+baseLabel.setAttribute("font-size", "8.5");
+baseLabel.setAttribute("font-style", "italic");
+baseLabel.textContent = "1991 baseline = 100";
+svg.appendChild(baseLabel);
+
+// Draw lines for each country
+const grouped = {};
+data.forEach(function(d) {
+  if (!grouped[d.country]) grouped[d.country] = [];
+  grouped[d.country].push(d);
+});
+
+// Draw lines (dimmed first, then highlighted ones on top)
+const growing = ["Ireland", "Spain", "Sweden", "Germany"];
+const shrinking = ["Latvia", "Bulgaria", "Lithuania", "Romania", "Croatia"];
+const flat = ["Poland"];
+
+// Draw all lines
+sortedCountries.forEach(function(c) {
+  const pts = grouped[c].sort(function(a, b) { return a.year - b.year; });
+  const path = document.createElementNS(svgNS, "path");
+  let d = "";
+  pts.forEach(function(pt, i) {
+    d += (i === 0 ? "M" : "L") + xScale(pt.year) + "," + yScale(pt.index);
+  });
+  path.setAttribute("d", d);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", colors[c]);
+  path.setAttribute("stroke-width", (c === "Ireland" || c === "Latvia") ? "2.2" : "1.6");
+  path.setAttribute("opacity", "0.85");
+  path.setAttribute("data-country", c);
+  svg.appendChild(path);
+});
+
+// End labels (right side)
+sortedCountries.forEach(function(c) {
+  const pts = grouped[c];
+  const last = pts[pts.length - 1];
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", xScale(last.year) + 6);
+  label.setAttribute("y", yScale(last.index) + 3.5);
+  label.setAttribute("fill", colors[c]);
+  label.setAttribute("font-size", "9.5");
+  label.setAttribute("font-weight", "500");
+  label.textContent = c;
+  label.setAttribute("data-country-label", c);
+  svg.appendChild(label);
+});
+
+// X axis
+const xAxisLine = document.createElementNS(svgNS, "line");
+xAxisLine.setAttribute("x1", pad.left);
+xAxisLine.setAttribute("x2", W - pad.right);
+xAxisLine.setAttribute("y1", pad.top + ch);
+xAxisLine.setAttribute("y2", pad.top + ch);
+xAxisLine.setAttribute("stroke", "#A8A59C");
+xAxisLine.setAttribute("stroke-width", "1");
+svg.appendChild(xAxisLine);
+
+const xTickYears = [1991, 1995, 2000, 2005, 2010, 2015, 2020, 2025];
+xTickYears.forEach(function(year) {
+  const x = xScale(year);
+  const tick = document.createElementNS(svgNS, "line");
+  tick.setAttribute("x1", x);
+  tick.setAttribute("x2", x);
+  tick.setAttribute("y1", pad.top + ch);
+  tick.setAttribute("y2", pad.top + ch + 5);
+  tick.setAttribute("stroke", "#A8A59C");
+  tick.setAttribute("stroke-width", "1");
+  svg.appendChild(tick);
+
+  const label = document.createElementNS(svgNS, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top + ch + 20);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-size", "10");
+  label.textContent = year;
+  svg.appendChild(label);
+});
+
+// Y axis title
+const yTitle = document.createElementNS(svgNS, "text");
+yTitle.setAttribute("x", 14);
+yTitle.setAttribute("y", pad.top + ch / 2);
+yTitle.setAttribute("text-anchor", "middle");
+yTitle.setAttribute("fill", "#7A786F");
+yTitle.setAttribute("font-size", "9");
+yTitle.setAttribute("transform", "rotate(-90, 14, " + (pad.top + ch / 2) + ")");
+yTitle.textContent = "Population index (1991 = 100)";
+svg.appendChild(yTitle);
+
+// Hover overlay
+const overlay = document.createElementNS(svgNS, "rect");
+overlay.setAttribute("x", pad.left);
+overlay.setAttribute("y", pad.top);
+overlay.setAttribute("width", cw);
+overlay.setAttribute("height", ch);
+overlay.setAttribute("fill", "transparent");
+svg.appendChild(overlay);
+
+// Vertical hover line
+const hoverLine = document.createElementNS(svgNS, "line");
+hoverLine.setAttribute("y1", pad.top);
+hoverLine.setAttribute("y2", pad.top + ch);
+hoverLine.setAttribute("stroke", "#2B2A27");
+hoverLine.setAttribute("stroke-width", "1");
+hoverLine.setAttribute("stroke-dasharray", "3,3");
+hoverLine.setAttribute("opacity", "0");
+svg.appendChild(hoverLine);
+
+// Hover dots
+const hoverDots = {};
+sortedCountries.forEach(function(c) {
+  const dot = document.createElementNS(svgNS, "circle");
+  dot.setAttribute("r", "3.5");
+  dot.setAttribute("fill", colors[c]);
+  dot.setAttribute("stroke", "#F6F5EE");
+  dot.setAttribute("stroke-width", "1.5");
+  dot.setAttribute("opacity", "0");
+  svg.appendChild(dot);
+  hoverDots[c] = dot;
+});
+
+const tip = document.getElementById("tip");
+const chartDiv = document.getElementById("chart");
+
+function formatPop(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(2) + "M";
+  if (n >= 1000) return (n / 1000).toFixed(0) + "K";
+  return n.toString();
+}
+
+overlay.addEventListener("mousemove", function(e) {
+  var rect = svg.getBoundingClientRect();
+  var mx = e.clientX - rect.left;
+  var relX = mx - pad.left;
+  var yearIdx = Math.round((relX / cw) * (years.length - 1));
+  var idx = Math.max(0, Math.min(years.length - 1, yearIdx));
+  var hovYear = years[idx];
+  var x = xScale(hovYear);
+
+  hoverLine.setAttribute("x1", x);
+  hoverLine.setAttribute("x2", x);
+  hoverLine.setAttribute("opacity", "0.5");
+
+  // Collect data for hovered year, sorted by index descending
+  var yearData = data.filter(function(d) { return d.year === hovYear; });
+  yearData.sort(function(a, b) { return b.index - a.index; });
+
+  // Update dots
+  sortedCountries.forEach(function(c) {
+    var pt = yearData.find(function(d) { return d.country === c; });
+    if (pt) {
+      hoverDots[c].setAttribute("cx", x);
+      hoverDots[c].setAttribute("cy", yScale(pt.index));
+      hoverDots[c].setAttribute("opacity", "1");
+    }
+  });
+
+  var html = '<div class="tt-year">' + hovYear + '</div>';
+  yearData.forEach(function(d) {
+    var change = d.index >= 100 ? "+" + (d.index - 100).toFixed(1) : (d.index - 100).toFixed(1);
+    html += '<div class="tt-row"><span class="tt-swatch" style="background:' + colors[d.country] + '"></span>' + d.country + ': ' + formatPop(d.pop) + ' (' + change + '%)</div>';
+  });
+  tip.innerHTML = html;
+  tip.style.opacity = "1";
+
+  var tipRect = tip.getBoundingClientRect();
+  var chartRect = chartDiv.getBoundingClientRect();
+  var tipX = e.clientX - chartRect.left + 14;
+  if (tipX + tipRect.width > chartRect.width - 10) {
+    tipX = e.clientX - chartRect.left - tipRect.width - 14;
+  }
+  var tipY = e.clientY - chartRect.top - tipRect.height / 2;
+  tipY = Math.max(0, Math.min(chartRect.height - tipRect.height, tipY));
+  tip.style.left = tipX + "px";
+  tip.style.top = tipY + "px";
+});
+
+overlay.addEventListener("mouseleave", function() {
+  hoverLine.setAttribute("opacity", "0");
+  tip.style.opacity = "0";
+  sortedCountries.forEach(function(c) {
+    hoverDots[c].setAttribute("opacity", "0");
+  });
+});
+
+// Annotation: EU accession 2004
+var ann2004x = xScale(2004);
+var annLine = document.createElementNS(svgNS, "line");
+annLine.setAttribute("x1", ann2004x);
+annLine.setAttribute("x2", ann2004x);
+annLine.setAttribute("y1", pad.top + 2);
+annLine.setAttribute("y2", pad.top + ch);
+annLine.setAttribute("stroke", "#C4C0B4");
+annLine.setAttribute("stroke-width", "0.8");
+annLine.setAttribute("stroke-dasharray", "2,3");
+svg.insertBefore(annLine, overlay);
+
+var annText = document.createElementNS(svgNS, "text");
+annText.setAttribute("x", ann2004x + 4);
+annText.setAttribute("y", pad.top + 12);
+annText.setAttribute("fill", "#A8A59C");
+annText.setAttribute("font-size", "8");
+annText.setAttribute("font-style", "italic");
+annText.textContent = "EU enlargement 2004";
+svg.insertBefore(annText, overlay);
+</script></body></html>

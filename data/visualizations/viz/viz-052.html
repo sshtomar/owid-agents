@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Safer Beginnings</h1>
+<p class="subtitle">Births attended by skilled health staff (% of total) -- earliest vs. latest survey for 15 developing countries. Lines slope upward from an earlier survey (left dot) to the most recent (right dot). Every country shown has made substantial progress, some leaping from single digits to near-universal coverage in two decades.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- SH.STA.BRTC.ZS (Births attended by skilled health staff, % of total)</p>
+<script>
+const data = [
+  { name: "Ecuador",     early: 61.3, earlyYr: 1987, late: 99.4, lateYr: 2020 },
+  { name: "Cambodia",    early: 43.3, earlyYr: 1995, late: 98.7, lateYr: 2022 },
+  { name: "Colombia",    early: 71.1, earlyYr: 1986, late: 98.8, lateYr: 2019 },
+  { name: "Brazil",      early: 69.5, earlyYr: 1991, late: 98.4, lateYr: 2020 },
+  { name: "Egypt",       early: 34.6, earlyYr: 1988, late: 97.1, lateYr: 2021 },
+  { name: "Indonesia",   early: 36.3, earlyYr: 1987, late: 94.7, lateYr: 2019 },
+  { name: "India",       early: 34.2, earlyYr: 1993, late: 89.4, lateYr: 2021 },
+  { name: "Burundi",     early: 19.1, earlyYr: 1987, late: 87.4, lateYr: 2020 },
+  { name: "Bolivia",     early: 42.1, earlyYr: 1989, late: 81.1, lateYr: 2019 },
+  { name: "Ghana",       early: 40.1, earlyYr: 1988, late: 78.9, lateYr: 2018 },
+  { name: "Kenya",       early: 50.1, earlyYr: 1989, late: 70.2, lateYr: 2016 },
+  { name: "Guatemala",   early: 35.0, earlyYr: 1984, late: 69.6, lateYr: 2017 },
+  { name: "Afghanistan", early: 12.4, earlyYr: 2000, late: 61.8, lateYr: 2020 },
+  { name: "Bangladesh",  early:  9.5, earlyYr: 1994, late: 59.0, lateYr: 2019 },
+  { name: "Ethiopia",    early:  6.5, earlyYr: 1998, late: 49.8, lateYr: 2019 }
+];
+
+data.sort((a, b) => b.late - a.late);
+
+const W = 720;
+const rowH = 36;
+const gap = 2;
+const pad = { left: 120, right: 55, top: 40, bottom: 20 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const chartW = W - pad.left - pad.right;
+
+const xScale = v => pad.left + (v / 100) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// X-axis grid lines and labels
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 || v === 100 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 12);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+// Color thresholds: big improvement (>=40pp) = green, moderate (<40pp) = amber
+const greenStroke = "#3A9E8F";
+const greenDotEarly = "#8ECFC4";
+const amberStroke = "#D4A843";
+const amberDotEarly = "#E8CC80";
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap) + rowH / 2;
+  const improvement = d.late - d.early;
+  const isBig = improvement >= 40;
+  const strokeColor = isBig ? greenStroke : amberStroke;
+  const earlyDotColor = isBig ? greenDotEarly : amberDotEarly;
+
+  // Row background for hover
+  const bg = document.createElementNS(ns, "rect");
+  bg.setAttribute("x", 0);
+  bg.setAttribute("y", y - rowH / 2);
+  bg.setAttribute("width", W);
+  bg.setAttribute("height", rowH);
+  bg.setAttribute("fill", "transparent");
+  bg.style.cursor = "pointer";
+
+  // Country label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 10);
+  nameLabel.setAttribute("y", y + 4);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("font-weight", "500");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Slope line
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", xScale(d.early));
+  line.setAttribute("x2", xScale(d.late));
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", strokeColor);
+  line.setAttribute("stroke-width", 2.5);
+  line.setAttribute("stroke-opacity", 0.5);
+  line.setAttribute("stroke-linecap", "round");
+  svg.appendChild(line);
+
+  // Early dot (lighter, hollow feel)
+  const earlyDot = document.createElementNS(ns, "circle");
+  earlyDot.setAttribute("cx", xScale(d.early));
+  earlyDot.setAttribute("cy", y);
+  earlyDot.setAttribute("r", 4);
+  earlyDot.setAttribute("fill", earlyDotColor);
+  earlyDot.setAttribute("stroke", strokeColor);
+  earlyDot.setAttribute("stroke-width", 1.5);
+  svg.appendChild(earlyDot);
+
+  // Late dot (solid, filled)
+  const lateDot = document.createElementNS(ns, "circle");
+  lateDot.setAttribute("cx", xScale(d.late));
+  lateDot.setAttribute("cy", y);
+  lateDot.setAttribute("r", 5);
+  lateDot.setAttribute("fill", strokeColor);
+  svg.appendChild(lateDot);
+
+  // Latest value label
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", xScale(d.late) + 9);
+  valLabel.setAttribute("y", y + 3.5);
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.late.toFixed(0) + "%";
+  svg.appendChild(valLabel);
+
+  // Hover behaviour
+  bg.addEventListener("mouseenter", e => {
+    line.setAttribute("stroke-opacity", "0.85");
+    line.setAttribute("stroke-width", "3.5");
+    tip.style.opacity = 1;
+    tip.innerHTML = `<strong>${d.name}</strong>  ${d.early.toFixed(1)}% (${d.earlyYr}) &rarr; ${d.late.toFixed(1)}% (${d.lateYr})  |  +${improvement.toFixed(1)} pp`;
+  });
+  bg.addEventListener("mousemove", e => {
+    tip.style.left = (e.pageX + 12) + "px";
+    tip.style.top = (e.pageY - 10) + "px";
+  });
+  bg.addEventListener("mouseleave", () => {
+    line.setAttribute("stroke-opacity", "0.5");
+    line.setAttribute("stroke-width", "2.5");
+    tip.style.opacity = 0;
+  });
+  svg.appendChild(bg);
+});
+
+// Legend
+const legendY = pad.top + chartH + 12;
+
+function legendItem(x, color, earlyColor, label) {
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x + 30);
+  line.setAttribute("y1", legendY);
+  line.setAttribute("y2", legendY);
+  line.setAttribute("stroke", color);
+  line.setAttribute("stroke-width", 2.5);
+  line.setAttribute("stroke-opacity", 0.5);
+  svg.appendChild(line);
+
+  const dot1 = document.createElementNS(ns, "circle");
+  dot1.setAttribute("cx", x);
+  dot1.setAttribute("cy", legendY);
+  dot1.setAttribute("r", 3.5);
+  dot1.setAttribute("fill", earlyColor);
+  dot1.setAttribute("stroke", color);
+  dot1.setAttribute("stroke-width", 1);
+  svg.appendChild(dot1);
+
+  const dot2 = document.createElementNS(ns, "circle");
+  dot2.setAttribute("cx", x + 30);
+  dot2.setAttribute("cy", legendY);
+  dot2.setAttribute("r", 4);
+  dot2.setAttribute("fill", color);
+  svg.appendChild(dot2);
+
+  const txt = document.createElementNS(ns, "text");
+  txt.setAttribute("x", x + 38);
+  txt.setAttribute("y", legendY + 3.5);
+  txt.setAttribute("font-size", "9");
+  txt.setAttribute("fill", "#7A786F");
+  txt.textContent = label;
+  svg.appendChild(txt);
+}
+
+legendItem(pad.left, greenStroke, greenDotEarly, "Large improvement (40+ pp)");
+legendItem(pad.left + 230, amberStroke, amberDotEarly, "Moderate improvement (<40 pp)");
+
+// Open dot = earliest survey, solid dot = latest survey
+const noteText = document.createElementNS(ns, "text");
+noteText.setAttribute("x", pad.left + 460);
+noteText.setAttribute("y", legendY + 3.5);
+noteText.setAttribute("font-family", "'JetBrains Mono', monospace");
+noteText.setAttribute("font-size", "8");
+noteText.setAttribute("fill", "#A09D95");
+noteText.textContent = "open dot = earliest survey, solid = latest";
+svg.appendChild(noteText);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

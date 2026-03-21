@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 580px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Carbon Shift: Who Drives Global CO2 Emissions?</h1>
+<p class="subtitle">CO2 emissions from fuel combustion (millions of tonnes) for the eight largest emitters, 2000 to 2022. China overtook the United States around 2006 and now emits more than twice as much, while India has tripled its output.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 9.4.1 -- CO2 Emissions from Fuel Combustion (EN_ATM_CO2)</p>
+<script>
+const data = [
+  {"year":2000,"country":"China","value":3233.9},
+  {"year":2002,"country":"China","value":3640.9},
+  {"year":2004,"country":"China","value":4713.4},
+  {"year":2006,"country":"China","value":5909.5},
+  {"year":2008,"country":"China","value":6770.5},
+  {"year":2010,"country":"China","value":7821.0},
+  {"year":2012,"country":"China","value":8868.9},
+  {"year":2014,"country":"China","value":9152.9},
+  {"year":2016,"country":"China","value":9203.0},
+  {"year":2018,"country":"China","value":9606.2},
+  {"year":2020,"country":"China","value":10245.4},
+  {"year":2022,"country":"China","value":10575.2},
+  {"year":2000,"country":"United States","value":5702.1},
+  {"year":2002,"country":"United States","value":5656.4},
+  {"year":2004,"country":"United States","value":5656.9},
+  {"year":2006,"country":"United States","value":5694.9},
+  {"year":2008,"country":"United States","value":5403.7},
+  {"year":2010,"country":"United States","value":5124.4},
+  {"year":2012,"country":"United States","value":5083.3},
+  {"year":2014,"country":"United States","value":4983.6},
+  {"year":2016,"country":"United States","value":4845.0},
+  {"year":2018,"country":"United States","value":4753.1},
+  {"year":2020,"country":"United States","value":4647.0},
+  {"year":2022,"country":"United States","value":4549.3},
+  {"year":2000,"country":"India","value":876.0},
+  {"year":2002,"country":"India","value":952.0},
+  {"year":2004,"country":"India","value":1029.6},
+  {"year":2006,"country":"India","value":1149.8},
+  {"year":2008,"country":"India","value":1366.3},
+  {"year":2010,"country":"India","value":1558.2},
+  {"year":2012,"country":"India","value":1797.1},
+  {"year":2014,"country":"India","value":2021.8},
+  {"year":2016,"country":"India","value":2076.3},
+  {"year":2018,"country":"India","value":2300.3},
+  {"year":2020,"country":"India","value":2109.8},
+  {"year":2022,"country":"India","value":2517.0},
+  {"year":2000,"country":"Russia","value":1474.7},
+  {"year":2002,"country":"Russia","value":1484.3},
+  {"year":2004,"country":"Russia","value":1487.9},
+  {"year":2006,"country":"Russia","value":1507.8},
+  {"year":2008,"country":"Russia","value":1487.2},
+  {"year":2010,"country":"Russia","value":1522.7},
+  {"year":2012,"country":"Russia","value":1586.6},
+  {"year":2014,"country":"Russia","value":1550.8},
+  {"year":2016,"country":"Russia","value":1535.1},
+  {"year":2018,"country":"Russia","value":1564.4},
+  {"year":2020,"country":"Russia","value":1625.3},
+  {"year":2022,"country":"Russia","value":1659.1},
+  {"year":2000,"country":"Japan","value":1143.9},
+  {"year":2002,"country":"Japan","value":1169.2},
+  {"year":2004,"country":"Japan","value":1171.3},
+  {"year":2006,"country":"Japan","value":1156.8},
+  {"year":2008,"country":"Japan","value":1126.2},
+  {"year":2010,"country":"Japan","value":1129.2},
+  {"year":2012,"country":"Japan","value":1225.6},
+  {"year":2014,"country":"Japan","value":1188.2},
+  {"year":2016,"country":"Japan","value":1134.9},
+  {"year":2018,"country":"Japan","value":1080.7},
+  {"year":2020,"country":"Japan","value":986.8},
+  {"year":2022,"country":"Japan","value":973.7},
+  {"year":2000,"country":"Germany","value":812.3},
+  {"year":2002,"country":"Germany","value":817.9},
+  {"year":2004,"country":"Germany","value":804.6},
+  {"year":2006,"country":"Germany","value":798.7},
+  {"year":2008,"country":"Germany","value":773.9},
+  {"year":2010,"country":"Germany","value":758.9},
+  {"year":2012,"country":"Germany","value":745.1},
+  {"year":2014,"country":"Germany","value":723.1},
+  {"year":2016,"country":"Germany","value":734.5},
+  {"year":2018,"country":"Germany","value":694.5},
+  {"year":2020,"country":"Germany","value":593.1},
+  {"year":2022,"country":"Germany","value":612.0},
+  {"year":2000,"country":"South Korea","value":417.5},
+  {"year":2002,"country":"South Korea","value":442.9},
+  {"year":2004,"country":"South Korea","value":468.3},
+  {"year":2006,"country":"South Korea","value":472.3},
+  {"year":2008,"country":"South Korea","value":500.8},
+  {"year":2010,"country":"South Korea","value":567.4},
+  {"year":2012,"country":"South Korea","value":593.5},
+  {"year":2014,"country":"South Korea","value":577.2},
+  {"year":2016,"country":"South Korea","value":589.8},
+  {"year":2018,"country":"South Korea","value":627.6},
+  {"year":2020,"country":"South Korea","value":558.4},
+  {"year":2022,"country":"South Korea","value":549.3},
+  {"year":2000,"country":"Canada","value":503.6},
+  {"year":2002,"country":"Canada","value":514.6},
+  {"year":2004,"country":"Canada","value":519.7},
+  {"year":2006,"country":"Canada","value":523.6},
+  {"year":2008,"country":"Canada","value":534.3},
+  {"year":2010,"country":"Canada","value":521.3},
+  {"year":2012,"country":"Canada","value":529.8},
+  {"year":2014,"country":"Canada","value":543.3},
+  {"year":2016,"country":"Canada","value":536.6},
+  {"year":2018,"country":"Canada","value":557.6},
+  {"year":2020,"country":"Canada","value":502.2},
+  {"year":2022,"country":"Canada","value":523.3}
+];
+
+// Stack order: largest on bottom
+const stackOrder = ["China", "United States", "India", "Russia", "Japan", "Germany", "South Korea", "Canada"];
+const colors = {
+  "China": "#E15759",
+  "United States": "#4E79A7",
+  "India": "#F28E2B",
+  "Russia": "#76B7B2",
+  "Japan": "#59A14F",
+  "Germany": "#EDC948",
+  "South Korea": "#B07AA1",
+  "Canada": "#FF9DA7"
+};
+
+const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+
+// Build stacked data
+const stacked = [];
+for (const year of years) {
+  let cumulative = 0;
+  for (const country of stackOrder) {
+    const d = data.find(r => r.year === year && r.country === country);
+    const value = d ? d.value : 0;
+    stacked.push({
+      year,
+      country,
+      value,
+      y0: cumulative,
+      y1: cumulative + value
+    });
+    cumulative += value;
+  }
+}
+
+const W = 740, H = 480;
+const pad = { left: 60, right: 140, top: 24, bottom: 40 };
+const plotW = W - pad.left - pad.right;
+const plotH = H - pad.top - pad.bottom;
+const maxY = Math.ceil(Math.max(...stacked.map(d => d.y1)) / 5000) * 5000;
+
+const xScale = year => pad.left + (year - years[0]) / (years[years.length - 1] - years[0]) * plotW;
+const yScale = val => pad.top + (1 - val / maxY) * plotH;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+// Grid lines
+const yTicks = [0, 5000, 10000, 15000, 20000, 25000];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", pad.left); line.setAttribute("x2", W - pad.right);
+  line.setAttribute("y1", y); line.setAttribute("y2", y);
+  line.setAttribute("stroke", "#D5D3CA"); line.setAttribute("stroke-width", "0.5");
+  svg.appendChild(line);
+
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", pad.left - 8); label.setAttribute("y", y + 3.5);
+  label.setAttribute("text-anchor", "end"); label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.textContent = v === 0 ? "0" : (v / 1000).toFixed(0) + "k";
+  svg.appendChild(label);
+});
+
+// Y-axis label
+const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+yLabel.setAttribute("x", 14); yLabel.setAttribute("y", pad.top + plotH / 2);
+yLabel.setAttribute("text-anchor", "middle"); yLabel.setAttribute("font-size", "9");
+yLabel.setAttribute("fill", "#7A786F"); yLabel.setAttribute("transform", `rotate(-90, 14, ${pad.top + plotH / 2})`);
+yLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+yLabel.textContent = "Millions of tonnes CO2";
+svg.appendChild(yLabel);
+
+// X-axis labels
+years.forEach(y => {
+  const x = xScale(y);
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", x); label.setAttribute("y", H - pad.bottom + 18);
+  label.setAttribute("text-anchor", "middle"); label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.textContent = y % 4 === 0 ? y : "";
+  svg.appendChild(label);
+});
+
+// Draw stacked areas (bottom to top)
+const areaGroups = [];
+for (const country of stackOrder) {
+  const pts = stacked.filter(d => d.country === country).sort((a, b) => a.year - b.year);
+
+  // Build path: top line forward, bottom line backward
+  let pathD = "";
+  pts.forEach((p, i) => {
+    const x = xScale(p.year);
+    const y = yScale(p.y1);
+    pathD += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+  });
+  for (let i = pts.length - 1; i >= 0; i--) {
+    const x = xScale(pts[i].year);
+    const y = yScale(pts[i].y0);
+    pathD += "L" + x.toFixed(1) + "," + y.toFixed(1);
+  }
+  pathD += "Z";
+
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", pathD);
+  path.setAttribute("fill", colors[country]);
+  path.setAttribute("fill-opacity", "0.85");
+  path.setAttribute("stroke", "#F6F5EE");
+  path.setAttribute("stroke-width", "0.5");
+  svg.appendChild(path);
+  areaGroups.push({ country, path, pts });
+}
+
+// Right-side labels at the last year
+const lastYear = years[years.length - 1];
+const labelData = stackOrder.map(country => {
+  const pt = stacked.find(d => d.country === country && d.year === lastYear);
+  return { country, midY: (yScale(pt.y0) + yScale(pt.y1)) / 2, value: pt.value };
+}).filter(d => d.value > 300);
+
+// Resolve label collisions
+labelData.sort((a, b) => a.midY - b.midY);
+for (let pass = 0; pass < 20; pass++) {
+  let moved = false;
+  for (let i = 1; i < labelData.length; i++) {
+    const gap = labelData[i].midY - labelData[i - 1].midY;
+    if (gap < 14) {
+      const shift = (14 - gap) / 2;
+      labelData[i - 1].midY -= shift;
+      labelData[i].midY += shift;
+      moved = true;
+    }
+  }
+  if (!moved) break;
+}
+
+labelData.forEach(d => {
+  const x = W - pad.right + 8;
+  const swatch = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  swatch.setAttribute("x", x); swatch.setAttribute("y", d.midY - 4);
+  swatch.setAttribute("width", 10); swatch.setAttribute("height", 8);
+  swatch.setAttribute("rx", 1); swatch.setAttribute("fill", colors[d.country]);
+  svg.appendChild(swatch);
+
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", x + 14); label.setAttribute("y", d.midY + 3);
+  label.setAttribute("text-anchor", "start"); label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#2B2A27"); label.setAttribute("font-weight", "500");
+  label.textContent = d.country;
+  svg.appendChild(label);
+});
+
+// Smaller countries that got filtered out: show in compact legend
+const smallCountries = stackOrder.filter(c => {
+  const pt = stacked.find(d => d.country === c && d.year === lastYear);
+  return pt.value <= 300;
+});
+// (none expected to be filtered, but kept for safety)
+
+// Vertical hover line
+const hoverLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+hoverLine.setAttribute("y1", pad.top); hoverLine.setAttribute("y2", pad.top + plotH);
+hoverLine.setAttribute("stroke", "#2B2A27"); hoverLine.setAttribute("stroke-width", "0.5");
+hoverLine.setAttribute("stroke-dasharray", "3,2");
+hoverLine.style.opacity = "0";
+svg.appendChild(hoverLine);
+
+document.getElementById("chart").appendChild(svg);
+
+// Tooltip interactivity
+const tip = document.getElementById("tip");
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+
+  if (sx < pad.left || sx > W - pad.right || sy < pad.top || sy > pad.top + plotH) {
+    hoverLine.style.opacity = "0";
+    tip.style.opacity = "0";
+    areaGroups.forEach(g => { g.path.setAttribute("fill-opacity", "0.85"); });
+    return;
+  }
+
+  // Find nearest year
+  const yearFloat = years[0] + (sx - pad.left) / plotW * (years[years.length - 1] - years[0]);
+  const nearestYear = years.reduce((a, b) => Math.abs(b - yearFloat) < Math.abs(a - yearFloat) ? b : a);
+
+  hoverLine.setAttribute("x1", xScale(nearestYear));
+  hoverLine.setAttribute("x2", xScale(nearestYear));
+  hoverLine.style.opacity = "1";
+
+  // Find which country band the cursor is in
+  const yVal = (1 - (sy - pad.top) / plotH) * maxY;
+  let hoveredCountry = null;
+  for (const country of stackOrder) {
+    const pt = stacked.find(d => d.country === country && d.year === nearestYear);
+    if (pt && yVal >= pt.y0 && yVal <= pt.y1) {
+      hoveredCountry = country;
+      break;
+    }
+  }
+
+  areaGroups.forEach(g => {
+    g.path.setAttribute("fill-opacity", hoveredCountry ? (g.country === hoveredCountry ? "1" : "0.3") : "0.85");
+  });
+
+  // Build tooltip
+  const yearData = stacked.filter(d => d.year === nearestYear).sort((a, b) => b.value - a.value);
+  const total = yearData.reduce((s, d) => s + d.value, 0);
+  let tipText = nearestYear + " -- Total: " + Math.round(total).toLocaleString() + " MT\n";
+  yearData.forEach(d => {
+    const marker = d.country === hoveredCountry ? " <<" : "";
+    tipText += d.country + ": " + Math.round(d.value).toLocaleString() + marker + "\n";
+  });
+
+  tip.textContent = tipText.trim();
+  tip.style.opacity = "1";
+  tip.style.whiteSpace = "pre";
+  tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 250) + "px";
+  tip.style.top = (e.clientY - 30) + "px";
+});
+
+svg.addEventListener("mouseleave", () => {
+  hoverLine.style.opacity = "0";
+  tip.style.opacity = "0";
+  areaGroups.forEach(g => { g.path.setAttribute("fill-opacity", "0.85"); });
+});
+</script>
+</body></html>

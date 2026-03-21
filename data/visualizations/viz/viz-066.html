@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 18px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 1px; }
+</style></head><body>
+<h1>What Nations Invest in Education</h1>
+<p class="subtitle">Government expenditure on education as a share of GDP for 24 countries, most recent year available (2020-2024). Countries colored by World Bank income classification reveal that spending levels do not track neatly with national wealth.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3A9E8F;"></div>High income</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#6C8EBF;"></div>Upper-middle income</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#E6A040;"></div>Lower-middle income</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#D06050;"></div>Low income</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- SE.XPD.TOTL.GD.ZS (Government expenditure on education, total, % of GDP)</p>
+<script>
+const data = [
+  { name: "Cuba", value: 8.44, year: 2022, income: "Upper-middle income", region: "Latin America" },
+  { name: "Bolivia", value: 8.32, year: 2023, income: "Lower-middle income", region: "Latin America" },
+  { name: "Botswana", value: 8.06, year: 2020, income: "Upper-middle income", region: "Sub-Saharan Africa" },
+  { name: "Iceland", value: 7.29, year: 2022, income: "High income", region: "Europe" },
+  { name: "Finland", value: 6.38, year: 2022, income: "High income", region: "Europe" },
+  { name: "Denmark", value: 6.36, year: 2022, income: "High income", region: "Europe" },
+  { name: "Belgium", value: 6.28, year: 2022, income: "High income", region: "Europe" },
+  { name: "Costa Rica", value: 6.25, year: 2021, income: "Upper-middle income", region: "Latin America" },
+  { name: "South Korea", value: 5.81, year: 2022, income: "High income", region: "East Asia" },
+  { name: "Brazil", value: 5.62, year: 2022, income: "Upper-middle income", region: "Latin America" },
+  { name: "France", value: 5.32, year: 2022, income: "High income", region: "Europe" },
+  { name: "Germany", value: 5.24, year: 2022, income: "High income", region: "Europe" },
+  { name: "Australia", value: 5.06, year: 2022, income: "High income", region: "Oceania" },
+  { name: "Canada", value: 4.88, year: 2022, income: "High income", region: "North America" },
+  { name: "India", value: 4.10, year: 2022, income: "Lower-middle income", region: "South Asia" },
+  { name: "Japan", value: 3.34, year: 2021, income: "High income", region: "East Asia" },
+  { name: "Ghana", value: 2.91, year: 2022, income: "Lower-middle income", region: "Sub-Saharan Africa" },
+  { name: "Ethiopia", value: 2.30, year: 2024, income: "Low income", region: "Sub-Saharan Africa" },
+  { name: "Bangladesh", value: 2.03, year: 2024, income: "Lower-middle income", region: "South Asia" },
+  { name: "Bahrain", value: 1.90, year: 2023, income: "High income", region: "Middle East" },
+  { name: "Central African Rep.", value: 1.83, year: 2023, income: "Low income", region: "Sub-Saharan Africa" },
+  { name: "Guinea", value: 1.72, year: 2023, income: "Low income", region: "Sub-Saharan Africa" },
+  { name: "Indonesia", value: 1.28, year: 2023, income: "Lower-middle income", region: "Southeast Asia" },
+  { name: "Haiti", value: 0.96, year: 2023, income: "Low income", region: "Latin America" }
+];
+
+data.sort((a, b) => b.value - a.value);
+
+const incomeColors = {
+  "High income": "#3A9E8F",
+  "Upper-middle income": "#6C8EBF",
+  "Lower-middle income": "#E6A040",
+  "Low income": "#D06050"
+};
+
+const W = 780;
+const rowH = 26;
+const gap = 3;
+const pad = { left: 155, right: 70, top: 30, bottom: 20 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const chartW = W - pad.left - pad.right;
+const maxVal = 10;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines and x-axis labels
+const ticks = [0, 2, 4, 6, 8, 10];
+ticks.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 12);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+// Rows
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap);
+  const cy = y + rowH / 2;
+  const barColor = incomeColors[d.income] || "#999";
+
+  // Alternating background stripes
+  if (i % 2 === 0) {
+    const bg = document.createElementNS(ns, "rect");
+    bg.setAttribute("x", pad.left);
+    bg.setAttribute("y", y);
+    bg.setAttribute("width", chartW);
+    bg.setAttribute("height", rowH);
+    bg.setAttribute("fill", "#EDECE5");
+    bg.setAttribute("rx", 1);
+    svg.appendChild(bg);
+  }
+
+  // Country label
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", pad.left - 10);
+  label.setAttribute("y", cy + 4);
+  label.setAttribute("text-anchor", "end");
+  label.setAttribute("font-size", "11");
+  label.setAttribute("font-weight", "500");
+  label.setAttribute("fill", "#2B2A27");
+  label.textContent = d.name;
+  svg.appendChild(label);
+
+  // Bar
+  const barW = Math.max(1, xScale(d.value) - xScale(0));
+  const bar = document.createElementNS(ns, "rect");
+  bar.setAttribute("x", xScale(0));
+  bar.setAttribute("y", y + 4);
+  bar.setAttribute("width", barW);
+  bar.setAttribute("height", rowH - 8);
+  bar.setAttribute("fill", barColor);
+  bar.setAttribute("rx", 2);
+  bar.setAttribute("opacity", "0.85");
+  svg.appendChild(bar);
+
+  // Value label at end of bar
+  const valLabel = document.createElementNS(ns, "text");
+  const valX = xScale(d.value) + 6;
+  valLabel.setAttribute("x", valX);
+  valLabel.setAttribute("y", cy + 4);
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1) + "%";
+  svg.appendChild(valLabel);
+
+  // Invisible hover target
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", (e) => {
+    bar.setAttribute("opacity", "1");
+    tip.innerHTML = `<strong>${d.name}</strong> (${d.year})<br>${d.income} | ${d.region}<br>Education spending: <strong>${d.value.toFixed(2)}%</strong> of GDP`;
+    tip.style.opacity = 1;
+  });
+  hitArea.addEventListener("mousemove", (e) => {
+    const chartDiv = document.getElementById("chart");
+    const rect = chartDiv.getBoundingClientRect();
+    let tx = e.clientX - rect.left + 12;
+    let ty = e.clientY - rect.top - 10;
+    if (tx + 220 > rect.width) tx = e.clientX - rect.left - 220;
+    tip.style.left = tx + "px";
+    tip.style.top = ty + "px";
+  });
+  hitArea.addEventListener("mouseleave", () => {
+    bar.setAttribute("opacity", "0.85");
+    tip.style.opacity = 0;
+  });
+  svg.appendChild(hitArea);
+});
+
+// Global average reference line
+const globalAvg = data.reduce((s, d) => s + d.value, 0) / data.length;
+const avgX = xScale(globalAvg);
+const avgLine = document.createElementNS(ns, "line");
+avgLine.setAttribute("x1", avgX);
+avgLine.setAttribute("x2", avgX);
+avgLine.setAttribute("y1", pad.top - 5);
+avgLine.setAttribute("y2", pad.top + chartH);
+avgLine.setAttribute("stroke", "#2B2A27");
+avgLine.setAttribute("stroke-width", 1);
+avgLine.setAttribute("stroke-dasharray", "3,3");
+avgLine.setAttribute("opacity", "0.4");
+svg.appendChild(avgLine);
+
+const avgLabel = document.createElementNS(ns, "text");
+avgLabel.setAttribute("x", avgX);
+avgLabel.setAttribute("y", pad.top + chartH + 14);
+avgLabel.setAttribute("text-anchor", "middle");
+avgLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+avgLabel.setAttribute("font-size", "8");
+avgLabel.setAttribute("fill", "#7A786F");
+avgLabel.textContent = "Sample avg: " + globalAvg.toFixed(1) + "%";
+svg.appendChild(avgLabel);
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

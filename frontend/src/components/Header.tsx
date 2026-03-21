@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
 import React from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
-const styles: Record<string, React.CSSProperties> = {
+const baseStyles: Record<string, React.CSSProperties> = {
   header: {
     display: "flex",
     justifyContent: "space-between",
@@ -40,10 +41,22 @@ const linkStyle = ({
 });
 
 export default function Header() {
+  const mobile = useIsMobile();
+  const styles = {
+    ...baseStyles,
+    header: {
+      ...baseStyles.header,
+      padding: mobile ? "12px 16px" : "12px 40px",
+    },
+    nav: {
+      ...baseStyles.nav,
+      gap: mobile ? 12 : 20,
+    },
+  };
   return (
     <header style={styles.header}>
-      <NavLink to="/" style={{ ...styles.logo, textDecoration: "none" }}>
-        OWID / Agents
+      <NavLink to="/" style={{ ...baseStyles.logo, textDecoration: "none" }}>
+        Fieldnotes
       </NavLink>
       <nav style={styles.nav}>
         <NavLink to="/gallery" style={linkStyle}>

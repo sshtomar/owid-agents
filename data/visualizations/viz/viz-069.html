@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Women in the Boardroom</h1>
+<p class="subtitle">Proportion of women in managerial positions (%, SDG 5.5.2). Most recent available data for selected countries. The dashed line marks 50% gender parity -- few countries reach it, and wide disparities persist across regions.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG Global Database -- Indicator 5.5.2 (IC_GEN_MGTL)</p>
+<script>
+const data = [
+  { name: "Jamaica", value: 60.3, year: 2023, region: "Caribbean" },
+  { name: "Cameroon", value: 57.74, year: 2021, region: "Africa" },
+  { name: "Botswana", value: 51.89, year: 2023, region: "Africa" },
+  { name: "Costa Rica", value: 49.12, year: 2024, region: "Latin America" },
+  { name: "Philippines", value: 48.63, year: 2022, region: "Asia" },
+  { name: "Colombia", value: 44.42, year: 2024, region: "Latin America" },
+  { name: "Belarus", value: 45.28, year: 2023, region: "Europe" },
+  { name: "Sweden", value: 43.66, year: 2023, region: "Europe" },
+  { name: "United States", value: 42.86, year: 2024, region: "N. America" },
+  { name: "Australia", value: 41.72, year: 2024, region: "Oceania" },
+  { name: "Brazil", value: 39.4, year: 2024, region: "Latin America" },
+  { name: "France", value: 38.85, year: 2023, region: "Europe" },
+  { name: "Rwanda", value: 37.83, year: 2023, region: "Africa" },
+  { name: "South Africa", value: 35.53, year: 2024, region: "Africa" },
+  { name: "Norway", value: 33.71, year: 2023, region: "Europe" },
+  { name: "Indonesia", value: 33.09, year: 2023, region: "Asia" },
+  { name: "Germany", value: 28.6, year: 2023, region: "Europe" },
+  { name: "Italy", value: 27.96, year: 2023, region: "Europe" },
+  { name: "Viet Nam", value: 27.27, year: 2023, region: "Asia" },
+  { name: "Turkiye", value: 19.07, year: 2023, region: "Asia" },
+  { name: "South Korea", value: 17.53, year: 2024, region: "Asia" },
+  { name: "Japan", value: 16.26, year: 2024, region: "Asia" },
+  { name: "Saudi Arabia", value: 15.1, year: 2023, region: "W. Asia" },
+  { name: "India", value: 12.58, year: 2023, region: "Asia" },
+  { name: "Bangladesh", value: 7.32, year: 2022, region: "Asia" },
+  { name: "Pakistan", value: 5.71, year: 2021, region: "Asia" }
+];
+
+data.sort((a, b) => b.value - a.value);
+
+const W = 740;
+const barH = 22;
+const gap = 4;
+const pad = { left: 130, right: 70, top: 10, bottom: 30 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = 70;
+const xScale = (v) => pad.left + (v / maxVal) * (W - pad.left - pad.right);
+
+const regionColors = {
+  "Caribbean": "#6B8E5A",
+  "Africa": "#D4843E",
+  "Latin America": "#4A8E8E",
+  "Asia": "#8B6BAE",
+  "Europe": "#3A7BC8",
+  "N. America": "#C75B5B",
+  "Oceania": "#2A9D8F",
+  "W. Asia": "#C4956A"
+};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("width", W);
+svg.setAttribute("height", H);
+svg.style.display = "block";
+
+// Grid lines
+[0, 10, 20, 30, 40, 50, 60].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 50 ? "#2B2A27" : "#DAD8CE");
+  line.setAttribute("stroke-width", v === 50 ? 1.5 : 0.5);
+  if (v === 50) line.setAttribute("stroke-dasharray", "6,3");
+  svg.appendChild(line);
+
+  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top + chartH + 16);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-size", "9px");
+  label.setAttribute("fill", v === 50 ? "#2B2A27" : "#7A786F");
+  label.setAttribute("font-weight", v === 50 ? "600" : "400");
+  label.textContent = v === 50 ? "50% parity" : v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barW = xScale(d.value) - xScale(0);
+  const color = regionColors[d.region] || "#7A786F";
+
+  // Country label
+  const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  nameText.setAttribute("x", pad.left - 8);
+  nameText.setAttribute("y", y + barH / 2 + 4);
+  nameText.setAttribute("text-anchor", "end");
+  nameText.setAttribute("font-size", "11px");
+  nameText.setAttribute("fill", "#2B2A27");
+  nameText.setAttribute("font-weight", "500");
+  nameText.textContent = d.name;
+  svg.appendChild(nameText);
+
+  // Bar
+  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  rect.setAttribute("x", xScale(0));
+  rect.setAttribute("y", y);
+  rect.setAttribute("width", barW);
+  rect.setAttribute("height", barH);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.opacity = 0.85;
+  rect.style.transition = "opacity 0.15s";
+
+  // Lollipop circle at end
+  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  circle.setAttribute("cx", xScale(d.value));
+  circle.setAttribute("cy", y + barH / 2);
+  circle.setAttribute("r", 5);
+  circle.setAttribute("fill", color);
+  circle.style.transition = "r 0.15s";
+
+  // Value label
+  const valText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  valText.setAttribute("x", xScale(d.value) + 12);
+  valText.setAttribute("y", y + barH / 2 + 4);
+  valText.setAttribute("font-size", "10px");
+  valText.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valText.setAttribute("fill", "#7A786F");
+  valText.textContent = d.value.toFixed(1) + "%";
+  svg.appendChild(valText);
+
+  // Hover group
+  const hitArea = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", (e) => {
+    rect.style.opacity = 1;
+    circle.setAttribute("r", 7);
+    tip.style.opacity = 1;
+    tip.innerHTML = "<strong>" + d.name + "</strong> (" + d.year + ")<br>" +
+      d.value.toFixed(1) + "% women in management<br>" +
+      "<span style='color:#9A9890;'>" + d.region + "</span>";
+  });
+
+  hitArea.addEventListener("mousemove", (e) => {
+    const chartDiv = document.getElementById("chart");
+    const box = chartDiv.getBoundingClientRect();
+    tip.style.left = (e.clientX - box.left + 14) + "px";
+    tip.style.top = (e.clientY - box.top - 10) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.style.opacity = 0.85;
+    circle.setAttribute("r", 5);
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(circle);
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

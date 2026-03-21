@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.6; }
+  .legend { display: flex; gap: 20px; margin: 0 0 16px; font-size: 10px; color: #7A786F; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+</style></head><body>
+<h1>Who Cares for the Carers?</h1>
+<p class="subtitle">Nursing and midwifery personnel vs. medical doctors per 10,000 population. Rich nations deploy 100+ nurses per 10,000 people; much of Sub-Saharan Africa operates below 10. The paired bars reveal that in most countries nurses far outnumber doctors, except China where doctors outnumber nurses. The dashed line marks the WHO minimum health-workforce threshold of 44.5 skilled health workers per 10,000.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#2D7FC1;"></div> Nurses &amp; midwives</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#E8833A;"></div> Medical doctors</div>
+  <div class="legend-item" style="gap:6px;"><svg width="18" height="12"><line x1="0" y1="6" x2="18" y2="6" stroke="#B5483A" stroke-width="1.2" stroke-dasharray="3,2"/></svg> WHO threshold (44.5)</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- HWF_0006 (Nursing &amp; midwifery personnel per 10,000) &amp; HWF_0001 (Medical doctors per 10,000)</p>
+<script>
+const data = [
+  { name: "Switzerland", nurses: 187.08, nYear: 2020, doctors: 45.59, dYear: 2023 },
+  { name: "Norway", nurses: 157.95, nYear: 2017, doctors: 45.78, dYear: 2019 },
+  { name: "Ireland", nurses: 154.04, nYear: 2024, doctors: 33.17, dYear: 2019 },
+  { name: "Germany", nurses: 122.59, nYear: 2021, doctors: 44.43, dYear: 2020 },
+  { name: "United States", nurses: 120.55, nYear: 2023, doctors: 25.71, dYear: 2020 },
+  { name: "Japan", nurses: 119.75, nYear: 2018, doctors: 25.92, dYear: 2020 },
+  { name: "Canada", nurses: 116.18, nYear: 2024, doctors: 28.19, dYear: 2023 },
+  { name: "Australia", nurses: 107.34, nYear: 2009, doctors: 38.08, dYear: 2019 },
+  { name: "United Kingdom", nurses: 95.59, nYear: 2023, doctors: 32.31, dYear: 2022 },
+  { name: "France", nurses: 93.36, nYear: 2019, doctors: 32.43, dYear: 2019 },
+  { name: "Brazil", nurses: 56.38, nYear: 2021, doctors: 13.79, dYear: 1999 },
+  { name: "South Africa", nurses: 41.54, nYear: 2024, doctors: 7.66, dYear: 2024 },
+  { name: "Indonesia", nurses: 41.23, nYear: 2022, doctors: 4.21, dYear: 2018 },
+  { name: "Turkey", nurses: 35.30, nYear: 2023, doctors: 21.18, dYear: 2021 },
+  { name: "Mexico", nurses: 30.48, nYear: 2023, doctors: 20.07, dYear: 2010 },
+  { name: "Thailand", nurses: 25.29, nYear: 2020, doctors: 5.45, dYear: 2022 },
+  { name: "China", nurses: 24.98, nYear: 2016, doctors: 28.19, dYear: 2023 },
+  { name: "India", nurses: 24.85, nYear: 2021, doctors: 9.39, dYear: 2023 },
+  { name: "Kenya", nurses: 6.50, nYear: 2021, doctors: 0.98, dYear: 2021 },
+  { name: "Nigeria", nurses: 3.94, nYear: 2020, doctors: 3.80, dYear: 2023 },
+  { name: "Ethiopia", nurses: 1.96, nYear: 2008, doctors: 1.05, dYear: 2022 },
+  { name: "Chad", nurses: 1.91, nYear: 2021, doctors: 0.82, dYear: 2022 }
+];
+
+const W = 780;
+const barH = 10;
+const rowH = 28;
+const pad = { left: 130, right: 50, top: 30, bottom: 36 };
+const chartH = data.length * rowH;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = Math.ceil(Math.max(...data.map(d => Math.max(d.nurses, d.doctors))) / 20) * 20;
+
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const nurseColor = "#2D7FC1";
+const doctorColor = "#E8833A";
+const thresholdVal = 44.5;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines and x-axis labels
+const ticks = [0, 40, 80, 120, 160, 200];
+ticks.forEach(v => {
+  if (v > maxVal) return;
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#DDD9CE");
+  line.setAttribute("stroke-width", 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 10);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v;
+  svg.appendChild(label);
+});
+
+// X-axis title
+const xTitle = document.createElementNS(ns, "text");
+xTitle.setAttribute("x", pad.left + chartW / 2);
+xTitle.setAttribute("y", pad.top + chartH + 28);
+xTitle.setAttribute("text-anchor", "middle");
+xTitle.setAttribute("font-size", "9");
+xTitle.setAttribute("fill", "#7A786F");
+xTitle.setAttribute("font-family", "'JetBrains Mono', monospace");
+xTitle.textContent = "per 10,000 population";
+svg.appendChild(xTitle);
+
+// WHO threshold line
+const threshX = xScale(thresholdVal);
+const threshLine = document.createElementNS(ns, "line");
+threshLine.setAttribute("x1", threshX);
+threshLine.setAttribute("x2", threshX);
+threshLine.setAttribute("y1", pad.top);
+threshLine.setAttribute("y2", pad.top + chartH);
+threshLine.setAttribute("stroke", "#B5483A");
+threshLine.setAttribute("stroke-width", 1.2);
+threshLine.setAttribute("stroke-dasharray", "4,3");
+svg.appendChild(threshLine);
+
+const threshLabel = document.createElementNS(ns, "text");
+threshLabel.setAttribute("x", threshX + 4);
+threshLabel.setAttribute("y", pad.top + chartH + 14);
+threshLabel.setAttribute("text-anchor", "start");
+threshLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+threshLabel.setAttribute("font-size", "8");
+threshLabel.setAttribute("fill", "#B5483A");
+threshLabel.textContent = "44.5 WHO min.";
+svg.appendChild(threshLabel);
+
+// Tooltip
+const tip = document.getElementById("tip");
+
+// Bars
+data.forEach((d, i) => {
+  const yBase = pad.top + i * rowH;
+  const nurseBarY = yBase + 4;
+  const docBarY = nurseBarY + barH + 2;
+
+  // Alternating row background for readability
+  if (i % 2 === 0) {
+    const bg = document.createElementNS(ns, "rect");
+    bg.setAttribute("x", 0);
+    bg.setAttribute("y", yBase);
+    bg.setAttribute("width", W);
+    bg.setAttribute("height", rowH);
+    bg.setAttribute("fill", "#EEEDEA");
+    bg.setAttribute("opacity", "0.45");
+    svg.appendChild(bg);
+  }
+
+  // Country label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", yBase + rowH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Nurse bar
+  const nurseRect = document.createElementNS(ns, "rect");
+  nurseRect.setAttribute("x", pad.left);
+  nurseRect.setAttribute("y", nurseBarY);
+  nurseRect.setAttribute("width", Math.max(xScale(d.nurses) - pad.left, 1));
+  nurseRect.setAttribute("height", barH);
+  nurseRect.setAttribute("fill", nurseColor);
+  nurseRect.setAttribute("rx", 1);
+  nurseRect.style.transition = "opacity 0.15s";
+  svg.appendChild(nurseRect);
+
+  // Doctor bar
+  const docRect = document.createElementNS(ns, "rect");
+  docRect.setAttribute("x", pad.left);
+  docRect.setAttribute("y", docBarY);
+  docRect.setAttribute("width", Math.max(xScale(d.doctors) - pad.left, 1));
+  docRect.setAttribute("height", barH);
+  docRect.setAttribute("fill", doctorColor);
+  docRect.setAttribute("rx", 1);
+  docRect.style.transition = "opacity 0.15s";
+  svg.appendChild(docRect);
+
+  // Hit area for hover
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", yBase);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", e => {
+    nurseRect.setAttribute("opacity", "0.75");
+    docRect.setAttribute("opacity", "0.75");
+    const ratio = d.doctors > 0 ? (d.nurses / d.doctors).toFixed(1) : "N/A";
+    const combined = (d.nurses + d.doctors).toFixed(1);
+    const belowThresh = parseFloat(combined) < thresholdVal;
+    const threshNote = belowThresh ? "  <span style='color:#E06050;'>below WHO min.</span>" : "";
+    tip.innerHTML = `<strong>${d.name}</strong><br>`
+      + `Nurses & midwives: ${d.nurses.toFixed(1)} (${d.nYear})<br>`
+      + `Doctors: ${d.doctors.toFixed(1)} (${d.dYear})<br>`
+      + `Nurse-to-doctor ratio: ${ratio}:1<br>`
+      + `Combined: ${combined}${threshNote}`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    const tipW = tip.offsetWidth;
+    let left = e.clientX - r.left + 14;
+    if (left + tipW > r.width) left = e.clientX - r.left - tipW - 14;
+    tip.style.left = left + "px";
+    tip.style.top = (e.clientY - r.top - 30) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    nurseRect.setAttribute("opacity", "1");
+    docRect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

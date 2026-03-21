@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "0c8e59a27f244779e3d2222e08352c72",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"under-pressure\">Under Pressure</h1>\n<span class=\"paragraph\">Raised blood pressure prevalence across countries and regions. The silent epidemic affecting over a billion people worldwide.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "3cefc4eb70763d421d95fbbd0a92f629",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Raised blood pressure (SBP&gt;=140 OR DBP&gt;=90) (age-standardized estimate)** (WHO Global Health Observatory)\n</code></pre></div>\n<span class=\"paragraph\">Raised blood pressure (SBP&gt;=140 OR DBP&gt;=90) (age-standardized estimate) from who-gho\nSource: <a href=\"https://www.who.int/data/gho/data/indicators/indicator-details/GHO/BP_04\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.who.int/data/gho/data/indicators/indicator-details/GHO/BP_04</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "e501947de9d1addfb481d11f5dc87c12",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='d52478a4-ff3a-fc57-ff7f-067a93aa33bd'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;NLD&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;NLD&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:28.528933},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;SRB&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;SRB&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:46.97073},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;SSD&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;SSD&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:33.934391},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;NRU&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;NRU&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:38.567944},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;WSM&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;WSM&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:29.831985},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;GRD&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;GRD&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:35.79319},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;LBR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;LBR&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:37.728138},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;MDV&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;MDV&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:28.274134},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;FJI&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;FJI&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:30.590557},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;PRK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;PRK&#92;&quot;,&#92;&quot;year&#92;&quot;:1990,&#92;&quot;value&#92;&quot;:22.331301}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "f586dece2f26effe93f5b83958824442",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a comparison view we take the latest non-null value per country, then sort to show the ranking.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "2566fcfc55008c5e4f733dbf17a9f6c4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='19822871-c635-315d-5064-53edf64b35fd'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:22,&#92;&quot;country&#92;&quot;:&#92;&quot;LTU&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;LTU&#92;&quot;,&#92;&quot;year&#92;&quot;:2003,&#92;&quot;value&#92;&quot;:57.628857,&#92;&quot;latest_year&#92;&quot;:2003},{&#92;&quot;&#92;&quot;:10,&#92;&quot;country&#92;&quot;:&#92;&quot;EST&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;EST&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:48.325184,&#92;&quot;latest_year&#92;&quot;:2000},{&#92;&quot;&#92;&quot;:130,&#92;&quot;country&#92;&quot;:&#92;&quot;MDA&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;MDA&#92;&quot;,&#92;&quot;year&#92;&quot;:2016,&#92;&quot;value&#92;&quot;:47.149872,&#92;&quot;latest_year&#92;&quot;:2016},{&#92;&quot;&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;PRY&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;PRY&#92;&quot;,&#92;&quot;year&#92;&quot;:1991,&#92;&quot;value&#92;&quot;:46.326649,&#92;&quot;latest_year&#92;&quot;:1991},{&#92;&quot;&#92;&quot;:217,&#92;&quot;country&#92;&quot;:&#92;&quot;ARM&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;ARM&#92;&quot;,&#92;&quot;year&#92;&quot;:2019,&#92;&quot;value&#92;&quot;:44.937836,&#92;&quot;latest_year&#92;&quot;:2019},{&#92;&quot;&#92;&quot;:163,&#92;&quot;country&#92;&quot;:&#92;&quot;HRV&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;HRV&#92;&quot;,&#92;&quot;year&#92;&quot;:2018,&#92;&quot;value&#92;&quot;:43.981358,&#92;&quot;latest_year&#92;&quot;:2018},{&#92;&quot;&#92;&quot;:41,&#92;&quot;country&#92;&quot;:&#92;&quot;MNE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;MNE&#92;&quot;,&#92;&quot;year&#92;&quot;:2008,&#92;&quot;value&#92;&quot;:43.790371,&#92;&quot;latest_year&#92;&quot;:2008},{&#92;&quot;&#92;&quot;:11,&#92;&quot;country&#92;&quot;:&#92;&quot;STP&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;STP&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:43.560143,&#92;&quot;latest_year&#92;&quot;:2000},{&#92;&quot;&#92;&quot;:187,&#92;&quot;country&#92;&quot;:&#92;&quot;TJK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;TJK&#92;&quot;,&#92;&quot;year&#92;&quot;:2019,&#92;&quot;value&#92;&quot;:43.387749,&#92;&quot;latest_year&#92;&quot;:2019},{&#92;&quot;&#92;&quot;:211,&#92;&quot;country&#92;&quot;:&#92;&quot;IRQ&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;IRQ&#92;&quot;,&#92;&quot;year&#92;&quot;:2019,&#92;&quot;value&#92;&quot;:42.987137,&#92;&quot;latest_year&#92;&quot;:2019}]&quot;' data-total-rows='20' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;number&quot;,&quot;float64&quot;]],[&quot;latest_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "60dd584174f3bbec483e61f8229252bf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='3f8014c0-ad16-efed-6f0c-8ace542f0955'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////iAUAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAA/AMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAANQDAAAEAAAAxQMAAHsiaW5kZXhfY29sdW1ucyI6IFsiX19pbmRleF9sZXZlbF8wX18iXSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnkiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5IiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInZhbHVlIiwgImZpZWxkX25hbWUiOiAidmFsdWUiLCAicGFuZGFzX3R5cGUiOiAiZmxvYXQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAibGF0ZXN0X3llYXIiLCAiZmllbGRfbmFtZSI6ICJsYXRlc3RfeWVhciIsICJwYW5kYXNfdHlwZSI6ICJpbnQ2NCIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiBudWxsLCAiZmllbGRfbmFtZSI6ICJfX2lu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&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;bar&quot;},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;legend&quot;:null,&quot;scale&quot;:{&quot;scheme&quot;:&quot;blues&quot;},&quot;type&quot;:&quot;quantitative&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;sort&quot;:&quot;-x&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;}},&quot;height&quot;:500,&quot;width&quot;:700,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "922a768d5e12e47ff1a4467179cacb87",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Sub-Saharan Africa has highest hypertension rates</li>\n<li>South Korea and Canada lowest among surveyed</li>\n<li>Global average declining but slowly</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

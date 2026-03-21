@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 600px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: default; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  #tooltip {
+    position: fixed;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    z-index: 10;
+    white-space: nowrap;
+    line-height: 1.7;
+    max-height: 320px;
+    overflow: hidden;
+  }
+  .tt-year { font-weight: 500; margin-bottom: 2px; border-bottom: 1px solid #5A584F; padding-bottom: 3px; }
+  .tt-row { display: flex; align-items: center; gap: 6px; }
+  .tt-dot { width: 6px; height: 6px; border-radius: 1px; flex-shrink: 0; }
+  .tt-name { flex: 1; }
+  .tt-val { text-align: right; font-weight: 500; }
+</style>
+</head><body>
+<h1>Displaced Within</h1>
+<p class="subtitle">Internally displaced persons (IDPs) in the 10 most-affected countries, 2000-2024. Internal displacement crises driven by conflict, violence, and instability often receive less attention than cross-border refugee flows, yet affect far larger populations.</p>
+<div class="legend" id="legend"></div>
+<svg id="chart"></svg>
+<p class="source">Source: UNHCR Refugee Statistics -- unhcr.org/refugee-statistics</p>
+<div id="tooltip"></div>
+
+<script>
+const COUNTRIES = [
+  { code: "SUD", name: "Sudan",           color: "#A63D40" },
+  { code: "SYR", name: "Syria",           color: "#E07A5F" },
+  { code: "COL", name: "Colombia",        color: "#D4A373" },
+  { code: "COD", name: "DR Congo",        color: "#6B705C" },
+  { code: "YEM", name: "Yemen",           color: "#CB997E" },
+  { code: "SOM", name: "Somalia",         color: "#B5838D" },
+  { code: "MYA", name: "Myanmar",         color: "#8D99AE" },
+  { code: "NIG", name: "Nigeria",         color: "#7F6A93" },
+  { code: "UKR", name: "Ukraine",         color: "#457B9D" },
+  { code: "AFG", name: "Afghanistan",     color: "#9C6644" }
+];
+
+const RAW = [
+  { c: "AFG", y: 2000, v: 758625 }, { c: "AFG", y: 2001, v: 1200000 }, { c: "AFG", y: 2002, v: 665156 },
+  { c: "AFG", y: 2003, v: 184269 }, { c: "AFG", y: 2004, v: 159549 }, { c: "AFG", y: 2005, v: 142505 },
+  { c: "AFG", y: 2006, v: 129310 }, { c: "AFG", y: 2007, v: 153718 }, { c: "AFG", y: 2008, v: 230670 },
+  { c: "AFG", y: 2009, v: 297129 }, { c: "AFG", y: 2010, v: 351907 }, { c: "AFG", y: 2011, v: 447547 },
+  { c: "AFG", y: 2012, v: 486298 }, { c: "AFG", y: 2013, v: 631286 }, { c: "AFG", y: 2014, v: 805409 },
+  { c: "AFG", y: 2015, v: 1174306 }, { c: "AFG", y: 2016, v: 1797551 }, { c: "AFG", y: 2017, v: 1837079 },
+  { c: "AFG", y: 2018, v: 2106893 }, { c: "AFG", y: 2019, v: 2553390 }, { c: "AFG", y: 2020, v: 2886317 },
+  { c: "AFG", y: 2021, v: 3457744 }, { c: "AFG", y: 2022, v: 3254002 }, { c: "AFG", y: 2023, v: 3222397 },
+  { c: "AFG", y: 2024, v: 3199710 },
+  { c: "COD", y: 2000, v: 3000 }, { c: "COD", y: 2001, v: 3458 }, { c: "COD", y: 2002, v: 9000 },
+  { c: "COD", y: 2003, v: 0 }, { c: "COD", y: 2004, v: 0 }, { c: "COD", y: 2005, v: 0 },
+  { c: "COD", y: 2006, v: 1075297 }, { c: "COD", y: 2007, v: 1317879 }, { c: "COD", y: 2008, v: 1460102 },
+  { c: "COD", y: 2009, v: 2052677 }, { c: "COD", y: 2010, v: 1721382 }, { c: "COD", y: 2011, v: 1709278 },
+  { c: "COD", y: 2012, v: 2669069 }, { c: "COD", y: 2013, v: 2963799 }, { c: "COD", y: 2014, v: 2756585 },
+  { c: "COD", y: 2015, v: 1555112 }, { c: "COD", y: 2016, v: 2232900 }, { c: "COD", y: 2017, v: 4351376 },
+  { c: "COD", y: 2018, v: 4516866 }, { c: "COD", y: 2019, v: 5014253 }, { c: "COD", y: 2020, v: 5198131 },
+  { c: "COD", y: 2021, v: 5407840 }, { c: "COD", y: 2022, v: 5541021 }, { c: "COD", y: 2023, v: 6251790 },
+  { c: "COD", y: 2024, v: 6905511 },
+  { c: "COL", y: 2000, v: 525000 }, { c: "COL", y: 2001, v: 720000 }, { c: "COL", y: 2002, v: 950000 },
+  { c: "COL", y: 2003, v: 1244072 }, { c: "COL", y: 2004, v: 2000000 }, { c: "COL", y: 2005, v: 2000000 },
+  { c: "COL", y: 2006, v: 3000000 }, { c: "COL", y: 2007, v: 3000000 }, { c: "COL", y: 2008, v: 3000000 },
+  { c: "COL", y: 2009, v: 3303979 }, { c: "COL", y: 2010, v: 3672054 }, { c: "COL", y: 2011, v: 3888309 },
+  { c: "COL", y: 2012, v: 3943509 }, { c: "COL", y: 2013, v: 5368138 }, { c: "COL", y: 2014, v: 6044151 },
+  { c: "COL", y: 2015, v: 6939067 }, { c: "COL", y: 2016, v: 7410816 }, { c: "COL", y: 2017, v: 7677609 },
+  { c: "COL", y: 2018, v: 7816473 }, { c: "COL", y: 2019, v: 7976412 }, { c: "COL", y: 2020, v: 8252788 },
+  { c: "COL", y: 2021, v: 6766002 }, { c: "COL", y: 2022, v: 6834492 }, { c: "COL", y: 2023, v: 6918373 },
+  { c: "COL", y: 2024, v: 7031498 },
+  { c: "SOM", y: 2000, v: 18000 }, { c: "SOM", y: 2001, v: 0 }, { c: "SOM", y: 2002, v: 0 },
+  { c: "SOM", y: 2003, v: 0 }, { c: "SOM", y: 2004, v: 0 }, { c: "SOM", y: 2005, v: 400000 },
+  { c: "SOM", y: 2006, v: 400000 }, { c: "SOM", y: 2007, v: 1000000 }, { c: "SOM", y: 2008, v: 1277200 },
+  { c: "SOM", y: 2009, v: 1550000 }, { c: "SOM", y: 2010, v: 1463780 }, { c: "SOM", y: 2011, v: 1356845 },
+  { c: "SOM", y: 2012, v: 1132963 }, { c: "SOM", y: 2013, v: 1133000 }, { c: "SOM", y: 2014, v: 1133000 },
+  { c: "SOM", y: 2015, v: 1133000 }, { c: "SOM", y: 2016, v: 1562554 }, { c: "SOM", y: 2017, v: 2116705 },
+  { c: "SOM", y: 2018, v: 2648001 }, { c: "SOM", y: 2019, v: 2648000 }, { c: "SOM", y: 2020, v: 2967500 },
+  { c: "SOM", y: 2021, v: 2967500 }, { c: "SOM", y: 2022, v: 2967500 }, { c: "SOM", y: 2023, v: 3860099 },
+  { c: "SOM", y: 2024, v: 3861643 },
+  { c: "SUD", y: 2000, v: 0 }, { c: "SUD", y: 2001, v: 0 }, { c: "SUD", y: 2002, v: 0 },
+  { c: "SUD", y: 2003, v: 0 }, { c: "SUD", y: 2004, v: 662302 }, { c: "SUD", y: 2005, v: 841946 },
+  { c: "SUD", y: 2006, v: 1325235 }, { c: "SUD", y: 2007, v: 1250000 }, { c: "SUD", y: 2008, v: 1201040 },
+  { c: "SUD", y: 2009, v: 1034140 }, { c: "SUD", y: 2010, v: 1624100 }, { c: "SUD", y: 2011, v: 2422520 },
+  { c: "SUD", y: 2012, v: 1873300 }, { c: "SUD", y: 2013, v: 1873300 }, { c: "SUD", y: 2014, v: 2192830 },
+  { c: "SUD", y: 2015, v: 3218234 }, { c: "SUD", y: 2016, v: 2225557 }, { c: "SUD", y: 2017, v: 1997022 },
+  { c: "SUD", y: 2018, v: 1864195 }, { c: "SUD", y: 2019, v: 1885782 }, { c: "SUD", y: 2020, v: 2552174 },
+  { c: "SUD", y: 2021, v: 3036590 }, { c: "SUD", y: 2022, v: 3552717 }, { c: "SUD", y: 2023, v: 9052822 },
+  { c: "SUD", y: 2024, v: 11559970 },
+  { c: "SYR", y: 2000, v: 0 }, { c: "SYR", y: 2001, v: 0 }, { c: "SYR", y: 2002, v: 0 },
+  { c: "SYR", y: 2003, v: 0 }, { c: "SYR", y: 2004, v: 0 }, { c: "SYR", y: 2005, v: 0 },
+  { c: "SYR", y: 2006, v: 0 }, { c: "SYR", y: 2007, v: 0 }, { c: "SYR", y: 2008, v: 0 },
+  { c: "SYR", y: 2009, v: 0 }, { c: "SYR", y: 2010, v: 0 }, { c: "SYR", y: 2011, v: 0 },
+  { c: "SYR", y: 2012, v: 2016500 }, { c: "SYR", y: 2013, v: 6520800 }, { c: "SYR", y: 2014, v: 7632500 },
+  { c: "SYR", y: 2015, v: 6563462 }, { c: "SYR", y: 2016, v: 6325978 }, { c: "SYR", y: 2017, v: 6150005 },
+  { c: "SYR", y: 2018, v: 6183920 }, { c: "SYR", y: 2019, v: 6146994 }, { c: "SYR", y: 2020, v: 6701972 },
+  { c: "SYR", y: 2021, v: 6865308 }, { c: "SYR", y: 2022, v: 6780994 }, { c: "SYR", y: 2023, v: 7248188 },
+  { c: "SYR", y: 2024, v: 7408909 },
+  { c: "YEM", y: 2000, v: 0 }, { c: "YEM", y: 2001, v: 0 }, { c: "YEM", y: 2002, v: 0 },
+  { c: "YEM", y: 2003, v: 0 }, { c: "YEM", y: 2004, v: 0 }, { c: "YEM", y: 2005, v: 0 },
+  { c: "YEM", y: 2006, v: 0 }, { c: "YEM", y: 2007, v: 77000 }, { c: "YEM", y: 2008, v: 100000 },
+  { c: "YEM", y: 2009, v: 250000 }, { c: "YEM", y: 2010, v: 220994 }, { c: "YEM", y: 2011, v: 347295 },
+  { c: "YEM", y: 2012, v: 385320 }, { c: "YEM", y: 2013, v: 306614 }, { c: "YEM", y: 2014, v: 334093 },
+  { c: "YEM", y: 2015, v: 2532032 }, { c: "YEM", y: 2016, v: 2025060 }, { c: "YEM", y: 2017, v: 2014062 },
+  { c: "YEM", y: 2018, v: 2144719 }, { c: "YEM", y: 2019, v: 3625716 }, { c: "YEM", y: 2020, v: 4002012 },
+  { c: "YEM", y: 2021, v: 4288739 }, { c: "YEM", y: 2022, v: 4523022 }, { c: "YEM", y: 2023, v: 4516341 },
+  { c: "YEM", y: 2024, v: 4795983 },
+  { c: "UKR", y: 2000, v: 0 }, { c: "UKR", y: 2001, v: 0 }, { c: "UKR", y: 2002, v: 0 },
+  { c: "UKR", y: 2003, v: 0 }, { c: "UKR", y: 2004, v: 0 }, { c: "UKR", y: 2005, v: 0 },
+  { c: "UKR", y: 2006, v: 0 }, { c: "UKR", y: 2007, v: 0 }, { c: "UKR", y: 2008, v: 0 },
+  { c: "UKR", y: 2009, v: 0 }, { c: "UKR", y: 2010, v: 0 }, { c: "UKR", y: 2011, v: 0 },
+  { c: "UKR", y: 2012, v: 0 }, { c: "UKR", y: 2013, v: 0 }, { c: "UKR", y: 2014, v: 823000 },
+  { c: "UKR", y: 2015, v: 1600000 }, { c: "UKR", y: 2016, v: 1800000 }, { c: "UKR", y: 2017, v: 1800000 },
+  { c: "UKR", y: 2018, v: 1500002 }, { c: "UKR", y: 2019, v: 734000 }, { c: "UKR", y: 2020, v: 734000 },
+  { c: "UKR", y: 2021, v: 854000 }, { c: "UKR", y: 2022, v: 5914000 }, { c: "UKR", y: 2023, v: 3689000 },
+  { c: "UKR", y: 2024, v: 3665000 },
+  { c: "NIG", y: 2000, v: 0 }, { c: "NIG", y: 2001, v: 0 }, { c: "NIG", y: 2002, v: 0 },
+  { c: "NIG", y: 2003, v: 0 }, { c: "NIG", y: 2004, v: 0 }, { c: "NIG", y: 2005, v: 0 },
+  { c: "NIG", y: 2006, v: 0 }, { c: "NIG", y: 2007, v: 0 }, { c: "NIG", y: 2008, v: 0 },
+  { c: "NIG", y: 2009, v: 0 }, { c: "NIG", y: 2010, v: 0 }, { c: "NIG", y: 2011, v: 0 },
+  { c: "NIG", y: 2012, v: 0 }, { c: "NIG", y: 2013, v: 0 }, { c: "NIG", y: 2014, v: 1188018 },
+  { c: "NIG", y: 2015, v: 2172532 }, { c: "NIG", y: 2016, v: 2219272 }, { c: "NIG", y: 2017, v: 1704080 },
+  { c: "NIG", y: 2018, v: 2167925 }, { c: "NIG", y: 2019, v: 2195779 }, { c: "NIG", y: 2020, v: 2610278 },
+  { c: "NIG", y: 2021, v: 3084916 }, { c: "NIG", y: 2022, v: 3286881 }, { c: "NIG", y: 2023, v: 3313601 },
+  { c: "NIG", y: 2024, v: 3432959 },
+  { c: "MYA", y: 2000, v: 0 }, { c: "MYA", y: 2001, v: 0 }, { c: "MYA", y: 2002, v: 0 },
+  { c: "MYA", y: 2003, v: 0 }, { c: "MYA", y: 2004, v: 0 }, { c: "MYA", y: 2005, v: 0 },
+  { c: "MYA", y: 2006, v: 58500 }, { c: "MYA", y: 2007, v: 67290 }, { c: "MYA", y: 2008, v: 67290 },
+  { c: "MYA", y: 2009, v: 67290 }, { c: "MYA", y: 2010, v: 62015 }, { c: "MYA", y: 2011, v: 339200 },
+  { c: "MYA", y: 2012, v: 430400 }, { c: "MYA", y: 2013, v: 372000 }, { c: "MYA", y: 2014, v: 376500 },
+  { c: "MYA", y: 2015, v: 451089 }, { c: "MYA", y: 2016, v: 375016 }, { c: "MYA", y: 2017, v: 353108 },
+  { c: "MYA", y: 2018, v: 370306 }, { c: "MYA", y: 2019, v: 312018 }, { c: "MYA", y: 2020, v: 370320 },
+  { c: "MYA", y: 2021, v: 671011 }, { c: "MYA", y: 2022, v: 1504848 }, { c: "MYA", y: 2023, v: 2607645 },
+  { c: "MYA", y: 2024, v: 3513867 }
+];
+
+const YEARS = [];
+for (let y = 2000; y <= 2024; y++) YEARS.push(y);
+
+const codes = COUNTRIES.map(c => c.code);
+
+// Build per-year per-country lookup
+const lookup = {};
+for (const d of RAW) {
+  if (!lookup[d.y]) lookup[d.y] = {};
+  lookup[d.y][d.c] = d.v;
+}
+
+// Stack order: bottom to top (reversed from COUNTRIES so Sudan is on top visually)
+const stackOrder = [...codes].reverse();
+
+// Compute stacked values
+const stacked = [];
+for (const year of YEARS) {
+  let cumulative = 0;
+  const entry = { year, layers: {} };
+  for (const code of stackOrder) {
+    const val = (lookup[year] && lookup[year][code]) || 0;
+    entry.layers[code] = { y0: cumulative, y1: cumulative + val, value: val };
+    cumulative += val;
+  }
+  entry.total = cumulative;
+  stacked.push(entry);
+}
+
+const maxTotal = Math.max(...stacked.map(s => s.total));
+
+// Chart dimensions
+const W = 820, H = 420;
+const margin = { top: 12, right: 24, bottom: 32, left: 48 };
+const cw = W - margin.left - margin.right;
+const ch = H - margin.top - margin.bottom;
+
+// Nice y-axis max (round up to next 5 million)
+const yMax = Math.ceil(maxTotal / 5e6) * 5e6;
+
+function xScale(year) { return margin.left + ((year - 2000) / 24) * cw; }
+function yScale(val) { return margin.top + ch - (val / yMax) * ch; }
+
+// Build legend
+const legendEl = document.getElementById('legend');
+for (const c of COUNTRIES) {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = '<div class="legend-dot" style="background:' + c.color + '"></div>' + c.name;
+  legendEl.appendChild(item);
+}
+
+// Build SVG
+const svg = document.getElementById('chart');
+svg.setAttribute('width', W);
+svg.setAttribute('height', H);
+svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+// Grid lines and y-axis labels
+const yTicks = [];
+for (let v = 0; v <= yMax; v += 5e6) yTicks.push(v);
+
+for (const v of yTicks) {
+  const y = yScale(v);
+  svg.appendChild(el('line', {
+    x1: margin.left, x2: W - margin.right, y1: y, y2: y,
+    stroke: '#DDDCD4', 'stroke-width': 1
+  }));
+  const label = el('text', {
+    x: margin.left - 8, y: y + 3,
+    'text-anchor': 'end', fill: '#7A786F',
+    'font-family': 'JetBrains Mono, monospace', 'font-size': '9px'
+  });
+  label.textContent = (v / 1e6) + 'M';
+  svg.appendChild(label);
+}
+
+// X-axis labels
+for (let y = 2000; y <= 2024; y += 4) {
+  const x = xScale(y);
+  const label = el('text', {
+    x: x, y: H - 6,
+    'text-anchor': 'middle', fill: '#7A786F',
+    'font-family': 'JetBrains Mono, monospace', 'font-size': '9px'
+  });
+  label.textContent = y;
+  svg.appendChild(label);
+  svg.appendChild(el('line', {
+    x1: x, x2: x, y1: margin.top, y2: margin.top + ch,
+    stroke: '#ECEAE2', 'stroke-width': 1
+  }));
+}
+
+// Draw stacked areas (bottom to top)
+for (const code of stackOrder) {
+  const country = COUNTRIES.find(c => c.code === code);
+  let pathD = '';
+
+  // Top edge (left to right)
+  for (let i = 0; i < stacked.length; i++) {
+    const x = xScale(stacked[i].year);
+    const y = yScale(stacked[i].layers[code].y1);
+    pathD += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  }
+
+  // Bottom edge (right to left)
+  for (let i = stacked.length - 1; i >= 0; i--) {
+    const x = xScale(stacked[i].year);
+    const y = yScale(stacked[i].layers[code].y0);
+    pathD += 'L' + x.toFixed(1) + ',' + y.toFixed(1);
+  }
+  pathD += 'Z';
+
+  svg.appendChild(el('path', {
+    d: pathD,
+    fill: country.color,
+    opacity: '0.85',
+    'data-code': code
+  }));
+}
+
+// Hover overlay (invisible columns per year)
+const tooltip = document.getElementById('tooltip');
+const hoverGroup = el('g', {});
+svg.appendChild(hoverGroup);
+
+const vertLine = el('line', {
+  x1: 0, x2: 0, y1: margin.top, y2: margin.top + ch,
+  stroke: '#2B2A27', 'stroke-width': 1, opacity: 0, 'stroke-dasharray': '3,2'
+});
+svg.appendChild(vertLine);
+
+const colW = cw / YEARS.length;
+
+for (let i = 0; i < YEARS.length; i++) {
+  const year = YEARS[i];
+  const x = xScale(year);
+  const rect = el('rect', {
+    x: x - colW / 2, y: margin.top, width: colW, height: ch,
+    fill: 'transparent', cursor: 'crosshair'
+  });
+
+  rect.addEventListener('mouseenter', function(e) {
+    vertLine.setAttribute('x1', x);
+    vertLine.setAttribute('x2', x);
+    vertLine.setAttribute('opacity', 0.4);
+
+    const entry = stacked[i];
+    let rows = '';
+    // Show countries sorted by value descending for this year
+    const sorted = COUNTRIES.filter(c => {
+      const val = entry.layers[c.code] ? entry.layers[c.code].value : 0;
+      return val > 0;
+    }).sort((a, b) => {
+      return (entry.layers[b.code].value) - (entry.layers[a.code].value);
+    });
+
+    for (const c of sorted) {
+      const val = entry.layers[c.code].value;
+      const formatted = val >= 1e6 ? (val / 1e6).toFixed(1) + 'M' : val >= 1e3 ? (val / 1e3).toFixed(0) + 'K' : val.toString();
+      rows += '<div class="tt-row"><div class="tt-dot" style="background:' + c.color + '"></div><span class="tt-name">' + c.name + '</span><span class="tt-val">' + formatted + '</span></div>';
+    }
+
+    const totalFormatted = entry.total >= 1e6 ? (entry.total / 1e6).toFixed(1) + 'M' : entry.total.toFixed(0);
+
+    tooltip.innerHTML = '<div class="tt-year">' + year + ' -- Total: ' + totalFormatted + '</div>' + rows;
+    tooltip.style.opacity = 1;
+  });
+
+  rect.addEventListener('mousemove', function(e) {
+    let tx = e.clientX + 14;
+    let ty = e.clientY - 10;
+    const tw = tooltip.offsetWidth;
+    const th = tooltip.offsetHeight;
+    if (tx + tw > window.innerWidth - 12) tx = e.clientX - tw - 14;
+    if (ty + th > window.innerHeight - 12) ty = window.innerHeight - th - 12;
+    if (ty < 4) ty = 4;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+  });
+
+  rect.addEventListener('mouseleave', function() {
+    tooltip.style.opacity = 0;
+    vertLine.setAttribute('opacity', 0);
+  });
+
+  hoverGroup.appendChild(rect);
+}
+</script>
+</body></html>

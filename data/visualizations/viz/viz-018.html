@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 14px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .chart-wrap { position: relative; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { font-size: 10px; color: #2B2A27; }
+  .legend-val { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 5px 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    white-space: nowrap;
+    z-index: 10;
+  }
+</style></head><body>
+<h1>Lighting Up the World</h1>
+<p class="subtitle">Access to electricity (% of population), 1990-2023. Selected countries in Sub-Saharan Africa and South Asia that started with limited access and made remarkable progress. Bangladesh rose from 14% to near-universal coverage. Ethiopia, Kenya, Cambodia, and others show the ongoing transformation.</p>
+<div class="chart-wrap">
+  <svg id="chart"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+<div class="legend" id="legend"></div>
+<p class="source">Source: World Bank EG.ELC.ACCS.ZS</p>
+
+<script>
+const YEARS = Array.from({length: 34}, function(_, i) { return 1990 + i; });
+
+// 12 countries with compelling stories across Sub-Saharan Africa and South Asia
+// Series: index 0 = 1990, index 33 = 2023
+const countries = [
+  {
+    code: 'BD', name: 'Bangladesh',
+    series: [null,14.3,9.9,12.7,17.8,18.3,21.1,22.4,26.7,29.5,32,35,37.8,40.5,40.6,44.2,50.5,46.5,54.3,57.1,55.3,59.6,65.5,61.5,62.4,74,75.9,88,86.9,92.2,96.2,99,99.4,99.5]
+  },
+  {
+    code: 'KH', name: 'Cambodia',
+    series: [null,null,null,null,null,null,null,null,18.7,8.8,16.6,9.5,13.1,19.3,14.2,20.5,27.5,20.2,26.4,25.6,31.1,37.4,42.3,50.9,56.1,62.7,68.8,89.1,80.7,84,86.4,82.5,92.3,95]
+  },
+  {
+    code: 'BT', name: 'Bhutan',
+    series: [null,null,null,null,null,null,null,null,null,null,31.2,40.2,44.1,41.1,51.9,59.8,59.7,71.8,67.6,71.5,73.3,81.8,91.5,87.4,91.4,95.4,99.3,97.7,100,100,100,100,100,100]
+  },
+  {
+    code: 'IN', name: 'India',
+    series: [null,null,null,50.9,49.8,51.4,53,54.6,56.2,60.1,60.3,62,62.3,65.4,64.4,68.8,67.9,72.3,74.1,75,76.3,79.5,79.9,83.1,85.1,88,89.6,91.8,95.7,95.9,96.5,99.6,99.2,99.5]
+  },
+  {
+    code: 'ID', name: 'Indonesia',
+    series: [null,48.9,66.7,55.4,62.8,66.9,72.4,80.3,80.9,83.7,86.3,86.3,87.6,87.9,89,84.8,90.6,91.1,92.7,93.6,94.2,94.8,96,96.5,97,97.5,97.6,98.1,98.5,98.9,97,99.2,100,99.4]
+  },
+  {
+    code: 'KE', name: 'Kenya',
+    series: [null,null,null,10.9,3.5,5.4,7.4,9.3,14.5,13.2,15.2,17,18.9,16,22.6,24.5,26.4,28.3,30.3,23,19.2,36.2,38.1,40.1,36,41.6,53.1,55.8,61.2,69.7,71.5,76.5,76,76.2]
+  },
+  {
+    code: 'GH', name: 'Ghana',
+    series: [null,null,null,30.6,30.4,32.5,34.5,36.6,42.6,40.7,43.7,44.8,46.8,48.3,50.8,41.3,55.1,56.9,60.5,61.1,64.2,64.1,56.5,70.7,78.3,74,79.3,79,80.4,83.5,85.4,86.3,85.1,89.5]
+  },
+  {
+    code: 'CM', name: 'Cameroon',
+    series: [null,29,32.7,33.8,35,36.1,37.3,38.4,40.7,40.7,41,46.2,44,45.1,47.1,47.2,49,48.2,50.6,51.7,52.8,53.7,55.2,56.3,56.8,58.6,59.8,60.9,62.2,63.2,64.3,65.4,71,72]
+  },
+  {
+    code: 'ET', name: 'Ethiopia',
+    series: [null,null,null,null,null,null,null,null,null,null,12.7,10.2,11.9,13.5,15.2,14,18.6,20.3,22,23.7,25.5,23,29,30.8,27.2,29,42.9,44.3,44.8,48,51.1,54.2,55.4,55.4]
+  },
+  {
+    code: 'BJ', name: 'Benin',
+    series: [null,null,null,null,null,null,14.5,18.6,19.6,20.6,21.5,21.9,23.4,24.3,25.2,26.1,27.9,28,29,30,34.2,36.9,38.4,34.7,34.1,29.6,37,34.5,39,40,41,42,56.5,57]
+  },
+  {
+    code: 'BW', name: 'Botswana',
+    series: [null,10.1,9.4,11.6,13.9,16.1,18.4,20.6,22.8,25.1,26.5,24.8,27,33.1,35.3,37.5,39.7,41.9,44.5,43.4,52,53.2,56,58,60,62.1,64.2,67.4,68.3,70.1,71.8,73.7,75.9,76]
+  },
+  {
+    code: 'GM', name: 'Gambia',
+    series: [null,null,null,17.7,18.3,19.9,21.6,23.3,24.9,26.6,34.3,29.9,31.5,27.8,34.8,30.5,38.1,39.8,41.5,43.2,46.8,48.3,49.9,51.5,53,54.7,56.4,56.2,60.3,62.1,62.2,63.7,65.4,66.9]
+  }
+];
+
+// Color palette: warm muted tones, ordered by 2023 access level
+// Near-universal (>95%): deep warm tones
+// Good progress (70-95%): mid tones
+// Still climbing (<70%): cooler muted tones
+const PALETTE = [
+  '#C45C2A', // deep orange-red
+  '#D4703A', // orange
+  '#9B6B3A', // warm brown
+  '#7A8C3A', // olive green
+  '#3A7A6B', // teal
+  '#3A6B8C', // steel blue
+  '#6B3A8C', // muted purple
+  '#8C3A6B', // dusty rose
+  '#C4A02A', // golden
+  '#5C8C3A', // muted green
+  '#8C5C2A', // tan-brown
+  '#3A4A8C', // slate blue
+];
+
+// Get latest (non-null) value for each country
+function getLatest(series) {
+  for (var i = series.length - 1; i >= 0; i--) {
+    if (series[i] !== null) return { val: series[i], year: 1990 + i };
+  }
+  return null;
+}
+
+// Sort by latest value descending, assign colors
+const sorted = countries.slice().sort(function(a, b) {
+  var av = getLatest(a.series); var bv = getLatest(b.series);
+  return (bv ? bv.val : 0) - (av ? av.val : 0);
+});
+sorted.forEach(function(c, i) { c.color = PALETTE[i % PALETTE.length]; });
+
+// Chart dimensions
+const W = 760, H = 400;
+const MARGIN = { top: 24, right: 120, bottom: 40, left: 44 };
+const PW = W - MARGIN.left - MARGIN.right;
+const PH = H - MARGIN.top - MARGIN.bottom;
+
+const svg = document.getElementById('chart');
+svg.setAttribute('width', W);
+svg.setAttribute('height', H);
+svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+function px(year) {
+  return MARGIN.left + ((year - 1990) / 33) * PW;
+}
+function py(val) {
+  return MARGIN.top + PH - (val / 100) * PH;
+}
+
+// Background
+const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+bg.setAttribute('x', MARGIN.left); bg.setAttribute('y', MARGIN.top);
+bg.setAttribute('width', PW); bg.setAttribute('height', PH);
+bg.setAttribute('fill', '#EFEDE4');
+svg.appendChild(bg);
+
+// Horizontal grid lines and Y axis labels
+[0, 20, 40, 60, 80, 100].forEach(function(v) {
+  var isTop = v === 100;
+  var y = py(v);
+
+  // Grid line
+  var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', MARGIN.left); line.setAttribute('x2', MARGIN.left + PW);
+  line.setAttribute('y1', y); line.setAttribute('y2', y);
+
+  if (isTop) {
+    // Reference line at 100%
+    line.setAttribute('stroke', '#C45C2A');
+    line.setAttribute('stroke-width', '1');
+    line.setAttribute('stroke-dasharray', '4,3');
+    line.setAttribute('opacity', '0.6');
+  } else {
+    line.setAttribute('stroke', '#E2E0D5');
+    line.setAttribute('stroke-width', '1');
+  }
+  svg.appendChild(line);
+
+  // Y label
+  var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  label.setAttribute('x', MARGIN.left - 6);
+  label.setAttribute('y', y + 3.5);
+  label.setAttribute('text-anchor', 'end');
+  label.setAttribute('font-size', '9');
+  label.setAttribute('fill', isTop ? '#C45C2A' : '#9A9890');
+  label.setAttribute('font-family', 'JetBrains Mono, monospace');
+  label.textContent = v + '%';
+  svg.appendChild(label);
+
+  // 100% label annotation
+  if (isTop) {
+    var ann = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    ann.setAttribute('x', MARGIN.left + PW + 4);
+    ann.setAttribute('y', y + 3.5);
+    ann.setAttribute('font-size', '9');
+    ann.setAttribute('fill', '#C45C2A');
+    ann.setAttribute('font-family', 'JetBrains Mono, monospace');
+    ann.textContent = 'universal';
+    svg.appendChild(ann);
+  }
+});
+
+// X axis tick marks and labels
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2023].forEach(function(yr) {
+  var x = px(yr);
+
+  var tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  tick.setAttribute('x1', x); tick.setAttribute('x2', x);
+  tick.setAttribute('y1', MARGIN.top + PH); tick.setAttribute('y2', MARGIN.top + PH + 4);
+  tick.setAttribute('stroke', '#C0BDB4'); tick.setAttribute('stroke-width', '1');
+  svg.appendChild(tick);
+
+  var label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  label.setAttribute('x', x);
+  label.setAttribute('y', MARGIN.top + PH + 14);
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('font-size', '9');
+  label.setAttribute('fill', '#9A9890');
+  label.setAttribute('font-family', 'JetBrains Mono, monospace');
+  label.textContent = yr;
+  svg.appendChild(label);
+});
+
+// Border box
+var border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+border.setAttribute('x', MARGIN.left); border.setAttribute('y', MARGIN.top);
+border.setAttribute('width', PW); border.setAttribute('height', PH);
+border.setAttribute('fill', 'none');
+border.setAttribute('stroke', '#D4D1C8'); border.setAttribute('stroke-width', '1');
+svg.appendChild(border);
+
+// Draw lines (sorted, dimmer first so brighter lines are on top)
+// Group: path + end dot + label for each country
+var lineGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+svg.appendChild(lineGroup);
+
+// Hover overlay (invisible rect on top)
+var hoverRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+hoverRect.setAttribute('x', MARGIN.left); hoverRect.setAttribute('y', MARGIN.top);
+hoverRect.setAttribute('width', PW); hoverRect.setAttribute('height', PH);
+hoverRect.setAttribute('fill', 'transparent');
+hoverRect.style.cursor = 'crosshair';
+
+// Vertical cursor line
+var cursorLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+cursorLine.setAttribute('y1', MARGIN.top); cursorLine.setAttribute('y2', MARGIN.top + PH);
+cursorLine.setAttribute('stroke', '#2B2A27'); cursorLine.setAttribute('stroke-width', '1');
+cursorLine.setAttribute('stroke-dasharray', '3,2');
+cursorLine.setAttribute('opacity', '0');
+svg.appendChild(cursorLine);
+
+// Draw all lines
+var pathEls = {};
+var endDots = {};
+var endLabels = {};
+
+// Reserve right-side label positions (y values, sorted for collision avoidance)
+function buildLabelPositions(countryList) {
+  // Get each country's latest y-position
+  var items = countryList.map(function(c) {
+    var latest = getLatest(c.series);
+    return { c: c, y: latest ? py(latest.val) : null };
+  }).filter(function(x) { return x.y !== null; });
+
+  // Sort by y ascending (top to bottom)
+  items.sort(function(a, b) { return a.y - b.y; });
+
+  // Resolve collisions (min gap = 11px)
+  var minGap = 11;
+  for (var pass = 0; pass < 20; pass++) {
+    for (var i = 1; i < items.length; i++) {
+      if (items[i].y - items[i-1].y < minGap) {
+        var mid = (items[i].y + items[i-1].y) / 2;
+        items[i-1].y = mid - minGap / 2;
+        items[i].y = mid + minGap / 2;
+      }
+    }
+  }
+
+  var result = {};
+  items.forEach(function(item) { result[item.c.code] = item.y; });
+  return result;
+}
+
+var labelPositions = buildLabelPositions(sorted);
+
+sorted.forEach(function(c, i) {
+  var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  var segments = [];
+  var prevHadVal = false;
+
+  c.series.forEach(function(val, idx) {
+    if (val === null) { prevHadVal = false; return; }
+    var x = px(1990 + idx);
+    var y = py(val);
+    if (!prevHadVal) {
+      segments.push('M ' + x + ' ' + y);
+    } else {
+      segments.push('L ' + x + ' ' + y);
+    }
+    prevHadVal = true;
+  });
+
+  path.setAttribute('d', segments.join(' '));
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', c.color);
+  path.setAttribute('stroke-width', '1.8');
+  path.setAttribute('stroke-linejoin', 'round');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('opacity', '0.85');
+  path.setAttribute('data-code', c.code);
+  lineGroup.appendChild(path);
+  pathEls[c.code] = path;
+
+  // End dot
+  var latest = getLatest(c.series);
+  if (latest) {
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', px(latest.year));
+    dot.setAttribute('cy', py(latest.val));
+    dot.setAttribute('r', '3');
+    dot.setAttribute('fill', c.color);
+    dot.setAttribute('opacity', '0.9');
+    lineGroup.appendChild(dot);
+    endDots[c.code] = dot;
+
+    // End label
+    var labelY = labelPositions[c.code] !== undefined ? labelPositions[c.code] : py(latest.val);
+    var lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    lbl.setAttribute('x', MARGIN.left + PW + 8);
+    lbl.setAttribute('y', labelY + 3.5);
+    lbl.setAttribute('font-size', '9.5');
+    lbl.setAttribute('font-weight', '500');
+    lbl.setAttribute('fill', c.color);
+    lbl.setAttribute('font-family', 'Inter, sans-serif');
+    lbl.textContent = c.name;
+    svg.appendChild(lbl);
+    endLabels[c.code] = lbl;
+
+    // Connector tick (small horizontal leader from plot edge to label)
+    var tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    tick.setAttribute('x1', px(latest.year) + 3);
+    tick.setAttribute('x2', MARGIN.left + PW + 6);
+    tick.setAttribute('y1', py(latest.val));
+    tick.setAttribute('y2', labelY + 0.5);
+    tick.setAttribute('stroke', c.color);
+    tick.setAttribute('stroke-width', '0.7');
+    tick.setAttribute('opacity', '0.5');
+    svg.appendChild(tick);
+  }
+});
+
+// Hover dots layer (one per country, hidden initially)
+var hoverDots = {};
+sorted.forEach(function(c) {
+  var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  dot.setAttribute('r', '4');
+  dot.setAttribute('fill', c.color);
+  dot.setAttribute('stroke', '#F6F5EE');
+  dot.setAttribute('stroke-width', '1.5');
+  dot.setAttribute('opacity', '0');
+  dot.setAttribute('pointer-events', 'none');
+  svg.appendChild(dot);
+  hoverDots[c.code] = dot;
+});
+
+svg.appendChild(hoverRect);
+
+// Tooltip
+var tooltip = document.getElementById('tooltip');
+var chartWrap = document.querySelector('.chart-wrap');
+
+hoverRect.addEventListener('mousemove', function(e) {
+  var rect = hoverRect.getBoundingClientRect();
+  var mx = e.clientX - rect.left;
+  var ratio = mx / (PW * rect.width / W);
+  var yearF = 1990 + ratio * 33;
+  var yearIdx = Math.round(Math.max(0, Math.min(33, ratio * 33)));
+  var year = 1990 + yearIdx;
+  var x = px(year);
+
+  cursorLine.setAttribute('x1', x); cursorLine.setAttribute('x2', x);
+  cursorLine.setAttribute('opacity', '0.4');
+
+  // Build tooltip content
+  var entries = [];
+  sorted.forEach(function(c) {
+    var val = c.series[yearIdx];
+    if (val !== null) {
+      entries.push({ name: c.name, val: val, color: c.color });
+    }
+  });
+  entries.sort(function(a, b) { return b.val - a.val; });
+
+  var lines = ['<span style="font-family:Inter,sans-serif;font-weight:600;font-size:10px">' + year + '</span>'];
+  entries.forEach(function(en) {
+    lines.push(
+      '<span style="color:' + en.color + '">' + en.name + '</span>' +
+      '<span style="color:#D0CEC6"> ' + en.val.toFixed(1) + '%</span>'
+    );
+  });
+  tooltip.innerHTML = lines.join('<br>');
+
+  // Update hover dots
+  sorted.forEach(function(c) {
+    var dot = hoverDots[c.code];
+    var val = c.series[yearIdx];
+    if (val !== null) {
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', py(val));
+      dot.setAttribute('opacity', '1');
+    } else {
+      dot.setAttribute('opacity', '0');
+    }
+  });
+
+  // Position tooltip
+  var svgRect = svg.getBoundingClientRect();
+  var tx = e.clientX - svgRect.left + 12;
+  var ty = e.clientY - svgRect.top - 10;
+  if (tx + 160 > W) tx = e.clientX - svgRect.left - 170;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+  tooltip.style.opacity = '1';
+});
+
+hoverRect.addEventListener('mouseleave', function() {
+  cursorLine.setAttribute('opacity', '0');
+  tooltip.style.opacity = '0';
+  sorted.forEach(function(c) {
+    hoverDots[c.code].setAttribute('opacity', '0');
+  });
+});
+
+// Legend
+var legend = document.getElementById('legend');
+sorted.forEach(function(c) {
+  var latest = getLatest(c.series);
+  var item = document.createElement('div');
+  item.className = 'legend-item';
+
+  var dot = document.createElement('div');
+  dot.className = 'legend-dot';
+  dot.style.background = c.color;
+
+  var name = document.createElement('span');
+  name.className = 'legend-label';
+  name.textContent = c.name;
+
+  var val = document.createElement('span');
+  val.className = 'legend-val';
+  val.textContent = latest ? latest.val.toFixed(0) + '%' : '—';
+
+  item.appendChild(dot);
+  item.appendChild(name);
+  item.appendChild(val);
+
+  // Hover highlight
+  item.addEventListener('mouseenter', function() {
+    sorted.forEach(function(cc) {
+      var isSame = cc.code === c.code;
+      pathEls[cc.code].setAttribute('opacity', isSame ? '1' : '0.15');
+      pathEls[cc.code].setAttribute('stroke-width', isSame ? '2.5' : '1.2');
+      if (endDots[cc.code]) endDots[cc.code].setAttribute('opacity', isSame ? '1' : '0.15');
+      if (endLabels[cc.code]) endLabels[cc.code].setAttribute('opacity', isSame ? '1' : '0.25');
+    });
+  });
+  item.addEventListener('mouseleave', function() {
+    sorted.forEach(function(cc) {
+      pathEls[cc.code].setAttribute('opacity', '0.85');
+      pathEls[cc.code].setAttribute('stroke-width', '1.8');
+      if (endDots[cc.code]) endDots[cc.code].setAttribute('opacity', '0.9');
+      if (endLabels[cc.code]) endLabels[cc.code].setAttribute('opacity', '1');
+    });
+  });
+
+  legend.appendChild(item);
+});
+</script>
+</body></html>

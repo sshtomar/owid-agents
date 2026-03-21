@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 18px; margin: 0 0 18px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+</style></head><body>
+<h1>Roads That Kill</h1>
+<p class="subtitle">Estimated road traffic death rates per 100,000 population across countries, 2021. Sub-Saharan Africa and parts of South Asia suffer the highest rates, while wealthy nations with strong enforcement and infrastructure cluster below 5. Color indicates severity tier.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#C93C3C;"></div>Critical (&gt; 20)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#E08A3C;"></div>High (10 - 20)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#D4AA3C;"></div>Moderate (5 - 10)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#5A9E6F;"></div>Low (&lt; 5)</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- RS_198 (Estimated road traffic death rate per 100,000 population, 2021)</p>
+<script>
+const data = [
+  { name: "Guinea", value: 37.4 },
+  { name: "Libya", value: 34.0 },
+  { name: "Haiti", value: 31.3 },
+  { name: "Zimbabwe", value: 29.9 },
+  { name: "Nepal", value: 28.2 },
+  { name: "Kenya", value: 28.2 },
+  { name: "Dominican Republic", value: 27.4 },
+  { name: "Chad", value: 26.4 },
+  { name: "Central African Republic", value: 25.9 },
+  { name: "Ghana", value: 25.9 },
+  { name: "Thailand", value: 25.4 },
+  { name: "South Africa", value: 24.5 },
+  { name: "Ecuador", value: 23.4 },
+  { name: "Iran", value: 20.6 },
+  { name: "Mozambique", value: 20.1 },
+  { name: "Saudi Arabia", value: 18.5 },
+  { name: "Vietnam", value: 17.7 },
+  { name: "Ethiopia", value: 17.7 },
+  { name: "China", value: 17.4 },
+  { name: "Nigeria", value: 17.2 },
+  { name: "Brazil", value: 15.7 },
+  { name: "India", value: 14.6 },
+  { name: "United States", value: 14.2 },
+  { name: "Colombia", value: 16.2 },
+  { name: "Mexico", value: 12.0 },
+  { name: "Russia", value: 10.6 },
+  { name: "Indonesia", value: 11.3 },
+  { name: "Egypt", value: 9.4 },
+  { name: "Argentina", value: 8.8 },
+  { name: "Turkey", value: 6.5 },
+  { name: "Italy", value: 5.0 },
+  { name: "France", value: 4.7 },
+  { name: "Australia", value: 4.5 },
+  { name: "Germany", value: 3.3 },
+  { name: "Japan", value: 2.7 },
+  { name: "UK", value: 2.4 },
+  { name: "Sweden", value: 2.1 },
+  { name: "Singapore", value: 1.9 },
+  { name: "Norway", value: 1.5 }
+];
+
+data.sort((a, b) => b.value - a.value);
+
+function severityColor(v) {
+  if (v > 20) return "#C93C3C";
+  if (v >= 10) return "#E08A3C";
+  if (v >= 5) return "#D4AA3C";
+  return "#5A9E6F";
+}
+
+function severityLabel(v) {
+  if (v > 20) return "Critical";
+  if (v >= 10) return "High";
+  if (v >= 5) return "Moderate";
+  return "Low";
+}
+
+const W = 740;
+const barH = 22;
+const gap = 3;
+const pad = { left: 170, right: 55, top: 10, bottom: 10 };
+const chartH = data.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxVal = Math.ceil(data[0].value / 5) * 5;
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+const ticks = [];
+for (let v = 0; v <= maxVal; v += 5) ticks.push(v);
+
+ticks.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 3);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v;
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const barWidth = xScale(d.value) - xScale(0);
+  const color = severityColor(d.value);
+
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", pad.left);
+  rect.setAttribute("y", y + 2);
+  rect.setAttribute("width", Math.max(barWidth, 1));
+  rect.setAttribute("height", barH - 4);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  const valLabel = document.createElementNS(ns, "text");
+  valLabel.setAttribute("x", xScale(d.value) + 5);
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", "start");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = d.value.toFixed(1);
+
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    rect.setAttribute("opacity", "0.75");
+    tip.innerHTML = `<strong>${d.name}</strong>  ${d.value.toFixed(1)} deaths per 100k  [${severityLabel(d.value)}]`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 12) + "px";
+    tip.style.top = (e.clientY - r.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

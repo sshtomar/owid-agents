@@ -19,6 +19,14 @@ You are a data visualization agent. Your job is to create compelling, interactiv
 
 4. Update `data/visualizations/index.json` with the new entry
 
+5. Write a companion Marimo notebook to `data/visualizations/notebooks/`:
+   - Data fetching: code that loads from catalog datasets
+   - Transformations: filtering, aggregation, reshaping
+   - Exploratory analysis: summary stats, distributions, outlier checks
+   - Design rationale: markdown cells explaining chart type, country selection, time range, and highlight choices
+   - File name matches viz ID: `viz-001.py`, `viz-002.py`, etc.
+   - Add `notebookPath` to the viz index entry: `"notebookPath": "notebooks/viz-001.py"`
+
 ## HTML Template
 
 ```html
@@ -90,6 +98,110 @@ You are a data visualization agent. Your job is to create compelling, interactiv
   "codeFilePath": "viz/viz-001.html",
   "generatedCode": "<full html>",
   "highlights": ["Key insight 1", "Key insight 2"],
-  "createdAt": "2026-03-20T00:00:00.000Z"
+  "createdAt": "2026-03-20T00:00:00.000Z",
+  "notebookPath": "notebooks/viz-001.py"
 }
+```
+
+## Marimo Notebook Guidelines
+
+Each visualization should have a companion notebook. Notebooks are Marimo `.py` files
+that can run locally (`marimo edit notebooks/viz-001.py`) or be exported to standalone
+WASM-powered HTML for browser-based viewing:
+
+```bash
+# Export for browser viewing (no Python server needed)
+marimo export html-wasm data/visualizations/notebooks/viz-001.py -o output_dir --mode run
+```
+
+See https://docs.marimo.io/guides/wasm/ for WASM hosting options including
+GitHub Pages deployment and iframe embedding.
+
+### WASM compatibility
+
+- Put `import marimo as mo` in its own cell with no other lines
+- Use only standard-library imports (json, pathlib, statistics) to avoid WASM package issues
+- Avoid heavy dependencies; keep notebooks lightweight for fast WASM startup
+- For data files, use `mo.notebook_location() / "public" / ...` instead of `Path(__file__)`
+- Place any JSON/CSV assets needed by the notebook under a `public/` folder next to the notebook so `marimo export html-wasm` copies them into the exported bundle
+
+### Notebook template
+
+```python
+import marimo
+
+app = marimo.App(width="medium")
+
+
+@app.cell
+def _():
+    import marimo as mo
+    import json
+    from pathlib import Path
+    return json, mo, Path
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        # Visualization Title -- Methodology
+
+        This notebook documents the data pipeline and editorial decisions
+        behind the visualization.
+        """
+    )
+    return
+
+
+@app.cell
+def _(json, mo):
+    # Load dataset from the notebook's bundled public assets
+    dataset_path = mo.notebook_location() / "public" / "catalog" / "datasets" / "DATASET_ID.json"
+    raw = json.loads(dataset_path.read_text())
+    meta = raw["meta"]
+    data = raw["data"]
+    print(f"Loaded {len(data)} data points: {meta['title']}")
+    return data, meta, raw
+
+
+@app.cell
+def _(data):
+    # Filter and transform
+    filtered = [
+        d for d in data
+        if d["value"] is not None
+    ]
+    print(f"After filtering nulls: {len(filtered)} rows")
+    return (filtered,)
+
+
+@app.cell
+def _(filtered):
+    # Summary statistics
+    values = [d["value"] for d in filtered]
+    countries = sorted(set(d["countryName"] for d in filtered))
+    years = sorted(set(d["year"] for d in filtered))
+    print(f"Countries: {len(countries)}, Year range: {years[0]}-{years[-1]}")
+    print(f"Value range: {min(values):.1f} - {max(values):.1f}")
+    return countries, values, years
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+        ## Design Rationale
+
+        - **Chart type**: Why this chart type was chosen
+        - **Country selection**: Which countries and why
+        - **Time range**: Start/end years and reasoning
+        - **Highlights**: What story the data tells
+        """
+    )
+    return
+
+
+if __name__ == "__main__":
+    app.run()
 ```

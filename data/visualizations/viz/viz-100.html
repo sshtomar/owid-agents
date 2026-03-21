@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11.5px; color: #7A786F; margin: 0 0 28px; max-width: 640px; line-height: 1.55; }
+  .section-title { font-size: 12px; font-weight: 600; color: #2B2A27; margin: 28px 0 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 24px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 3px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #5A584F; cursor: pointer; }
+  .legend-item .swatch { width: 12px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>Gateway to Europe</h1>
+<p class="subtitle">Immigration flows into European countries, 2020-2024. Germany saw a massive spike in 2022 driven by the displacement crisis from Ukraine, while Spain has overtaken it as the top destination by 2024 with nearly 1 million arrivals.</p>
+<div class="section-title">Trends -- Top 8 Destinations</div>
+<div class="legend" id="legend"></div>
+<div id="line-chart" style="position:relative;"></div>
+<div class="section-title">All Countries -- Latest Available Year</div>
+<div id="bar-chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat -- migr_imm1ctz (Immigration by age group, sex and citizenship)</p>
+<script>
+const allData = [{"c":"MD","n":"Moldova","y":2014,"v":35605},{"c":"MD","n":"Moldova","y":2015,"v":41864},{"c":"IE","n":"Ireland","y":2016,"v":40363},{"c":"MD","n":"Moldova","y":2016,"v":4072},{"c":"IE","n":"Ireland","y":2017,"v":50399},{"c":"MD","n":"Moldova","y":2017,"v":5092},{"c":"IE","n":"Ireland","y":2018,"v":63837},{"c":"MD","n":"Moldova","y":2018,"v":4948},{"c":"IE","n":"Ireland","y":2019,"v":74406},{"c":"MD","n":"Moldova","y":2019,"v":4483},{"c":"BE","n":"Belgium","y":2020,"v":45375},{"c":"BG","n":"Bulgaria","y":2020,"v":22050},{"c":"CZ","n":"Czechia","y":2020,"v":41944},{"c":"DK","n":"Denmark","y":2020,"v":18780},{"c":"DE","n":"Germany","y":2020,"v":278410},{"c":"EE","n":"Estonia","y":2020,"v":3539},{"c":"EL","n":"Greece","y":2020,"v":21927},{"c":"ES","n":"Spain","y":2020,"v":331235},{"c":"FR","n":"France","y":2020,"v":151498},{"c":"HR","n":"Croatia","y":2020,"v":11803},{"c":"IT","n":"Italy","y":2020,"v":149130},{"c":"CY","n":"Cyprus","y":2020,"v":12781},{"c":"LV","n":"Latvia","y":2020,"v":4118},{"c":"LT","n":"Lithuania","y":2020,"v":13459},{"c":"LU","n":"Luxembourg","y":2020,"v":12508},{"c":"HU","n":"Hungary","y":2020,"v":22686},{"c":"MT","n":"Malta","y":2020,"v":13948},{"c":"NL","n":"Netherlands","y":2020,"v":59873},{"c":"AT","n":"Austria","y":2020,"v":48844},{"c":"PL","n":"Poland","y":2020,"v":84487},{"c":"PT","n":"Portugal","y":2020,"v":37288},{"c":"RO","n":"Romania","y":2020,"v":34802},{"c":"SI","n":"Slovenia","y":2020,"v":16233},{"c":"SK","n":"Slovakia","y":2020,"v":4218},{"c":"FI","n":"Finland","y":2020,"v":16614},{"c":"SE","n":"Sweden","y":2020,"v":43779},{"c":"IS","n":"Iceland","y":2020,"v":2419},{"c":"LI","n":"Liechtenstein","y":2020,"v":633},{"c":"NO","n":"Norway","y":2020,"v":16204},{"c":"CH","n":"Switzerland","y":2020,"v":49487},{"c":"IE","n":"Ireland","y":2020,"v":37573},{"c":"MD","n":"Moldova","y":2020,"v":3722},{"c":"BE","n":"Belgium","y":2021,"v":63523},{"c":"BG","n":"Bulgaria","y":2021,"v":29596},{"c":"CZ","n":"Czechia","y":2021,"v":51896},{"c":"DK","n":"Denmark","y":2021,"v":21419},{"c":"DE","n":"Germany","y":2021,"v":424861},{"c":"EE","n":"Estonia","y":2021,"v":6397},{"c":"EL","n":"Greece","y":2021,"v":26539},{"c":"ES","n":"Spain","y":2021,"v":560344},{"c":"FR","n":"France","y":2021,"v":195869},{"c":"HR","n":"Croatia","y":2021,"v":19445},{"c":"IT","n":"Italy","y":2021,"v":199130},{"c":"CY","n":"Cyprus","y":2021,"v":17280},{"c":"LV","n":"Latvia","y":2021,"v":6330},{"c":"LT","n":"Lithuania","y":2021,"v":22223},{"c":"LU","n":"Luxembourg","y":2021,"v":14159},{"c":"HU","n":"Hungary","y":2021,"v":26073},{"c":"MT","n":"Malta","y":2021,"v":18155},{"c":"NL","n":"Netherlands","y":2021,"v":82745},{"c":"AT","n":"Austria","y":2021,"v":54936},{"c":"PL","n":"Poland","y":2021,"v":117286},{"c":"PT","n":"Portugal","y":2021,"v":37196},{"c":"RO","n":"Romania","y":2021,"v":44428},{"c":"SI","n":"Slovenia","y":2021,"v":16918},{"c":"SK","n":"Slovakia","y":2021,"v":4760},{"c":"FI","n":"Finland","y":2021,"v":18797},{"c":"SE","n":"Sweden","y":2021,"v":54816},{"c":"IS","n":"Iceland","y":2021,"v":2800},{"c":"LI","n":"Liechtenstein","y":2021,"v":744},{"c":"NO","n":"Norway","y":2021,"v":15802},{"c":"CH","n":"Switzerland","y":2021,"v":47625},{"c":"IE","n":"Ireland","y":2021,"v":46671},{"c":"MD","n":"Moldova","y":2021,"v":5447},{"c":"ME","n":"Montenegro","y":2021,"v":6455},{"c":"MK","n":"North Macedonia","y":2021,"v":4336},{"c":"BE","n":"Belgium","y":2022,"v":99178},{"c":"BG","n":"Bulgaria","y":2022,"v":36530},{"c":"CZ","n":"Czechia","y":2022,"v":330997},{"c":"DK","n":"Denmark","y":2022,"v":45254},{"c":"DE","n":"Germany","y":2022,"v":1594151},{"c":"EE","n":"Estonia","y":2022,"v":21853},{"c":"EL","n":"Greece","y":2022,"v":46539},{"c":"ES","n":"Spain","y":2022,"v":925587},{"c":"FR","n":"France","y":2022,"v":277012},{"c":"HR","n":"Croatia","y":2022,"v":28139},{"c":"IT","n":"Italy","y":2022,"v":287010},{"c":"CY","n":"Cyprus","y":2022,"v":22037},{"c":"LV","n":"Latvia","y":2022,"v":11946},{"c":"LT","n":"Lithuania","y":2022,"v":50756},{"c":"LU","n":"Luxembourg","y":2022,"v":14619},{"c":"HU","n":"Hungary","y":2022,"v":33003},{"c":"MT","n":"Malta","y":2022,"v":24137},{"c":"NL","n":"Netherlands","y":2022,"v":189955},{"c":"AT","n":"Austria","y":2022,"v":103571},{"c":"PL","n":"Poland","y":2022,"v":150675},{"c":"PT","n":"Portugal","y":2022,"v":96905},{"c":"RO","n":"Romania","y":2022,"v":66792},{"c":"SI","n":"Slovenia","y":2022,"v":23752},{"c":"SK","n":"Slovakia","y":2022,"v":12534},{"c":"FI","n":"Finland","y":2022,"v":31837},{"c":"SE","n":"Sweden","y":2022,"v":80827},{"c":"IS","n":"Iceland","y":2022,"v":5455},{"c":"LI","n":"Liechtenstein","y":2022,"v":833},{"c":"NO","n":"Norway","y":2022,"v":42416},{"c":"CH","n":"Switzerland","y":2022,"v":60870},{"c":"IE","n":"Ireland","y":2022,"v":63399},{"c":"MD","n":"Moldova","y":2022,"v":9428},{"c":"ME","n":"Montenegro","y":2022,"v":9651},{"c":"MK","n":"North Macedonia","y":2022,"v":4667},{"c":"BE","n":"Belgium","y":2023,"v":82783},{"c":"BG","n":"Bulgaria","y":2023,"v":27485},{"c":"CZ","n":"Czechia","y":2023,"v":126962},{"c":"DK","n":"Denmark","y":2023,"v":36116},{"c":"DE","n":"Germany","y":2023,"v":935412},{"c":"EE","n":"Estonia","y":2023,"v":7966},{"c":"EL","n":"Greece","y":2023,"v":69558},{"c":"ES","n":"Spain","y":2023,"v":903967},{"c":"FR","n":"France","y":2023,"v":261773},{"c":"HR","n":"Croatia","y":2023,"v":33780},{"c":"IT","n":"Italy","y":2023,"v":332761},{"c":"CY","n":"Cyprus","y":2023,"v":18703},{"c":"LV","n":"Latvia","y":2023,"v":7399},{"c":"LT","n":"Lithuania","y":2023,"v":28048},{"c":"LU","n":"Luxembourg","y":2023,"v":15379},{"c":"HU","n":"Hungary","y":2023,"v":40605},{"c":"MT","n":"Malta","y":2023,"v":22508},{"c":"NL","n":"Netherlands","y":2023,"v":140078},{"c":"AT","n":"Austria","y":2023,"v":69662},{"c":"PL","n":"Poland","y":2023,"v":182677},{"c":"PT","n":"Portugal","y":2023,"v":118048},{"c":"RO","n":"Romania","y":2023,"v":84277},{"c":"SI","n":"Slovenia","y":2023,"v":21534},{"c":"SK","n":"Slovakia","y":2023,"v":10069},{"c":"FI","n":"Finland","y":2023,"v":27020},{"c":"SE","n":"Sweden","y":2023,"v":72069},{"c":"IS","n":"Iceland","y":2023,"v":4685},{"c":"LI","n":"Liechtenstein","y":2023,"v":842},{"c":"NO","n":"Norway","y":2023,"v":42497},{"c":"CH","n":"Switzerland","y":2023,"v":58556},{"c":"IE","n":"Ireland","y":2023,"v":73750},{"c":"MD","n":"Moldova","y":2023,"v":9694},{"c":"ME","n":"Montenegro","y":2023,"v":14379},{"c":"MK","n":"North Macedonia","y":2023,"v":5488},{"c":"BE","n":"Belgium","y":2024,"v":84574},{"c":"BG","n":"Bulgaria","y":2024,"v":36076},{"c":"CZ","n":"Czechia","y":2024,"v":108073},{"c":"DK","n":"Denmark","y":2024,"v":37413},{"c":"DE","n":"Germany","y":2024,"v":763744},{"c":"EE","n":"Estonia","y":2024,"v":6795},{"c":"EL","n":"Greece","y":2024,"v":71941},{"c":"ES","n":"Spain","y":2024,"v":960949},{"c":"FR","n":"France","y":2024,"v":250133},{"c":"HR","n":"Croatia","y":2024,"v":32461},{"c":"IT","n":"Italy","y":2024,"v":352461},{"c":"CY","n":"Cyprus","y":2024,"v":16019},{"c":"LV","n":"Latvia","y":2024,"v":8085},{"c":"LT","n":"Lithuania","y":2024,"v":24753},{"c":"LU","n":"Luxembourg","y":2024,"v":15293},{"c":"HU","n":"Hungary","y":2024,"v":50221},{"c":"MT","n":"Malta","y":2024,"v":14785},{"c":"NL","n":"Netherlands","y":2024,"v":132064},{"c":"AT","n":"Austria","y":2024,"v":60863},{"c":"PL","n":"Poland","y":2024,"v":179724},{"c":"RO","n":"Romania","y":2024,"v":91157},{"c":"SI","n":"Slovenia","y":2024,"v":18770},{"c":"SK","n":"Slovakia","y":2024,"v":11267},{"c":"FI","n":"Finland","y":2024,"v":21992},{"c":"SE","n":"Sweden","y":2024,"v":72212},{"c":"IS","n":"Iceland","y":2024,"v":3750},{"c":"LI","n":"Liechtenstein","y":2024,"v":785},{"c":"NO","n":"Norway","y":2024,"v":38455},{"c":"CH","n":"Switzerland","y":2024,"v":66429},{"c":"IE","n":"Ireland","y":2024,"v":74463},{"c":"MD","n":"Moldova","y":2024,"v":8756},{"c":"ME","n":"Montenegro","y":2024,"v":18095},{"c":"MK","n":"North Macedonia","y":2024,"v":6387}];
+
+const ns = "http://www.w3.org/2000/svg";
+const tip = document.getElementById("tip");
+
+function fmt(v) {
+  if (v >= 1000000) return (v / 1000000).toFixed(1) + "M";
+  if (v >= 1000) return (v / 1000).toFixed(0) + "K";
+  return v.toString();
+}
+
+function fmtFull(v) {
+  return v.toLocaleString("en-US");
+}
+
+// --- COLOR PALETTE ---
+const palette = ["#3A7CA5", "#E06050", "#3A9E8F", "#D4953A", "#7B68AE", "#C75B8E", "#5B8C5A", "#AB6B51"];
+
+// --- LINE CHART ---
+(function() {
+  const top8 = ["Spain", "Germany", "Italy", "France", "Poland", "Netherlands", "Czechia", "Portugal"];
+  const years = [2020, 2021, 2022, 2023, 2024];
+
+  const series = {};
+  allData.forEach(d => {
+    if (!top8.includes(d.n)) return;
+    if (!series[d.n]) series[d.n] = {};
+    series[d.n][d.y] = d.v;
+  });
+
+  const W = 740, pad = { left: 55, right: 100, top: 20, bottom: 36 };
+  const chartW = W - pad.left - pad.right;
+  const H = 340;
+  const chartH = H - pad.top - pad.bottom;
+
+  const maxVal = Math.max(...top8.flatMap(name =>
+    years.map(y => (series[name] && series[name][y]) || 0)
+  ));
+  const yMax = Math.ceil(maxVal / 200000) * 200000;
+
+  const xScale = y => pad.left + ((y - 2020) / 4) * chartW;
+  const yScale = v => pad.top + chartH - (v / yMax) * chartH;
+
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("width", "100%");
+  svg.style.maxWidth = W + "px";
+  svg.style.overflow = "visible";
+
+  // Grid lines
+  const yTicks = [];
+  for (let v = 0; v <= yMax; v += 200000) yTicks.push(v);
+  yTicks.forEach(v => {
+    const line = document.createElementNS(ns, "line");
+    line.setAttribute("x1", pad.left);
+    line.setAttribute("x2", W - pad.right);
+    line.setAttribute("y1", yScale(v));
+    line.setAttribute("y2", yScale(v));
+    line.setAttribute("stroke", v === 0 ? "#C5C3BA" : "#E0DFD8");
+    line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+    svg.appendChild(line);
+
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", pad.left - 8);
+    label.setAttribute("y", yScale(v) + 3.5);
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("font-size", "9");
+    label.setAttribute("fill", "#7A786F");
+    label.textContent = fmt(v);
+    svg.appendChild(label);
+  });
+
+  // X axis labels
+  years.forEach(y => {
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", xScale(y));
+    label.setAttribute("y", H - pad.bottom + 20);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-size", "10");
+    label.setAttribute("fill", "#7A786F");
+    label.textContent = y;
+    svg.appendChild(label);
+  });
+
+  // Lines and dots
+  const activeLines = {};
+  top8.forEach((name, idx) => {
+    const color = palette[idx];
+    const pts = years
+      .filter(y => series[name] && series[name][y] !== undefined)
+      .map(y => ({ x: xScale(y), y: yScale(series[name][y]), year: y, val: series[name][y] }));
+
+    if (pts.length < 2) return;
+
+    // Line
+    const path = document.createElementNS(ns, "path");
+    const d = pts.map((p, i) => (i === 0 ? "M" : "L") + p.x + "," + p.y).join(" ");
+    path.setAttribute("d", d);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width", "2.5");
+    path.setAttribute("stroke-linejoin", "round");
+    path.setAttribute("stroke-linecap", "round");
+    svg.appendChild(path);
+    activeLines[name] = { path, dots: [], color };
+
+    // Dots
+    pts.forEach(p => {
+      const circle = document.createElementNS(ns, "circle");
+      circle.setAttribute("cx", p.x);
+      circle.setAttribute("cy", p.y);
+      circle.setAttribute("r", "3.5");
+      circle.setAttribute("fill", color);
+      circle.setAttribute("stroke", "#F6F5EE");
+      circle.setAttribute("stroke-width", "1.5");
+      svg.appendChild(circle);
+      activeLines[name].dots.push(circle);
+    });
+
+    // End label
+    const lastPt = pts[pts.length - 1];
+    const endLabel = document.createElementNS(ns, "text");
+    endLabel.setAttribute("x", lastPt.x + 8);
+    endLabel.setAttribute("y", lastPt.y + 3.5);
+    endLabel.setAttribute("font-size", "9.5");
+    endLabel.setAttribute("font-weight", "500");
+    endLabel.setAttribute("fill", color);
+    endLabel.textContent = name;
+    svg.appendChild(endLabel);
+    activeLines[name].label = endLabel;
+  });
+
+  // Hover overlay
+  const overlay = document.createElementNS(ns, "rect");
+  overlay.setAttribute("x", pad.left);
+  overlay.setAttribute("y", pad.top);
+  overlay.setAttribute("width", chartW);
+  overlay.setAttribute("height", chartH);
+  overlay.setAttribute("fill", "transparent");
+  svg.appendChild(overlay);
+
+  overlay.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const svgX = (e.clientX - rect.left) / rect.width * W;
+    const yearIdx = Math.round((svgX - pad.left) / chartW * 4);
+    const year = 2020 + Math.max(0, Math.min(4, yearIdx));
+
+    let rows = [];
+    top8.forEach((name, idx) => {
+      if (series[name] && series[name][year] !== undefined) {
+        rows.push({ name, val: series[name][year], color: palette[idx] });
+      }
+    });
+    rows.sort((a, b) => b.val - a.val);
+
+    if (rows.length === 0) { tip.style.opacity = "0"; return; }
+
+    tip.innerHTML = "<strong>" + year + "</strong><br>" +
+      rows.map(r => r.name + ": " + fmtFull(r.val)).join("<br>");
+    tip.style.opacity = "1";
+
+    const chartEl = document.getElementById("line-chart");
+    const chartRect = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - chartRect.left + 14) + "px";
+    tip.style.top = (e.clientY - chartRect.top - 10) + "px";
+  });
+
+  overlay.addEventListener("mouseleave", () => { tip.style.opacity = "0"; });
+
+  document.getElementById("line-chart").appendChild(svg);
+
+  // Legend
+  const legendEl = document.getElementById("legend");
+  top8.forEach((name, idx) => {
+    const item = document.createElement("div");
+    item.className = "legend-item";
+    item.innerHTML = '<span class="swatch" style="background:' + palette[idx] + '"></span>' + name;
+    legendEl.appendChild(item);
+  });
+})();
+
+// --- BAR CHART ---
+(function() {
+  // Get latest year per country
+  const latest = {};
+  allData.forEach(d => {
+    if (!latest[d.n] || d.y > latest[d.n].y) {
+      latest[d.n] = d;
+    }
+  });
+  const ranked = Object.values(latest).sort((a, b) => b.v - a.v);
+
+  const barH = 22;
+  const gap = 3;
+  const W = 740;
+  const pad = { left: 120, right: 80, top: 10, bottom: 10 };
+  const chartW = W - pad.left - pad.right;
+  const chartHeight = ranked.length * (barH + gap) - gap;
+  const H = chartHeight + pad.top + pad.bottom;
+
+  const maxVal = ranked[0].v;
+
+  const xScale = v => pad.left + (v / maxVal) * chartW;
+
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.setAttribute("width", "100%");
+  svg.style.maxWidth = W + "px";
+  svg.style.overflow = "visible";
+
+  // Grid lines
+  const xTicks = [];
+  const step = maxVal > 500000 ? 200000 : 100000;
+  for (let v = 0; v <= maxVal; v += step) xTicks.push(v);
+  xTicks.forEach(v => {
+    const x = xScale(v);
+    const line = document.createElementNS(ns, "line");
+    line.setAttribute("x1", x);
+    line.setAttribute("x2", x);
+    line.setAttribute("y1", pad.top);
+    line.setAttribute("y2", pad.top + chartHeight);
+    line.setAttribute("stroke", v === 0 ? "#C5C3BA" : "#E0DFD8");
+    line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+    svg.appendChild(line);
+
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", x);
+    label.setAttribute("y", pad.top - 4);
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-size", "8.5");
+    label.setAttribute("fill", "#7A786F");
+    label.textContent = fmt(v);
+    svg.appendChild(label);
+  });
+
+  // Bars
+  const barColor = "#3A7CA5";
+  const barColorHover = "#2B5F7F";
+  const top8Names = ["Spain", "Germany", "Italy", "France", "Poland", "Netherlands", "Czechia", "Portugal"];
+
+  ranked.forEach((d, i) => {
+    const y = pad.top + i * (barH + gap);
+    const w = (d.v / maxVal) * chartW;
+
+    // Country label
+    const label = document.createElementNS(ns, "text");
+    label.setAttribute("x", pad.left - 8);
+    label.setAttribute("y", y + barH / 2 + 3.5);
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("font-size", "9.5");
+    label.setAttribute("fill", top8Names.includes(d.n) ? "#2B2A27" : "#7A786F");
+    label.setAttribute("font-weight", top8Names.includes(d.n) ? "600" : "400");
+    label.textContent = d.n;
+    svg.appendChild(label);
+
+    // Bar
+    const rect = document.createElementNS(ns, "rect");
+    rect.setAttribute("x", pad.left);
+    rect.setAttribute("y", y);
+    rect.setAttribute("width", Math.max(1, w));
+    rect.setAttribute("height", barH);
+    rect.setAttribute("rx", "2");
+    rect.setAttribute("fill", top8Names.includes(d.n) ? barColor : "#A8C4D4");
+    rect.style.transition = "fill 0.12s";
+    svg.appendChild(rect);
+
+    // Value label
+    const valLabel = document.createElementNS(ns, "text");
+    valLabel.setAttribute("x", pad.left + w + 6);
+    valLabel.setAttribute("y", y + barH / 2 + 3.5);
+    valLabel.setAttribute("font-size", "8.5");
+    valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+    valLabel.setAttribute("fill", "#7A786F");
+    valLabel.textContent = fmt(d.v);
+    svg.appendChild(valLabel);
+
+    // Hover events
+    const hitArea = document.createElementNS(ns, "rect");
+    hitArea.setAttribute("x", 0);
+    hitArea.setAttribute("y", y);
+    hitArea.setAttribute("width", W);
+    hitArea.setAttribute("height", barH + gap);
+    hitArea.setAttribute("fill", "transparent");
+    svg.appendChild(hitArea);
+
+    hitArea.addEventListener("mouseenter", () => {
+      rect.setAttribute("fill", top8Names.includes(d.n) ? barColorHover : "#7BACC4");
+      tip.innerHTML = "<strong>" + d.n + " (" + d.y + ")</strong><br>" + fmtFull(d.v) + " immigrants";
+      tip.style.opacity = "1";
+    });
+
+    hitArea.addEventListener("mousemove", e => {
+      const chartEl = document.getElementById("bar-chart");
+      const chartRect = chartEl.getBoundingClientRect();
+      tip.style.left = (e.clientX - chartRect.left + 14) + "px";
+      tip.style.top = (e.clientY - chartRect.top - 10) + "px";
+    });
+
+    hitArea.addEventListener("mouseleave", () => {
+      rect.setAttribute("fill", top8Names.includes(d.n) ? barColor : "#A8C4D4");
+      tip.style.opacity = "0";
+    });
+  });
+
+  document.getElementById("bar-chart").appendChild(svg);
+})();
+</script>
+</body></html>

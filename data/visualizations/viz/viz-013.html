@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 580px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip {
+    position: absolute; pointer-events: none;
+    background: #2B2A27; color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; padding: 6px 10px;
+    border-radius: 2px; white-space: nowrap;
+    opacity: 0; transition: opacity 0.15s; z-index: 10;
+  }
+</style></head><body>
+<h1>The Safety Divide</h1>
+<p class="subtitle">Intentional homicide rate per 100,000 population. Countries span a 1,000-fold range — from the deadliest corridors of Latin America and the Caribbean to the near-zero rates of East Asian and Gulf states. Most recent data available (2020-2023).</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 16.1.1 / VC_IHR_PSRC</p>
+<script>
+const data = [
+  { n: "Saint Lucia",                   v: 68.85, year: 2023 },
+  { n: "Colombia",                       v: 46.95, year: 2023 },
+  { n: "Ecuador",                        v: 45.72, year: 2023 },
+  { n: "St. Vincent & Grenadines",       v: 41.16, year: 2022 },
+  { n: "Trinidad and Tobago",            v: 40.44, year: 2022 },
+  { n: "Bahamas",                        v: 32.20, year: 2022 },
+  { n: "Honduras",                       v: 31.44, year: 2023 },
+  { n: "Belize",                         v: 28.06, year: 2022 },
+  { n: "Guyana",                         v: 27.08, year: 2023 },
+  { n: "Mexico",                         v: 24.86, year: 2023 },
+  { n: "Nigeria",                        v: 24.40, year: 2023 },
+  { n: "Brazil",                         v: 20.58, year: 2023 },
+  { n: "United States",                  v:  8.94, year: 2023 },
+  { n: "Jamaica",                        v:  8.29, year: 2023 },
+  { n: "Philippines",                    v:  7.54, year: 2023 },
+  { n: "Ukraine",                        v:  3.78, year: 2021 },
+  { n: "India",                          v:  3.23, year: 2022 },
+  { n: "Canada",                         v:  1.98, year: 2023 },
+  { n: "France",                         v:  1.94, year: 2023 },
+  { n: "Sweden",                         v:  1.66, year: 2023 },
+  { n: "Australia",                      v:  1.16, year: 2023 },
+  { n: "Germany",                        v:  0.87, year: 2023 },
+  { n: "Norway",                         v:  0.79, year: 2023 },
+  { n: "Japan",                          v:  0.23, year: 2023 },
+  { n: "Singapore",                      v:  0.07, year: 2023 },
+];
+
+// Color by severity tier
+function barColor(v) {
+  if (v >= 40)  return "#9B1B30"; // deep crimson
+  if (v >= 25)  return "#C0392B"; // strong red
+  if (v >= 15)  return "#D95F3B"; // red-orange
+  if (v >= 8)   return "#E07B39"; // burnt orange
+  if (v >= 3)   return "#C49A22"; // amber
+  if (v >= 1)   return "#7A9E5F"; // muted green
+  return "#4A7F5C";               // deep green
+}
+
+const W = 720;
+const barH = 20;
+const gap = 7;
+const rowH = barH + gap;
+const pad = { left: 186, right: 90, top: 30, bottom: 20 };
+const H = pad.top + data.length * rowH + pad.bottom;
+
+const maxV = 75;
+const xScale = v => pad.left + (v / maxV) * (W - pad.left - pad.right);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+
+// Grid lines
+[0, 10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  if (v > maxV) return;
+  const x = xScale(v);
+
+  // Tick label at top
+  const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  lbl.setAttribute("x", x);
+  lbl.setAttribute("y", pad.top - 8);
+  lbl.setAttribute("text-anchor", "middle");
+  lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "8");
+  lbl.setAttribute("fill", "#9A9891");
+  lbl.setAttribute("letter-spacing", "0.2");
+  lbl.textContent = v === 0 ? "" : v;
+  svg.appendChild(lbl);
+
+  // Vertical grid line
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", x); line.setAttribute("y1", pad.top - 4);
+  line.setAttribute("x2", x); line.setAttribute("y2", H - pad.bottom);
+  line.setAttribute("stroke", v === 0 ? "#C8C6BD" : "#E0DED6");
+  line.setAttribute("stroke-width", v === 0 ? "1" : "0.5");
+  svg.appendChild(line);
+});
+
+// Axis label
+const axisLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+axisLabel.setAttribute("x", W - pad.right + 8);
+axisLabel.setAttribute("y", pad.top - 8);
+axisLabel.setAttribute("text-anchor", "start");
+axisLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+axisLabel.setAttribute("font-size", "8");
+axisLabel.setAttribute("fill", "#9A9891");
+axisLabel.textContent = "per 100k";
+svg.appendChild(axisLabel);
+
+// Bars and labels
+const bars = [];
+data.forEach((d, i) => {
+  const y = pad.top + i * rowH;
+  const bw = xScale(d.v) - pad.left;
+  const col = barColor(d.v);
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.style.cursor = "default";
+
+  // Country label
+  const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  lbl.setAttribute("x", pad.left - 8);
+  lbl.setAttribute("y", y + barH * 0.67);
+  lbl.setAttribute("text-anchor", "end");
+  lbl.setAttribute("font-size", "10");
+  lbl.setAttribute("fill", "#2B2A27");
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  // Background track
+  const track = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  track.setAttribute("x", pad.left);
+  track.setAttribute("y", y + 1);
+  track.setAttribute("width", W - pad.left - pad.right);
+  track.setAttribute("height", barH - 2);
+  track.setAttribute("fill", "#EDECEA");
+  track.setAttribute("rx", "2");
+  g.appendChild(track);
+
+  // Bar
+  const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bar.setAttribute("x", pad.left);
+  bar.setAttribute("y", y + 1);
+  bar.setAttribute("width", Math.max(bw, 2));
+  bar.setAttribute("height", barH - 2);
+  bar.setAttribute("fill", col);
+  bar.setAttribute("rx", "2");
+  g.appendChild(bar);
+
+  // Value label
+  const valX = pad.left + Math.max(bw, 2) + 6;
+  const val = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  val.setAttribute("x", valX);
+  val.setAttribute("y", y + barH * 0.67);
+  val.setAttribute("text-anchor", "start");
+  val.setAttribute("font-family", "'JetBrains Mono', monospace");
+  val.setAttribute("font-size", "9");
+  val.setAttribute("fill", "#7A786F");
+  val.textContent = d.v.toFixed(2);
+  g.appendChild(val);
+
+  // Invisible hit area (full row width)
+  const hit = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hit.setAttribute("x", 0);
+  hit.setAttribute("y", y);
+  hit.setAttribute("width", W);
+  hit.setAttribute("height", rowH);
+  hit.setAttribute("fill", "transparent");
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  bars.push({ g, bar, track, lbl, val, d, col });
+});
+
+// Legend
+const legendItems = [
+  { col: "#9B1B30", label: "40+ (extreme)" },
+  { col: "#D95F3B", label: "15-40 (very high)" },
+  { col: "#E07B39", label: "8-15 (high)" },
+  { col: "#C49A22", label: "3-8 (elevated)" },
+  { col: "#7A9E5F", label: "1-3 (moderate)" },
+  { col: "#4A7F5C", label: "<1 (low)" },
+];
+const legY = H - pad.bottom + 10;
+legendItems.forEach((item, i) => {
+  const x = pad.left + i * 102;
+  const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r.setAttribute("x", x); r.setAttribute("y", legY - 5);
+  r.setAttribute("width", 10); r.setAttribute("height", 8);
+  r.setAttribute("fill", item.col); r.setAttribute("rx", "1");
+  svg.appendChild(r);
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x + 14); t.setAttribute("y", legY + 2);
+  t.setAttribute("font-size", "8.5");
+  t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  t.setAttribute("fill", "#7A786F");
+  t.textContent = item.label;
+  svg.appendChild(t);
+});
+
+// Update viewBox to include legend
+svg.setAttribute("viewBox", `0 0 ${W} ${H + 22}`);
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+
+function highlightRow(idx) {
+  bars.forEach((b, i) => {
+    if (idx === -1 || i === idx) {
+      b.g.style.opacity = "1";
+      b.bar.setAttribute("opacity", "1");
+      b.lbl.setAttribute("fill", "#2B2A27");
+    } else {
+      b.g.style.opacity = "0.25";
+    }
+  });
+}
+
+bars.forEach((b, i) => {
+  const hit = b.g.querySelector("rect:last-child");
+  b.g.addEventListener("mouseenter", e => {
+    highlightRow(i);
+    const d = b.d;
+    const tier =
+      d.v >= 40 ? "Extreme" :
+      d.v >= 15 ? "Very High" :
+      d.v >= 8  ? "High" :
+      d.v >= 3  ? "Elevated" :
+      d.v >= 1  ? "Moderate" : "Low";
+    tip.textContent = `${d.n}: ${d.v.toFixed(2)} per 100,000 (${d.year}) — ${tier}`;
+    tip.style.opacity = "1";
+  });
+  b.g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top  = (e.clientY - 24) + "px";
+  });
+  b.g.addEventListener("mouseleave", () => {
+    highlightRow(-1);
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

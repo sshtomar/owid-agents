@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+  .legend { display: flex; gap: 18px; margin-bottom: 16px; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style></head><body>
+<h1>Living Longer, Living Healthier</h1>
+<p class="subtitle">Healthy life expectancy (HALE) at birth measures the average number of years a person can expect to live in full health. This chart tracks each country's earliest and latest available HALE values, revealing where the biggest gains have occurred. Sub-Saharan African nations show the most dramatic improvements, often adding 10+ healthy years in under two decades.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#B8A9C9;"></div> Earliest available</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3A9E8F;"></div> Latest available</div>
+  <div class="legend-item" style="margin-left:6px;font-size:9px;color:#AAA8A0;">--- Line shows change</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- WHOSIS_000002 (Healthy Life Expectancy at Birth, years)</p>
+<script>
+const data = [
+  { name: "South Korea", code: "KOR", earliest: 70.5, eYear: 2005, latest: 74.1, lYear: 2021 },
+  { name: "Singapore", code: "SGP", earliest: 70.6, eYear: 2009, latest: 73.6, lYear: 2021 },
+  { name: "Israel", code: "ISR", earliest: 69.3, eYear: 2001, latest: 71.5, lYear: 2018 },
+  { name: "France", code: "FRA", earliest: 70.2, eYear: 2004, latest: 71.0, lYear: 2021 },
+  { name: "New Zealand", code: "NZL", earliest: 67.2, eYear: 2001, latest: 69.7, lYear: 2019 },
+  { name: "Thailand", code: "THA", earliest: 59.6, eYear: 2000, latest: 69.5, lYear: 2019 },
+  { name: "China", code: "CHN", earliest: 63.7, eYear: 2002, latest: 69.9, lYear: 2016 },
+  { name: "United States", code: "USA", earliest: 65.8, eYear: 2005, latest: 66.0, lYear: 2019 },
+  { name: "Brazil", code: "BRA", earliest: 62.7, eYear: 2000, latest: 65.7, lYear: 2015 },
+  { name: "Mongolia", code: "MNG", earliest: 53.9, eYear: 2002, latest: 65.3, lYear: 2019 },
+  { name: "Indonesia", code: "IDN", earliest: 59.4, eYear: 2000, latest: 63.0, lYear: 2020 },
+  { name: "India", code: "IND", earliest: 57.9, eYear: 2011, latest: 58.1, lYear: 2021 },
+  { name: "Ghana", code: "GHA", earliest: 51.8, eYear: 2003, latest: 59.2, lYear: 2020 },
+  { name: "South Africa", code: "ZAF", earliest: 45.6, eYear: 2004, latest: 54.2, lYear: 2018 },
+  { name: "Zambia", code: "ZMB", earliest: 39.3, eYear: 2001, latest: 51.2, lYear: 2014 }
+];
+
+data.sort((a, b) => b.latest - a.latest);
+
+const W = 760;
+const rowH = 30;
+const gap = 4;
+const pad = { left: 130, right: 50, top: 35, bottom: 40 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const allVals = data.flatMap(d => [d.earliest, d.latest]);
+const minVal = Math.floor(Math.min(...allVals) / 5) * 5;
+const maxVal = Math.ceil(Math.max(...allVals) / 5) * 5;
+
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + ((v - minVal) / (maxVal - minVal)) * chartW;
+
+const earlyColor = "#B8A9C9";
+const latestColor = "#3A9E8F";
+const lineColor = "#C8C5BC";
+const gainColor = "#3A9E8F";
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines and axis labels
+const ticks = [];
+for (let v = minVal; v <= maxVal; v += 5) ticks.push(v);
+
+ticks.forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", "#DDD9CE");
+  line.setAttribute("stroke-width", 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 12);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + " yrs";
+  svg.appendChild(label);
+});
+
+// Axis label at bottom
+const axisLabel = document.createElementNS(ns, "text");
+axisLabel.setAttribute("x", pad.left + chartW / 2);
+axisLabel.setAttribute("y", pad.top + chartH + 28);
+axisLabel.setAttribute("text-anchor", "middle");
+axisLabel.setAttribute("font-size", "9");
+axisLabel.setAttribute("fill", "#AAA8A0");
+axisLabel.setAttribute("letter-spacing", "0.5");
+axisLabel.textContent = "HEALTHY LIFE EXPECTANCY AT BIRTH (YEARS)";
+svg.appendChild(axisLabel);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap);
+  const cy = y + rowH / 2;
+  const x1 = xScale(d.earliest);
+  const x2 = xScale(d.latest);
+  const change = d.latest - d.earliest;
+
+  // Connecting line
+  const conn = document.createElementNS(ns, "line");
+  conn.setAttribute("x1", x1);
+  conn.setAttribute("x2", x2);
+  conn.setAttribute("y1", cy);
+  conn.setAttribute("y2", cy);
+  conn.setAttribute("stroke", lineColor);
+  conn.setAttribute("stroke-width", 2);
+  conn.setAttribute("stroke-linecap", "round");
+  svg.appendChild(conn);
+
+  // Earliest dot
+  const dotE = document.createElementNS(ns, "circle");
+  dotE.setAttribute("cx", x1);
+  dotE.setAttribute("cy", cy);
+  dotE.setAttribute("r", 5);
+  dotE.setAttribute("fill", earlyColor);
+  dotE.style.transition = "r 0.15s";
+  svg.appendChild(dotE);
+
+  // Latest dot
+  const dotL = document.createElementNS(ns, "circle");
+  dotL.setAttribute("cx", x2);
+  dotL.setAttribute("cy", cy);
+  dotL.setAttribute("r", 5);
+  dotL.setAttribute("fill", latestColor);
+  dotL.style.transition = "r 0.15s";
+  svg.appendChild(dotL);
+
+  // Country label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", cy + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Change label (inline, after latest dot)
+  const changeLabel = document.createElementNS(ns, "text");
+  changeLabel.setAttribute("x", x2 + 10);
+  changeLabel.setAttribute("y", cy + 1);
+  changeLabel.setAttribute("dominant-baseline", "middle");
+  changeLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  changeLabel.setAttribute("font-size", "9");
+  changeLabel.setAttribute("fill", change >= 5 ? gainColor : "#7A786F");
+  changeLabel.setAttribute("font-weight", change >= 5 ? "500" : "400");
+  changeLabel.textContent = "+" + change.toFixed(1);
+  svg.appendChild(changeLabel);
+
+  // Hit area for hover
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    dotE.setAttribute("r", "7");
+    dotL.setAttribute("r", "7");
+    conn.setAttribute("stroke", "#AAA8A0");
+    conn.setAttribute("stroke-width", "3");
+    const sign = change >= 0 ? "+" : "";
+    tip.innerHTML =
+      `<strong>${d.name}</strong><br>` +
+      `${d.eYear}: ${d.earliest.toFixed(1)} yrs` +
+      ` &rarr; ${d.lYear}: ${d.latest.toFixed(1)} yrs<br>` +
+      `Change: <span style="color:${change >= 5 ? "#6ECFBF" : "#F6F5EE"}">${sign}${change.toFixed(1)} years</span>` +
+      ` over ${d.lYear - d.eYear} yrs`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 14) + "px";
+    tip.style.top = (e.clientY - r.top - 28) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    dotE.setAttribute("r", "5");
+    dotL.setAttribute("r", "5");
+    conn.setAttribute("stroke", lineColor);
+    conn.setAttribute("stroke-width", "2");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

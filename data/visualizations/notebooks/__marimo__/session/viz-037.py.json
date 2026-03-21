@@ -1,0 +1,126 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "9b1567dd8dbfa82d6f13bfb13d0a70be",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"open-doors\">Open Doors</h1>\n<span class=\"paragraph\">Top 20 refugee-hosting countries by number of refugees in 2024. Iran leads with 3.49 million, followed by Turkey (2.94M) and Germany (2.75M). Shows which nations bear the burden of hosting displaced populations.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "592a86589b08fc0d14a80251dae21bcd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"data-sources\">Data Sources</h2>\n<div class=\"language-scdoc highlight\"><pre><span></span><code><span class=\"k\">-</span> **Refugees by Country of Asylum** (unhcr)\n</code></pre></div>\n<span class=\"paragraph\">Refugees by Country of Asylum from unhcr\nSource: <a href=\"https://www.unhcr.org/refugee-statistics/\" rel=\"noopener noreferrer\" target=\"_blank\">https://www.unhcr.org/refugee-statistics/</a></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "6938b1f460c5ec0a728f5a5543dffe99",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "43a5e0b3f51f92b0dc970021b8890849",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='lEQa-0' random-id='45e7b363-849f-4ac0-687e-cae766947b6f'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;country&#92;&quot;:&#92;&quot;ALB&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Albania&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:521},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;country&#92;&quot;:&#92;&quot;ALG&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Algeria&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:169654},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;country&#92;&quot;:&#92;&quot;ANG&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Angola&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:12086},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;country&#92;&quot;:&#92;&quot;ARE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Egypt&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:6840},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;country&#92;&quot;:&#92;&quot;ARG&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Argentina&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:2383},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;country&#92;&quot;:&#92;&quot;ARM&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Armenia&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:280586},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;country&#92;&quot;:&#92;&quot;AUL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Australia&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:60219},{&#92;&quot;_marimo_row_id&#92;&quot;:7,&#92;&quot;country&#92;&quot;:&#92;&quot;AUS&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Austria&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:15493},{&#92;&quot;_marimo_row_id&#92;&quot;:8,&#92;&quot;country&#92;&quot;:&#92;&quot;AZE&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Azerbaijan&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:280},{&#92;&quot;_marimo_row_id&#92;&quot;:9,&#92;&quot;country&#92;&quot;:&#92;&quot;BDI&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Burundi&#92;&quot;,&#92;&quot;year&#92;&quot;:2000,&#92;&quot;value&#92;&quot;:27133}]&quot;' data-total-rows='20' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false' data-download-file-name='&quot;download&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "f586dece2f26effe93f5b83958824442",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"transformation\">Transformation</h2>\n<span class=\"paragraph\">For a comparison view we take the latest non-null value per country, then sort to show the ranking.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "2566fcfc55008c5e4f733dbf17a9f6c4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='03c9b179-55fe-de93-7407-efd714793e83'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;&#92;&quot;:85,&#92;&quot;country&#92;&quot;:&#92;&quot;IRN&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Iran (Islamic Rep. of)&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:3489257,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:169,&#92;&quot;country&#92;&quot;:&#92;&quot;TUR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;T&#92;&#92;u00fcrkiye&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:2940735,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:68,&#92;&quot;country&#92;&quot;:&#92;&quot;GFR&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Germany&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:2749266,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:171,&#92;&quot;country&#92;&quot;:&#92;&quot;UGA&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Uganda&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:1759492,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:130,&#92;&quot;country&#92;&quot;:&#92;&quot;PAK&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Pakistan&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:1560480,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:41,&#92;&quot;country&#92;&quot;:&#92;&quot;CHD&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Chad&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:1278866,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:137,&#92;&quot;country&#92;&quot;:&#92;&quot;POL&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Poland&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:1008871,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:60,&#92;&quot;country&#92;&quot;:&#92;&quot;ETH&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Ethiopia&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:1008826,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:27,&#92;&quot;country&#92;&quot;:&#92;&quot;BGD&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Bangladesh&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:1005602,&#92;&quot;latest_year&#92;&quot;:2024},{&#92;&quot;&#92;&quot;:152,&#92;&quot;country&#92;&quot;:&#92;&quot;SUD&#92;&quot;,&#92;&quot;countryName&#92;&quot;:&#92;&quot;Sudan&#92;&quot;,&#92;&quot;year&#92;&quot;:2024,&#92;&quot;value&#92;&quot;:793395,&#92;&quot;latest_year&#92;&quot;:2024}]&quot;' data-total-rows='20' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='true' data-page-size='10' data-field-types='[[&quot;country&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;countryName&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;year&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;value&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;latest_year&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-show-filters='true' data-show-download='true' data-show-column-summaries='true' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[[&quot;&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-has-stable-row-id='false' data-lazy='false' data-preload='false' data-download-file-name='&quot;df&quot;'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "60dd584174f3bbec483e61f8229252bf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SFPL-0' random-id='4a55a990-5ef8-f079-431c-4a343b315b08'><marimo-vega data-initial-value='{}' data-label='null' data-spec='{&quot;config&quot;:{&quot;view&quot;:{&quot;continuousWidth&quot;:300,&quot;continuousHeight&quot;:300}},&quot;data&quot;:{&quot;url&quot;:&quot;data:text/plain;base64,QVJST1cxAAD/////gAUAABAAAAAAAAoADgAGAAUACAAKAAAAAAEEABAAAAAAAAoADAAAAAQACAAKAAAA+AMAAAQAAAABAAAADAAAAAgADAAEAAgACAAAANADAAAEAAAAwwMAAHsiaW5kZXhfY29sdW1ucyI6IFsiX19pbmRleF9sZXZlbF8wX18iXSwgImNvbHVtbl9pbmRleGVzIjogW3sibmFtZSI6IG51bGwsICJmaWVsZF9uYW1lIjogbnVsbCwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiB7ImVuY29kaW5nIjogIlVURi04In19XSwgImNvbHVtbnMiOiBbeyJuYW1lIjogImNvdW50cnkiLCAiZmllbGRfbmFtZSI6ICJjb3VudHJ5IiwgInBhbmRhc190eXBlIjogInVuaWNvZGUiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogImNvdW50cnlOYW1lIiwgImZpZWxkX25hbWUiOiAiY291bnRyeU5hbWUiLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAieWVhciIsICJmaWVsZF9uYW1lIjogInllYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogInZhbHVlIiwgImZpZWxkX25hbWUiOiAidmFsdWUiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogImxhdGVzdF95ZWFyIiwgImZpZWxkX25hbWUiOiAibGF0ZXN0X3llYXIiLCAicGFuZGFzX3R5cGUiOiAiaW50NjQiLCAibnVtcHlfdHlwZSI6ICJvYmplY3QiLCAibWV0YWRhdGEiOiBudWxsfSwgeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiAiX19pbmRl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&quot;,&quot;format&quot;:{&quot;type&quot;:&quot;arrow&quot;}},&quot;mark&quot;:{&quot;type&quot;:&quot;bar&quot;},&quot;encoding&quot;:{&quot;color&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;legend&quot;:null,&quot;scale&quot;:{&quot;scheme&quot;:&quot;blues&quot;},&quot;type&quot;:&quot;quantitative&quot;},&quot;tooltip&quot;:[{&quot;field&quot;:&quot;countryName&quot;,&quot;type&quot;:&quot;nominal&quot;},{&quot;field&quot;:&quot;year&quot;,&quot;type&quot;:&quot;quantitative&quot;},{&quot;field&quot;:&quot;value&quot;,&quot;type&quot;:&quot;quantitative&quot;}],&quot;x&quot;:{&quot;field&quot;:&quot;value&quot;,&quot;title&quot;:&quot;Value&quot;,&quot;type&quot;:&quot;quantitative&quot;},&quot;y&quot;:{&quot;field&quot;:&quot;countryName&quot;,&quot;sort&quot;:&quot;-x&quot;,&quot;title&quot;:&quot;Country&quot;,&quot;type&quot;:&quot;nominal&quot;}},&quot;height&quot;:500,&quot;width&quot;:700,&quot;&#36;schema&quot;:&quot;https://vega.github.io/schema/vega-lite/v5.20.1.json&quot;}' data-chart-selection='true' data-field-selection='true' data-embed-options='{}'></marimo-vega></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "0cbce30b232b82d31e225f7cfa6400b9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"key-insights\">Key Insights</h2>\n<ul>\n<li>Iran hosts the most refugees at 3.49 million, primarily from Afghanistan</li>\n<li>Uganda (1.76M) and Chad (1.28M) host more refugees than far wealthier nations</li>\n<li>Germany (2.75M) and Poland (1.01M) are the top European hosts, driven by Syria and Ukraine crises</li>\n<li>The top 20 host countries collectively shelter over 20 million refugees</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

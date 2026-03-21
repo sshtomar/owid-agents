@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; cursor: pointer; }
+  .legend-item:hover { color: #2B2A27; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 1px; }
+  .legend-group { font-family: 'JetBrains Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: #B0AEA4; margin-right: 4px; }
+</style></head><body>
+<h1>The Measles Shield</h1>
+<p class="subtitle">Measles MCV1 vaccination coverage among 1-year-olds (%), 2000-2024. The WHO sets 95% as the herd immunity threshold for measles. While Bangladesh has climbed from 74% to 96%, several European countries are sliding backward -- Montenegro collapsed from 90% to 33%, and Romania fell from 98% to 78%. The US has never crossed the 95% line in WHO data.</p>
+<div class="legend" id="legend"></div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- WHS8_110 (Measles MCV1 Immunization Coverage Among 1-Year-Olds, %)</p>
+<script>
+const raw = [
+  {c:"BGD",n:"Bangladesh",y:2000,v:74},{c:"BGD",n:"Bangladesh",y:2004,v:81},{c:"BGD",n:"Bangladesh",y:2010,v:88},{c:"BGD",n:"Bangladesh",y:2012,v:88},{c:"BGD",n:"Bangladesh",y:2016,v:97},{c:"BGD",n:"Bangladesh",y:2023,v:96},{c:"BGD",n:"Bangladesh",y:2024,v:96},
+  {c:"RUS",n:"Russia",y:2001,v:97},{c:"RUS",n:"Russia",y:2008,v:99},{c:"RUS",n:"Russia",y:2011,v:98},{c:"RUS",n:"Russia",y:2017,v:98},{c:"RUS",n:"Russia",y:2019,v:98},{c:"RUS",n:"Russia",y:2020,v:97},
+  {c:"LVA",n:"Latvia",y:2005,v:98},{c:"LVA",n:"Latvia",y:2006,v:98},{c:"LVA",n:"Latvia",y:2010,v:95},{c:"LVA",n:"Latvia",y:2014,v:95},{c:"LVA",n:"Latvia",y:2015,v:96},{c:"LVA",n:"Latvia",y:2020,v:99},{c:"LVA",n:"Latvia",y:2024,v:98},
+  {c:"USA",n:"United States",y:2014,v:92},{c:"USA",n:"United States",y:2015,v:92},{c:"USA",n:"United States",y:2016,v:92},{c:"USA",n:"United States",y:2017,v:91},{c:"USA",n:"United States",y:2019,v:90},{c:"USA",n:"United States",y:2020,v:91},
+  {c:"GBR",n:"United Kingdom",y:2000,v:88},{c:"GBR",n:"United Kingdom",y:2001,v:85},{c:"GBR",n:"United Kingdom",y:2009,v:86},{c:"GBR",n:"United Kingdom",y:2018,v:92},{c:"GBR",n:"United Kingdom",y:2019,v:91},{c:"GBR",n:"United Kingdom",y:2024,v:89},
+  {c:"POL",n:"Poland",y:2002,v:98},{c:"POL",n:"Poland",y:2004,v:97},{c:"POL",n:"Poland",y:2008,v:98},{c:"POL",n:"Poland",y:2013,v:98},{c:"POL",n:"Poland",y:2017,v:94},{c:"POL",n:"Poland",y:2018,v:93},{c:"POL",n:"Poland",y:2023,v:92},
+  {c:"NLD",n:"Netherlands",y:2004,v:96},{c:"NLD",n:"Netherlands",y:2005,v:95},{c:"NLD",n:"Netherlands",y:2010,v:96},{c:"NLD",n:"Netherlands",y:2011,v:96},{c:"NLD",n:"Netherlands",y:2012,v:96},{c:"NLD",n:"Netherlands",y:2014,v:96},{c:"NLD",n:"Netherlands",y:2020,v:94},{c:"NLD",n:"Netherlands",y:2024,v:89},
+  {c:"ROU",n:"Romania",y:2002,v:98},{c:"ROU",n:"Romania",y:2004,v:97},{c:"ROU",n:"Romania",y:2005,v:97},{c:"ROU",n:"Romania",y:2011,v:93},{c:"ROU",n:"Romania",y:2015,v:86},{c:"ROU",n:"Romania",y:2021,v:86},{c:"ROU",n:"Romania",y:2024,v:78},
+  {c:"MNE",n:"Montenegro",y:2006,v:90},{c:"MNE",n:"Montenegro",y:2007,v:90},{c:"MNE",n:"Montenegro",y:2013,v:88},{c:"MNE",n:"Montenegro",y:2019,v:37},{c:"MNE",n:"Montenegro",y:2021,v:18},{c:"MNE",n:"Montenegro",y:2022,v:33},
+  {c:"BIH",n:"Bosnia & Herz.",y:2001,v:92},{c:"BIH",n:"Bosnia & Herz.",y:2004,v:88},{c:"BIH",n:"Bosnia & Herz.",y:2006,v:85},{c:"BIH",n:"Bosnia & Herz.",y:2010,v:91},{c:"BIH",n:"Bosnia & Herz.",y:2011,v:89},{c:"BIH",n:"Bosnia & Herz.",y:2014,v:89},{c:"BIH",n:"Bosnia & Herz.",y:2022,v:58},
+  {c:"NGA",n:"Nigeria",y:2000,v:33},{c:"NGA",n:"Nigeria",y:2003,v:34},{c:"NGA",n:"Nigeria",y:2005,v:41},{c:"NGA",n:"Nigeria",y:2006,v:44},{c:"NGA",n:"Nigeria",y:2010,v:56},{c:"NGA",n:"Nigeria",y:2013,v:42},{c:"NGA",n:"Nigeria",y:2016,v:48},{c:"NGA",n:"Nigeria",y:2022,v:51},
+  {c:"ETH",n:"Ethiopia",y:2003,v:33},{c:"ETH",n:"Ethiopia",y:2010,v:64},{c:"ETH",n:"Ethiopia",y:2014,v:54},{c:"ETH",n:"Ethiopia",y:2019,v:56}
+];
+
+const groups = {
+  "Above 95% threshold": ["BGD", "RUS", "LVA"],
+  "Below threshold": ["USA", "GBR", "POL", "NLD"],
+  "Sharp decline": ["ROU", "MNE", "BIH"],
+  "Low coverage": ["NGA", "ETH"]
+};
+
+const palette = {
+  "BGD": "#1B7A5A",
+  "RUS": "#3BAA7E",
+  "LVA": "#6DC4A0",
+  "USA": "#3A76B0",
+  "GBR": "#5A9BD4",
+  "POL": "#8AB8E0",
+  "NLD": "#A7CCE8",
+  "ROU": "#C2402A",
+  "MNE": "#E8693A",
+  "BIH": "#D4894D",
+  "NGA": "#8B6EB5",
+  "ETH": "#A899E8"
+};
+
+const HERD_THRESHOLD = 95;
+
+const nameMap = {};
+raw.forEach(d => { nameMap[d.c] = d.n; });
+
+const byCountry = {};
+raw.forEach(d => {
+  if (!byCountry[d.c]) byCountry[d.c] = [];
+  byCountry[d.c].push(d);
+});
+Object.values(byCountry).forEach(arr => arr.sort((a, b) => a.y - b.y));
+
+const allCountries = Object.keys(byCountry);
+
+const W = 740;
+const H = 460;
+const pad = { left: 48, right: 130, top: 20, bottom: 40 };
+const chartW = W - pad.left - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const minYear = 2000;
+const maxYear = 2025;
+const minVal = 0;
+const maxVal = 100;
+
+const xScale = y => pad.left + ((y - minYear) / (maxYear - minYear)) * chartW;
+const yScale = v => pad.top + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
+
+const ns = "http://www.w3.org/2000/svg";
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  if (attrs) Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v));
+  return e;
+}
+
+const svg = el("svg", { viewBox: "0 0 " + W + " " + H, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+svg.style.display = "block";
+
+// Y-axis grid lines and labels
+for (let v = 0; v <= maxVal; v += 10) {
+  const y = yScale(v);
+  svg.appendChild(el("line", { x1: pad.left, x2: W - pad.right, y1: y, y2: y, stroke: "#D8D6CE", "stroke-width": 0.5 }));
+  const label = el("text", { x: pad.left - 8, y: y + 3.5, "text-anchor": "end", fill: "#B0AEA4", "font-size": "9" });
+  label.textContent = v + "%";
+  svg.appendChild(label);
+}
+
+// X-axis labels
+for (let yr = 2000; yr <= 2024; yr += 4) {
+  const x = xScale(yr);
+  const label = el("text", { x: x, y: H - pad.bottom + 18, "text-anchor": "middle", fill: "#B0AEA4", "font-size": "9" });
+  label.textContent = yr;
+  svg.appendChild(label);
+  svg.appendChild(el("line", { x1: x, x2: x, y1: pad.top, y2: pad.top + chartH, stroke: "#E5E3DC", "stroke-width": 0.5, "stroke-dasharray": "2,3" }));
+}
+
+// Herd immunity threshold line at 95%
+const threshY = yScale(HERD_THRESHOLD);
+svg.appendChild(el("line", {
+  x1: pad.left, x2: W - pad.right, y1: threshY, y2: threshY,
+  stroke: "#D4A017", "stroke-width": 1.5, "stroke-dasharray": "6,4"
+}));
+
+const threshLabel = el("text", {
+  x: W - pad.right + 4, y: threshY + 3.5,
+  fill: "#D4A017", "font-size": "8", "font-weight": "500",
+  "font-family": "'JetBrains Mono', monospace"
+});
+threshLabel.textContent = "95% HERD";
+svg.appendChild(threshLabel);
+
+const threshLabel2 = el("text", {
+  x: W - pad.right + 4, y: threshY + 12,
+  fill: "#D4A017", "font-size": "8", "font-weight": "500",
+  "font-family": "'JetBrains Mono', monospace"
+});
+threshLabel2.textContent = "IMMUNITY";
+svg.appendChild(threshLabel2);
+
+// Draw lines and dots for each country
+const pathElements = {};
+const dotElements = {};
+const labelElements = {};
+
+allCountries.forEach(code => {
+  const pts = byCountry[code];
+  const color = palette[code];
+
+  const pathD = pts.map((d, i) => (i === 0 ? "M" : "L") + xScale(d.y).toFixed(1) + "," + yScale(d.v).toFixed(1)).join(" ");
+  const path = el("path", { d: pathD, fill: "none", stroke: color, "stroke-width": 1.8, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: "0.85" });
+  path.dataset.country = code;
+  svg.appendChild(path);
+  pathElements[code] = path;
+
+  dotElements[code] = [];
+  pts.forEach(d => {
+    const dot = el("circle", { cx: xScale(d.y), cy: yScale(d.v), r: "2.5", fill: color, stroke: "#F6F5EE", "stroke-width": "1" });
+    dot.dataset.country = code;
+    svg.appendChild(dot);
+    dotElements[code].push(dot);
+  });
+
+  const last = pts[pts.length - 1];
+  const lbl = el("text", { x: xScale(last.y) + 6, y: yScale(last.v) + 3.5, fill: color, "font-size": "9", "font-weight": "500" });
+  lbl.textContent = nameMap[code];
+  lbl.dataset.country = code;
+  svg.appendChild(lbl);
+  labelElements[code] = lbl;
+});
+
+// Resolve label overlaps
+function resolveLabels() {
+  const labels = allCountries.map(code => {
+    const pts = byCountry[code];
+    const last = pts[pts.length - 1];
+    return { code: code, baseY: yScale(last.v), y: yScale(last.v), x: xScale(last.y) + 6 };
+  });
+  labels.sort((a, b) => a.baseY - b.baseY);
+  const spacing = 10;
+  for (let i = 1; i < labels.length; i++) {
+    if (labels[i].y - labels[i - 1].y < spacing) {
+      labels[i].y = labels[i - 1].y + spacing;
+    }
+  }
+  labels.forEach(l => {
+    labelElements[l.code].setAttribute("y", l.y + 3.5);
+  });
+}
+resolveLabels();
+
+document.getElementById("chart").appendChild(svg);
+
+// Tooltip and hover interaction
+const tip = document.getElementById("tip");
+const chartDiv = document.getElementById("chart");
+
+function highlight(code) {
+  allCountries.forEach(c => {
+    const dim = c !== code;
+    pathElements[c].setAttribute("opacity", dim ? 0.12 : 1);
+    pathElements[c].setAttribute("stroke-width", dim ? 1.2 : 2.8);
+    dotElements[c].forEach(dot => {
+      dot.setAttribute("opacity", dim ? 0.12 : 1);
+      dot.setAttribute("r", dim ? 2 : 3.5);
+    });
+    labelElements[c].setAttribute("opacity", dim ? 0.15 : 1);
+    labelElements[c].setAttribute("font-weight", dim ? "400" : "600");
+  });
+}
+
+function resetHighlight() {
+  allCountries.forEach(c => {
+    pathElements[c].setAttribute("opacity", "0.85");
+    pathElements[c].setAttribute("stroke-width", "1.8");
+    dotElements[c].forEach(dot => {
+      dot.setAttribute("opacity", "1");
+      dot.setAttribute("r", "2.5");
+    });
+    labelElements[c].setAttribute("opacity", "1");
+    labelElements[c].setAttribute("font-weight", "500");
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleX;
+
+  let closest = null;
+  let closestDist = Infinity;
+
+  allCountries.forEach(code => {
+    byCountry[code].forEach(d => {
+      const dx = xScale(d.y) - mx;
+      const dy = yScale(d.v) - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < closestDist && dist < 35) {
+        closestDist = dist;
+        closest = { code: code, y: d.y, v: d.v };
+      }
+    });
+  });
+
+  if (closest) {
+    highlight(closest.code);
+    tip.style.opacity = 1;
+    var status = closest.v >= HERD_THRESHOLD ? "Above threshold" : "Below threshold";
+    tip.innerHTML = "<strong>" + nameMap[closest.code] + "</strong><br>" + closest.y + ": " + closest.v + "% " + status;
+    var tipRect = tip.getBoundingClientRect();
+    var chartRect = chartDiv.getBoundingClientRect();
+    var tx = e.clientX - chartRect.left + 12;
+    var ty = e.clientY - chartRect.top - 10;
+    if (tx + tipRect.width > chartRect.width) tx = tx - tipRect.width - 24;
+    tip.style.left = tx + "px";
+    tip.style.top = ty + "px";
+  } else {
+    resetHighlight();
+    tip.style.opacity = 0;
+  }
+});
+
+svg.addEventListener("mouseleave", function() {
+  resetHighlight();
+  tip.style.opacity = 0;
+});
+
+// Build legend
+var legendDiv = document.getElementById("legend");
+Object.entries(groups).forEach(function(entry) {
+  var groupName = entry[0];
+  var codes = entry[1];
+  var groupLabel = document.createElement("span");
+  groupLabel.className = "legend-group";
+  groupLabel.textContent = groupName + ":";
+  legendDiv.appendChild(groupLabel);
+  codes.forEach(function(code) {
+    var item = document.createElement("span");
+    item.className = "legend-item";
+    var swatch = document.createElement("span");
+    swatch.className = "legend-swatch";
+    swatch.style.background = palette[code];
+    item.appendChild(swatch);
+    var text = document.createElement("span");
+    text.textContent = nameMap[code];
+    item.appendChild(text);
+    item.addEventListener("mouseenter", function() { highlight(code); });
+    item.addEventListener("mouseleave", resetHighlight);
+    legendDiv.appendChild(item);
+  });
+});
+</script>
+</body></html>

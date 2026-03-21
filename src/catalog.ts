@@ -8,11 +8,12 @@ import type {
   VizEntry,
 } from "./types.js";
 
-const DATA_DIR = join(import.meta.dirname, "..", "data");
+const DATA_DIR = process.env.OWID_DATA_DIR ?? join(import.meta.dirname, "..", "data");
 const CATALOG_DIR = join(DATA_DIR, "catalog");
 const DATASETS_DIR = join(CATALOG_DIR, "datasets");
 const VIZ_DIR = join(DATA_DIR, "visualizations");
 const VIZ_FILES_DIR = join(VIZ_DIR, "viz");
+const NOTEBOOKS_DIR = join(VIZ_DIR, "notebooks");
 
 const CATALOG_INDEX = join(CATALOG_DIR, "index.json");
 const VIZ_INDEX = join(VIZ_DIR, "index.json");
@@ -87,13 +88,24 @@ export function writeVizIndex(index: VizIndex): void {
   writeJSON(VIZ_INDEX, index);
 }
 
-export function addVisualization(entry: VizEntry, htmlCode: string): void {
+export function addVisualization(
+  entry: VizEntry,
+  htmlCode: string,
+  notebookCode?: string,
+): void {
   ensureDir(VIZ_FILES_DIR);
   const filePath = join(VIZ_FILES_DIR, `${entry.id}.html`);
   writeFileSync(filePath, htmlCode, "utf-8");
 
   entry.codeFilePath = `viz/${entry.id}.html`;
   entry.generatedCode = htmlCode;
+
+  if (notebookCode) {
+    ensureDir(NOTEBOOKS_DIR);
+    const nbPath = join(NOTEBOOKS_DIR, `${entry.id}.py`);
+    writeFileSync(nbPath, notebookCode, "utf-8");
+    entry.notebookPath = `notebooks/${entry.id}.py`;
+  }
 
   const index = readVizIndex();
   const existing = index.visualizations.findIndex((v) => v.id === entry.id);
@@ -118,6 +130,33 @@ export function getVizHtml(id: string): string | null {
   const filePath = join(VIZ_FILES_DIR, `${id}.html`);
   if (!existsSync(filePath)) return null;
   return readFileSync(filePath, "utf-8");
+}
+
+export function getVizNotebook(id: string): string | null {
+  const filePath = join(NOTEBOOKS_DIR, `${id}.py`);
+  if (!existsSync(filePath)) return null;
+  return readFileSync(filePath, "utf-8");
+}
+
+const WASM_DIR = join(NOTEBOOKS_DIR, "wasm");
+
+export function getVizNotebookWasm(id: string): string | null {
+  const filePath = join(WASM_DIR, `${id}.html`);
+  if (!existsSync(filePath)) return null;
+  return readFileSync(filePath, "utf-8");
+}
+
+export function addVizNotebook(id: string, code: string): void {
+  ensureDir(NOTEBOOKS_DIR);
+  const nbPath = join(NOTEBOOKS_DIR, `${id}.py`);
+  writeFileSync(nbPath, code, "utf-8");
+
+  const index = readVizIndex();
+  const viz = index.visualizations.find((v) => v.id === id);
+  if (viz) {
+    viz.notebookPath = `notebooks/${id}.py`;
+    writeVizIndex(index);
+  }
 }
 
 export function nextVizId(): string {

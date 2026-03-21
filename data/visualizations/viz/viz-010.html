@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 28px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5; }
+</style></head><body>
+<h1>Europe's Green Surge</h1>
+<p class="subtitle">Share of renewable energy in gross final energy consumption (%), 2004 vs 2024. Countries sorted by latest share. Hover to see exact values and change.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Eurostat sdg_07_40</p>
+<script>
+// Data: {n: name, a: 2004 value, b: 2024 value}
+// Selected 20 individual countries, sorted by 2024 value descending
+const data = [
+  {"n": "Iceland",      "a": 58.899, "b": 79.332},
+  {"n": "Norway",       "a": 58.417, "b": 77.932},
+  {"n": "Sweden",       "a": 38.427, "b": 62.846},
+  {"n": "Finland",      "a": 29.232, "b": 52.124},
+  {"n": "Denmark",      "a": 14.839, "b": 46.461},
+  {"n": "Latvia",       "a": 32.794, "b": 45.535},
+  {"n": "Albania",      "a": 29.620, "b": 43.111},
+  {"n": "Estonia",      "a": 18.420, "b": 42.232},
+  {"n": "Austria",      "a": 22.553, "b": 42.951},
+  {"n": "Montenegro",   "a": null,   "b": 40.822},
+  {"n": "Lithuania",    "a": 17.221, "b": 35.408},
+  {"n": "Portugal",     "a": 19.205, "b": 36.319},
+  {"n": "Croatia",      "a": 23.404, "b": 26.477},
+  {"n": "Serbia",       "a": 12.724, "b": 25.862},
+  {"n": "Romania",      "a": 16.811, "b": 25.378},
+  {"n": "Greece",       "a":  7.161, "b": 25.364},
+  {"n": "Spain",        "a":  8.345, "b": 25.417},
+  {"n": "France",       "a":  9.319, "b": 23.229},
+  {"n": "Germany",      "a":  6.207, "b": 22.474},
+  {"n": "Bulgaria",     "a":  9.231, "b": 23.210}
+];
+
+// Sort by 2024 value descending (already done above)
+data.sort((a, b) => b.b - a.b);
+
+const W = 720, rowH = 20;
+const margin = { top: 48, right: 90, bottom: 48, left: 110 };
+const H = margin.top + data.length * rowH + margin.bottom;
+const iw = W - margin.left - margin.right;
+
+// x scale: 0 to 85%
+const xMax = 85;
+const xScale = v => margin.left + (v / xMax) * iw;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+// Helper: create SVG text element
+const mkEl = (tag) => document.createElementNS("http://www.w3.org/2000/svg", tag);
+
+const mkText = (x, y, txt, opts = {}) => {
+  const t = mkEl("text");
+  t.setAttribute("x", x);
+  t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "9");
+  t.setAttribute("fill", opts.fill || "#7A786F");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  if (opts.weight) t.setAttribute("font-weight", opts.weight);
+  t.textContent = txt;
+  svg.appendChild(t);
+  return t;
+};
+
+// Color scale for magnitude of change (percentage points gained)
+// Montenegro has no 2004 data - treat specially
+function lineColor(d) {
+  if (d.a === null) return "#C8C4B8"; // no early data
+  const gain = d.b - d.a;
+  if (gain >= 28) return "#EA5E33";       // very large gain (orange-red)
+  if (gain >= 18) return "#F29A44";       // large gain (amber)
+  if (gain >= 10) return "#7BAF78";       // moderate gain (green)
+  return "#A6C4A2";                       // small gain (muted green)
+}
+
+function dotColor2004() { return "#E8D5A0"; }
+function dotColor2024(d) { return lineColor(d); }
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  const x = xScale(v);
+  const gridLine = mkEl("line");
+  gridLine.setAttribute("x1", x); gridLine.setAttribute("y1", margin.top - 16);
+  gridLine.setAttribute("x2", x); gridLine.setAttribute("y2", H - margin.bottom + 10);
+  gridLine.setAttribute("stroke", "#E2E0D5");
+  gridLine.setAttribute("stroke-width", "0.5");
+  svg.appendChild(gridLine);
+  mkText(x, margin.top - 20, `${v}%`, { anchor: "middle", mono: true, size: "9" });
+});
+
+// Column header
+mkText(margin.left - 8, margin.top - 30, "COUNTRY", { anchor: "end", size: "9", mono: true });
+mkText(xScale(xMax / 2), margin.top - 30, "RENEWABLE ENERGY SHARE (% OF GROSS FINAL CONSUMPTION)", { anchor: "middle", size: "9", mono: true });
+
+const rowGroups = [];
+
+data.forEach((d, i) => {
+  const y = margin.top + i * rowH + rowH / 2;
+  const x1 = d.a !== null ? xScale(d.a) : null;
+  const x2 = xScale(d.b);
+  const col = lineColor(d);
+
+  const g = mkEl("g");
+
+  // Invisible hit area for the whole row
+  const bg = mkEl("rect");
+  bg.setAttribute("x", 0); bg.setAttribute("y", y - rowH / 2);
+  bg.setAttribute("width", W); bg.setAttribute("height", rowH);
+  bg.setAttribute("fill", "transparent");
+  g.appendChild(bg);
+
+  // Country label
+  const label = mkText(margin.left - 8, y + 3.5, d.n, { anchor: "end", size: "10", fill: "#2B2A27" });
+
+  // Connecting line (only if we have 2004 data)
+  let connLine = null;
+  if (x1 !== null) {
+    connLine = mkEl("line");
+    connLine.setAttribute("x1", x1); connLine.setAttribute("y1", y);
+    connLine.setAttribute("x2", x2); connLine.setAttribute("y2", y);
+    connLine.setAttribute("stroke", col);
+    connLine.setAttribute("stroke-width", "1.2");
+    connLine.setAttribute("opacity", "0.55");
+    g.appendChild(connLine);
+  }
+
+  // 2004 dot (earlier)
+  let c1 = null;
+  if (x1 !== null) {
+    c1 = mkEl("circle");
+    c1.setAttribute("cx", x1); c1.setAttribute("cy", y); c1.setAttribute("r", "3");
+    c1.setAttribute("fill", dotColor2004());
+    c1.setAttribute("stroke", "#C8C0A0"); c1.setAttribute("stroke-width", "0.5");
+    g.appendChild(c1);
+  }
+
+  // 2024 dot (latest)
+  const c2 = mkEl("circle");
+  c2.setAttribute("cx", x2); c2.setAttribute("cy", y); c2.setAttribute("r", "3.5");
+  c2.setAttribute("fill", dotColor2024(d));
+  g.appendChild(c2);
+
+  // Value label after dot
+  const valLabel = mkText(x2 + 7, y + 3.5, `${d.b.toFixed(1)}%`, { size: "9", mono: true, fill: "#2B2A27" });
+
+  // Hit area on top
+  const hit = mkEl("rect");
+  hit.setAttribute("x", 0); hit.setAttribute("y", y - rowH / 2);
+  hit.setAttribute("width", W); hit.setAttribute("height", rowH);
+  hit.setAttribute("fill", "transparent");
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rowGroups.push({ g, bg, d, y, c1, c2, connLine, label, valLabel, col });
+});
+
+// Legend
+const legendY = H - 12;
+const legendItems = [
+  { col: "#E8D5A0", label: "2004 share", dot: true },
+  { col: "#EA5E33", label: "+28pp gain", dot: false },
+  { col: "#F29A44", label: "+18-28pp gain", dot: false },
+  { col: "#7BAF78", label: "+10-18pp gain", dot: false },
+  { col: "#A6C4A2", label: "<10pp gain", dot: false },
+];
+
+let lx = margin.left;
+legendItems.forEach((item, i) => {
+  const circle = mkEl("circle");
+  circle.setAttribute("cx", lx); circle.setAttribute("cy", legendY - 3); circle.setAttribute("r", "3.5");
+  circle.setAttribute("fill", item.col);
+  if (item.dot) {
+    circle.setAttribute("stroke", "#C8C0A0");
+    circle.setAttribute("stroke-width", "0.5");
+  }
+  svg.appendChild(circle);
+  const w = mkText(lx + 7, legendY, item.label, { size: "9", mono: true });
+  // Estimate width: ~6px per char approx
+  lx += item.label.length * 5.8 + 22;
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeRow = -1;
+
+function highlightRow(idx) {
+  if (idx === activeRow) return;
+  activeRow = idx;
+  rowGroups.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.bg.setAttribute("fill", "transparent");
+      if (row.c1) { row.c1.setAttribute("r", "3"); }
+      row.c2.setAttribute("r", "3.5");
+      if (row.connLine) { row.connLine.setAttribute("stroke-width", "1.2"); row.connLine.setAttribute("opacity", "0.55"); }
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.bg.setAttribute("fill", "rgba(234, 94, 51, 0.06)");
+      if (row.c1) { row.c1.setAttribute("r", "4.5"); }
+      row.c2.setAttribute("r", "5");
+      if (row.connLine) { row.connLine.setAttribute("stroke-width", "2.5"); row.connLine.setAttribute("opacity", "0.85"); }
+    } else {
+      row.g.style.opacity = "0.18";
+      row.bg.setAttribute("fill", "transparent");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const my = (e.clientY - rect.top) / rect.height * H;
+
+  let best = -1;
+  rowGroups.forEach((row, i) => {
+    if (Math.abs(my - row.y) < rowH / 2) best = i;
+  });
+
+  highlightRow(best);
+
+  if (best >= 0) {
+    const d = rowGroups[best].d;
+    const gainStr = d.a !== null
+      ? `Change: +${(d.b - d.a).toFixed(1)}pp`
+      : "No 2004 data";
+    const earlyStr = d.a !== null ? `2004: ${d.a.toFixed(1)}%` : "2004: n/a";
+    tip.innerHTML = `<b>${d.n}</b><br>${earlyStr}<br>2024: ${d.b.toFixed(1)}%<br>${gainStr}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 46) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => {
+  highlightRow(-1);
+  tip.style.opacity = "0";
+});
+</script>
+</body></html>

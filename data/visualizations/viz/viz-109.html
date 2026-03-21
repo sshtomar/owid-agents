@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>The Price of a Longer Life</h1>
+  <p class="subtitle">Health expenditure per capita vs. life expectancy at birth, 85 countries, 2021. Logarithmic x-axis reveals that initial health spending buys dramatic gains, but returns flatten sharply beyond ~$1,000 per person.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank -- Health Expenditure per Capita (SH.XPD.CHEX.PC.CD) and Life Expectancy at Birth (SP.DYN.LE00.IN)</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const data = [{"n":"Afghanistan","r":"South Asia","x":81.52,"y":60.42,"l":1},{"n":"Albania","r":"Europe","x":465.57,"y":76.84},{"n":"Algeria","r":"Middle East & N. Africa","x":208.94,"y":75.21},{"n":"Andorra","r":"Europe","x":3668.45,"y":82.33},{"n":"Angola","r":"Sub-Saharan Africa","x":66.94,"y":62.96},{"n":"Argentina","r":"Latin America","x":1182.16,"y":73.95},{"n":"Armenia","r":"Europe","x":595.84,"y":72.28},{"n":"Australia","r":"East Asia & Pacific","x":7092.13,"y":83.3,"l":1},{"n":"Austria","r":"Europe","x":6554.14,"y":81.19},{"n":"Azerbaijan","r":"Europe","x":250.99,"y":71},{"n":"Bahamas","r":"Latin America","x":1946.22,"y":70.75},{"n":"Bahrain","r":"Middle East & N. Africa","x":1176.92,"y":78.08},{"n":"Bangladesh","r":"South Asia","x":56.1,"y":71.1,"l":1},{"n":"Barbados","r":"Latin America","x":1391.5,"y":76.58},{"n":"Belarus","r":"Europe","x":484.04,"y":72.07},{"n":"Belgium","r":"Europe","x":5847.17,"y":81.79},{"n":"Belize","r":"Latin America","x":308.94,"y":70.92},{"n":"Benin","r":"Sub-Saharan Africa","x":38.45,"y":59.61},{"n":"Bhutan","r":"South Asia","x":161.47,"y":72.45},{"n":"Bolivia","r":"Latin America","x":276.21,"y":61.43},{"n":"Bosnia and Herzegovina","r":"Europe","x":697.07,"y":74.57},{"n":"Botswana","r":"Sub-Saharan Africa","x":492.14,"y":63.3},{"n":"Brazil","r":"Latin America","x":768.27,"y":73.04,"l":1},{"n":"Brunei Darussalam","r":"East Asia & Pacific","x":665.87,"y":74.87},{"n":"Bulgaria","r":"Europe","x":1109.1,"y":71.21},{"n":"Burkina Faso","r":"Sub-Saharan Africa","x":63.59,"y":60.05},{"n":"Burundi","r":"Sub-Saharan Africa","x":23.11,"y":62.1},{"n":"Cabo Verde","r":"Sub-Saharan Africa","x":262.42,"y":74.42},{"n":"Cambodia","r":"East Asia & Pacific","x":137.39,"y":69.3},{"n":"Cameroon","r":"Sub-Saharan Africa","x":72.6,"y":61.15},{"n":"Canada","r":"North America","x":6511.47,"y":81.52},{"n":"Central African Republic","r":"Sub-Saharan Africa","x":46.25,"y":40.28,"l":1},{"n":"Chad","r":"Sub-Saharan Africa","x":37.59,"y":53.14},{"n":"Chile","r":"Latin America","x":1576.69,"y":78.88,"l":1},{"n":"China","r":"East Asia & Pacific","x":670.26,"y":78.12,"l":1},{"n":"Colombia","r":"Latin America","x":568.84,"y":72.7},{"n":"Comoros","r":"Sub-Saharan Africa","x":100.5,"y":65.2},{"n":"Congo, Dem. Rep.","r":"Sub-Saharan Africa","x":21.59,"y":60.04,"l":1},{"n":"Congo, Rep.","r":"Sub-Saharan Africa","x":78.6,"y":64.19},{"n":"Costa Rica","r":"Latin America","x":977.15,"y":78.05},{"n":"Cote d'Ivoire","r":"Sub-Saharan Africa","x":92.4,"y":60.29},{"n":"Croatia","r":"Europe","x":1423.53,"y":76.42},{"n":"Cyprus","r":"Europe","x":2947.81,"y":80.57},{"n":"Czechia","r":"Europe","x":2538.03,"y":77.22},{"n":"Denmark","r":"Europe","x":7429.99,"y":81.4},{"n":"Djibouti","r":"Sub-Saharan Africa","x":86.88,"y":63.83},{"n":"Dominican Republic","r":"Latin America","x":433.89,"y":71.76},{"n":"Ecuador","r":"Latin America","x":507.65,"y":72.75},{"n":"Egypt","r":"Middle East & N. Africa","x":176.94,"y":68.98},{"n":"El Salvador","r":"Latin America","x":470.14,"y":69.94},{"n":"Equatorial Guinea","r":"Sub-Saharan Africa","x":243.81,"y":62.45},{"n":"Eritrea","r":"Sub-Saharan Africa","x":27.59,"y":66.94},{"n":"Estonia","r":"Europe","x":2091.16,"y":76.94},{"n":"Eswatini","r":"Sub-Saharan Africa","x":297.72,"y":58.23},{"n":"Ethiopia","r":"Sub-Saharan Africa","x":26.07,"y":65.33,"l":1},{"n":"Fiji","r":"East Asia & Pacific","x":331.58,"y":64.9},{"n":"Finland","r":"Europe","x":5261.91,"y":81.89},{"n":"France","r":"Europe","x":5364.9,"y":82.32,"l":1},{"n":"Gabon","r":"Sub-Saharan Africa","x":228.47,"y":67.07},{"n":"Gambia","r":"Sub-Saharan Africa","x":29.77,"y":63.85},{"n":"Georgia","r":"Europe","x":524.32,"y":71.64},{"n":"Germany","r":"Europe","x":6653.58,"y":80.79,"l":1},{"n":"Ghana","r":"Sub-Saharan Africa","x":94.4,"y":64.29},{"n":"Greece","r":"Europe","x":1846.37,"y":80.08},{"n":"Guatemala","r":"Latin America","x":361.52,"y":67.86},{"n":"Guinea","r":"Sub-Saharan Africa","x":44.1,"y":59.37},{"n":"Guinea-Bissau","r":"Sub-Saharan Africa","x":70.21,"y":61.65},{"n":"Guyana","r":"Latin America","x":457.87,"y":64.32},{"n":"Haiti","r":"Latin America","x":59.89,"y":62.61},{"n":"Honduras","r":"Latin America","x":253.63,"y":69.49},{"n":"Hungary","r":"Europe","x":1392.97,"y":74.07},{"n":"Iceland","r":"Europe","x":6722.42,"y":83.17},{"n":"India","r":"South Asia","x":75.55,"y":67.28,"l":1},{"n":"Indonesia","r":"East Asia & Pacific","x":158.9,"y":67.45},{"n":"Iran","r":"Middle East & N. Africa","x":196.67,"y":73.75},{"n":"Iraq","r":"Middle East & N. Africa","x":251.6,"y":70.7},{"n":"Ireland","r":"Europe","x":6754.08,"y":82.25,"l":1},{"n":"Israel","r":"Middle East & N. Africa","x":4294.19,"y":82.5},{"n":"Italy","r":"Europe","x":3414.57,"y":82.65,"l":1},{"n":"Jamaica","r":"Latin America","x":413.36,"y":69.08},{"n":"Japan","r":"East Asia & Pacific","x":4843.94,"y":84.45,"l":1},{"n":"Jordan","r":"Middle East & N. Africa","x":322.02,"y":74.2},{"n":"Kazakhstan","r":"Europe","x":391.82,"y":70.13},{"n":"Kenya","r":"Sub-Saharan Africa","x":94.2,"y":61.23,"l":1},{"n":"Korea","r":"East Asia & Pacific","x":3125.83,"y":83.53,"l":1}];
+
+    const regionColors = {
+      "Sub-Saharan Africa": "#e15759",
+      "Europe": "#4e79a7",
+      "Latin America": "#59a14f",
+      "East Asia & Pacific": "#f28e2b",
+      "South Asia": "#b07aa1",
+      "Middle East & N. Africa": "#edc948",
+      "North America": "#76b7b2"
+    };
+
+    const regions = Object.keys(regionColors);
+    const colors = Object.values(regionColors);
+
+    const labeled = data.filter(d => d.l === 1);
+
+    const chart = Plot.plot({
+      width: 820,
+      height: 520,
+      marginLeft: 50,
+      marginBottom: 50,
+      marginRight: 20,
+      marginTop: 20,
+      x: {
+        type: "log",
+        label: "Health expenditure per capita (US$, log scale)",
+        tickFormat: d => d >= 1000 ? `$${d / 1000}k` : `$${d}`,
+        grid: true,
+        domain: [15, 10000]
+      },
+      y: {
+        label: "Life expectancy at birth (years)",
+        grid: true,
+        domain: [38, 86]
+      },
+      color: {
+        domain: regions,
+        range: colors,
+        legend: true
+      },
+      marks: [
+        Plot.dot(data, {
+          x: "x",
+          y: "y",
+          fill: "r",
+          fillOpacity: 0.7,
+          stroke: "r",
+          strokeOpacity: 0.9,
+          strokeWidth: 1,
+          r: 5,
+          tip: true,
+          title: d => `${d.n}\nHealth spending: $${d.x.toLocaleString()}\nLife expectancy: ${d.y} years`
+        }),
+        Plot.text(labeled, {
+          x: "x",
+          y: "y",
+          text: "n",
+          fontSize: 10,
+          fill: "#334155",
+          stroke: "#fff",
+          strokeWidth: 3,
+          dy: d => {
+            if (d.n === "Afghanistan") return 14;
+            if (d.n === "Congo, Dem. Rep.") return 14;
+            if (d.n === "Central African Republic") return 14;
+            if (d.n === "Korea") return 14;
+            if (d.n === "Australia") return 14;
+            return -10;
+          },
+          dx: d => {
+            if (d.n === "Bangladesh") return 42;
+            if (d.n === "Congo, Dem. Rep.") return 50;
+            if (d.n === "Ethiopia") return 32;
+            if (d.n === "India") return 18;
+            if (d.n === "Kenya") return 24;
+            if (d.n === "Central African Republic") return 62;
+            if (d.n === "Chile") return 20;
+            if (d.n === "China") return 24;
+            if (d.n === "Brazil") return 22;
+            if (d.n === "Australia") return -24;
+            if (d.n === "Ireland") return -16;
+            if (d.n === "Germany") return -22;
+            if (d.n === "France") return -16;
+            if (d.n === "Italy") return -14;
+            if (d.n === "Japan") return -14;
+            if (d.n === "Korea") return -14;
+            return 0;
+          }
+        })
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; max-width: 640px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    .label { font-size: 10px; font-weight: 600; dominant-baseline: middle; }
+  </style>
+</head>
+<body>
+  <h1>The Mobile Revolution: From Zero to Ubiquity</h1>
+  <p class="subtitle">Mobile cellular subscriptions per 100 people, 1990-2023. Finland led the world in the 1990s, but by the 2010s nearly every country shown had reached or surpassed 100 subscriptions per 100 people -- except India and Ethiopia, which are still climbing.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank -- IT.CEL.SETS.P2</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const raw = [{"c":"Bangladesh","y":1990,"v":0},{"c":"Bangladesh","y":1991,"v":0},{"c":"Bangladesh","y":1992,"v":0},{"c":"Bangladesh","y":1993,"v":0},{"c":"Bangladesh","y":1994,"v":0},{"c":"Bangladesh","y":1995,"v":0},{"c":"Bangladesh","y":1996,"v":0},{"c":"Bangladesh","y":1997,"v":0.02},{"c":"Bangladesh","y":1998,"v":0.06},{"c":"Bangladesh","y":1999,"v":0.12},{"c":"Bangladesh","y":2000,"v":0.21},{"c":"Bangladesh","y":2001,"v":0.38},{"c":"Bangladesh","y":2002,"v":0.77},{"c":"Bangladesh","y":2003,"v":0.97},{"c":"Bangladesh","y":2004,"v":1.95},{"c":"Bangladesh","y":2005,"v":6.22},{"c":"Bangladesh","y":2006,"v":13.07},{"c":"Bangladesh","y":2007,"v":23.22},{"c":"Bangladesh","y":2008,"v":29.86},{"c":"Bangladesh","y":2009,"v":34.04},{"c":"Bangladesh","y":2010,"v":44.63},{"c":"Bangladesh","y":2011,"v":54.93},{"c":"Bangladesh","y":2012,"v":62.67},{"c":"Bangladesh","y":2013,"v":74.46},{"c":"Bangladesh","y":2014,"v":80.31},{"c":"Bangladesh","y":2015,"v":82.43},{"c":"Bangladesh","y":2016,"v":84.56},{"c":"Bangladesh","y":2017,"v":93.07},{"c":"Bangladesh","y":2018,"v":98.93},{"c":"Bangladesh","y":2019,"v":100.4},{"c":"Bangladesh","y":2020,"v":106},{"c":"Bangladesh","y":2021,"v":110.01},{"c":"Bangladesh","y":2022,"v":109.87},{"c":"Bangladesh","y":2023,"v":114.36},{"c":"China","y":1990,"v":0},{"c":"China","y":1991,"v":0},{"c":"China","y":1992,"v":0.01},{"c":"China","y":1993,"v":0.05},{"c":"China","y":1994,"v":0.13},{"c":"China","y":1995,"v":0.3},{"c":"China","y":1996,"v":0.56},{"c":"China","y":1997,"v":1.07},{"c":"China","y":1998,"v":1.91},{"c":"China","y":1999,"v":3.45},{"c":"China","y":2000,"v":6.72},{"c":"China","y":2001,"v":11.33},{"c":"China","y":2002,"v":16.01},{"c":"China","y":2003,"v":20.85},{"c":"China","y":2004,"v":25.71},{"c":"China","y":2005,"v":30.03},{"c":"China","y":2006,"v":34.98},{"c":"China","y":2007,"v":41.28},{"c":"China","y":2008,"v":48.08},{"c":"China","y":2009,"v":55.66},{"c":"China","y":2010,"v":63.56},{"c":"China","y":2011,"v":72.51},{"c":"China","y":2012,"v":81.21},{"c":"China","y":2013,"v":89.13},{"c":"China","y":2014,"v":92.66},{"c":"China","y":2015,"v":92.54},{"c":"China","y":2016,"v":97.21},{"c":"China","y":2017,"v":104.07},{"c":"China","y":2018,"v":116.23},{"c":"China","y":2019,"v":122.67},{"c":"China","y":2020,"v":120.5},{"c":"China","y":2021,"v":121.49},{"c":"China","y":2022,"v":124.2},{"c":"China","y":2023,"v":128.25},{"c":"Ethiopia","y":1990,"v":0},{"c":"Ethiopia","y":1991,"v":0},{"c":"Ethiopia","y":1992,"v":0},{"c":"Ethiopia","y":1993,"v":0},{"c":"Ethiopia","y":1994,"v":0},{"c":"Ethiopia","y":1995,"v":0},{"c":"Ethiopia","y":1996,"v":0},{"c":"Ethiopia","y":1997,"v":0},{"c":"Ethiopia","y":1998,"v":0},{"c":"Ethiopia","y":1999,"v":0.01},{"c":"Ethiopia","y":2000,"v":0.03},{"c":"Ethiopia","y":2001,"v":0.04},{"c":"Ethiopia","y":2002,"v":0.07},{"c":"Ethiopia","y":2003,"v":0.07},{"c":"Ethiopia","y":2004,"v":0.2},{"c":"Ethiopia","y":2005,"v":0.52},{"c":"Ethiopia","y":2006,"v":1.07},{"c":"Ethiopia","y":2007,"v":1.45},{"c":"Ethiopia","y":2008,"v":2.28},{"c":"Ethiopia","y":2009,"v":4.6},{"c":"Ethiopia","y":2010,"v":7.57},{"c":"Ethiopia","y":2011,"v":15.17},{"c":"Ethiopia","y":2012,"v":21.42},{"c":"Ethiopia","y":2013,"v":26.05},{"c":"Ethiopia","y":2014,"v":30.15},{"c":"Ethiopia","y":2015,"v":40.74},{"c":"Ethiopia","y":2016,"v":48},{"c":"Ethiopia","y":2017,"v":36.11},{"c":"Ethiopia","y":2019,"v":36.22},{"c":"Ethiopia","y":2020,"v":37.42},{"c":"Ethiopia","y":2021,"v":52.81},{"c":"Ethiopia","y":2022,"v":56.96},{"c":"Finland","y":1990,"v":5.17},{"c":"Finland","y":1991,"v":6.37},{"c":"Finland","y":1992,"v":7.66},{"c":"Finland","y":1993,"v":9.65},{"c":"Finland","y":1994,"v":13.28},{"c":"Finland","y":1995,"v":20.34},{"c":"Finland","y":1996,"v":29.31},{"c":"Finland","y":1997,"v":42.07},{"c":"Finland","y":1998,"v":55.22},{"c":"Finland","y":1999,"v":63.37},{"c":"Finland","y":2000,"v":72.03},{"c":"Finland","y":2001,"v":80.49},{"c":"Finland","y":2002,"v":86.85},{"c":"Finland","y":2003,"v":91.06},{"c":"Finland","y":2004,"v":95.41},{"c":"Finland","y":2005,"v":100.46},{"c":"Finland","y":2006,"v":107.67},{"c":"Finland","y":2007,"v":114.96},{"c":"Finland","y":2008,"v":128.54},{"c":"Finland","y":2009,"v":144.23},{"c":"Finland","y":2010,"v":156.43},{"c":"Finland","y":2011,"v":165.92},{"c":"Finland","y":2012,"v":172.15},{"c":"Finland","y":2013,"v":136.26},{"c":"Finland","y":2014,"v":139.2},{"c":"Finland","y":2015,"v":134.97},{"c":"Finland","y":2016,"v":131.38},{"c":"Finland","y":2017,"v":129.98},{"c":"Finland","y":2018,"v":129.63},{"c":"Finland","y":2019,"v":129.49},{"c":"Finland","y":2020,"v":128.76},{"c":"Finland","y":2021,"v":129.04},{"c":"Finland","y":2022,"v":128.02},{"c":"Finland","y":2023,"v":127.47},{"c":"India","y":1990,"v":0},{"c":"India","y":1991,"v":0},{"c":"India","y":1992,"v":0},{"c":"India","y":1993,"v":0},{"c":"India","y":1994,"v":0},{"c":"India","y":1995,"v":0.01},{"c":"India","y":1996,"v":0.03},{"c":"India","y":1997,"v":0.09},{"c":"India","y":1998,"v":0.12},{"c":"India","y":1999,"v":0.18},{"c":"India","y":2000,"v":0.34},{"c":"India","y":2001,"v":0.61},{"c":"India","y":2002,"v":1.18},{"c":"India","y":2003,"v":3.02},{"c":"India","y":2004,"v":4.6},{"c":"India","y":2005,"v":7.81},{"c":"India","y":2006,"v":14.16},{"c":"India","y":2007,"v":19.62},{"c":"India","y":2008,"v":28.72},{"c":"India","y":2009,"v":42.85},{"c":"India","y":2010,"v":60.49},{"c":"India","y":2011,"v":70.87},{"c":"India","y":2012,"v":67.63},{"c":"India","y":2013,"v":68.4},{"c":"India","y":2014,"v":71.94},{"c":"India","y":2015,"v":75.38},{"c":"India","y":2016,"v":83.92},{"c":"India","y":2017,"v":85.97},{"c":"India","y":2018,"v":85.55},{"c":"India","y":2019,"v":82.9},{"c":"India","y":2020,"v":82.25},{"c":"India","y":2021,"v":81.6},{"c":"India","y":2022,"v":80.18},{"c":"India","y":2023,"v":80.56},{"c":"Italy","y":1990,"v":0.47},{"c":"Italy","y":1991,"v":1},{"c":"Italy","y":1992,"v":1.38},{"c":"Italy","y":1993,"v":2.12},{"c":"Italy","y":1994,"v":3.94},{"c":"Italy","y":1995,"v":6.9},{"c":"Italy","y":1996,"v":11.29},{"c":"Italy","y":1997,"v":20.62},{"c":"Italy","y":1998,"v":35.98},{"c":"Italy","y":1999,"v":53.2},{"c":"Italy","y":2000,"v":73.76},{"c":"Italy","y":2001,"v":89.43},{"c":"Italy","y":2002,"v":94.39},{"c":"Italy","y":2003,"v":98.32},{"c":"Italy","y":2004,"v":107.86},{"c":"Italy","y":2005,"v":122.18},{"c":"Italy","y":2006,"v":136.87},{"c":"Italy","y":2007,"v":151.93},{"c":"Italy","y":2008,"v":151.68},{"c":"Italy","y":2009,"v":150.29},{"c":"Italy","y":2010,"v":155.68},{"c":"Italy","y":2011,"v":159.09},{"c":"Italy","y":2012,"v":160.56},{"c":"Italy","y":2013,"v":159.7},{"c":"Italy","y":2014,"v":148.22},{"c":"Italy","y":2015,"v":144.76},{"c":"Italy","y":2016,"v":142.13},{"c":"Italy","y":2017,"v":138.88},{"c":"Italy","y":2018,"v":138.26},{"c":"Italy","y":2019,"v":132.18},{"c":"Italy","y":2020,"v":129.49},{"c":"Italy","y":2021,"v":130.78},{"c":"Italy","y":2022,"v":131.67},{"c":"Italy","y":2023,"v":131.87},{"c":"Japan","y":1990,"v":0.7},{"c":"Japan","y":1991,"v":1.11},{"c":"Japan","y":1992,"v":1.38},{"c":"Japan","y":1993,"v":1.71},{"c":"Japan","y":1994,"v":3.46},{"c":"Japan","y":1995,"v":9.34},{"c":"Japan","y":1996,"v":21.4},{"c":"Japan","y":1997,"v":30.35},{"c":"Japan","y":1998,"v":37.45},{"c":"Japan","y":1999,"v":44.92},{"c":"Japan","y":2000,"v":52.57},{"c":"Japan","y":2001,"v":58.79},{"c":"Japan","y":2002,"v":63.63},{"c":"Japan","y":2003,"v":67.87},{"c":"Japan","y":2004,"v":71.57},{"c":"Japan","y":2005,"v":75.43},{"c":"Japan","y":2006,"v":77.99},{"c":"Japan","y":2007,"v":83.8},{"c":"Japan","y":2008,"v":86.14},{"c":"Japan","y":2009,"v":90.72},{"c":"Japan","y":2010,"v":96.18},{"c":"Japan","y":2011,"v":103.64},{"c":"Japan","y":2012,"v":110.32},{"c":"Japan","y":2013,"v":115.79},{"c":"Japan","y":2014,"v":123.82},{"c":"Japan","y":2015,"v":126.15},{"c":"Japan","y":2016,"v":131.22},{"c":"Japan","y":2017,"v":135.99},{"c":"Japan","y":2018,"v":141.73},{"c":"Japan","y":2019,"v":147.21},{"c":"Japan","y":2020,"v":154.43},{"c":"Japan","y":2021,"v":159.52},{"c":"Japan","y":2022,"v":168.6},{"c":"Japan","y":2023,"v":178.43},{"c":"Kenya","y":1990,"v":0},{"c":"Kenya","y":1991,"v":0},{"c":"Kenya","y":1992,"v":0},{"c":"Kenya","y":1993,"v":0},{"c":"Kenya","y":1994,"v":0.01},{"c":"Kenya","y":1995,"v":0.01},{"c":"Kenya","y":1996,"v":0.01},{"c":"Kenya","y":1997,"v":0.02},{"c":"Kenya","y":1998,"v":0.04},{"c":"Kenya","y":1999,"v":0.08},{"c":"Kenya","y":2000,"v":0.42},{"c":"Kenya","y":2001,"v":1.9},{"c":"Kenya","y":2002,"v":3.64},{"c":"Kenya","y":2003,"v":4.73},{"c":"Kenya","y":2004,"v":7.33},{"c":"Kenya","y":2005,"v":12.88},{"c":"Kenya","y":2006,"v":19.89},{"c":"Kenya","y":2007,"v":29.84},{"c":"Kenya","y":2008,"v":41.58},{"c":"Kenya","y":2009,"v":47.92},{"c":"Kenya","y":2010,"v":60.02},{"c":"Kenya","y":2011,"v":65.67},{"c":"Kenya","y":2012,"v":70.02},{"c":"Kenya","y":2013,"v":70.75},{"c":"Kenya","y":2014,"v":73.03},{"c":"Kenya","y":2015,"v":80.1},{"c":"Kenya","y":2016,"v":80.98},{"c":"Kenya","y":2017,"v":87.03},{"c":"Kenya","y":2018,"v":98.59},{"c":"Kenya","y":2019,"v":106.55},{"c":"Kenya","y":2020,"v":117.6},{"c":"Kenya","y":2021,"v":122.3},{"c":"Kenya","y":2022,"v":121.17},{"c":"Kenya","y":2023,"v":120.61},{"c":"South Korea","y":1990,"v":0.18},{"c":"South Korea","y":1991,"v":0.37},{"c":"South Korea","y":1992,"v":0.61},{"c":"South Korea","y":1993,"v":1.05},{"c":"South Korea","y":1994,"v":2.13},{"c":"South Korea","y":1995,"v":3.62},{"c":"South Korea","y":1996,"v":6.97},{"c":"South Korea","y":1997,"v":14.97},{"c":"South Korea","y":1998,"v":30.31},{"c":"South Korea","y":1999,"v":50.39},{"c":"South Korea","y":2000,"v":57.34},{"c":"South Korea","y":2001,"v":61.74},{"c":"South Korea","y":2002,"v":68.38},{"c":"South Korea","y":2003,"v":70.7},{"c":"South Korea","y":2004,"v":76.71},{"c":"South Korea","y":2005,"v":80.13},{"c":"South Korea","y":2006,"v":83.73},{"c":"South Korea","y":2007,"v":92.09},{"c":"South Korea","y":2008,"v":94.31},{"c":"South Korea","y":2009,"v":98.76},{"c":"South Korea","y":2010,"v":104.1},{"c":"South Korea","y":2011,"v":106.88},{"c":"South Korea","y":2012,"v":108.12},{"c":"South Korea","y":2013,"v":109.21},{"c":"South Korea","y":2014,"v":113.36},{"c":"South Korea","y":2015,"v":115.6},{"c":"South Korea","y":2016,"v":119.49},{"c":"South Korea","y":2017,"v":123.64},{"c":"South Korea","y":2018,"v":128.5},{"c":"South Korea","y":2019,"v":133.08},{"c":"South Korea","y":2020,"v":135.97},{"c":"South Korea","y":2021,"v":140.52},{"c":"South Korea","y":2022,"v":148.68},{"c":"South Korea","y":2023,"v":162.11}];
+
+    const data = raw.map(d => ({ country: d.c, year: d.y, value: d.v }));
+
+    // Color scheme: distinct, colorblind-friendly palette
+    const colorMap = {
+      "Finland": "#2563eb",
+      "Italy": "#7c3aed",
+      "Japan": "#dc2626",
+      "South Korea": "#ea580c",
+      "China": "#ca8a04",
+      "India": "#16a34a",
+      "Kenya": "#0d9488",
+      "Bangladesh": "#0891b2",
+      "Ethiopia": "#6b7280"
+    };
+
+    const countries = Object.keys(colorMap);
+
+    // Get last data point for each country for direct labels
+    const endpoints = countries.map(c => {
+      const pts = data.filter(d => d.country === c).sort((a, b) => b.year - a.year);
+      return pts[0];
+    });
+
+    const chart = Plot.plot({
+      width: 760,
+      height: 480,
+      marginRight: 100,
+      marginTop: 20,
+      marginBottom: 40,
+      x: {
+        label: "Year",
+        tickFormat: "d",
+        ticks: [1990, 1995, 2000, 2005, 2010, 2015, 2020]
+      },
+      y: {
+        label: "Subscriptions per 100 people",
+        grid: true,
+        domain: [0, 190]
+      },
+      color: {
+        domain: countries,
+        range: countries.map(c => colorMap[c])
+      },
+      marks: [
+        // Reference line at 100 (1 subscription per person)
+        Plot.ruleY([100], { stroke: "#e2e8f0", strokeWidth: 1, strokeDasharray: "4,4" }),
+        Plot.text(["100 per 100 = full penetration"], {
+          x: 1990.5,
+          y: 103,
+          textAnchor: "start",
+          fill: "#94a3b8",
+          fontSize: 9,
+          fontStyle: "italic"
+        }),
+
+        // Lines
+        Plot.line(data, {
+          x: "year",
+          y: "value",
+          stroke: "country",
+          strokeWidth: 2,
+          curve: "natural"
+        }),
+
+        // Direct labels at endpoints
+        Plot.text(endpoints, {
+          x: "year",
+          y: "value",
+          text: d => `${d.country} ${Math.round(d.value)}`,
+          textAnchor: "start",
+          dx: 6,
+          fill: d => colorMap[d.country],
+          fontSize: 10,
+          fontWeight: 600
+        })
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

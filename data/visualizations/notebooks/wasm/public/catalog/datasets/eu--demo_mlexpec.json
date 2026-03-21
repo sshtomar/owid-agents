@@ -1,0 +1,7617 @@
+{
+  "meta": {
+    "id": "eu--demo_mlexpec",
+    "title": "Life Expectancy by Age and Sex",
+    "description": "Life expectancy by age and sex from eurostat",
+    "source": {
+      "provider": "eurostat",
+      "indicatorId": "demo_mlexpec",
+      "indicatorName": "Life expectancy by age and sex",
+      "sourceUrl": "https://ec.europa.eu/eurostat/databrowser/view/demo_mlexpec/default/table",
+      "lastFetched": "2026-03-20T17:04:58.653Z"
+    },
+    "topics": [
+      "health",
+      "demographics"
+    ],
+    "countries": [
+      "BE",
+      "BG",
+      "CZ",
+      "DK",
+      "DE",
+      "EE",
+      "IE",
+      "EL",
+      "ES",
+      "FX",
+      "IT",
+      "LT",
+      "LU",
+      "HU",
+      "NL",
+      "AT",
+      "PL",
+      "PT",
+      "RO",
+      "SI",
+      "SK",
+      "FI",
+      "SE",
+      "IS",
+      "NO",
+      "CH",
+      "CY",
+      "UK",
+      "LI",
+      "MK",
+      "MT",
+      "FR",
+      "RS",
+      "HR",
+      "LV",
+      "ME",
+      "MD",
+      "GE",
+      "UA",
+      "RU",
+      "AM",
+      "AZ",
+      "TR",
+      "BY",
+      "SM",
+      "AL",
+      "XK"
+    ],
+    "dateRange": {
+      "start": "1990",
+      "end": "2024"
+    },
+    "dataPointCount": 1257,
+    "dataFilePath": "datasets/eu--demo_mlexpec.json"
+  },
+  "data": [
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1990,
+      "value": 76.2
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1990,
+      "value": 71.2
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1990,
+      "value": 71.5
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1990,
+      "value": 74.9
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1990,
+      "value": 77.4
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1990,
+      "value": 69.9
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1990,
+      "value": 74.8
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1990,
+      "value": 77.1
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1990,
+      "value": 76.9
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1990,
+      "value": 77
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1990,
+      "value": 77.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1990,
+      "value": 71.5
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1990,
+      "value": 75.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1990,
+      "value": 69.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1990,
+      "value": 77.1
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1990,
+      "value": 75.8
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1990,
+      "value": 70.7
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1990,
+      "value": 74.1
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1990,
+      "value": 69.9
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1990,
+      "value": 73.9
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1990,
+      "value": 71.1
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1990,
+      "value": 75.1
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1990,
+      "value": 77.7
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1990,
+      "value": 78.1
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1990,
+      "value": 76.6
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1990,
+      "value": 77.5
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1991,
+      "value": 76.3
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1991,
+      "value": 71.1
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1991,
+      "value": 72
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1991,
+      "value": 75.3
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1991,
+      "value": 75.7
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1991,
+      "value": 69.8
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1991,
+      "value": 75
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1991,
+      "value": 77.3
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1991,
+      "value": 77.1
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1991,
+      "value": 77.2
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1991,
+      "value": 77.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1991,
+      "value": 70.6
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1991,
+      "value": 75.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1991,
+      "value": 69.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1991,
+      "value": 77.2
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1991,
+      "value": 75.9
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1991,
+      "value": 70.4
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1991,
+      "value": 74.1
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1991,
+      "value": 70.1
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1991,
+      "value": 73.6
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1991,
+      "value": 71.1
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1991,
+      "value": 75.5
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1991,
+      "value": 77.8
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1991,
+      "value": 78
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1991,
+      "value": 77.1
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1991,
+      "value": 77.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1992,
+      "value": 76.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1992,
+      "value": 71.2
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1992,
+      "value": 72.4
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1992,
+      "value": 75.3
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1992,
+      "value": 76.2
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1992,
+      "value": 69.1
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1992,
+      "value": 75.4
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1992,
+      "value": 77.2
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1992,
+      "value": 77.6
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1992,
+      "value": 77.5
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1992,
+      "value": 77.5
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1992,
+      "value": 70.5
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1992,
+      "value": 75.3
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1992,
+      "value": 69.2
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1992,
+      "value": 77.4
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1992,
+      "value": 76.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1992,
+      "value": 71
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1992,
+      "value": 74.7
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1992,
+      "value": 69.5
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1992,
+      "value": 73.7
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1992,
+      "value": 71.5
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1992,
+      "value": 75.7
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1992,
+      "value": 78.2
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1992,
+      "value": 78.8
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1992,
+      "value": 77.3
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1992,
+      "value": 78.1
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1993,
+      "value": 76.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1993,
+      "value": 71.2
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1993,
+      "value": 72.9
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1993,
+      "value": 75.2
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1993,
+      "value": 76.2
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1993,
+      "value": 68.1
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1993,
+      "value": 75.3
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1993,
+      "value": 77.6
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1993,
+      "value": 77.7
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1993,
+      "value": 77.5
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1993,
+      "value": 77.8
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1993,
+      "value": 77.2
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1993,
+      "value": 69
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1993,
+      "value": 76
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1993,
+      "value": 69.2
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1993,
+      "value": 77.1
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1993,
+      "value": 76.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1993,
+      "value": 71.5
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1993,
+      "value": 74.6
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1993,
+      "value": 69.5
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1993,
+      "value": 73.6
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1993,
+      "value": 72
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1993,
+      "value": 75.9
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1993,
+      "value": 78.2
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1993,
+      "value": 79
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1993,
+      "value": 77.2
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1993,
+      "value": 78.4
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1993,
+      "value": 76.2
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1994,
+      "value": 76.8
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1994,
+      "value": 70.9
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1994,
+      "value": 73.2
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1994,
+      "value": 75.5
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1994,
+      "value": 76.6
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1994,
+      "value": 66.6
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1994,
+      "value": 75.8
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1994,
+      "value": 77.8
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1994,
+      "value": 78
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1994,
+      "value": 78
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1994,
+      "value": 78
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1994,
+      "value": 77.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1994,
+      "value": 68.6
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1994,
+      "value": 76.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1994,
+      "value": 69.6
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1994,
+      "value": 77.6
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1994,
+      "value": 76.7
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1994,
+      "value": 71.8
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1994,
+      "value": 75.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1994,
+      "value": 69.4
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1994,
+      "value": 74
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1994,
+      "value": 72.5
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1994,
+      "value": 76.7
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1994,
+      "value": 78.9
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1994,
+      "value": 79.3
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 1994,
+      "value": 78.7
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1994,
+      "value": 77.9
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1994,
+      "value": 78.7
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1994,
+      "value": 76.8
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 1994,
+      "value": 71.7
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1995,
+      "value": 77
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1995,
+      "value": 71
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1995,
+      "value": 73.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1995,
+      "value": 75.3
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1995,
+      "value": 76.7
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1995,
+      "value": 67.7
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1995,
+      "value": 75.5
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1995,
+      "value": 77.8
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1995,
+      "value": 78.1
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1995,
+      "value": 78.1
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1995,
+      "value": 78.3
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1995,
+      "value": 77.4
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1995,
+      "value": 69.1
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1995,
+      "value": 76.8
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1995,
+      "value": 70
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 1995,
+      "value": 77.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1995,
+      "value": 77.6
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1995,
+      "value": 76.9
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1995,
+      "value": 72
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1995,
+      "value": 75.4
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1995,
+      "value": 69.3
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1995,
+      "value": 74.7
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1995,
+      "value": 72.4
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1995,
+      "value": 76.7
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1995,
+      "value": 79
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1995,
+      "value": 78
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 1995,
+      "value": 77.5
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1995,
+      "value": 77.9
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1995,
+      "value": 78.7
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1995,
+      "value": 76.7
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 1995,
+      "value": 71.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1996,
+      "value": 77.3
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1996,
+      "value": 70.8
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1996,
+      "value": 74
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1996,
+      "value": 75.7
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1996,
+      "value": 77
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1996,
+      "value": 69.9
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1996,
+      "value": 75.8
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1996,
+      "value": 77.9
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1996,
+      "value": 78.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1996,
+      "value": 78.2
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1996,
+      "value": 78.7
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1996,
+      "value": 77.7
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1996,
+      "value": 70.3
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1996,
+      "value": 76.8
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1996,
+      "value": 70.6
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 1996,
+      "value": 77.5
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1996,
+      "value": 77.6
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1996,
+      "value": 77.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1996,
+      "value": 72.3
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1996,
+      "value": 75.3
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1996,
+      "value": 68.8
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1996,
+      "value": 75.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1996,
+      "value": 72.9
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1996,
+      "value": 77
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1996,
+      "value": 79.2
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1996,
+      "value": 78.8
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 1996,
+      "value": 76.8
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1996,
+      "value": 78.3
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1996,
+      "value": 79.2
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1996,
+      "value": 77
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 1996,
+      "value": 72.5
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1997,
+      "value": 77.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1997,
+      "value": 70.3
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1997,
+      "value": 74.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1997,
+      "value": 76.1
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1997,
+      "value": 77.4
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1997,
+      "value": 70.1
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1997,
+      "value": 76
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1997,
+      "value": 78.4
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1997,
+      "value": 78.8
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1997,
+      "value": 78.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1997,
+      "value": 79
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1997,
+      "value": 77.4
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1997,
+      "value": 71.1
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1997,
+      "value": 77.1
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1997,
+      "value": 71.1
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 1997,
+      "value": 77.8
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1997,
+      "value": 78
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1997,
+      "value": 77.5
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1997,
+      "value": 72.7
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1997,
+      "value": 75.8
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1997,
+      "value": 69.1
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1997,
+      "value": 75.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1997,
+      "value": 72.9
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1997,
+      "value": 77.2
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1997,
+      "value": 79.4
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1997,
+      "value": 78.9
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 1997,
+      "value": 76.2
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1997,
+      "value": 78.3
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1997,
+      "value": 79.4
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1997,
+      "value": 77.2
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 1997,
+      "value": 72.5
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1998,
+      "value": 77.6
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1998,
+      "value": 70.9
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1998,
+      "value": 74.7
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1998,
+      "value": 76.5
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1998,
+      "value": 77.8
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1998,
+      "value": 69.7
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1998,
+      "value": 76.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1998,
+      "value": 78.3
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1998,
+      "value": 78.8
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 1998,
+      "value": 78.7
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1998,
+      "value": 78.8
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1998,
+      "value": 79.1
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1998,
+      "value": 77.2
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1998,
+      "value": 71.4
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1998,
+      "value": 77.3
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1998,
+      "value": 71
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 1998,
+      "value": 77.7
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1998,
+      "value": 78.1
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1998,
+      "value": 77.9
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1998,
+      "value": 73.1
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1998,
+      "value": 76
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1998,
+      "value": 69.9
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1998,
+      "value": 75.3
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1998,
+      "value": 72.8
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1998,
+      "value": 77.4
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1998,
+      "value": 79.5
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1998,
+      "value": 79.7
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 1998,
+      "value": 77.9
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1998,
+      "value": 78.5
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1998,
+      "value": 79.6
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1998,
+      "value": 77.4
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 1998,
+      "value": 72.3
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 1999,
+      "value": 77.7
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 1999,
+      "value": 71.6
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 1999,
+      "value": 74.9
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 1999,
+      "value": 76.6
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 1999,
+      "value": 78
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 1999,
+      "value": 70.6
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 1999,
+      "value": 76.1
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 1999,
+      "value": 78.5
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 1999,
+      "value": 78.8
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 1999,
+      "value": 78.9
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 1999,
+      "value": 78.9
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 1999,
+      "value": 79.6
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 1999,
+      "value": 78
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 1999,
+      "value": 71.8
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 1999,
+      "value": 78
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 1999,
+      "value": 71.1
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 1999,
+      "value": 77.6
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 1999,
+      "value": 78
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 1999,
+      "value": 78.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 1999,
+      "value": 73.1
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 1999,
+      "value": 76.2
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 1999,
+      "value": 70.6
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 1999,
+      "value": 75.7
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 1999,
+      "value": 73.2
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 1999,
+      "value": 77.6
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 1999,
+      "value": 79.6
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 1999,
+      "value": 79.4
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 1999,
+      "value": 79.3
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 1999,
+      "value": 78.4
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 1999,
+      "value": 79.9
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 1999,
+      "value": 77.5
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 1999,
+      "value": 72.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2000,
+      "value": 77.9
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2000,
+      "value": 71.6
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2000,
+      "value": 75.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2000,
+      "value": 76.9
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2000,
+      "value": 78.3
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2000,
+      "value": 71.1
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2000,
+      "value": 76.6
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2000,
+      "value": 78.6
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2000,
+      "value": 79.3
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2000,
+      "value": 79.2
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2000,
+      "value": 79.2
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2000,
+      "value": 79.9
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2000,
+      "value": 77.7
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2000,
+      "value": 72.1
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2000,
+      "value": 78
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2000,
+      "value": 71.9
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2000,
+      "value": 78.5
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2000,
+      "value": 78.2
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2000,
+      "value": 78.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2000,
+      "value": 73.8
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2000,
+      "value": 76.8
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2000,
+      "value": 71.2
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2000,
+      "value": 76.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2000,
+      "value": 73.3
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2000,
+      "value": 77.8
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2000,
+      "value": 79.8
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2000,
+      "value": 79.7
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2000,
+      "value": 77
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2000,
+      "value": 78.8
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2000,
+      "value": 80
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2000,
+      "value": 78
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2000,
+      "value": 73
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2000,
+      "value": 71.6
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2001,
+      "value": 78.1
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2001,
+      "value": 71.9
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2001,
+      "value": 75.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2001,
+      "value": 77
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2001,
+      "value": 78.6
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2001,
+      "value": 70.9
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2001,
+      "value": 77.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2001,
+      "value": 79.1
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2001,
+      "value": 79.8
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2001,
+      "value": 79.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2001,
+      "value": 79.3
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2001,
+      "value": 74.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2001,
+      "value": 80.3
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2001,
+      "value": 79
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2001,
+      "value": 71.6
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2001,
+      "value": 78
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2001,
+      "value": 72.5
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2001,
+      "value": 78.9
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2001,
+      "value": 78.4
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2001,
+      "value": 78.8
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2001,
+      "value": 74.2
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2001,
+      "value": 77.2
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2001,
+      "value": 71.1
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2001,
+      "value": 76.4
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2001,
+      "value": 73.6
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2001,
+      "value": 78.2
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2001,
+      "value": 79.9
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2001,
+      "value": 80.7
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2001,
+      "value": 79.3
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2001,
+      "value": 79
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2001,
+      "value": 80.5
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2001,
+      "value": 78.2
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2001,
+      "value": 73.4
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2001,
+      "value": 72.3
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2002,
+      "value": 78.2
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2002,
+      "value": 72.1
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2002,
+      "value": 75.4
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2002,
+      "value": 77.1
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2002,
+      "value": 78.6
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2002,
+      "value": 71.4
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2002,
+      "value": 77.7
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2002,
+      "value": 79.2
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2002,
+      "value": 79.8
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2002,
+      "value": 79.4
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2002,
+      "value": 79.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2002,
+      "value": 74.7
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2002,
+      "value": 80.4
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2002,
+      "value": 78.7
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2002,
+      "value": 70.2
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2002,
+      "value": 71.8
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2002,
+      "value": 78.1
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2002,
+      "value": 72.6
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2002,
+      "value": 78.8
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2002,
+      "value": 78.5
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2002,
+      "value": 78.9
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2002,
+      "value": 74.5
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2002,
+      "value": 77.4
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2002,
+      "value": 70.9
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2002,
+      "value": 76.6
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2002,
+      "value": 73.8
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2002,
+      "value": 78.3
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2002,
+      "value": 80
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2002,
+      "value": 80.6
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2002,
+      "value": 79.8
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2002,
+      "value": 79
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2002,
+      "value": 80.6
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2002,
+      "value": 78.3
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2002,
+      "value": 73
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2002,
+      "value": 72.3
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2003,
+      "value": 78.3
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2003,
+      "value": 72.3
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2003,
+      "value": 75.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2003,
+      "value": 77.4
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2003,
+      "value": 78.6
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2003,
+      "value": 71.9
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2003,
+      "value": 78.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2003,
+      "value": 79.3
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2003,
+      "value": 79.7
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2003,
+      "value": 79.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2003,
+      "value": 79.3
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2003,
+      "value": 74.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2003,
+      "value": 80.1
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2003,
+      "value": 79
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2003,
+      "value": 70.6
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2003,
+      "value": 72
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2003,
+      "value": 77.9
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2003,
+      "value": 72.6
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2003,
+      "value": 78.7
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2003,
+      "value": 78.7
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2003,
+      "value": 78.8
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2003,
+      "value": 74.7
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2003,
+      "value": 77.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2003,
+      "value": 71
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2003,
+      "value": 76.4
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2003,
+      "value": 73.8
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2003,
+      "value": 78.6
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2003,
+      "value": 80.3
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2003,
+      "value": 81
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2003,
+      "value": 80.1
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2003,
+      "value": 79.6
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2003,
+      "value": 80.7
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2003,
+      "value": 78.4
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2003,
+      "value": 73.2
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2003,
+      "value": 72.5
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2004,
+      "value": 79
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2004,
+      "value": 72.5
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2004,
+      "value": 75.9
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2004,
+      "value": 77.8
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2004,
+      "value": 79.3
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2004,
+      "value": 72.4
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2004,
+      "value": 78.6
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2004,
+      "value": 79.4
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2004,
+      "value": 80.4
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2004,
+      "value": 80.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2004,
+      "value": 80.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2004,
+      "value": 75.4
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2004,
+      "value": 80.9
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2004,
+      "value": 79.1
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2004,
+      "value": 70.9
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2004,
+      "value": 72
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2004,
+      "value": 79.2
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2004,
+      "value": 73
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2004,
+      "value": 79.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2004,
+      "value": 79.3
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2004,
+      "value": 79.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2004,
+      "value": 74.9
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2004,
+      "value": 78.4
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2004,
+      "value": 71.4
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2004,
+      "value": 77.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2004,
+      "value": 74.2
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2004,
+      "value": 79
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2004,
+      "value": 80.7
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2004,
+      "value": 81.1
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2004,
+      "value": 82
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2004,
+      "value": 80.1
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2004,
+      "value": 81.3
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2004,
+      "value": 79
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2004,
+      "value": 73.6
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2004,
+      "value": 72.7
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2005,
+      "value": 79.1
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2005,
+      "value": 72.5
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2005,
+      "value": 76.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2005,
+      "value": 78.3
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2005,
+      "value": 79.4
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2005,
+      "value": 73
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2005,
+      "value": 79
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2005,
+      "value": 79.6
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2005,
+      "value": 80.3
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2005,
+      "value": 80.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2005,
+      "value": 80.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2005,
+      "value": 75.3
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2005,
+      "value": 80.9
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2005,
+      "value": 78.7
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2005,
+      "value": 70.6
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2005,
+      "value": 71.2
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2005,
+      "value": 79.6
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2005,
+      "value": 73
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2005,
+      "value": 79.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2005,
+      "value": 79.6
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2005,
+      "value": 79.5
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2005,
+      "value": 75
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2005,
+      "value": 78.2
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2005,
+      "value": 71.9
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2005,
+      "value": 77.5
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2005,
+      "value": 74.1
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2005,
+      "value": 79.1
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2005,
+      "value": 80.7
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2005,
+      "value": 81.5
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2005,
+      "value": 80.7
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2005,
+      "value": 80.3
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2005,
+      "value": 81.5
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2005,
+      "value": 79.2
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2005,
+      "value": 74
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2005,
+      "value": 73.7
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2005,
+      "value": 72.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2006,
+      "value": 79.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2006,
+      "value": 72.7
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2006,
+      "value": 76.7
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2006,
+      "value": 78.4
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2006,
+      "value": 79.9
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2006,
+      "value": 73.2
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2006,
+      "value": 79.3
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2006,
+      "value": 79.9
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2006,
+      "value": 81.1
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2006,
+      "value": 80.9
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2006,
+      "value": 81
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2006,
+      "value": 75.9
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2006,
+      "value": 81.4
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2006,
+      "value": 80.1
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2006,
+      "value": 70.6
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2006,
+      "value": 71
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2006,
+      "value": 79.4
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2006,
+      "value": 73.5
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2006,
+      "value": 79.5
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2006,
+      "value": 80
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2006,
+      "value": 80.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2006,
+      "value": 75.3
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2006,
+      "value": 79
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2006,
+      "value": 72.5
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2006,
+      "value": 78.3
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2006,
+      "value": 74.5
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2006,
+      "value": 79.5
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2006,
+      "value": 81
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2006,
+      "value": 81.2
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2006,
+      "value": 81
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2006,
+      "value": 80.6
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2006,
+      "value": 81.8
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2006,
+      "value": 79.5
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2006,
+      "value": 73.9
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2006,
+      "value": 68.5
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2006,
+      "value": 73.9
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2006,
+      "value": 74.2
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2006,
+      "value": 73.4
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2006,
+      "value": 67.9
+    },
+    {
+      "country": "RU",
+      "countryName": "Russia",
+      "year": 2006,
+      "value": 66.6
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2006,
+      "value": 72.9
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2006,
+      "value": 72.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2007,
+      "value": 79.9
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2007,
+      "value": 73
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2007,
+      "value": 77
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2007,
+      "value": 78.4
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2007,
+      "value": 80.1
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2007,
+      "value": 73.2
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2007,
+      "value": 79.7
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2007,
+      "value": 79.7
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2007,
+      "value": 81.1
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2007,
+      "value": 81.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2007,
+      "value": 81.3
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2007,
+      "value": 75.8
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2007,
+      "value": 81.6
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2007,
+      "value": 79.8
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2007,
+      "value": 70.8
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2007,
+      "value": 70.7
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2007,
+      "value": 79.5
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2007,
+      "value": 73.6
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2007,
+      "value": 79.9
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2007,
+      "value": 80.4
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2007,
+      "value": 80.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2007,
+      "value": 75.4
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2007,
+      "value": 79.3
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2007,
+      "value": 73.1
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2007,
+      "value": 78.4
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2007,
+      "value": 74.6
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2007,
+      "value": 79.6
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2007,
+      "value": 81.1
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2007,
+      "value": 81.5
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2007,
+      "value": 81.4
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2007,
+      "value": 80.6
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2007,
+      "value": 82
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2007,
+      "value": 79.7
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2007,
+      "value": 74.4
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2007,
+      "value": 68.9
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2007,
+      "value": 73.8
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2007,
+      "value": 74.9
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2007,
+      "value": 73.7
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2007,
+      "value": 67.6
+    },
+    {
+      "country": "RU",
+      "countryName": "Russia",
+      "year": 2007,
+      "value": 67.5
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2007,
+      "value": 73.6
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2007,
+      "value": 72.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2008,
+      "value": 79.8
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2008,
+      "value": 73.3
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2008,
+      "value": 77.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2008,
+      "value": 78.8
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2008,
+      "value": 80.2
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2008,
+      "value": 74.4
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2008,
+      "value": 80.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2008,
+      "value": 80.2
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2008,
+      "value": 81.5
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2008,
+      "value": 81.4
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2008,
+      "value": 81.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2008,
+      "value": 76
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2008,
+      "value": 81.7
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2008,
+      "value": 80.6
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2008,
+      "value": 72.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2008,
+      "value": 71.7
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2008,
+      "value": 80.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2008,
+      "value": 74.2
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2008,
+      "value": 79.7
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2008,
+      "value": 80.5
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2008,
+      "value": 80.6
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2008,
+      "value": 75.6
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2008,
+      "value": 79.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2008,
+      "value": 73.5
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2008,
+      "value": 79.1
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2008,
+      "value": 74.9
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2008,
+      "value": 79.9
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2008,
+      "value": 81.3
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2008,
+      "value": 81.6
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2008,
+      "value": 82.9
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2008,
+      "value": 80.8
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2008,
+      "value": 82.3
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2008,
+      "value": 79.8
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2008,
+      "value": 75.2
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2008,
+      "value": 69.3
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2008,
+      "value": 74.4
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2008,
+      "value": 74
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2008,
+      "value": 73.9
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2008,
+      "value": 68
+    },
+    {
+      "country": "RU",
+      "countryName": "Russia",
+      "year": 2008,
+      "value": 67.9
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2008,
+      "value": 73.6
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2008,
+      "value": 73.6
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2009,
+      "value": 80.2
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2009,
+      "value": 73.7
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2009,
+      "value": 77.4
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2009,
+      "value": 79
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2009,
+      "value": 80.3
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2009,
+      "value": 75.3
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2009,
+      "value": 80.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2009,
+      "value": 80.4
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2009,
+      "value": 81.9
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2009,
+      "value": 81.5
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2009,
+      "value": 81.6
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2009,
+      "value": 76.3
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2009,
+      "value": 81.8
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2009,
+      "value": 81
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2009,
+      "value": 72.8
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2009,
+      "value": 72.9
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2009,
+      "value": 80.8
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2009,
+      "value": 74.4
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2009,
+      "value": 80.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2009,
+      "value": 80.9
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2009,
+      "value": 80.5
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2009,
+      "value": 75.9
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2009,
+      "value": 79.7
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2009,
+      "value": 73.7
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2009,
+      "value": 79.4
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2009,
+      "value": 75.3
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2009,
+      "value": 80.1
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2009,
+      "value": 81.5
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2009,
+      "value": 81.8
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2009,
+      "value": 81.7
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2009,
+      "value": 81
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2009,
+      "value": 82.3
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2009,
+      "value": 80.4
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2009,
+      "value": 75.2
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2009,
+      "value": 69.4
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2009,
+      "value": 74.4
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2009,
+      "value": 73.3
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2009,
+      "value": 74
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2009,
+      "value": 76
+    },
+    {
+      "country": "RU",
+      "countryName": "Russia",
+      "year": 2009,
+      "value": 68.7
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2009,
+      "value": 73.7
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2009,
+      "value": 73.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2010,
+      "value": 80.3
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2010,
+      "value": 73.8
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2010,
+      "value": 77.7
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2010,
+      "value": 79.3
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2010,
+      "value": 80.5
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2010,
+      "value": 76
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2010,
+      "value": 80.8
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2010,
+      "value": 80.6
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2010,
+      "value": 82.4
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2010,
+      "value": 81.8
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2010,
+      "value": 81.9
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2010,
+      "value": 76.7
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2010,
+      "value": 82.2
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2010,
+      "value": 81.5
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2010,
+      "value": 73.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2010,
+      "value": 73.3
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2010,
+      "value": 80.8
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2010,
+      "value": 74.7
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2010,
+      "value": 81.5
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2010,
+      "value": 81
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2010,
+      "value": 80.7
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2010,
+      "value": 76.4
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2010,
+      "value": 80.1
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2010,
+      "value": 73.7
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2010,
+      "value": 79.8
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2010,
+      "value": 75.6
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2010,
+      "value": 80.2
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2010,
+      "value": 81.6
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2010,
+      "value": 81.9
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2010,
+      "value": 81.8
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2010,
+      "value": 81.2
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2010,
+      "value": 82.7
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2010,
+      "value": 80.6
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2010,
+      "value": 76.1
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2010,
+      "value": 69.1
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2010,
+      "value": 75
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2010,
+      "value": 74.5
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2010,
+      "value": 74.4
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2010,
+      "value": 76.8
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2010,
+      "value": 70.3
+    },
+    {
+      "country": "RU",
+      "countryName": "Russia",
+      "year": 2010,
+      "value": 68.9
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2010,
+      "value": 73.6
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2011,
+      "value": 80.7
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2011,
+      "value": 74.2
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2011,
+      "value": 78
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2011,
+      "value": 79.9
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2011,
+      "value": 80.6
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2011,
+      "value": 76.6
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2011,
+      "value": 80.9
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2011,
+      "value": 80.8
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2011,
+      "value": 82.6
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2011,
+      "value": 82.3
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2011,
+      "value": 82.3
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2011,
+      "value": 77.2
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2011,
+      "value": 82.4
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2011,
+      "value": 81.2
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2011,
+      "value": 73.9
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2011,
+      "value": 73.7
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2011,
+      "value": 81.1
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2011,
+      "value": 75.1
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2011,
+      "value": 80.9
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2011,
+      "value": 81.3
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2011,
+      "value": 81.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2011,
+      "value": 76.8
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2011,
+      "value": 80.7
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2011,
+      "value": 74.4
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2011,
+      "value": 80.1
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2011,
+      "value": 76.1
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2011,
+      "value": 80.6
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2011,
+      "value": 81.9
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2011,
+      "value": 82.4
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2011,
+      "value": 81.9
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2011,
+      "value": 81.4
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2011,
+      "value": 82.8
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2011,
+      "value": 81
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2011,
+      "value": 76.1
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2011,
+      "value": 71
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2011,
+      "value": 75.1
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2011,
+      "value": 74.5
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2011,
+      "value": 74.6
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2011,
+      "value": 77.1
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2011,
+      "value": 71.1
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2011,
+      "value": 70.7
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2012,
+      "value": 80.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2012,
+      "value": 74.4
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2012,
+      "value": 78.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2012,
+      "value": 80.2
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2012,
+      "value": 80.7
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2012,
+      "value": 76.7
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2012,
+      "value": 80.9
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2012,
+      "value": 80.7
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2012,
+      "value": 82.5
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2012,
+      "value": 82.1
+    },
+    {
+      "country": "FX",
+      "countryName": "Metropolitan France",
+      "year": 2012,
+      "value": 82.1
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2012,
+      "value": 77.3
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2012,
+      "value": 82.4
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2012,
+      "value": 81.1
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2012,
+      "value": 74.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2012,
+      "value": 74.1
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2012,
+      "value": 81.5
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2012,
+      "value": 75.3
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2012,
+      "value": 81.2
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2012,
+      "value": 81.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2012,
+      "value": 76.9
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2012,
+      "value": 80.6
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2012,
+      "value": 74.4
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2012,
+      "value": 80.3
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2012,
+      "value": 76.3
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2012,
+      "value": 80.7
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2012,
+      "value": 81.8
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2012,
+      "value": 83
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2012,
+      "value": 82.5
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2012,
+      "value": 81.5
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2012,
+      "value": 82.8
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2012,
+      "value": 81
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2012,
+      "value": 76.3
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2012,
+      "value": 71
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2012,
+      "value": 74.9
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2012,
+      "value": 74.9
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2012,
+      "value": 77.6
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2012,
+      "value": 71.2
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2012,
+      "value": 72.3
+    },
+    {
+      "country": "SM",
+      "countryName": "San Marino",
+      "year": 2012,
+      "value": 85.6
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2012,
+      "value": 74.1
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2013,
+      "value": 80.7
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2013,
+      "value": 74.9
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2013,
+      "value": 78.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2013,
+      "value": 80.4
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2013,
+      "value": 80.6
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2013,
+      "value": 77.5
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2013,
+      "value": 81
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2013,
+      "value": 81.4
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2013,
+      "value": 83.2
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2013,
+      "value": 82.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2013,
+      "value": 77.8
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2013,
+      "value": 82.9
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2013,
+      "value": 82.5
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2013,
+      "value": 74.3
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2013,
+      "value": 74.1
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2013,
+      "value": 81.9
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2013,
+      "value": 75.8
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2013,
+      "value": 81.8
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2013,
+      "value": 81.4
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2013,
+      "value": 81.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2013,
+      "value": 77.1
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2013,
+      "value": 80.9
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2013,
+      "value": 75.1
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2013,
+      "value": 80.5
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2013,
+      "value": 76.6
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2013,
+      "value": 81.1
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2013,
+      "value": 82
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2013,
+      "value": 82.1
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2013,
+      "value": 82.5
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2013,
+      "value": 81.8
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2013,
+      "value": 82.9
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2013,
+      "value": 81.1
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2013,
+      "value": 76.5
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2013,
+      "value": 75.5
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2013,
+      "value": 77.9
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2013,
+      "value": 75.3
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2013,
+      "value": 78.2
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2013,
+      "value": 72.7
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2013,
+      "value": 74.7
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2014,
+      "value": 81.4
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2014,
+      "value": 74.5
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2014,
+      "value": 78.9
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2014,
+      "value": 80.7
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2014,
+      "value": 81.2
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2014,
+      "value": 77.4
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2014,
+      "value": 81.4
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2014,
+      "value": 81.5
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2014,
+      "value": 83.3
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2014,
+      "value": 82.9
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2014,
+      "value": 77.9
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2014,
+      "value": 83.2
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2014,
+      "value": 82.3
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2014,
+      "value": 74.5
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2014,
+      "value": 74.7
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2014,
+      "value": 82.3
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2014,
+      "value": 76
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2014,
+      "value": 82
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2014,
+      "value": 81.8
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2014,
+      "value": 81.6
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2014,
+      "value": 77.8
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2014,
+      "value": 81.3
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2014,
+      "value": 75
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2014,
+      "value": 81.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2014,
+      "value": 77
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2014,
+      "value": 81.3
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2014,
+      "value": 82.3
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2014,
+      "value": 82.9
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2014,
+      "value": 82.1
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2014,
+      "value": 82.2
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2014,
+      "value": 83.3
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2014,
+      "value": 81.4
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2014,
+      "value": 76.5
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2014,
+      "value": 75.5
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2014,
+      "value": 74.1
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2014,
+      "value": 78.2
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2014,
+      "value": 75.4
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2014,
+      "value": 78.1
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2014,
+      "value": 71.8
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2014,
+      "value": 73.3
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2014,
+      "value": 74.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2015,
+      "value": 81.1
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2015,
+      "value": 74.7
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2015,
+      "value": 78.7
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2015,
+      "value": 80.8
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2015,
+      "value": 80.7
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2015,
+      "value": 78
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2015,
+      "value": 81.5
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2015,
+      "value": 81.1
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2015,
+      "value": 83
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2015,
+      "value": 82.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2015,
+      "value": 77.5
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2015,
+      "value": 82.7
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2015,
+      "value": 81.8
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2015,
+      "value": 74.8
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2015,
+      "value": 74.6
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2015,
+      "value": 82.4
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2015,
+      "value": 75.7
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2015,
+      "value": 81.9
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2015,
+      "value": 81.6
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2015,
+      "value": 81.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2015,
+      "value": 77.5
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2015,
+      "value": 81.3
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2015,
+      "value": 74.9
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2015,
+      "value": 80.9
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2015,
+      "value": 76.7
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2015,
+      "value": 81.6
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2015,
+      "value": 82.2
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2015,
+      "value": 82.5
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2015,
+      "value": 82.7
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2015,
+      "value": 82.4
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2015,
+      "value": 83
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2015,
+      "value": 81
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2015,
+      "value": 76.5
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2015,
+      "value": 75.5
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2015,
+      "value": 73
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2015,
+      "value": 77.9
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2015,
+      "value": 75.3
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2015,
+      "value": 78.2
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2015,
+      "value": 72.5
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2015,
+      "value": 74
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2015,
+      "value": 75.1
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2015,
+      "value": 75.3
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2016,
+      "value": 81.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2016,
+      "value": 74.9
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2016,
+      "value": 79.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2016,
+      "value": 80.9
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2016,
+      "value": 81
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2016,
+      "value": 78
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2016,
+      "value": 81.7
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2016,
+      "value": 81.5
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2016,
+      "value": 83.5
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2016,
+      "value": 82.7
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2016,
+      "value": 78.2
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2016,
+      "value": 83.4
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2016,
+      "value": 82.7
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2016,
+      "value": 74.9
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2016,
+      "value": 74.9
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2016,
+      "value": 82.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2016,
+      "value": 76.2
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2016,
+      "value": 82.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2016,
+      "value": 81.7
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2016,
+      "value": 81.8
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2016,
+      "value": 78
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2016,
+      "value": 81.3
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2016,
+      "value": 75.2
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2016,
+      "value": 81.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2016,
+      "value": 77.3
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2016,
+      "value": 81.5
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2016,
+      "value": 82.4
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2016,
+      "value": 82.2
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2016,
+      "value": 82.3
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2016,
+      "value": 82.5
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2016,
+      "value": 83.7
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2016,
+      "value": 81.2
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2016,
+      "value": 76.5
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2016,
+      "value": 75.4
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2016,
+      "value": 72.7
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2016,
+      "value": 78.5
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2016,
+      "value": 75.7
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2016,
+      "value": 78.1
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2016,
+      "value": 72.9
+    },
+    {
+      "country": "XK",
+      "countryName": "Kosovo*",
+      "year": 2016,
+      "value": 78.6
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2016,
+      "value": 74.2
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2016,
+      "value": 75.1
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2017,
+      "value": 81.6
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2017,
+      "value": 74.8
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2017,
+      "value": 79.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2017,
+      "value": 81.1
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2017,
+      "value": 81.1
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2017,
+      "value": 78.4
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2017,
+      "value": 82.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2017,
+      "value": 81.4
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2017,
+      "value": 83.4
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2017,
+      "value": 82.7
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2017,
+      "value": 78
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2017,
+      "value": 83.1
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2017,
+      "value": 82.2
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2017,
+      "value": 74.9
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2017,
+      "value": 75.8
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2017,
+      "value": 82.1
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2017,
+      "value": 76
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2017,
+      "value": 82.3
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2017,
+      "value": 81.8
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2017,
+      "value": 81.7
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2017,
+      "value": 77.8
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2017,
+      "value": 81.6
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2017,
+      "value": 75.2
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2017,
+      "value": 81.2
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2017,
+      "value": 77.3
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2017,
+      "value": 81.7
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2017,
+      "value": 82.5
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2017,
+      "value": 82.6
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2017,
+      "value": 83.7
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2017,
+      "value": 82.7
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2017,
+      "value": 83.7
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2017,
+      "value": 81.3
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2017,
+      "value": 76.6
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2017,
+      "value": 76
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2017,
+      "value": 73.5
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2017,
+      "value": 78.5
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2017,
+      "value": 75.6
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2017,
+      "value": 78.5
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2017,
+      "value": 73.3
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2017,
+      "value": 74.5
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2017,
+      "value": 75.8
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2017,
+      "value": 75.6
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2018,
+      "value": 81.7
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2018,
+      "value": 75
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2018,
+      "value": 79.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2018,
+      "value": 81
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2018,
+      "value": 81
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2018,
+      "value": 78.5
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2018,
+      "value": 82.2
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2018,
+      "value": 81.9
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2018,
+      "value": 83.5
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2018,
+      "value": 82.8
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2018,
+      "value": 78.2
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2018,
+      "value": 83.4
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2018,
+      "value": 82.9
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2018,
+      "value": 75.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2018,
+      "value": 76
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2018,
+      "value": 82.3
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2018,
+      "value": 76.2
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2018,
+      "value": 82.3
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2018,
+      "value": 81.9
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2018,
+      "value": 81.8
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2018,
+      "value": 77.7
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2018,
+      "value": 81.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2018,
+      "value": 75.3
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2018,
+      "value": 81.5
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2018,
+      "value": 77.4
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2018,
+      "value": 81.8
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2018,
+      "value": 82.6
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2018,
+      "value": 82.9
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2018,
+      "value": 83.1
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2018,
+      "value": 82.8
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2018,
+      "value": 83.8
+    },
+    {
+      "country": "UK",
+      "countryName": "United Kingdom",
+      "year": 2018,
+      "value": 81.3
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2018,
+      "value": 76.9
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2018,
+      "value": 76.7
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2018,
+      "value": 74
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2018,
+      "value": 78.9
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2018,
+      "value": 75.9
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2018,
+      "value": 78.9
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2018,
+      "value": 73.2
+    },
+    {
+      "country": "BY",
+      "countryName": "Belarus",
+      "year": 2018,
+      "value": 74.5
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2018,
+      "value": 76.7
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2018,
+      "value": 76
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2019,
+      "value": 82.1
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2019,
+      "value": 75.1
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2019,
+      "value": 79.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2019,
+      "value": 81.5
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2019,
+      "value": 81.3
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2019,
+      "value": 79
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2019,
+      "value": 82.8
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2019,
+      "value": 81.7
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2019,
+      "value": 84
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2019,
+      "value": 83
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2019,
+      "value": 78.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2019,
+      "value": 83.6
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2019,
+      "value": 82.3
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2019,
+      "value": 75.7
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2019,
+      "value": 76.5
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2019,
+      "value": 82.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2019,
+      "value": 76.5
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2019,
+      "value": 82.7
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2019,
+      "value": 82.2
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2019,
+      "value": 82
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2019,
+      "value": 78
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2019,
+      "value": 81.9
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2019,
+      "value": 75.6
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2019,
+      "value": 81.6
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2019,
+      "value": 77.8
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2019,
+      "value": 82.1
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2019,
+      "value": 83.2
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2019,
+      "value": 83.2
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2019,
+      "value": 84.3
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2019,
+      "value": 83
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2019,
+      "value": 84
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2019,
+      "value": 76.7
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2019,
+      "value": 76.6
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2019,
+      "value": 74.1
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2019,
+      "value": 79.1
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2019,
+      "value": 76
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2019,
+      "value": 79.1
+    },
+    {
+      "country": "UA",
+      "countryName": "Ukraine",
+      "year": 2019,
+      "value": 73.4
+    },
+    {
+      "country": "AM",
+      "countryName": "Armenia",
+      "year": 2019,
+      "value": 76.6
+    },
+    {
+      "country": "AZ",
+      "countryName": "Azerbaijan",
+      "year": 2019,
+      "value": 76.6
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2020,
+      "value": 80.8
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2020,
+      "value": 73.3
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2020,
+      "value": 78.3
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2020,
+      "value": 81.6
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2020,
+      "value": 81.1
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2020,
+      "value": 78.9
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2020,
+      "value": 82.5
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2020,
+      "value": 81.4
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2020,
+      "value": 82.3
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2020,
+      "value": 82.3
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2020,
+      "value": 77.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2020,
+      "value": 82.3
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2020,
+      "value": 82.4
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2020,
+      "value": 75.5
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2020,
+      "value": 75.2
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2020,
+      "value": 82.2
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2020,
+      "value": 75.5
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2020,
+      "value": 82.1
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2020,
+      "value": 81.4
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2020,
+      "value": 81.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2020,
+      "value": 76.4
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2020,
+      "value": 81.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2020,
+      "value": 74.2
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2020,
+      "value": 80.6
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2020,
+      "value": 77
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2020,
+      "value": 82
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2020,
+      "value": 82.4
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2020,
+      "value": 83.1
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2020,
+      "value": 81.8
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2020,
+      "value": 83.3
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2020,
+      "value": 83.1
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2020,
+      "value": 75.9
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2020,
+      "value": 74.4
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2020,
+      "value": 77.4
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2020,
+      "value": 74.5
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2021,
+      "value": 81.9
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2021,
+      "value": 71.2
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2021,
+      "value": 77.2
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2021,
+      "value": 81.5
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2021,
+      "value": 80.8
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2021,
+      "value": 77.2
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2021,
+      "value": 82.3
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2021,
+      "value": 80.2
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2021,
+      "value": 83.3
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2021,
+      "value": 82.4
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2021,
+      "value": 76.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2021,
+      "value": 82.7
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2021,
+      "value": 81.3
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2021,
+      "value": 73.1
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2021,
+      "value": 74.2
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2021,
+      "value": 82.7
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2021,
+      "value": 74.1
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2021,
+      "value": 82.3
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2021,
+      "value": 81.4
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2021,
+      "value": 81.3
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2021,
+      "value": 75.4
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2021,
+      "value": 81.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2021,
+      "value": 72.8
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2021,
+      "value": 80.7
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2021,
+      "value": 74.6
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2021,
+      "value": 81.9
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2021,
+      "value": 83.1
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2021,
+      "value": 83.2
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2021,
+      "value": 84.4
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2021,
+      "value": 83.2
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2021,
+      "value": 83.9
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2021,
+      "value": 73.8
+    },
+    {
+      "country": "MK",
+      "countryName": "North Macedonia",
+      "year": 2021,
+      "value": 73.2
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2021,
+      "value": 75.5
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2021,
+      "value": 72.8
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2022,
+      "value": 81.8
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2022,
+      "value": 74.2
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2022,
+      "value": 79
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2022,
+      "value": 81.3
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2022,
+      "value": 80.7
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2022,
+      "value": 78.1
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2022,
+      "value": 82.6
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2022,
+      "value": 80.8
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2022,
+      "value": 83.2
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2022,
+      "value": 82.3
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2022,
+      "value": 77.7
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2022,
+      "value": 82.8
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2022,
+      "value": 81.6
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2022,
+      "value": 74.5
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2022,
+      "value": 75.8
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2022,
+      "value": 83
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2022,
+      "value": 76
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2022,
+      "value": 82.3
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2022,
+      "value": 81.7
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2022,
+      "value": 81.4
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2022,
+      "value": 77.2
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2022,
+      "value": 81.8
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2022,
+      "value": 75.1
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2022,
+      "value": 81.3
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2022,
+      "value": 77
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2022,
+      "value": 81.2
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2022,
+      "value": 83.1
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2022,
+      "value": 82.1
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2022,
+      "value": 83.9
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2022,
+      "value": 82.5
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2022,
+      "value": 83.7
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2022,
+      "value": 73.7
+    },
+    {
+      "country": "AL",
+      "countryName": "Albania",
+      "year": 2022,
+      "value": 79.1
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2022,
+      "value": 75.2
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2022,
+      "value": 76.3
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2023,
+      "value": 82.5
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2023,
+      "value": 75.8
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2023,
+      "value": 79.9
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2023,
+      "value": 81.8
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2023,
+      "value": 81.1
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2023,
+      "value": 79.1
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2023,
+      "value": 82.9
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2023,
+      "value": 81.8
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2023,
+      "value": 84
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2023,
+      "value": 83
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2023,
+      "value": 78.6
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2023,
+      "value": 83.5
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2023,
+      "value": 82.9
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2023,
+      "value": 75.6
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2023,
+      "value": 77.6
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2023,
+      "value": 83.4
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2023,
+      "value": 76.7
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2023,
+      "value": 83.4
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2023,
+      "value": 81.9
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2023,
+      "value": 81.9
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2023,
+      "value": 78.4
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2023,
+      "value": 82.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2023,
+      "value": 76.4
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2023,
+      "value": 82
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2023,
+      "value": 78.2
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2023,
+      "value": 81.6
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2023,
+      "value": 83.4
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2023,
+      "value": 82.4
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2023,
+      "value": 84.6
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2023,
+      "value": 83.1
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2023,
+      "value": 84.3
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2023,
+      "value": 77.6
+    },
+    {
+      "country": "MD",
+      "countryName": "Moldova",
+      "year": 2023,
+      "value": 71.9
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2023,
+      "value": 73.7
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2023,
+      "value": 76.2
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2023,
+      "value": 77.3
+    },
+    {
+      "country": "BE",
+      "countryName": "Belgium",
+      "year": 2024,
+      "value": 82.4
+    },
+    {
+      "country": "BG",
+      "countryName": "Bulgaria",
+      "year": 2024,
+      "value": 75.8
+    },
+    {
+      "country": "CZ",
+      "countryName": "Czechia",
+      "year": 2024,
+      "value": 80.1
+    },
+    {
+      "country": "DK",
+      "countryName": "Denmark",
+      "year": 2024,
+      "value": 82
+    },
+    {
+      "country": "DE",
+      "countryName": "Germany",
+      "year": 2024,
+      "value": 81.2
+    },
+    {
+      "country": "EE",
+      "countryName": "Estonia",
+      "year": 2024,
+      "value": 79.4
+    },
+    {
+      "country": "IE",
+      "countryName": "Ireland",
+      "year": 2024,
+      "value": 83.1
+    },
+    {
+      "country": "EL",
+      "countryName": "Greece",
+      "year": 2024,
+      "value": 81.9
+    },
+    {
+      "country": "ES",
+      "countryName": "Spain",
+      "year": 2024,
+      "value": 84
+    },
+    {
+      "country": "FR",
+      "countryName": "France",
+      "year": 2024,
+      "value": 83
+    },
+    {
+      "country": "HR",
+      "countryName": "Croatia",
+      "year": 2024,
+      "value": 78.9
+    },
+    {
+      "country": "IT",
+      "countryName": "Italy",
+      "year": 2024,
+      "value": 83.7
+    },
+    {
+      "country": "CY",
+      "countryName": "Cyprus",
+      "year": 2024,
+      "value": 83.5
+    },
+    {
+      "country": "LV",
+      "countryName": "Latvia",
+      "year": 2024,
+      "value": 76.4
+    },
+    {
+      "country": "LT",
+      "countryName": "Lithuania",
+      "year": 2024,
+      "value": 77.5
+    },
+    {
+      "country": "LU",
+      "countryName": "Luxembourg",
+      "year": 2024,
+      "value": 83.2
+    },
+    {
+      "country": "HU",
+      "countryName": "Hungary",
+      "year": 2024,
+      "value": 76.8
+    },
+    {
+      "country": "MT",
+      "countryName": "Malta",
+      "year": 2024,
+      "value": 83
+    },
+    {
+      "country": "NL",
+      "countryName": "Netherlands",
+      "year": 2024,
+      "value": 81.9
+    },
+    {
+      "country": "AT",
+      "countryName": "Austria",
+      "year": 2024,
+      "value": 82.1
+    },
+    {
+      "country": "PL",
+      "countryName": "Poland",
+      "year": 2024,
+      "value": 78.5
+    },
+    {
+      "country": "PT",
+      "countryName": "Portugal",
+      "year": 2024,
+      "value": 82.5
+    },
+    {
+      "country": "RO",
+      "countryName": "Romania",
+      "year": 2024,
+      "value": 76.5
+    },
+    {
+      "country": "SI",
+      "countryName": "Slovenia",
+      "year": 2024,
+      "value": 82.1
+    },
+    {
+      "country": "SK",
+      "countryName": "Slovakia",
+      "year": 2024,
+      "value": 78.4
+    },
+    {
+      "country": "FI",
+      "countryName": "Finland",
+      "year": 2024,
+      "value": 82.2
+    },
+    {
+      "country": "SE",
+      "countryName": "Sweden",
+      "year": 2024,
+      "value": 83.8
+    },
+    {
+      "country": "IS",
+      "countryName": "Iceland",
+      "year": 2024,
+      "value": 82.8
+    },
+    {
+      "country": "LI",
+      "countryName": "Liechtenstein",
+      "year": 2024,
+      "value": 84.2
+    },
+    {
+      "country": "NO",
+      "countryName": "Norway",
+      "year": 2024,
+      "value": 83.2
+    },
+    {
+      "country": "CH",
+      "countryName": "Switzerland",
+      "year": 2024,
+      "value": 84.2
+    },
+    {
+      "country": "ME",
+      "countryName": "Montenegro",
+      "year": 2024,
+      "value": 77.6
+    },
+    {
+      "country": "GE",
+      "countryName": "Georgia",
+      "year": 2024,
+      "value": 74.9
+    },
+    {
+      "country": "RS",
+      "countryName": "Serbia",
+      "year": 2024,
+      "value": 76.2
+    },
+    {
+      "country": "TR",
+      "countryName": "Türkiye",
+      "year": 2024,
+      "value": 79
+    }
+  ]
+}

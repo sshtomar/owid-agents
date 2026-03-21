@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>The Green Revolution: Who Benefited, Who Was Left Behind</h1>
+  <p class="subtitle">Cereal yield in kg per hectare, 1961--2023. High-yield seeds and fertilizers transformed Asia and Latin America while parts of Africa saw little change.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank -- Cereal yield (kg per hectare), indicator AG.YLD.CREL.KG</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const raw = [{"c":"Brazil","y":1961,"v":1346},{"c":"China","y":1961,"v":1193},{"c":"Ethiopia","y":1961,"v":715},{"c":"France","y":1961,"v":2276},{"c":"India","y":1961,"v":947},{"c":"Indonesia","y":1961,"v":1542},{"c":"Japan","y":1961,"v":4174},{"c":"Kenya","y":1961,"v":1245},{"c":"Brazil","y":1962,"v":1382},{"c":"China","y":1962,"v":1323},{"c":"Ethiopia","y":1962,"v":702},{"c":"France","y":1962,"v":2690},{"c":"India","y":1962,"v":930},{"c":"Indonesia","y":1962,"v":1554},{"c":"Japan","y":1962,"v":4340},{"c":"Kenya","y":1962,"v":1207},{"c":"Brazil","y":1963,"v":1322},{"c":"China","y":1963,"v":1491},{"c":"Ethiopia","y":1963,"v":704},{"c":"France","y":1963,"v":2769},{"c":"India","y":1963,"v":966},{"c":"Indonesia","y":1963,"v":1502},{"c":"Japan","y":1963,"v":4224},{"c":"Kenya","y":1963,"v":1250},{"c":"Brazil","y":1964,"v":1256},{"c":"China","y":1964,"v":1623},{"c":"Ethiopia","y":1964,"v":724},{"c":"France","y":1964,"v":2823},{"c":"India","y":1964,"v":994},{"c":"Indonesia","y":1964,"v":1513},{"c":"Japan","y":1964,"v":4318},{"c":"Kenya","y":1964,"v":1200},{"c":"Brazil","y":1965,"v":1428},{"c":"China","y":1965,"v":1747},{"c":"Ethiopia","y":1965,"v":732},{"c":"France","y":1965,"v":3107},{"c":"India","y":1965,"v":854},{"c":"Indonesia","y":1965,"v":1560},{"c":"Japan","y":1965,"v":4398},{"c":"Kenya","y":1965,"v":1143},{"c":"Brazil","y":1966,"v":1321},{"c":"China","y":1966,"v":1879},{"c":"Ethiopia","y":1966,"v":741},{"c":"France","y":1966,"v":2908},{"c":"India","y":1966,"v":864},{"c":"Indonesia","y":1966,"v":1514},{"c":"Japan","y":1966,"v":4509},{"c":"Kenya","y":1966,"v":1140},{"c":"Brazil","y":1967,"v":1402},{"c":"China","y":1967,"v":1936},{"c":"Ethiopia","y":1967,"v":744},{"c":"France","y":1967,"v":3477},{"c":"India","y":1967,"v":994},{"c":"Indonesia","y":1967,"v":1549},{"c":"Japan","y":1967,"v":5137},{"c":"Kenya","y":1967,"v":1235},{"c":"Brazil","y":1968,"v":1351},{"c":"China","y":1968,"v":1939},{"c":"Ethiopia","y":1968,"v":724},{"c":"France","y":1968,"v":3571},{"c":"India","y":1968,"v":1037},{"c":"Indonesia","y":1968,"v":1809},{"c":"Japan","y":1968,"v":5227},{"c":"Kenya","y":1968,"v":1287},{"c":"Brazil","y":1969,"v":1303},{"c":"China","y":1969,"v":1900},{"c":"Ethiopia","y":1969,"v":759},{"c":"France","y":1969,"v":3532},{"c":"India","y":1969,"v":1054},{"c":"Indonesia","y":1969,"v":1944},{"c":"Japan","y":1969,"v":5072},{"c":"Kenya","y":1969,"v":1303},{"c":"Brazil","y":1970,"v":1409},{"c":"China","y":1970,"v":2128},{"c":"Ethiopia","y":1970,"v":771},{"c":"France","y":1970,"v":3374},{"c":"India","y":1970,"v":1135},{"c":"Indonesia","y":1970,"v":2001},{"c":"Japan","y":1970,"v":5125},{"c":"Kenya","y":1970,"v":1278},{"c":"Brazil","y":1971,"v":1291},{"c":"China","y":1971,"v":2174},{"c":"Ethiopia","y":1971,"v":785},{"c":"France","y":1971,"v":3876},{"c":"India","y":1971,"v":1136},{"c":"Indonesia","y":1971,"v":2082},{"c":"Japan","y":1971,"v":4917},{"c":"Kenya","y":1971,"v":1270},{"c":"Brazil","y":1972,"v":1300},{"c":"China","y":1972,"v":2107},{"c":"Ethiopia","y":1972,"v":804},{"c":"France","y":1972,"v":4169},{"c":"India","y":1972,"v":1108},{"c":"Indonesia","y":1972,"v":2152},{"c":"Japan","y":1972,"v":5507},{"c":"Kenya","y":1972,"v":1287},{"c":"Brazil","y":1973,"v":1412},{"c":"China","y":1973,"v":2276},{"c":"Ethiopia","y":1973,"v":827},{"c":"France","y":1973,"v":4408},{"c":"India","y":1973,"v":1153},{"c":"Indonesia","y":1973,"v":2127},{"c":"Japan","y":1973,"v":5748},{"c":"Kenya","y":1973,"v":1306},{"c":"Brazil","y":1974,"v":1456},{"c":"China","y":1974,"v":2389},{"c":"Ethiopia","y":1974,"v":812},{"c":"France","y":1974,"v":4179},{"c":"India","y":1974,"v":1075},{"c":"Indonesia","y":1974,"v":2280},{"c":"Japan","y":1974,"v":5630},{"c":"Kenya","y":1974,"v":1352},{"c":"Brazil","y":1975,"v":1359},{"c":"China","y":1975,"v":2480},{"c":"Ethiopia","y":1975,"v":853},{"c":"France","y":1975,"v":3697},{"c":"India","y":1975,"v":1261},{"c":"Indonesia","y":1975,"v":2307},{"c":"Japan","y":1975,"v":5933},{"c":"Kenya","y":1975,"v":1397},{"c":"Brazil","y":1976,"v":1445},{"c":"China","y":1976,"v":2522},{"c":"Ethiopia","y":1976,"v":1064},{"c":"France","y":1976,"v":3441},{"c":"India","y":1976,"v":1199},{"c":"Indonesia","y":1976,"v":2473},{"c":"Japan","y":1976,"v":5276},{"c":"Kenya","y":1976,"v":1583},{"c":"Brazil","y":1977,"v":1453},{"c":"China","y":1977,"v":2487},{"c":"Ethiopia","y":1977,"v":1036},{"c":"France","y":1977,"v":4051},{"c":"India","y":1977,"v":1331},{"c":"Indonesia","y":1977,"v":2425},{"c":"Japan","y":1977,"v":5932},{"c":"Kenya","y":1977,"v":1551},{"c":"Brazil","y":1978,"v":1210},{"c":"China","y":1978,"v":2792},{"c":"Ethiopia","y":1978,"v":897},{"c":"France","y":1978,"v":4631},{"c":"India","y":1978,"v":1370},{"c":"Indonesia","y":1978,"v":2493},{"c":"Japan","y":1978,"v":5897},{"c":"Kenya","y":1978,"v":1410},{"c":"Brazil","y":1979,"v":1301},{"c":"China","y":1979,"v":3033},{"c":"Ethiopia","y":1979,"v":1124},{"c":"France","y":1979,"v":4516},{"c":"India","y":1979,"v":1222},{"c":"Indonesia","y":1979,"v":2622},{"c":"Japan","y":1979,"v":5706},{"c":"Kenya","y":1979,"v":1283},{"c":"Brazil","y":1980,"v":1576},{"c":"China","y":1980,"v":2937},{"c":"Ethiopia","y":1980,"v":1261},{"c":"France","y":1980,"v":4854},{"c":"India","y":1980,"v":1350},{"c":"Indonesia","y":1980,"v":2866},{"c":"Japan","y":1980,"v":4843},{"c":"Kenya","y":1980,"v":1242},{"c":"Brazil","y":1981,"v":1611},{"c":"China","y":1981,"v":3082},{"c":"Ethiopia","y":1981,"v":1191},{"c":"France","y":1981,"v":4729},{"c":"India","y":1981,"v":1399},{"c":"Indonesia","y":1981,"v":3022},{"c":"Japan","y":1981,"v":5207},{"c":"Kenya","y":1981,"v":1562},{"c":"Brazil","y":1982,"v":1545},{"c":"China","y":1982,"v":3456},{"c":"Ethiopia","y":1982,"v":1165},{"c":"France","y":1982,"v":5008},{"c":"India","y":1982,"v":1346},{"c":"Indonesia","y":1982,"v":3332},{"c":"Japan","y":1982,"v":5308},{"c":"Kenya","y":1982,"v":1963},{"c":"Brazil","y":1983,"v":1615},{"c":"China","y":1983,"v":3716},{"c":"Ethiopia","y":1983,"v":1336},{"c":"France","y":1983,"v":4950},{"c":"India","y":1983,"v":1564},{"c":"Indonesia","y":1983,"v":3320},{"c":"Japan","y":1983,"v":5301},{"c":"Kenya","y":1983,"v":1676},{"c":"Brazil","y":1984,"v":1677},{"c":"China","y":1984,"v":3955},{"c":"Ethiopia","y":1984,"v":1170},{"c":"France","y":1984,"v":5977},{"c":"India","y":1984,"v":1564},{"c":"Indonesia","y":1984,"v":3379},{"c":"Japan","y":1984,"v":5958},{"c":"Kenya","y":1984,"v":1343},{"c":"Brazil","y":1985,"v":1828},{"c":"China","y":1985,"v":3821},{"c":"Ethiopia","y":1985,"v":881},{"c":"France","y":1985,"v":5743},{"c":"India","y":1985,"v":1592},{"c":"Indonesia","y":1985,"v":3513},{"c":"Japan","y":1985,"v":5847},{"c":"Kenya","y":1985,"v":1634},{"c":"Brazil","y":1986,"v":1665},{"c":"China","y":1986,"v":3890},{"c":"Ethiopia","y":1986,"v":966},{"c":"France","y":1986,"v":5302},{"c":"India","y":1986,"v":1585},{"c":"Indonesia","y":1986,"v":3476},{"c":"Japan","y":1986,"v":5899},{"c":"Kenya","y":1986,"v":1886},{"c":"Brazil","y":1987,"v":1882},{"c":"China","y":1987,"v":3973},{"c":"Ethiopia","y":1987,"v":1153},{"c":"France","y":1987,"v":5706},{"c":"India","y":1987,"v":1584},{"c":"Indonesia","y":1987,"v":3605},{"c":"Japan","y":1987,"v":5684},{"c":"Kenya","y":1987,"v":1569},{"c":"Brazil","y":1988,"v":1859},{"c":"China","y":1988,"v":3931},{"c":"Ethiopia","y":1988,"v":1214},{"c":"France","y":1988,"v":6081},{"c":"India","y":1988,"v":1776},{"c":"Indonesia","y":1988,"v":3568},{"c":"Japan","y":1988,"v":5469},{"c":"Kenya","y":1988,"v":1746},{"c":"Brazil","y":1989,"v":2000},{"c":"China","y":1989,"v":4015},{"c":"Ethiopia","y":1989,"v":1172},{"c":"France","y":1989,"v":6099},{"c":"India","y":1989,"v":1916},{"c":"Indonesia","y":1989,"v":3779},{"c":"Japan","y":1989,"v":5674},{"c":"Kenya","y":1989,"v":1723},{"c":"Brazil","y":1990,"v":1755},{"c":"China","y":1990,"v":4307},{"c":"Ethiopia","y":1990,"v":1238},{"c":"France","y":1990,"v":6083},{"c":"India","y":1990,"v":1891},{"c":"Indonesia","y":1990,"v":3800},{"c":"Japan","y":1990,"v":5846},{"c":"Kenya","y":1990,"v":1562},{"c":"Brazil","y":1991,"v":1851},{"c":"China","y":1991,"v":4231},{"c":"Ethiopia","y":1991,"v":1308},{"c":"France","y":1991,"v":6536},{"c":"India","y":1991,"v":1926},{"c":"Indonesia","y":1991,"v":3862},{"c":"Japan","y":1991,"v":5416},{"c":"Kenya","y":1991,"v":1712},{"c":"Brazil","y":1992,"v":2143},{"c":"China","y":1992,"v":4362},{"c":"Ethiopia","y":1992,"v":1156},{"c":"France","y":1992,"v":6485},{"c":"India","y":1992,"v":2025},{"c":"Indonesia","y":1992,"v":3817},{"c":"Japan","y":1992,"v":5877},{"c":"Kenya","y":1992,"v":1661},{"c":"Brazil","y":1993,"v":2355},{"c":"China","y":1993,"v":4562},{"c":"Ethiopia","y":1993,"v":1313},{"c":"France","y":1993,"v":6513},{"c":"India","y":1993,"v":2085},{"c":"Indonesia","y":1993,"v":3916},{"c":"Japan","y":1993,"v":4429},{"c":"Kenya","y":1993,"v":1461},{"c":"Brazil","y":1994,"v":2285},{"c":"China","y":1994,"v":4505},{"c":"Ethiopia","y":1994,"v":974},{"c":"France","y":1994,"v":6543},{"c":"India","y":1994,"v":2116},{"c":"Indonesia","y":1994,"v":3866},{"c":"Japan","y":1994,"v":6449},{"c":"Kenya","y":1994,"v":1918},{"c":"Brazil","y":1995,"v":2513},{"c":"China","y":1995,"v":4659},{"c":"Ethiopia","y":1995,"v":1034},{"c":"France","y":1995,"v":6457},{"c":"India","y":1995,"v":2112},{"c":"Indonesia","y":1995,"v":3843},{"c":"Japan","y":1995,"v":6003},{"c":"Kenya","y":1995,"v":1753},{"c":"Brazil","y":1996,"v":2422},{"c":"China","y":1996,"v":4892},{"c":"Ethiopia","y":1996,"v":1214},{"c":"France","y":1996,"v":7082},{"c":"India","y":1996,"v":2181},{"c":"Indonesia","y":1996,"v":3945},{"c":"Japan","y":1996,"v":6155},{"c":"Kenya","y":1996,"v":1403},{"c":"Brazil","y":1997,"v":2522},{"c":"China","y":1997,"v":4813},{"c":"Ethiopia","y":1997,"v":1264},{"c":"France","y":1997,"v":6890},{"c":"India","y":1997,"v":2229},{"c":"Indonesia","y":1997,"v":4011},{"c":"Japan","y":1997,"v":6062},{"c":"Kenya","y":1997,"v":1397},{"c":"Brazil","y":1998,"v":2580},{"c":"China","y":1998,"v":4953},{"c":"Ethiopia","y":1998,"v":1141},{"c":"France","y":1998,"v":7415},{"c":"India","y":1998,"v":2248},{"c":"Indonesia","y":1998,"v":3817},{"c":"Japan","y":1998,"v":5810},{"c":"Kenya","y":1998,"v":1590},{"c":"Brazil","y":1999,"v":2732},{"c":"China","y":1999,"v":4945},{"c":"Ethiopia","y":1999,"v":1125},{"c":"France","y":1999,"v":7260},{"c":"India","y":1999,"v":2314},{"c":"Indonesia","y":1999,"v":3896},{"c":"Japan","y":1999,"v":5999},{"c":"Kenya","y":1999,"v":1428},{"c":"Brazil","y":2000,"v":2643},{"c":"China","y":2000,"v":4753},{"c":"Ethiopia","y":2000,"v":1116},{"c":"France","y":2000,"v":7232},{"c":"India","y":2000,"v":2294},{"c":"Indonesia","y":2000,"v":4026},{"c":"Japan","y":2000,"v":6257},{"c":"Kenya","y":2000,"v":1375},{"c":"Brazil","y":2001,"v":3148},{"c":"China","y":2001,"v":4800},{"c":"Ethiopia","y":2001,"v":1198},{"c":"France","y":2001,"v":6729},{"c":"India","y":2001,"v":2423},{"c":"Indonesia","y":2001,"v":4045},{"c":"Japan","y":2001,"v":6107},{"c":"Kenya","y":2001,"v":1640},{"c":"Brazil","y":2002,"v":2845},{"c":"China","y":2002,"v":4869},{"c":"Ethiopia","y":2002,"v":1354},{"c":"France","y":2002,"v":7453},{"c":"India","y":2002,"v":2187},{"c":"Indonesia","y":2002,"v":4170},{"c":"Japan","y":2002,"v":6086},{"c":"Kenya","y":2002,"v":1488},{"c":"Brazil","y":2003,"v":3385},{"c":"China","y":2003,"v":4871},{"c":"Ethiopia","y":2003,"v":1123},{"c":"France","y":2003,"v":6125},{"c":"India","y":2003,"v":2399},{"c":"Indonesia","y":2003,"v":4248},{"c":"Japan","y":2003,"v":5451},{"c":"Kenya","y":2003,"v":1594},{"c":"Brazil","y":2004,"v":3132},{"c":"China","y":2004,"v":5187},{"c":"Ethiopia","y":2004,"v":1163},{"c":"France","y":2004,"v":7519},{"c":"India","y":2004,"v":2350},{"c":"Indonesia","y":2004,"v":4275},{"c":"Japan","y":2004,"v":5942},{"c":"Kenya","y":2004,"v":1806},{"c":"Brazil","y":2005,"v":2883},{"c":"China","y":2005,"v":5225},{"c":"Ethiopia","y":2005,"v":1361},{"c":"France","y":2005,"v":6965},{"c":"India","y":2005,"v":2412},{"c":"Indonesia","y":2005,"v":4311},{"c":"Japan","y":2005,"v":6154},{"c":"Kenya","y":2005,"v":1646},{"c":"Brazil","y":2006,"v":3211},{"c":"China","y":2006,"v":5313},{"c":"Ethiopia","y":2006,"v":1563},{"c":"France","y":2006,"v":6801},{"c":"India","y":2006,"v":2447},{"c":"Indonesia","y":2006,"v":4366},{"c":"Japan","y":2006,"v":5852},{"c":"Kenya","y":2006,"v":1646},{"c":"Brazil","y":2007,"v":3553},{"c":"China","y":2007,"v":5321},{"c":"Ethiopia","y":2007,"v":1441},{"c":"France","y":2007,"v":6521},{"c":"India","y":2007,"v":2583},{"c":"Indonesia","y":2007,"v":4414},{"c":"Japan","y":2007,"v":6062},{"c":"Kenya","y":2007,"v":1773},{"c":"Brazil","y":2008,"v":3831},{"c":"China","y":2008,"v":5550},{"c":"Ethiopia","y":2008,"v":1418},{"c":"France","y":2008,"v":7253},{"c":"India","y":2008,"v":2638},{"c":"Indonesia","y":2008,"v":4703},{"c":"Japan","y":2008,"v":6262},{"c":"Kenya","y":2008,"v":1418},{"c":"Brazil","y":2009,"v":3532},{"c":"China","y":2009,"v":5450},{"c":"Ethiopia","y":2009,"v":1647},{"c":"France","y":2009,"v":7412},{"c":"India","y":2009,"v":2581},{"c":"Indonesia","y":2009,"v":4809},{"c":"Japan","y":2009,"v":5920},{"c":"Kenya","y":2009,"v":1243},{"c":"Brazil","y":2010,"v":4041},{"c":"China","y":2010,"v":5528},{"c":"Ethiopia","y":2010,"v":1767},{"c":"France","y":2010,"v":7069},{"c":"India","y":2010,"v":2676},{"c":"Indonesia","y":2010,"v":4872},{"c":"Japan","y":2010,"v":5854},{"c":"Kenya","y":2010,"v":1710},{"c":"Brazil","y":2011,"v":4038},{"c":"China","y":2011,"v":5710},{"c":"Ethiopia","y":2011,"v":1877},{"c":"France","y":2011,"v":6919},{"c":"India","y":2011,"v":2861},{"c":"Indonesia","y":2011,"v":4891},{"c":"Japan","y":2011,"v":6011},{"c":"Kenya","y":2011,"v":1515},{"c":"Brazil","y":2012,"v":4585},{"c":"China","y":2012,"v":5829},{"c":"Ethiopia","y":2012,"v":1963},{"c":"France","y":2012,"v":7255},{"c":"India","y":2012,"v":2964},{"c":"Indonesia","y":2012,"v":5087},{"c":"Japan","y":2012,"v":6249},{"c":"Kenya","y":2012,"v":1745},{"c":"Brazil","y":2013,"v":4826},{"c":"China","y":2013,"v":5898},{"c":"Ethiopia","y":2013,"v":2102},{"c":"France","y":2013,"v":7085},{"c":"India","y":2013,"v":2978},{"c":"Indonesia","y":2013,"v":5087},{"c":"Japan","y":2013,"v":6282},{"c":"Kenya","y":2013,"v":1662},{"c":"Brazil","y":2014,"v":4640},{"c":"China","y":2014,"v":5896},{"c":"Ethiopia","y":2014,"v":2235},{"c":"France","y":2014,"v":7579},{"c":"India","y":2014,"v":2966},{"c":"Indonesia","y":2014,"v":5099},{"c":"Japan","y":2014,"v":6325},{"c":"Kenya","y":2014,"v":1583},{"c":"Brazil","y":2015,"v":5001},{"c":"China","y":2015,"v":5985},{"c":"Ethiopia","y":2015,"v":2345},{"c":"France","y":2015,"v":7591},{"c":"India","y":2015,"v":2854},{"c":"Indonesia","y":2015,"v":5314},{"c":"Japan","y":2015,"v":6317},{"c":"Kenya","y":2015,"v":1773},{"c":"Brazil","y":2016,"v":4182},{"c":"China","y":2016,"v":6019},{"c":"Ethiopia","y":2016,"v":2352},{"c":"France","y":2016,"v":5691},{"c":"India","y":2016,"v":2995},{"c":"Indonesia","y":2016,"v":5159},{"c":"Japan","y":2016,"v":6253},{"c":"Kenya","y":2016,"v":1383},{"c":"Brazil","y":2017,"v":5210},{"c":"China","y":2017,"v":6111},{"c":"Ethiopia","y":2017,"v":2539},{"c":"France","y":2017,"v":7307},{"c":"India","y":2017,"v":3128},{"c":"Indonesia","y":2017,"v":5138},{"c":"Japan","y":2017,"v":6285},{"c":"Kenya","y":2017,"v":1426},{"c":"Brazil","y":2018,"v":4807},{"c":"China","y":2018,"v":6122},{"c":"Ethiopia","y":2018,"v":2730},{"c":"France","y":2018,"v":6829},{"c":"India","y":2018,"v":3278},{"c":"Indonesia","y":2018,"v":5228},{"c":"Japan","y":2018,"v":6132},{"c":"Kenya","y":2018,"v":1709},{"c":"Brazil","y":2019,"v":5321},{"c":"China","y":2019,"v":6265},{"c":"Ethiopia","y":2019,"v":2832},{"c":"France","y":2019,"v":7492},{"c":"India","y":2019,"v":3416},{"c":"Indonesia","y":2019,"v":5351},{"c":"Japan","y":2019,"v":6296},{"c":"Kenya","y":2019,"v":1605},{"c":"Brazil","y":2020,"v":5255},{"c":"China","y":2020,"v":6296},{"c":"Ethiopia","y":2020,"v":2841},{"c":"France","y":2020,"v":6395},{"c":"India","y":2020,"v":3384},{"c":"Indonesia","y":2020,"v":5462},{"c":"Japan","y":2020,"v":6230},{"c":"Kenya","y":2020,"v":1843},{"c":"Brazil","y":2021,"v":4479},{"c":"China","y":2021,"v":6318},{"c":"Ethiopia","y":2021,"v":2903},{"c":"France","y":2021,"v":7171},{"c":"India","y":2021,"v":3498},{"c":"Indonesia","y":2021,"v":5696},{"c":"Japan","y":2021,"v":6417},{"c":"Kenya","y":2021,"v":1522},{"c":"Brazil","y":2022,"v":4907},{"c":"China","y":2022,"v":6381},{"c":"Ethiopia","y":2022,"v":2823},{"c":"France","y":2022,"v":6655},{"c":"India","y":2022,"v":3589},{"c":"Indonesia","y":2022,"v":5834},{"c":"Japan","y":2022,"v":6320},{"c":"Kenya","y":2022,"v":1477},{"c":"Brazil","y":2023,"v":5336},{"c":"China","y":2023,"v":6418},{"c":"Ethiopia","y":2023,"v":2864},{"c":"France","y":2023,"v":7274},{"c":"India","y":2023,"v":3626},{"c":"Indonesia","y":2023,"v":5829},{"c":"Japan","y":2023,"v":6245},{"c":"Kenya","y":2023,"v":1758}];
+
+    const data = raw.map(d => ({ country: d.c, year: d.y, value: d.v }));
+
+    const colorMap = {
+      "France": "#2563eb",
+      "Japan": "#7c3aed",
+      "China": "#dc2626",
+      "Indonesia": "#059669",
+      "Brazil": "#d97706",
+      "India": "#ea580c",
+      "Ethiopia": "#64748b",
+      "Kenya": "#94a3b8"
+    };
+
+    const countries = Object.keys(colorMap);
+
+    // Get endpoint data for direct labels
+    const endpoints = countries.map(c => {
+      const cd = data.filter(d => d.country === c);
+      return cd[cd.length - 1];
+    });
+
+    const chart = Plot.plot({
+      width: 860,
+      height: 520,
+      marginRight: 90,
+      marginLeft: 50,
+      marginTop: 10,
+      marginBottom: 40,
+      x: {
+        label: null,
+        tickFormat: "d",
+        domain: [1961, 2023]
+      },
+      y: {
+        label: "Cereal yield (kg per hectare)",
+        domain: [0, 8000],
+        grid: true,
+        tickFormat: d => d.toLocaleString()
+      },
+      color: {
+        domain: countries,
+        range: countries.map(c => colorMap[c])
+      },
+      marks: [
+        Plot.ruleY([0]),
+        Plot.line(data, {
+          x: "year",
+          y: "value",
+          stroke: "country",
+          strokeWidth: d => (d.country === "Kenya" || d.country === "Ethiopia") ? 1.8 : 2.2,
+          strokeOpacity: d => (d.country === "Kenya" || d.country === "Ethiopia") ? 0.7 : 0.9
+        }),
+        Plot.text(endpoints, {
+          x: "year",
+          y: "value",
+          text: d => `${d.country} ${(d.value / 1000).toFixed(1)}k`,
+          textAnchor: "start",
+          dx: 6,
+          fontSize: 11,
+          fontWeight: 600,
+          fill: d => colorMap[d.country]
+        }),
+        // Green Revolution annotation
+        Plot.ruleX([1966], { stroke: "#e2e8f0", strokeDasharray: "4,3" }),
+        Plot.text([""], {
+          x: [1966],
+          y: [7700],
+          text: ["Green Revolution begins"],
+          textAnchor: "start",
+          dx: 4,
+          fontSize: 10,
+          fill: "#94a3b8",
+          fontStyle: "italic"
+        })
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

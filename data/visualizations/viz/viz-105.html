@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Classroom Climb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F6F5EE;
+    color: #2B2A27;
+    font-family: 'Inter', sans-serif;
+    padding: 32px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    color: #2B2A27;
+  }
+  p.subtitle {
+    font-size: 11px;
+    color: #7A786F;
+    max-width: 640px;
+    line-height: 1.55;
+    margin-bottom: 20px;
+  }
+  p.source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7A786F;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 20px;
+  }
+  .chart-wrap { position: relative; width: 100%; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    line-height: 1.6;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .legend {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 18px;
+    font-size: 10px;
+    color: #7A786F;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 20px; height: 3px; border-radius: 1px; }
+</style>
+</head>
+<body>
+
+<h1>The Classroom Climb</h1>
+<p class="subtitle">Primary school completion rates (%) from around 2000 to the most recent year available. A slope chart for 20 countries spanning diverse regions: steep upward lines reveal where millions more children now finish primary education, while flat or declining slopes mark stalled progress.</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3B7A6E;"></div>Rose 15+ pts</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#A5A39B;"></div>Rose &lt;15 pts</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C4665A;"></div>Declined</div>
+</div>
+
+<div class="chart-wrap" id="chartWrap">
+  <svg id="chart"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<p class="source">Source: UNESCO Institute for Statistics -- CR.1 Primary Completion Rate (%)</p>
+
+<script>
+(function() {
+  var DATA = [
+    { n: "Comoros", v0: 40.3, v1: 81.5, y0: 2000, y1: 2022 },
+    { n: "DR Congo", v0: 33.1, v1: 70.0, y0: 2001, y1: 2023 },
+    { n: "Ethiopia", v0: 17.9, v1: 54.4, y0: 2000, y1: 2022 },
+    { n: "Laos", v0: 51.6, v1: 87.7, y0: 2000, y1: 2023 },
+    { n: "Togo", v0: 43.0, v1: 79.1, y0: 2000, y1: 2022 },
+    { n: "Rwanda", v0: 27.8, v1: 62.7, y0: 2000, y1: 2022 },
+    { n: "Guatemala", v0: 50.4, v1: 85.0, y0: 2000, y1: 2024 },
+    { n: "Suriname", v0: 62.4, v1: 92.5, y0: 2000, y1: 2022 },
+    { n: "Bangladesh", v0: 59.6, v1: 88.4, y0: 2000, y1: 2022 },
+    { n: "Mali", v0: 19.3, v1: 47.5, y0: 2001, y1: 2024 },
+    { n: "Senegal", v0: 32.8, v1: 52.7, y0: 2000, y1: 2023 },
+    { n: "Paraguay", v0: 77.3, v1: 96.8, y0: 2001, y1: 2024 },
+    { n: "Guinea-Bissau", v0: 19.6, v1: 38.7, y0: 2000, y1: 2022 },
+    { n: "Zambia", v0: 55.3, v1: 74.3, y0: 2001, y1: 2024 },
+    { n: "Dominican Rep.", v0: 71.5, v1: 90.1, y0: 2000, y1: 2024 },
+    { n: "Armenia", v0: 99.1, v1: 100.0, y0: 2000, y1: 2023 },
+    { n: "Uzbekistan", v0: 99.5, v1: 99.7, y0: 2000, y1: 2022 },
+    { n: "Jamaica", v0: 99.0, v1: 99.2, y0: 2001, y1: 2022 },
+    { n: "Uganda", v0: 39.5, v1: 38.7, y0: 2001, y1: 2024 },
+    { n: "Jordan", v0: 98.1, v1: 96.5, y0: 2002, y1: 2023 }
+  ];
+
+  // Sort by change descending
+  DATA.sort(function(a, b) { return (b.v1 - b.v0) - (a.v1 - a.v0); });
+
+  var colorBig = "#3B7A6E";
+  var colorSmall = "#A5A39B";
+  var colorDecline = "#C4665A";
+
+  function getColor(d) {
+    var change = d.v1 - d.v0;
+    if (change < 0) return colorDecline;
+    if (change >= 15) return colorBig;
+    return colorSmall;
+  }
+
+  var svgNS = "http://www.w3.org/2000/svg";
+  var n = DATA.length;
+  var rowH = 28;
+  var gap = 3;
+  var pad = { top: 36, bottom: 20, left: 140, right: 140, middle: 340 };
+  var W = pad.left + pad.middle + pad.right;
+  var chartH = n * (rowH + gap) - gap;
+  var H = pad.top + chartH + pad.bottom;
+
+  // Value domain 0-100
+  var valMin = 0;
+  var valMax = 105;
+
+  var leftX = pad.left;
+  var rightX = pad.left + pad.middle;
+
+  function scaleV(val) {
+    return leftX + ((val - valMin) / (valMax - valMin)) * pad.middle;
+  }
+
+  function el(tag, attrs) {
+    var e = document.createElementNS(svgNS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  var svg = document.getElementById("chart");
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.style.maxWidth = "100%";
+  svg.style.overflow = "visible";
+
+  // Column headers
+  var earlyLabel = el("text", {
+    x: leftX, y: pad.top - 14, "text-anchor": "start",
+    fill: "#7A786F", "font-size": "10px", "font-weight": "500",
+    "font-family": "'JetBrains Mono', monospace", "letter-spacing": "0.3px"
+  });
+  earlyLabel.textContent = "~2000";
+  svg.appendChild(earlyLabel);
+
+  var lateLabel = el("text", {
+    x: rightX, y: pad.top - 14, "text-anchor": "end",
+    fill: "#7A786F", "font-size": "10px", "font-weight": "500",
+    "font-family": "'JetBrains Mono', monospace", "letter-spacing": "0.3px"
+  });
+  lateLabel.textContent = "~2023";
+  svg.appendChild(lateLabel);
+
+  // Vertical reference lines at key thresholds
+  [0, 25, 50, 75, 100].forEach(function(v) {
+    var x = scaleV(v);
+    var line = el("line", {
+      x1: x, y1: pad.top - 4, x2: x, y2: pad.top + chartH,
+      stroke: v === 100 ? "#C8C6BD" : "#E8E6DE", "stroke-width": 0.7
+    });
+    svg.appendChild(line);
+
+    var label = el("text", {
+      x: x, y: pad.top - 6, "text-anchor": "middle",
+      fill: "#B5B2A9", "font-size": "8px",
+      "font-family": "'JetBrains Mono', monospace"
+    });
+    label.textContent = v + "%";
+    svg.appendChild(label);
+  });
+
+  // Tooltip element
+  var tooltipEl = document.getElementById("tooltip");
+  var wrapEl = document.getElementById("chartWrap");
+
+  // Draw each country as a slope line
+  DATA.forEach(function(d, i) {
+    var y = pad.top + i * (rowH + gap) + rowH / 2;
+    var x0 = scaleV(d.v0);
+    var x1 = scaleV(d.v1);
+    var color = getColor(d);
+    var change = d.v1 - d.v0;
+
+    // Connecting line
+    var line = el("line", {
+      x1: x0, y1: y, x2: x1, y2: y,
+      stroke: color, "stroke-width": 2.2,
+      "stroke-linecap": "round", opacity: 0.75
+    });
+    line.setAttribute("data-idx", i);
+    svg.appendChild(line);
+
+    // Start dot
+    var dot0 = el("circle", {
+      cx: x0, cy: y, r: 3.5, fill: color, opacity: 0.9
+    });
+    dot0.setAttribute("data-idx", i);
+    svg.appendChild(dot0);
+
+    // End dot
+    var dot1 = el("circle", {
+      cx: x1, cy: y, r: 3.5, fill: color, opacity: 0.9
+    });
+    dot1.setAttribute("data-idx", i);
+    svg.appendChild(dot1);
+
+    // Country name label (left side)
+    var nameLabel = el("text", {
+      x: pad.left - 8, y: y + 1,
+      "text-anchor": "end", "dominant-baseline": "middle",
+      "font-size": "10px", fill: "#2B2A27", "font-weight": "400"
+    });
+    nameLabel.textContent = d.n;
+    svg.appendChild(nameLabel);
+
+    // Change label (right side)
+    var sign = change >= 0 ? "+" : "";
+    var changeLabel = el("text", {
+      x: rightX + 10, y: y + 1,
+      "text-anchor": "start", "dominant-baseline": "middle",
+      "font-size": "9px", fill: color, "font-weight": "500",
+      "font-family": "'JetBrains Mono', monospace"
+    });
+    changeLabel.textContent = sign + change.toFixed(1) + " pp";
+    svg.appendChild(changeLabel);
+
+    // Invisible hit area for hover
+    var hitArea = el("rect", {
+      x: 0, y: pad.top + i * (rowH + gap), width: W, height: rowH + gap,
+      fill: "transparent"
+    });
+    hitArea.style.cursor = "pointer";
+
+    hitArea.addEventListener("mouseenter", function() {
+      // Dim all others
+      svg.querySelectorAll("line[data-idx], circle[data-idx]").forEach(function(el) {
+        if (el.getAttribute("data-idx") !== String(i)) {
+          el.setAttribute("opacity", "0.15");
+        } else {
+          if (el.tagName === "line") el.setAttribute("opacity", "1");
+          if (el.tagName === "circle") el.setAttribute("opacity", "1");
+        }
+      });
+
+      var direction = change > 0 ? "Improved" : change < 0 ? "Declined" : "Unchanged";
+      tooltipEl.innerHTML =
+        "<strong>" + d.n + "</strong><br>" +
+        d.y0 + ": " + d.v0.toFixed(1) + "%<br>" +
+        d.y1 + ": " + d.v1.toFixed(1) + "%<br>" +
+        direction + " by " + Math.abs(change).toFixed(1) + " pp";
+      tooltipEl.style.opacity = "1";
+    });
+
+    hitArea.addEventListener("mousemove", function(e) {
+      var r = wrapEl.getBoundingClientRect();
+      var tx = e.clientX - r.left + 14;
+      var ty = e.clientY - r.top - 30;
+      var tw = tooltipEl.offsetWidth;
+      if (tx + tw > W) tx = e.clientX - r.left - tw - 14;
+      if (ty < 0) ty = 4;
+      tooltipEl.style.left = tx + "px";
+      tooltipEl.style.top = ty + "px";
+    });
+
+    hitArea.addEventListener("mouseleave", function() {
+      svg.querySelectorAll("line[data-idx], circle[data-idx]").forEach(function(el) {
+        if (el.tagName === "line") el.setAttribute("opacity", "0.75");
+        if (el.tagName === "circle") el.setAttribute("opacity", "0.9");
+      });
+      tooltipEl.style.opacity = "0";
+    });
+
+    svg.appendChild(hitArea);
+  });
+
+  // Arrowhead at the 100% line
+  var arrowY = pad.top + chartH + 10;
+  var arrowX = scaleV(100);
+  var arrowLabel = el("text", {
+    x: arrowX, y: arrowY + 2, "text-anchor": "middle",
+    fill: "#7A786F", "font-size": "8px",
+    "font-family": "'JetBrains Mono', monospace", "letter-spacing": "0.4px"
+  });
+  arrowLabel.textContent = "UNIVERSAL COMPLETION";
+  svg.appendChild(arrowLabel);
+
+})();
+</script>
+</body>
+</html>

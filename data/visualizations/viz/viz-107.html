@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate Leverage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F6F5EE;
+    color: #2B2A27;
+    font-family: 'Inter', sans-serif;
+    padding: 32px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    color: #2B2A27;
+  }
+  p.subtitle {
+    font-size: 11px;
+    color: #7A786F;
+    max-width: 640px;
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+  p.source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7A786F;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 16px;
+  }
+  .chart-container {
+    position: relative;
+    width: 100%;
+  }
+  svg text {
+    font-family: 'Inter', sans-serif;
+  }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    line-height: 1.6;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .tooltip.visible { opacity: 1; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-bottom: 18px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #7A786F;
+    cursor: default;
+  }
+  .legend-swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 1px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Corporate Leverage</h1>
+<p class="subtitle">Nonfinancial corporate debt as a share of GDP across 10 major economies, 1990-2024. France and China carry the heaviest corporate debt loads. The 2020 pandemic triggered a sharp debt spike in most countries, while India and Australia remain comparatively under-leveraged.</p>
+
+<div class="legend" id="legend"></div>
+
+<div class="chart-container" id="chartContainer">
+  <svg id="chart"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<p class="source">Source: IMF Global Debt Database -- Nonfinancial Corporate Debt (% of GDP)</p>
+
+<script>
+(function() {
+  var COUNTRIES = {
+    FRA: { name: "France" },
+    CHN: { name: "China" },
+    JPN: { name: "Japan" },
+    CAN: { name: "Canada" },
+    KOR: { name: "South Korea" },
+    DEU: { name: "Germany" },
+    USA: { name: "United States" },
+    GBR: { name: "United Kingdom" },
+    AUS: { name: "Australia" },
+    IND: { name: "India" }
+  };
+
+  var COLORS = {
+    FRA: "#C4665A",
+    CHN: "#B85C4A",
+    JPN: "#4A7FB5",
+    CAN: "#3B7A6E",
+    KOR: "#6B8E6B",
+    DEU: "#8B7A5E",
+    USA: "#5A8C6F",
+    GBR: "#D4856A",
+    AUS: "#7A8FB5",
+    IND: "#C6923A"
+  };
+
+  var RAW = [{"c":"USA","n":"United States","y":1990,"v":63.92},{"c":"GBR","n":"United Kingdom","y":1990,"v":57.07},{"c":"FRA","n":"France","y":1990,"v":95.76},{"c":"DEU","n":"Germany","y":1990,"v":63.85},{"c":"CAN","n":"Canada","y":1990,"v":79.18},{"c":"JPN","n":"Japan","y":1990,"v":139.18},{"c":"AUS","n":"Australia","y":1990,"v":75.91},{"c":"KOR","n":"South Korea","y":1990,"v":73.39},{"c":"USA","n":"United States","y":1991,"v":60.51},{"c":"GBR","n":"United Kingdom","y":1991,"v":56.1},{"c":"FRA","n":"France","y":1991,"v":99.37},{"c":"DEU","n":"Germany","y":1991,"v":60.14},{"c":"CAN","n":"Canada","y":1991,"v":82.76},{"c":"JPN","n":"Japan","y":1991,"v":138.8},{"c":"AUS","n":"Australia","y":1991,"v":73.31},{"c":"KOR","n":"South Korea","y":1991,"v":77.11},{"c":"USA","n":"United States","y":1992,"v":57.02},{"c":"GBR","n":"United Kingdom","y":1992,"v":56.79},{"c":"FRA","n":"France","y":1992,"v":103.8},{"c":"DEU","n":"Germany","y":1992,"v":59.85},{"c":"CAN","n":"Canada","y":1992,"v":82.8},{"c":"JPN","n":"Japan","y":1992,"v":141.2},{"c":"AUS","n":"Australia","y":1992,"v":70.83},{"c":"KOR","n":"South Korea","y":1992,"v":79.35},{"c":"USA","n":"United States","y":1993,"v":56.07},{"c":"GBR","n":"United Kingdom","y":1993,"v":56.01},{"c":"FRA","n":"France","y":1993,"v":106.26},{"c":"DEU","n":"Germany","y":1993,"v":64.32},{"c":"CAN","n":"Canada","y":1993,"v":84.19},{"c":"JPN","n":"Japan","y":1993,"v":144.87},{"c":"AUS","n":"Australia","y":1993,"v":64.12},{"c":"KOR","n":"South Korea","y":1993,"v":83.46},{"c":"USA","n":"United States","y":1994,"v":55.84},{"c":"GBR","n":"United Kingdom","y":1994,"v":52.58},{"c":"FRA","n":"France","y":1994,"v":102.12},{"c":"DEU","n":"Germany","y":1994,"v":62.39},{"c":"CAN","n":"Canada","y":1994,"v":82.22},{"c":"JPN","n":"Japan","y":1994,"v":144.73},{"c":"AUS","n":"Australia","y":1994,"v":61.47},{"c":"KOR","n":"South Korea","y":1994,"v":85.76},{"c":"USA","n":"United States","y":1995,"v":56.63},{"c":"GBR","n":"United Kingdom","y":1995,"v":53.87},{"c":"FRA","n":"France","y":1995,"v":99.82},{"c":"DEU","n":"Germany","y":1995,"v":59.48},{"c":"CAN","n":"Canada","y":1995,"v":81.94},{"c":"JPN","n":"Japan","y":1995,"v":142.35},{"c":"AUS","n":"Australia","y":1995,"v":60},{"c":"KOR","n":"South Korea","y":1995,"v":87.49},{"c":"USA","n":"United States","y":1996,"v":56.49},{"c":"GBR","n":"United Kingdom","y":1996,"v":51.9},{"c":"FRA","n":"France","y":1996,"v":97.19},{"c":"DEU","n":"Germany","y":1996,"v":61.34},{"c":"CAN","n":"Canada","y":1996,"v":80.92},{"c":"JPN","n":"Japan","y":1996,"v":138.98},{"c":"AUS","n":"Australia","y":1996,"v":59.33},{"c":"KOR","n":"South Korea","y":1996,"v":94.5},{"c":"USA","n":"United States","y":1997,"v":58.13},{"c":"GBR","n":"United Kingdom","y":1997,"v":54.35},{"c":"FRA","n":"France","y":1997,"v":96.98},{"c":"DEU","n":"Germany","y":1997,"v":62.66},{"c":"CAN","n":"Canada","y":1997,"v":83.14},{"c":"JPN","n":"Japan","y":1997,"v":136.96},{"c":"AUS","n":"Australia","y":1997,"v":61.28},{"c":"KOR","n":"South Korea","y":1997,"v":106.76},{"c":"USA","n":"United States","y":1998,"v":61.97},{"c":"GBR","n":"United Kingdom","y":1998,"v":60.22},{"c":"FRA","n":"France","y":1998,"v":95.72},{"c":"DEU","n":"Germany","y":1998,"v":64.85},{"c":"CAN","n":"Canada","y":1998,"v":87},{"c":"JPN","n":"Japan","y":1998,"v":129.53},{"c":"AUS","n":"Australia","y":1998,"v":62.99},{"c":"IND","n":"India","y":1998,"v":49.58},{"c":"KOR","n":"South Korea","y":1998,"v":109.2},{"c":"USA","n":"United States","y":1999,"v":64.58},{"c":"GBR","n":"United Kingdom","y":1999,"v":65.6},{"c":"FRA","n":"France","y":1999,"v":100.45},{"c":"DEU","n":"Germany","y":1999,"v":66.18},{"c":"CAN","n":"Canada","y":1999,"v":81.34},{"c":"JPN","n":"Japan","y":1999,"v":125.36},{"c":"AUS","n":"Australia","y":1999,"v":63.9},{"c":"IND","n":"India","y":1999,"v":52.79},{"c":"KOR","n":"South Korea","y":1999,"v":96.07},{"c":"USA","n":"United States","y":2000,"v":66.01},{"c":"GBR","n":"United Kingdom","y":2000,"v":70.74},{"c":"FRA","n":"France","y":2000,"v":104.91},{"c":"DEU","n":"Germany","y":2000,"v":77.27},{"c":"CAN","n":"Canada","y":2000,"v":82.6},{"c":"JPN","n":"Japan","y":2000,"v":117.78},{"c":"AUS","n":"Australia","y":2000,"v":68.72},{"c":"IND","n":"India","y":2000,"v":57.46},{"c":"KOR","n":"South Korea","y":2000,"v":85.83},{"c":"USA","n":"United States","y":2001,"v":66.83},{"c":"GBR","n":"United Kingdom","y":2001,"v":75.17},{"c":"FRA","n":"France","y":2001,"v":109.8},{"c":"DEU","n":"Germany","y":2001,"v":79.92},{"c":"CAN","n":"Canada","y":2001,"v":87.83},{"c":"JPN","n":"Japan","y":2001,"v":114.35},{"c":"AUS","n":"Australia","y":2001,"v":65.36},{"c":"IND","n":"India","y":2001,"v":58.63},{"c":"KOR","n":"South Korea","y":2001,"v":82.05},{"c":"USA","n":"United States","y":2002,"v":66.3},{"c":"GBR","n":"United Kingdom","y":2002,"v":79.37},{"c":"FRA","n":"France","y":2002,"v":109.33},{"c":"DEU","n":"Germany","y":2002,"v":82.62},{"c":"CAN","n":"Canada","y":2002,"v":89.81},{"c":"JPN","n":"Japan","y":2002,"v":111.65},{"c":"AUS","n":"Australia","y":2002,"v":63.69},{"c":"IND","n":"India","y":2002,"v":64.63},{"c":"KOR","n":"South Korea","y":2002,"v":79.32},{"c":"USA","n":"United States","y":2003,"v":64.21},{"c":"GBR","n":"United Kingdom","y":2003,"v":74.77},{"c":"FRA","n":"France","y":2003,"v":107.26},{"c":"DEU","n":"Germany","y":2003,"v":83.4},{"c":"CAN","n":"Canada","y":2003,"v":84.6},{"c":"JPN","n":"Japan","y":2003,"v":104.57},{"c":"AUS","n":"Australia","y":2003,"v":62.04},{"c":"IND","n":"India","y":2003,"v":64.17},{"c":"KOR","n":"South Korea","y":2003,"v":77.46},{"c":"USA","n":"United States","y":2004,"v":64.19},{"c":"GBR","n":"United Kingdom","y":2004,"v":72.77},{"c":"FRA","n":"France","y":2004,"v":108.03},{"c":"DEU","n":"Germany","y":2004,"v":76.4},{"c":"CAN","n":"Canada","y":2004,"v":84.13},{"c":"JPN","n":"Japan","y":2004,"v":99.24},{"c":"AUS","n":"Australia","y":2004,"v":61.93},{"c":"IND","n":"India","y":2004,"v":70.69},{"c":"KOR","n":"South Korea","y":2004,"v":71.58},{"c":"USA","n":"United States","y":2005,"v":64.9},{"c":"GBR","n":"United Kingdom","y":2005,"v":78.22},{"c":"FRA","n":"France","y":2005,"v":109.04},{"c":"DEU","n":"Germany","y":2005,"v":78.6},{"c":"CAN","n":"Canada","y":2005,"v":77.42},{"c":"JPN","n":"Japan","y":2005,"v":101.49},{"c":"AUS","n":"Australia","y":2005,"v":67.78},{"c":"IND","n":"India","y":2005,"v":79.1},{"c":"KOR","n":"South Korea","y":2005,"v":70.56},{"c":"USA","n":"United States","y":2006,"v":67.25},{"c":"GBR","n":"United Kingdom","y":2006,"v":80.6},{"c":"FRA","n":"France","y":2006,"v":110.93},{"c":"DEU","n":"Germany","y":2006,"v":81.86},{"c":"CAN","n":"Canada","y":2006,"v":78.26},{"c":"JPN","n":"Japan","y":2006,"v":101.49},{"c":"AUS","n":"Australia","y":2006,"v":72.42},{"c":"IND","n":"India","y":2006,"v":86.84},{"c":"KOR","n":"South Korea","y":2006,"v":77.21},{"c":"CHN","n":"China","y":2006,"v":96.44},{"c":"USA","n":"United States","y":2007,"v":72.19},{"c":"GBR","n":"United Kingdom","y":2007,"v":81.24},{"c":"FRA","n":"France","y":2007,"v":112.41},{"c":"DEU","n":"Germany","y":2007,"v":81.67},{"c":"CAN","n":"Canada","y":2007,"v":81.12},{"c":"JPN","n":"Japan","y":2007,"v":100.4},{"c":"AUS","n":"Australia","y":2007,"v":78.25},{"c":"IND","n":"India","y":2007,"v":51.49},{"c":"KOR","n":"South Korea","y":2007,"v":81.44},{"c":"CHN","n":"China","y":2007,"v":85.64},{"c":"USA","n":"United States","y":2008,"v":74.78},{"c":"GBR","n":"United Kingdom","y":2008,"v":89.99},{"c":"FRA","n":"France","y":2008,"v":117.13},{"c":"DEU","n":"Germany","y":2008,"v":84.38},{"c":"CAN","n":"Canada","y":2008,"v":83.97},{"c":"JPN","n":"Japan","y":2008,"v":105.28},{"c":"AUS","n":"Australia","y":2008,"v":80.78},{"c":"IND","n":"India","y":2008,"v":60.6},{"c":"KOR","n":"South Korea","y":2008,"v":93.4},{"c":"CHN","n":"China","y":2008,"v":86.45},{"c":"USA","n":"United States","y":2009,"v":72.78},{"c":"GBR","n":"United Kingdom","y":2009,"v":87.15},{"c":"FRA","n":"France","y":2009,"v":120.64},{"c":"DEU","n":"Germany","y":2009,"v":85.57},{"c":"CAN","n":"Canada","y":2009,"v":88.33},{"c":"JPN","n":"Japan","y":2009,"v":108.53},{"c":"AUS","n":"Australia","y":2009,"v":74.16},{"c":"IND","n":"India","y":2009,"v":61.48},{"c":"KOR","n":"South Korea","y":2009,"v":96.46},{"c":"CHN","n":"China","y":2009,"v":102.47},{"c":"USA","n":"United States","y":2010,"v":69.15},{"c":"GBR","n":"United Kingdom","y":2010,"v":82.1},{"c":"FRA","n":"France","y":2010,"v":119.58},{"c":"DEU","n":"Germany","y":2010,"v":83.18},{"c":"CAN","n":"Canada","y":2010,"v":85.12},{"c":"JPN","n":"Japan","y":2010,"v":101.95},{"c":"AUS","n":"Australia","y":2010,"v":66.82},{"c":"IND","n":"India","y":2010,"v":67.87},{"c":"KOR","n":"South Korea","y":2010,"v":91.6},{"c":"CHN","n":"China","y":2010,"v":108.96},{"c":"USA","n":"United States","y":2011,"v":68.47},{"c":"GBR","n":"United Kingdom","y":2011,"v":80.14},{"c":"FRA","n":"France","y":2011,"v":125.14},{"c":"DEU","n":"Germany","y":2011,"v":81.75},{"c":"CAN","n":"Canada","y":2011,"v":85.41},{"c":"JPN","n":"Japan","y":2011,"v":101.61},{"c":"AUS","n":"Australia","y":2011,"v":64.35},{"c":"IND","n":"India","y":2011,"v":70.66},{"c":"KOR","n":"South Korea","y":2011,"v":92.4},{"c":"CHN","n":"China","y":2011,"v":106.65},{"c":"USA","n":"United States","y":2012,"v":69.3},{"c":"GBR","n":"United Kingdom","y":2012,"v":82.26},{"c":"FRA","n":"France","y":2012,"v":129.28},{"c":"DEU","n":"Germany","y":2012,"v":81.5},{"c":"CAN","n":"Canada","y":2012,"v":89.54},{"c":"JPN","n":"Japan","y":2012,"v":100.18},{"c":"AUS","n":"Australia","y":2012,"v":65.59},{"c":"IND","n":"India","y":2012,"v":70.49},{"c":"KOR","n":"South Korea","y":2012,"v":93.84},{"c":"CHN","n":"China","y":2012,"v":114.82},{"c":"USA","n":"United States","y":2013,"v":70.06},{"c":"GBR","n":"United Kingdom","y":2013,"v":77.76},{"c":"FRA","n":"France","y":2013,"v":126.98},{"c":"DEU","n":"Germany","y":2013,"v":84.21},{"c":"CAN","n":"Canada","y":2013,"v":94.92},{"c":"JPN","n":"Japan","y":2013,"v":99.09},{"c":"AUS","n":"Australia","y":2013,"v":69.21},{"c":"IND","n":"India","y":2013,"v":62.14},{"c":"KOR","n":"South Korea","y":2013,"v":93.45},{"c":"CHN","n":"China","y":2013,"v":119.86},{"c":"USA","n":"United States","y":2014,"v":71.87},{"c":"GBR","n":"United Kingdom","y":2014,"v":71.68},{"c":"FRA","n":"France","y":2014,"v":133.07},{"c":"DEU","n":"Germany","y":2014,"v":79.4},{"c":"CAN","n":"Canada","y":2014,"v":99},{"c":"JPN","n":"Japan","y":2014,"v":97.77},{"c":"AUS","n":"Australia","y":2014,"v":70.94},{"c":"IND","n":"India","y":2014,"v":65.52},{"c":"KOR","n":"South Korea","y":2014,"v":94.95},{"c":"CHN","n":"China","y":2014,"v":129.6},{"c":"USA","n":"United States","y":2015,"v":73.83},{"c":"GBR","n":"United Kingdom","y":2015,"v":69.64},{"c":"FRA","n":"France","y":2015,"v":137.89},{"c":"DEU","n":"Germany","y":2015,"v":80.01},{"c":"CAN","n":"Canada","y":2015,"v":108.59},{"c":"JPN","n":"Japan","y":2015,"v":94.96},{"c":"AUS","n":"Australia","y":2015,"v":76.17},{"c":"IND","n":"India","y":2015,"v":61.97},{"c":"KOR","n":"South Korea","y":2015,"v":93.11},{"c":"CHN","n":"China","y":2015,"v":138.45},{"c":"USA","n":"United States","y":2016,"v":75.43},{"c":"GBR","n":"United Kingdom","y":2016,"v":75.19},{"c":"FRA","n":"France","y":2016,"v":140.76},{"c":"DEU","n":"Germany","y":2016,"v":82.11},{"c":"CAN","n":"Canada","y":2016,"v":109.58},{"c":"JPN","n":"Japan","y":2016,"v":96.76},{"c":"AUS","n":"Australia","y":2016,"v":75.14},{"c":"IND","n":"India","y":2016,"v":53.4},{"c":"KOR","n":"South Korea","y":2016,"v":89.63},{"c":"CHN","n":"China","y":2016,"v":139.64},{"c":"USA","n":"United States","y":2017,"v":77.49},{"c":"GBR","n":"United Kingdom","y":2017,"v":76.53},{"c":"FRA","n":"France","y":2017,"v":142.3},{"c":"DEU","n":"Germany","y":2017,"v":82.24},{"c":"CAN","n":"Canada","y":2017,"v":109.99},{"c":"JPN","n":"Japan","y":2017,"v":96.88},{"c":"AUS","n":"Australia","y":2017,"v":71.11},{"c":"IND","n":"India","y":2017,"v":64.65},{"c":"KOR","n":"South Korea","y":2017,"v":87.82},{"c":"CHN","n":"China","y":2017,"v":136.43},{"c":"USA","n":"United States","y":2018,"v":78.4},{"c":"GBR","n":"United Kingdom","y":2018,"v":71.69},{"c":"FRA","n":"France","y":2018,"v":145.51},{"c":"DEU","n":"Germany","y":2018,"v":83.45},{"c":"CAN","n":"Canada","y":2018,"v":113.01},{"c":"JPN","n":"Japan","y":2018,"v":99.19},{"c":"AUS","n":"Australia","y":2018,"v":71.57},{"c":"IND","n":"India","y":2018,"v":57.67},{"c":"KOR","n":"South Korea","y":2018,"v":90.39},{"c":"CHN","n":"China","y":2018,"v":130.69},{"c":"USA","n":"United States","y":2019,"v":78.48},{"c":"GBR","n":"United Kingdom","y":2019,"v":71.28},{"c":"FRA","n":"France","y":2019,"v":149.95},{"c":"DEU","n":"Germany","y":2019,"v":85.37},{"c":"CAN","n":"Canada","y":2019,"v":117.64},{"c":"JPN","n":"Japan","y":2019,"v":103.56},{"c":"AUS","n":"Australia","y":2019,"v":70.58},{"c":"IND","n":"India","y":2019,"v":50.29},{"c":"KOR","n":"South Korea","y":2019,"v":95.5},{"c":"CHN","n":"China","y":2019,"v":128.45},{"c":"USA","n":"United States","y":2020,"v":86.63},{"c":"GBR","n":"United Kingdom","y":2020,"v":83.78},{"c":"FRA","n":"France","y":2020,"v":171.44},{"c":"DEU","n":"Germany","y":2020,"v":92.45},{"c":"CAN","n":"Canada","y":2020,"v":132.37},{"c":"JPN","n":"Japan","y":2020,"v":117.59},{"c":"AUS","n":"Australia","y":2020,"v":69.42},{"c":"IND","n":"India","y":2020,"v":53.34},{"c":"KOR","n":"South Korea","y":2020,"v":103.56},{"c":"CHN","n":"China","y":2020,"v":134.88},{"c":"USA","n":"United States","y":2021,"v":82.82},{"c":"GBR","n":"United Kingdom","y":2021,"v":76.05},{"c":"FRA","n":"France","y":2021,"v":161.06},{"c":"DEU","n":"Germany","y":2021,"v":92.01},{"c":"CAN","n":"Canada","y":2021,"v":125.15},{"c":"JPN","n":"Japan","y":2021,"v":118.12},{"c":"AUS","n":"Australia","y":2021,"v":63.73},{"c":"IND","n":"India","y":2021,"v":49.85},{"c":"KOR","n":"South Korea","y":2021,"v":106.93},{"c":"CHN","n":"China","y":2021,"v":127.6},{"c":"USA","n":"United States","y":2022,"v":79.34},{"c":"GBR","n":"United Kingdom","y":2022,"v":66.14},{"c":"FRA","n":"France","y":2022,"v":159.71},{"c":"DEU","n":"Germany","y":2022,"v":93.48},{"c":"CAN","n":"Canada","y":2022,"v":114.99},{"c":"JPN","n":"Japan","y":2022,"v":119.82},{"c":"AUS","n":"Australia","y":2022,"v":60.06},{"c":"IND","n":"India","y":2022,"v":47.5},{"c":"KOR","n":"South Korea","y":2022,"v":111.67},{"c":"CHN","n":"China","y":2022,"v":132.49},{"c":"USA","n":"United States","y":2023,"v":75.9},{"c":"GBR","n":"United Kingdom","y":2023,"v":63.93},{"c":"FRA","n":"France","y":2023,"v":154.82},{"c":"DEU","n":"Germany","y":2023,"v":89.7},{"c":"CAN","n":"Canada","y":2023,"v":117.46},{"c":"JPN","n":"Japan","y":2023,"v":117.34},{"c":"AUS","n":"Australia","y":2023,"v":59.14},{"c":"IND","n":"India","y":2023,"v":48.77},{"c":"KOR","n":"South Korea","y":2023,"v":112.97},{"c":"CHN","n":"China","y":2023,"v":137.34},{"c":"USA","n":"United States","y":2024,"v":73.77},{"c":"GBR","n":"United Kingdom","y":2024,"v":61.15},{"c":"FRA","n":"France","y":2024,"v":154.94},{"c":"DEU","n":"Germany","y":2024,"v":89.48},{"c":"CAN","n":"Canada","y":2024,"v":118.03},{"c":"JPN","n":"Japan","y":2024,"v":116.32},{"c":"AUS","n":"Australia","y":2024,"v":60.84},{"c":"IND","n":"India","y":2024,"v":49.78},{"c":"KOR","n":"South Korea","y":2024,"v":110.52},{"c":"CHN","n":"China","y":2024,"v":144.19}];
+
+  // Organize data by country code
+  var DATA = {};
+  RAW.forEach(function(d) {
+    if (!DATA[d.c]) DATA[d.c] = [];
+    DATA[d.c].push({ year: d.y, value: d.v });
+  });
+
+  // Sort each series by year
+  var keys = Object.keys(DATA);
+  keys.forEach(function(k) {
+    DATA[k].sort(function(a, b) { return a.year - b.year; });
+  });
+
+  var svgNS = "http://www.w3.org/2000/svg";
+  var countryOrder = ["FRA", "CHN", "JPN", "CAN", "KOR", "DEU", "USA", "GBR", "AUS", "IND"];
+
+  var margin = { top: 20, right: 95, bottom: 36, left: 44 };
+  var containerEl = document.getElementById("chartContainer");
+  var fullWidth = Math.min(880, containerEl.offsetWidth);
+  var fullHeight = 460;
+  var width = fullWidth - margin.left - margin.right;
+  var height = fullHeight - margin.top - margin.bottom;
+
+  var minX = 1990;
+  var maxX = 2024;
+  var minY = 40;
+  var maxY = 180;
+
+  function scaleX(year) {
+    return margin.left + ((year - minX) / (maxX - minX)) * width;
+  }
+  function scaleY(val) {
+    return margin.top + ((maxY - val) / (maxY - minY)) * height;
+  }
+
+  // Build legend
+  var legendEl = document.getElementById("legend");
+  countryOrder.forEach(function(code) {
+    var item = document.createElement("div");
+    item.className = "legend-item";
+    var swatch = document.createElement("div");
+    swatch.className = "legend-swatch";
+    swatch.style.background = COLORS[code];
+    var label = document.createElement("span");
+    label.textContent = COUNTRIES[code].name;
+    item.appendChild(swatch);
+    item.appendChild(label);
+    legendEl.appendChild(item);
+  });
+
+  // Create SVG
+  var svg = document.getElementById("chart");
+  svg.setAttribute("width", fullWidth);
+  svg.setAttribute("height", fullHeight);
+  svg.setAttribute("viewBox", "0 0 " + fullWidth + " " + fullHeight);
+
+  function createEl(tag, attrs) {
+    var el = document.createElementNS(svgNS, tag);
+    for (var k in attrs) {
+      el.setAttribute(k, attrs[k]);
+    }
+    return el;
+  }
+
+  // Y-axis gridlines and labels
+  var yTicks = [];
+  for (var y = minY; y <= maxY; y += 20) {
+    yTicks.push(y);
+  }
+  yTicks.forEach(function(tick) {
+    var yPos = scaleY(tick);
+    var line = createEl("line", {
+      x1: margin.left,
+      y1: yPos,
+      x2: margin.left + width,
+      y2: yPos,
+      stroke: tick === 100 ? "#C5C3B8" : "#E0DED6",
+      "stroke-width": tick === 100 ? 1 : 0.7
+    });
+    svg.appendChild(line);
+
+    var label = createEl("text", {
+      x: margin.left - 8,
+      y: yPos + 3.5,
+      "text-anchor": "end",
+      fill: "#7A786F",
+      "font-size": "10px",
+      "font-family": "Inter, sans-serif"
+    });
+    label.textContent = tick + "%";
+    svg.appendChild(label);
+  });
+
+  // 100% reference label
+  var refLabel = createEl("text", {
+    x: margin.left + width + 6,
+    y: scaleY(100) + 3.5,
+    "text-anchor": "start",
+    fill: "#9E9D89",
+    "font-size": "8px",
+    "font-family": "JetBrains Mono, monospace",
+    "letter-spacing": "0.3px"
+  });
+  refLabel.textContent = "= GDP";
+  svg.appendChild(refLabel);
+
+  // X-axis labels
+  for (var xYear = 1990; xYear <= 2024; xYear += 5) {
+    var xActual = xYear;
+    if (xYear === 2025) xActual = 2024;
+    var xPos = scaleX(xActual);
+
+    var xlabel = createEl("text", {
+      x: xPos,
+      y: margin.top + height + 20,
+      "text-anchor": "middle",
+      fill: "#7A786F",
+      "font-size": "10px",
+      "font-family": "Inter, sans-serif"
+    });
+    xlabel.textContent = xActual;
+    svg.appendChild(xlabel);
+
+    var xtick = createEl("line", {
+      x1: xPos,
+      y1: margin.top + height,
+      x2: xPos,
+      y2: margin.top + height + 5,
+      stroke: "#C8C6BD",
+      "stroke-width": 0.7
+    });
+    svg.appendChild(xtick);
+  }
+
+  // Draw lines for each country
+  countryOrder.forEach(function(code) {
+    var series = DATA[code];
+    if (!series || series.length < 2) return;
+
+    var color = COLORS[code];
+
+    // Build path
+    var pathStr = "";
+    series.forEach(function(d, i) {
+      var cmd = i === 0 ? "M" : "L";
+      pathStr += cmd + scaleX(d.year).toFixed(1) + "," + scaleY(d.value).toFixed(1);
+    });
+
+    var path = createEl("path", {
+      d: pathStr,
+      fill: "none",
+      stroke: color,
+      "stroke-width": 1.8,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round"
+    });
+    svg.appendChild(path);
+
+    // End label
+    var lastPt = series[series.length - 1];
+    var labelY = scaleY(lastPt.value) + 3.5;
+
+    // Nudge labels to avoid overlap at the right edge
+    var nudges = {
+      FRA: 0,
+      CHN: -8,
+      JPN: 8,
+      CAN: 0,
+      KOR: -8,
+      DEU: 8,
+      USA: -5,
+      GBR: 5,
+      AUS: 0,
+      IND: 0
+    };
+    labelY += (nudges[code] || 0);
+
+    var endLabel = createEl("text", {
+      x: scaleX(lastPt.year) + 6,
+      y: labelY,
+      fill: color,
+      "font-size": "9px",
+      "font-weight": "500",
+      "font-family": "Inter, sans-serif"
+    });
+    endLabel.textContent = COUNTRIES[code].name;
+    svg.appendChild(endLabel);
+  });
+
+  // Vertical hover line
+  var hoverLine = createEl("line", {
+    x1: 0, y1: margin.top, x2: 0, y2: margin.top + height,
+    stroke: "#C8C6BD",
+    "stroke-width": 0.7,
+    "stroke-dasharray": "3,3",
+    opacity: 0
+  });
+  svg.appendChild(hoverLine);
+
+  // Overlay for mouse tracking
+  var overlay = createEl("rect", {
+    x: margin.left,
+    y: margin.top,
+    width: width,
+    height: height,
+    fill: "transparent"
+  });
+  overlay.style.cursor = "crosshair";
+  svg.appendChild(overlay);
+
+  var activeDots = [];
+  var tooltipEl = document.getElementById("tooltip");
+
+  overlay.addEventListener("mousemove", function(e) {
+    var rect = svg.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    // Snap to nearest year
+    var yearFloat = minX + ((mouseX - margin.left) / width) * (maxX - minX);
+    var closestYear = Math.round(yearFloat);
+    if (closestYear < minX) closestYear = minX;
+    if (closestYear > maxX) closestYear = maxX;
+
+    var snapX = scaleX(closestYear);
+
+    hoverLine.setAttribute("x1", snapX);
+    hoverLine.setAttribute("x2", snapX);
+    hoverLine.setAttribute("opacity", 1);
+
+    // Remove old dots
+    activeDots.forEach(function(d) { svg.removeChild(d); });
+    activeDots = [];
+
+    // Build tooltip
+    var lines = ["<strong>" + closestYear + "</strong>"];
+    var yearData = [];
+    countryOrder.forEach(function(code) {
+      if (!DATA[code]) return;
+      var match = DATA[code].find(function(d) { return d.year === closestYear; });
+      if (match) {
+        yearData.push({ code: code, value: match.value });
+      }
+    });
+    yearData.sort(function(a, b) { return b.value - a.value; });
+
+    yearData.forEach(function(item) {
+      var dot = createEl("circle", {
+        cx: snapX,
+        cy: scaleY(item.value),
+        r: 3.5,
+        fill: COLORS[item.code],
+        stroke: "#F6F5EE",
+        "stroke-width": 1.5
+      });
+      svg.appendChild(dot);
+      activeDots.push(dot);
+
+      var swatch = '<span style="display:inline-block;width:8px;height:8px;border-radius:1px;background:' + COLORS[item.code] + ';margin-right:5px;vertical-align:middle;"></span>';
+      lines.push(swatch + COUNTRIES[item.code].name + "  " + item.value.toFixed(1) + "%");
+    });
+
+    tooltipEl.innerHTML = lines.join("<br>");
+    tooltipEl.classList.add("visible");
+
+    // Position tooltip
+    var tooltipWidth = tooltipEl.offsetWidth;
+    var tooltipHeight = tooltipEl.offsetHeight;
+    var tx = snapX + 14;
+    if (tx + tooltipWidth > fullWidth - 10) {
+      tx = snapX - tooltipWidth - 14;
+    }
+    var ty = mouseY - tooltipHeight / 2;
+    if (ty < 4) ty = 4;
+    if (ty + tooltipHeight > fullHeight - 4) ty = fullHeight - tooltipHeight - 4;
+
+    tooltipEl.style.left = tx + "px";
+    tooltipEl.style.top = ty + "px";
+  });
+
+  overlay.addEventListener("mouseleave", function() {
+    hoverLine.setAttribute("opacity", 0);
+    tooltipEl.classList.remove("visible");
+    activeDots.forEach(function(d) { svg.removeChild(d); });
+    activeDots = [];
+  });
+})();
+</script>
+</body>
+</html>

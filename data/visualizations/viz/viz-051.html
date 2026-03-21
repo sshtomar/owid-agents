@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart-wrap { position: relative; }
+  svg { display: block; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+    white-space: nowrap;
+    z-index: 10;
+    line-height: 1.6;
+  }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #5A5851; cursor: pointer; user-select: none; }
+  .legend-item.dimmed { opacity: 0.25; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 1px; }
+  .projection-note { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #9A9890; margin-bottom: 4px; letter-spacing: 0.3px; }
+</style>
+</head><body>
+<h1>Up in Smoke</h1>
+<p class="subtitle">Tobacco smoking prevalence (age-standardized %) across 12 countries, 2000 to 2030. Most nations are stubbing out the habit, but Indonesia and South Korea barely budge, while Egypt lights up more than ever. Values after 2024 are WHO projections.</p>
+<div class="projection-note">--- DASHED LINES = WHO PROJECTIONS (2025-2030)</div>
+<div class="legend" id="legend"></div>
+<div id="chart-wrap">
+  <div class="tooltip" id="tooltip"></div>
+</div>
+<p class="source">Source: WHO Global Health Observatory &mdash; M_Est_smk_curr_std (Tobacco Smoking Prevalence, age-standardized %)</p>
+
+<script>
+// --- DATA ---
+// Each country: array of {year, value} sorted by year
+// Values after 2024 are WHO projections (rendered dashed)
+const PROJECTION_START = 2025;
+
+const COUNTRIES = [
+  {
+    id: "JPN", name: "Japan", color: "#D44B3F",
+    data: [{y:2000,v:52.3},{y:2005,v:39.2},{y:2010,v:25.5},{y:2015,v:22.1},{y:2020,v:19.8},{y:2022,v:17.1},{y:2025,v:12.0},{y:2030,v:7.8}]
+  },
+  {
+    id: "USA", name: "United States", color: "#3A6FA0",
+    data: [{y:2000,v:38.7},{y:2005,v:31.0},{y:2010,v:25.1},{y:2015,v:21.0},{y:2020,v:16.8},{y:2022,v:14.5},{y:2025,v:12.0},{y:2030,v:9.3}]
+  },
+  {
+    id: "RUS", name: "Russia", color: "#7B5EA7",
+    data: [{y:2000,v:35.0},{y:2005,v:32.7},{y:2010,v:27.5},{y:2015,v:21.0},{y:2020,v:14.1},{y:2022,v:14.3},{y:2025,v:14.5},{y:2030,v:14.3}]
+  },
+  {
+    id: "IND", name: "India", color: "#D4903A",
+    data: [{y:2000,v:34.9},{y:2005,v:29.9},{y:2010,v:26.5},{y:2015,v:22.2},{y:2020,v:19.1},{y:2023,v:17.5},{y:2025,v:16.5},{y:2030,v:14.8}]
+  },
+  {
+    id: "DEU", name: "Germany", color: "#4E8B6A",
+    data: [{y:2000,v:34.9},{y:2005,v:32.0},{y:2010,v:29.5},{y:2015,v:27.0},{y:2020,v:24.5},{y:2024,v:22.0},{y:2025,v:21.5},{y:2030,v:19.0}]
+  },
+  {
+    id: "IDN", name: "Indonesia", color: "#C87533",
+    data: [{y:2000,v:32.5},{y:2005,v:32.0},{y:2010,v:31.2},{y:2015,v:31.5},{y:2020,v:31.0},{y:2023,v:30.8},{y:2025,v:30.2},{y:2030,v:29.5}]
+  },
+  {
+    id: "KOR", name: "South Korea", color: "#2D8E8E",
+    data: [{y:2000,v:32.0},{y:2005,v:30.5},{y:2007,v:29.4},{y:2010,v:28.0},{y:2015,v:23.6},{y:2020,v:22.5},{y:2025,v:20.0},{y:2030,v:26.5}]
+  },
+  {
+    id: "FRA", name: "France", color: "#8A6D9F",
+    data: [{y:2000,v:34.5},{y:2005,v:32.5},{y:2010,v:30.5},{y:2015,v:27.8},{y:2020,v:25.5},{y:2025,v:22.5},{y:2030,v:19.5}]
+  },
+  {
+    id: "SWE", name: "Sweden", color: "#3B89C9",
+    data: [{y:2000,v:28.0},{y:2005,v:25.4},{y:2010,v:18.2},{y:2015,v:15.8},{y:2020,v:12.0},{y:2022,v:9.5},{y:2025,v:8.0},{y:2030,v:6.5}]
+  },
+  {
+    id: "AUS", name: "Australia", color: "#5DA06A",
+    data: [{y:2000,v:22.7},{y:2005,v:21.2},{y:2010,v:17.5},{y:2015,v:13.5},{y:2020,v:11.5},{y:2025,v:10.5},{y:2030,v:9.6}]
+  },
+  {
+    id: "EGY", name: "Egypt", color: "#C7384F",
+    data: [{y:2000,v:18.5},{y:2005,v:19.5},{y:2007,v:20.8},{y:2010,v:21.5},{y:2015,v:25.0},{y:2020,v:32.0},{y:2025,v:42.0},{y:2030,v:53.4}]
+  },
+  {
+    id: "BRA", name: "Brazil", color: "#3FAA6E",
+    data: [{y:2000,v:22.0},{y:2005,v:19.5},{y:2010,v:17.5},{y:2015,v:14.5},{y:2020,v:11.0},{y:2025,v:9.0},{y:2030,v:7.0}]
+  }
+];
+
+// --- LAYOUT ---
+const W = 900, H = 520;
+const ML = 50, MR = 110, MT = 20, MB = 44;
+const PW = W - ML - MR;
+const PH = H - MT - MB;
+
+const yearMin = 2000, yearMax = 2030;
+const valMin = 0, valMax = 60;
+
+function xScale(year) { return ML + ((year - yearMin) / (yearMax - yearMin)) * PW; }
+function yScale(val) { return MT + PH - ((val - valMin) / (valMax - valMin)) * PH; }
+
+// SVG helper
+const ns = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, String(v));
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// --- BUILD SVG ---
+const wrap = document.getElementById("chart-wrap");
+const svg = el("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H });
+wrap.insertBefore(svg, wrap.firstChild);
+
+// Grid lines - horizontal
+const yTicks = [0, 10, 20, 30, 40, 50, 60];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  el("line", {
+    x1: ML, x2: ML + PW, y1: y, y2: y,
+    stroke: v === 0 ? "#C8C6BA" : "#ECEADF", "stroke-width": 1
+  }, svg);
+  const t = el("text", {
+    x: ML - 8, y: y + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#9A9890"
+  }, svg);
+  t.textContent = v + "%";
+});
+
+// Y-axis label
+const yLabel = el("text", {
+  x: 0, y: 0, "text-anchor": "middle",
+  "font-family": "'JetBrains Mono', monospace", "font-size": "8", fill: "#9A9890",
+  transform: "translate(14," + (MT + PH / 2) + ") rotate(-90)"
+}, svg);
+yLabel.textContent = "SMOKING PREVALENCE (%)";
+
+// Grid lines - vertical (every 5 years)
+for (let yr = 2000; yr <= 2030; yr += 5) {
+  const x = xScale(yr);
+  el("line", {
+    x1: x, x2: x, y1: MT, y2: MT + PH,
+    stroke: "#ECEADF", "stroke-width": 1
+  }, svg);
+  const t = el("text", {
+    x: x, y: MT + PH + 16, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#9A9890"
+  }, svg);
+  t.textContent = yr;
+}
+
+// Projection zone shading (2025-2030)
+el("rect", {
+  x: xScale(PROJECTION_START), y: MT,
+  width: xScale(yearMax) - xScale(PROJECTION_START), height: PH,
+  fill: "#EBE9E0", opacity: 0.6
+}, svg);
+
+const projLabel = el("text", {
+  x: xScale(2027.5), y: MT + 14, "text-anchor": "middle",
+  "font-family": "'JetBrains Mono', monospace", "font-size": "8", fill: "#B5B2A8"
+}, svg);
+projLabel.textContent = "PROJECTION";
+
+// --- DRAW LINES ---
+const lineGroup = el("g", {}, svg);
+const dotGroup = el("g", {}, svg);
+const labelGroup = el("g", {}, svg);
+
+// Track which countries are active (for toggle)
+const active = new Array(COUNTRIES.length).fill(true);
+
+// Interpolate between data points for smooth drawing
+function interpolate(data, year) {
+  if (year <= data[0].y) return data[0].v;
+  if (year >= data[data.length - 1].y) return data[data.length - 1].v;
+  for (let i = 0; i < data.length - 1; i++) {
+    if (year >= data[i].y && year <= data[i + 1].y) {
+      const t = (year - data[i].y) / (data[i + 1].y - data[i].y);
+      return data[i].v + t * (data[i + 1].v - data[i].v);
+    }
+  }
+  return data[0].v;
+}
+
+// Build paths for each country
+const pathElements = [];
+
+COUNTRIES.forEach((c, ci) => {
+  const pts = c.data;
+
+  // Split into solid (up to 2024) and dashed (2025+)
+  // Build a fine-grained set of points for smooth lines
+  const solidPts = [];
+  const dashPts = [];
+
+  for (let yr = pts[0].y; yr <= pts[pts.length - 1].y; yr += 0.5) {
+    const val = interpolate(pts, yr);
+    const px = xScale(yr);
+    const py = yScale(val);
+    if (yr < PROJECTION_START) {
+      solidPts.push({ x: px, y: py, yr: yr, val: val });
+    } else {
+      dashPts.push({ x: px, y: py, yr: yr, val: val });
+    }
+  }
+
+  // Add the boundary point to both
+  const boundaryVal = interpolate(pts, PROJECTION_START);
+  const boundaryPt = { x: xScale(PROJECTION_START), y: yScale(boundaryVal), yr: PROJECTION_START, val: boundaryVal };
+  if (solidPts.length > 0 && solidPts[solidPts.length - 1].yr < PROJECTION_START) {
+    solidPts.push(boundaryPt);
+  }
+  if (dashPts.length > 0 && dashPts[0].yr > PROJECTION_START) {
+    dashPts.unshift(boundaryPt);
+  }
+
+  function toPathD(points) {
+    return points.map((p, i) => (i === 0 ? "M" : "L") + p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" ");
+  }
+
+  // Solid line
+  const solidPath = el("path", {
+    d: toPathD(solidPts), fill: "none", stroke: c.color,
+    "stroke-width": 2.2, "stroke-linecap": "round", "stroke-linejoin": "round",
+    opacity: 0.85
+  }, lineGroup);
+
+  // Dashed line (projection)
+  const dashPath = el("path", {
+    d: toPathD(dashPts), fill: "none", stroke: c.color,
+    "stroke-width": 2.2, "stroke-linecap": "round", "stroke-linejoin": "round",
+    "stroke-dasharray": "6,4", opacity: 0.65
+  }, lineGroup);
+
+  pathElements.push({ solid: solidPath, dash: dashPath });
+
+  // Data point dots
+  pts.forEach(p => {
+    el("circle", {
+      cx: xScale(p.y), cy: yScale(p.v), r: 2.5,
+      fill: c.color, stroke: "#F6F5EE", "stroke-width": 1.2,
+      opacity: p.y >= PROJECTION_START ? 0.65 : 0.9,
+      "data-ci": ci
+    }, dotGroup);
+  });
+
+  // End label (at last data point)
+  const last = pts[pts.length - 1];
+  const labelY = yScale(last.v);
+
+  const lbl = el("text", {
+    x: xScale(last.y) + 6, y: labelY + 3.5, "text-anchor": "start",
+    "font-family": "'Inter', sans-serif", "font-size": "10", "font-weight": "500",
+    fill: c.color, "data-ci": ci
+  }, labelGroup);
+  lbl.textContent = c.name;
+
+  const valLbl = el("text", {
+    x: xScale(last.y) + 6, y: labelY + 14, "text-anchor": "start",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "8",
+    fill: c.color, opacity: 0.7, "data-ci": ci
+  }, labelGroup);
+  valLbl.textContent = last.v.toFixed(1) + "%";
+});
+
+// --- RESOLVE LABEL OVERLAPS ---
+(function resolveOverlaps() {
+  const labels = labelGroup.querySelectorAll("text[data-ci]");
+  const positions = [];
+  for (let i = 0; i < COUNTRIES.length; i++) {
+    const last = COUNTRIES[i].data[COUNTRIES[i].data.length - 1];
+    positions.push({ ci: i, y: yScale(last.v), name: COUNTRIES[i].name });
+  }
+  positions.sort((a, b) => a.y - b.y);
+
+  const minGap = 15;
+  for (let pass = 0; pass < 10; pass++) {
+    let moved = false;
+    for (let i = 1; i < positions.length; i++) {
+      const gap = positions[i].y - positions[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        positions[i - 1].y -= shift;
+        positions[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+
+  positions.forEach(p => {
+    const nameEl = labelGroup.querySelector("text[data-ci='" + p.ci + "']:not([font-family*='Mono'])");
+    const valEl = labelGroup.querySelector("text[data-ci='" + p.ci + "'][font-family*='Mono']");
+    if (nameEl) nameEl.setAttribute("y", p.y + 3.5);
+    if (valEl) valEl.setAttribute("y", p.y + 14);
+  });
+})();
+
+// --- LEGEND ---
+const legendEl = document.getElementById("legend");
+COUNTRIES.forEach((c, ci) => {
+  const item = document.createElement("div");
+  item.className = "legend-item";
+  item.innerHTML = '<div class="legend-swatch" style="background:' + c.color + '"></div>' + c.name;
+  item.addEventListener("click", () => {
+    active[ci] = !active[ci];
+    item.classList.toggle("dimmed", !active[ci]);
+    pathElements[ci].solid.style.display = active[ci] ? "" : "none";
+    pathElements[ci].dash.style.display = active[ci] ? "" : "none";
+    dotGroup.querySelectorAll("[data-ci='" + ci + "']").forEach(d => d.style.display = active[ci] ? "" : "none");
+    labelGroup.querySelectorAll("[data-ci='" + ci + "']").forEach(d => d.style.display = active[ci] ? "" : "none");
+  });
+  legendEl.appendChild(item);
+});
+
+// --- CROSSHAIR & TOOLTIP ---
+const crossLine = el("line", {
+  x1: 0, x2: 0, y1: MT, y2: MT + PH,
+  stroke: "#B5B2A8", "stroke-width": 0.8, "stroke-dasharray": "3,3",
+  opacity: 0, "pointer-events": "none"
+}, svg);
+
+const hitZone = el("rect", {
+  x: ML, y: MT, width: PW, height: PH,
+  fill: "transparent", "pointer-events": "all"
+}, svg);
+hitZone.style.cursor = "crosshair";
+
+const tooltip = document.getElementById("tooltip");
+
+hitZone.addEventListener("mousemove", function(e) {
+  const rect = svg.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const hoveredYear = yearMin + ((mx - ML) / PW) * (yearMax - yearMin);
+  const snappedYear = Math.round(hoveredYear);
+
+  if (snappedYear < yearMin || snappedYear > yearMax) {
+    crossLine.setAttribute("opacity", "0");
+    tooltip.style.opacity = "0";
+    return;
+  }
+
+  const cx = xScale(snappedYear);
+  crossLine.setAttribute("x1", cx);
+  crossLine.setAttribute("x2", cx);
+  crossLine.setAttribute("opacity", "1");
+
+  // Build tooltip content
+  let rows = [];
+  COUNTRIES.forEach((c, ci) => {
+    if (!active[ci]) return;
+    const pts = c.data;
+    if (snappedYear < pts[0].y || snappedYear > pts[pts.length - 1].y) return;
+    const val = interpolate(pts, snappedYear);
+    rows.push({ name: c.name, val: val, color: c.color });
+  });
+
+  rows.sort((a, b) => b.val - a.val);
+
+  let html = '<div style="font-family:Inter,sans-serif;font-weight:600;font-size:11px;margin-bottom:4px;color:#F6F5EE">' + snappedYear;
+  if (snappedYear >= PROJECTION_START) html += ' <span style="color:#9A9890;font-weight:400;font-size:9px">(projected)</span>';
+  html += '</div>';
+
+  rows.forEach(r => {
+    html += '<div><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + r.color + ';margin-right:5px;vertical-align:middle"></span>';
+    html += '<span style="color:#C8C6BA">' + r.name + '</span> ';
+    html += '<span style="color:' + r.color + ';font-weight:500">' + r.val.toFixed(1) + '%</span></div>';
+  });
+
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = "1";
+
+  const wrapRect = wrap.getBoundingClientRect();
+  let tx = e.clientX - wrapRect.left + 16;
+  let ty = e.clientY - wrapRect.top - 20;
+  if (tx + 180 > wrapRect.width) tx = e.clientX - wrapRect.left - 190;
+  if (ty < 0) ty = 10;
+  tooltip.style.left = tx + "px";
+  tooltip.style.top = ty + "px";
+});
+
+hitZone.addEventListener("mouseleave", function() {
+  crossLine.setAttribute("opacity", "0");
+  tooltip.style.opacity = "0";
+});
+
+// --- ANNOTATIONS ---
+// Highlight Egypt's rise
+const egyPts = COUNTRIES.find(c => c.id === "EGY").data;
+const egy2030 = egyPts[egyPts.length - 1];
+const annX = xScale(egy2030.y) - 50;
+const annY = yScale(egy2030.v) - 22;
+
+const annBg = el("rect", {
+  x: annX - 4, y: annY - 10, width: 70, height: 14, rx: 2,
+  fill: "#C7384F", opacity: 0.12
+}, svg);
+const annText = el("text", {
+  x: annX, y: annY, "font-family": "'JetBrains Mono', monospace",
+  "font-size": "8", "font-weight": "500", fill: "#C7384F"
+}, svg);
+annText.textContent = "53.4% by 2030";
+
+// Highlight Japan's dramatic fall
+const jpnStart = COUNTRIES.find(c => c.id === "JPN").data[0];
+const jpnAnnX = xScale(jpnStart.y) + 8;
+const jpnAnnY = yScale(jpnStart.v) - 8;
+
+const jpnBg = el("rect", {
+  x: jpnAnnX - 4, y: jpnAnnY - 10, width: 82, height: 14, rx: 2,
+  fill: "#D44B3F", opacity: 0.12
+}, svg);
+const jpnText = el("text", {
+  x: jpnAnnX, y: jpnAnnY, "font-family": "'JetBrains Mono', monospace",
+  "font-size": "8", "font-weight": "500", fill: "#D44B3F"
+}, svg);
+jpnText.textContent = "52.3% in 2000";
+
+</script>
+</body></html>

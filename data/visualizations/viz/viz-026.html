@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When Nature Strikes - Deaths from Natural Disasters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #F6F5EE;
+    color: #2B2A27;
+    font-family: 'Inter', sans-serif;
+    padding: 32px 40px 40px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: #2B2A27;
+    margin-bottom: 6px;
+  }
+  p.subtitle {
+    font-size: 11px;
+    color: #7A786F;
+    max-width: 600px;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  p.source {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7A786F;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 16px;
+  }
+  .chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+  }
+  svg text {
+    font-family: 'Inter', sans-serif;
+  }
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 8px 11px;
+    border-radius: 4px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .tooltip.visible {
+    opacity: 1;
+  }
+  .annotation-line {
+    stroke: #9A9790;
+    stroke-width: 0.7;
+    stroke-dasharray: 2,2;
+  }
+  .annotation-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5px;
+    fill: #5C5A53;
+    letter-spacing: 0.1px;
+  }
+</style>
+</head>
+<body>
+
+<h1>When Nature Strikes</h1>
+<p class="subtitle">
+  Global deaths from natural disasters per year, 1900 to 2024. Massive famines and floods in early-20th-century China and India dominate the record. In recent decades, individual catastrophic events stand out against a far lower baseline.
+</p>
+
+<div class="chart-container" id="chart-container">
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<p class="source">Source: Our World in Data / EM-DAT International Disaster Database</p>
+
+<script>
+(function() {
+  var DATA = [{"year":1900,"total":1267470},{"year":1901,"total":18},{"year":1902,"total":43790},{"year":1903,"total":7136},{"year":1904,"total":152},{"year":1905,"total":20946},{"year":1906,"total":33657},{"year":1907,"total":13241},{"year":1908,"total":75033},{"year":1909,"total":6316},{"year":1910,"total":20983},{"year":1911,"total":120605},{"year":1912,"total":69083},{"year":1913,"total":18952},{"year":1914,"total":21462},{"year":1915,"total":32337},{"year":1916,"total":481},{"year":1917,"total":23561},{"year":1918,"total":11250},{"year":1919,"total":5500},{"year":1920,"total":706872},{"year":1921,"total":0},{"year":1922,"total":101175},{"year":1923,"total":154263},{"year":1924,"total":3279},{"year":1925,"total":6959},{"year":1926,"total":4852},{"year":1927,"total":53270},{"year":1928,"total":3004895},{"year":1929,"total":3330},{"year":1930,"total":10903},{"year":1931,"total":3718976},{"year":1932,"total":4901},{"year":1933,"total":31442},{"year":1934,"total":5711},{"year":1935,"total":272119},{"year":1936,"total":5886},{"year":1937,"total":12450},{"year":1938,"total":2208},{"year":1939,"total":563205},{"year":1940,"total":5656},{"year":1941,"total":15797},{"year":1942,"total":1608421},{"year":1943,"total":1916950},{"year":1944,"total":20181},{"year":1945,"total":11358},{"year":1946,"total":35163},{"year":1947,"total":7374},{"year":1948,"total":10828},{"year":1949,"total":108274},{"year":1950,"total":6845},{"year":1951,"total":18227},{"year":1952,"total":6886},{"year":1953,"total":12516},{"year":1954,"total":41847},{"year":1955,"total":5556},{"year":1956,"total":7737},{"year":1957,"total":10580},{"year":1958,"total":4061},{"year":1959,"total":496147},{"year":1960,"total":997729},{"year":1961,"total":576292},{"year":1962,"total":16892},{"year":1963,"total":35361},{"year":1964,"total":12275},{"year":1965,"total":564710},{"year":1966,"total":517008},{"year":1967,"total":506500},{"year":1968,"total":22193},{"year":1969,"total":8381},{"year":1970,"total":386150},{"year":1971,"total":15774},{"year":1972,"total":19969},{"year":1973,"total":12197},{"year":1974,"total":87431},{"year":1975,"total":55562},{"year":1976,"total":308784},{"year":1977,"total":40877},{"year":1978,"total":54745},{"year":1979,"total":6686},{"year":1980,"total":21313},{"year":1981,"total":34012},{"year":1982,"total":29604},{"year":1983,"total":192654},{"year":1984,"total":263160},{"year":1985,"total":129679},{"year":1986,"total":7300},{"year":1987,"total":18744},{"year":1988,"total":17025},{"year":1989,"total":10337},{"year":1990,"total":50896},{"year":1991,"total":158615},{"year":1992,"total":12279},{"year":1993,"total":21170},{"year":1994,"total":13085},{"year":1995,"total":22676},{"year":1996,"total":14751},{"year":1997,"total":18732},{"year":1998,"total":50368},{"year":1999,"total":70250},{"year":2000,"total":9724},{"year":2001,"total":31039},{"year":2002,"total":12156},{"year":2003,"total":109915},{"year":2004,"total":242186},{"year":2005,"total":89213},{"year":2006,"total":23862},{"year":2007,"total":16839},{"year":2008,"total":235369},{"year":2009,"total":10813},{"year":2010,"total":307735},{"year":2011,"total":41323},{"year":2012,"total":9608},{"year":2013,"total":21847},{"year":2014,"total":7975},{"year":2015,"total":22879},{"year":2016,"total":8395},{"year":2017,"total":9761},{"year":2018,"total":11665},{"year":2019,"total":11923},{"year":2020,"total":15632},{"year":2021,"total":10525},{"year":2022,"total":76100},{"year":2023,"total":86517},{"year":2024,"total":1520}];
+
+  // Full annotations for tooltip display
+  var ANNOTATIONS = {
+    1900: "India famine",
+    1920: "China famine",
+    1923: "Great Kanto earthquake, Japan",
+    1928: "China famine",
+    1931: "China floods",
+    1939: "China floods & Turkey earthquake",
+    1942: "India famine",
+    1943: "Bengal famine",
+    1960: "China famine",
+    1965: "India drought & cyclones",
+    1970: "Bhola cyclone, Bangladesh",
+    1976: "Tangshan earthquake, China",
+    1984: "Ethiopian famine",
+    2004: "Indian Ocean tsunami",
+    2008: "Cyclone Nargis & Sichuan quake",
+    2010: "Haiti earthquake"
+  };
+
+  // Selected annotations to draw as labels on the chart (the most important ones, spaced out)
+  var LABELED = [
+    { year: 1928, label: "1928 China famine", anchor: "middle", yOff: 0 },
+    { year: 1931, label: "1931 China floods", anchor: "middle", yOff: 0 },
+    { year: 1943, label: "1943 Bengal famine", anchor: "start", yOff: 0 },
+    { year: 1960, label: "1960 China famine", anchor: "middle", yOff: 0 },
+    { year: 1970, label: "1970 Bhola cyclone", anchor: "middle", yOff: 0 },
+    { year: 1976, label: "1976 Tangshan quake", anchor: "middle", yOff: 18 },
+    { year: 2004, label: "2004 Tsunami", anchor: "middle", yOff: 0 },
+    { year: 2010, label: "2010 Haiti quake", anchor: "end", yOff: 0 }
+  ];
+
+  var container = document.getElementById("chart-container");
+  var tooltip = document.getElementById("tooltip");
+
+  var margin = { top: 36, right: 30, bottom: 40, left: 58 };
+  var fullWidth = Math.min(960, container.clientWidth);
+  var fullHeight = 440;
+  var width = fullWidth - margin.left - margin.right;
+  var height = fullHeight - margin.top - margin.bottom;
+
+  var maxVal = 0;
+  for (var i = 0; i < DATA.length; i++) {
+    if (DATA[i].total > maxVal) maxVal = DATA[i].total;
+  }
+
+  var minYear = DATA[0].year;
+  var maxYear = DATA[DATA.length - 1].year;
+  var yearSpan = maxYear - minYear;
+
+  function xScale(year) {
+    return margin.left + ((year - minYear) / yearSpan) * width;
+  }
+
+  function yScale(val) {
+    return margin.top + height - (val / maxVal) * height;
+  }
+
+  var barWidth = Math.max(1.5, (width / DATA.length) - 0.8);
+
+  var ns = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("width", fullWidth);
+  svg.setAttribute("height", fullHeight);
+  svg.setAttribute("viewBox", "0 0 " + fullWidth + " " + fullHeight);
+  svg.style.display = "block";
+
+  // Y-axis gridlines and labels
+  var yTicks = [0, 1000000, 2000000, 3000000];
+  var yLabels = ["0", "1M", "2M", "3M"];
+  for (var t = 0; t < yTicks.length; t++) {
+    var yPos = yScale(yTicks[t]);
+
+    if (yTicks[t] > 0) {
+      var gridLine = document.createElementNS(ns, "line");
+      gridLine.setAttribute("x1", margin.left);
+      gridLine.setAttribute("x2", margin.left + width);
+      gridLine.setAttribute("y1", yPos);
+      gridLine.setAttribute("y2", yPos);
+      gridLine.setAttribute("stroke", "#DDD9CE");
+      gridLine.setAttribute("stroke-width", "0.5");
+      svg.appendChild(gridLine);
+    }
+
+    var label = document.createElementNS(ns, "text");
+    label.setAttribute("x", margin.left - 8);
+    label.setAttribute("y", yPos + 3);
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("fill", "#7A786F");
+    label.setAttribute("font-size", "9px");
+    label.setAttribute("font-family", "JetBrains Mono, monospace");
+    label.textContent = yLabels[t];
+    svg.appendChild(label);
+  }
+
+  // X-axis baseline
+  var baseline = document.createElementNS(ns, "line");
+  baseline.setAttribute("x1", margin.left);
+  baseline.setAttribute("x2", margin.left + width);
+  baseline.setAttribute("y1", yScale(0));
+  baseline.setAttribute("y2", yScale(0));
+  baseline.setAttribute("stroke", "#C5C1B6");
+  baseline.setAttribute("stroke-width", "1");
+  svg.appendChild(baseline);
+
+  // X-axis labels
+  for (var yr = 1900; yr <= 2020; yr += 20) {
+    var xPos = xScale(yr);
+    var xLabel = document.createElementNS(ns, "text");
+    xLabel.setAttribute("x", xPos);
+    xLabel.setAttribute("y", yScale(0) + 16);
+    xLabel.setAttribute("text-anchor", "middle");
+    xLabel.setAttribute("fill", "#7A786F");
+    xLabel.setAttribute("font-size", "9px");
+    xLabel.setAttribute("font-family", "JetBrains Mono, monospace");
+    xLabel.textContent = yr;
+    svg.appendChild(xLabel);
+
+    var tick = document.createElementNS(ns, "line");
+    tick.setAttribute("x1", xPos);
+    tick.setAttribute("x2", xPos);
+    tick.setAttribute("y1", yScale(0));
+    tick.setAttribute("y2", yScale(0) + 4);
+    tick.setAttribute("stroke", "#C5C1B6");
+    tick.setAttribute("stroke-width", "1");
+    svg.appendChild(tick);
+  }
+
+  // Bars
+  var barColor = "#C2796B";
+  var barColorHover = "#A85A4C";
+  var barColorAnnotated = "#B5685A";
+
+  var bars = [];
+  for (var i = 0; i < DATA.length; i++) {
+    var d = DATA[i];
+    if (d.total === 0) continue;
+    var bx = xScale(d.year) - barWidth / 2;
+    var by = yScale(d.total);
+    var bh = yScale(0) - by;
+
+    var rect = document.createElementNS(ns, "rect");
+    rect.setAttribute("x", bx);
+    rect.setAttribute("y", by);
+    rect.setAttribute("width", barWidth);
+    rect.setAttribute("height", Math.max(bh, 0.5));
+    rect.setAttribute("fill", ANNOTATIONS[d.year] ? barColorAnnotated : barColor);
+    rect.setAttribute("data-idx", i);
+    rect.style.cursor = "pointer";
+    rect.style.transition = "fill 0.1s ease";
+    svg.appendChild(rect);
+    bars.push(rect);
+  }
+
+  // Draw labeled annotations
+  for (var a = 0; a < LABELED.length; a++) {
+    var ann = LABELED[a];
+    var aData = null;
+    for (var j = 0; j < DATA.length; j++) {
+      if (DATA[j].year === ann.year) { aData = DATA[j]; break; }
+    }
+    if (!aData) continue;
+
+    var ax = xScale(ann.year);
+    var barTop = yScale(aData.total);
+    var labelY = barTop - 8 - ann.yOff;
+
+    // Keep label inside SVG
+    if (labelY < 10) labelY = 10;
+
+    // Dashed connector line
+    var aLine = document.createElementNS(ns, "line");
+    aLine.setAttribute("x1", ax);
+    aLine.setAttribute("x2", ax);
+    aLine.setAttribute("y1", barTop - 1);
+    aLine.setAttribute("y2", labelY + 4);
+    aLine.setAttribute("class", "annotation-line");
+    svg.appendChild(aLine);
+
+    // Label text
+    var aText = document.createElementNS(ns, "text");
+    aText.setAttribute("x", ax);
+    aText.setAttribute("y", labelY);
+    aText.setAttribute("text-anchor", ann.anchor);
+    aText.setAttribute("class", "annotation-text");
+    aText.textContent = ann.label;
+    svg.appendChild(aText);
+  }
+
+  container.insertBefore(svg, tooltip);
+
+  // Tooltip interaction
+  function formatNumber(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(2) + "M";
+    if (n >= 1000) return Math.round(n / 1000).toLocaleString() + "K";
+    return n.toLocaleString();
+  }
+
+  svg.addEventListener("mousemove", function(e) {
+    var svgRect = svg.getBoundingClientRect();
+    var mx = e.clientX - svgRect.left;
+    var my = e.clientY - svgRect.top;
+
+    // Find closest bar
+    var closestIdx = -1;
+    var closestDist = Infinity;
+    for (var i = 0; i < DATA.length; i++) {
+      var bx = xScale(DATA[i].year);
+      var dist = Math.abs(mx - bx);
+      if (dist < closestDist && dist < barWidth + 5) {
+        closestDist = dist;
+        closestIdx = i;
+      }
+    }
+
+    // Reset bar colors
+    for (var b = 0; b < bars.length; b++) {
+      var bIdx = parseInt(bars[b].getAttribute("data-idx"));
+      bars[b].setAttribute("fill", ANNOTATIONS[DATA[bIdx].year] ? barColorAnnotated : barColor);
+    }
+
+    if (closestIdx >= 0 && my >= margin.top && my <= margin.top + height) {
+      var d = DATA[closestIdx];
+
+      // Highlight bar
+      for (var b = 0; b < bars.length; b++) {
+        if (parseInt(bars[b].getAttribute("data-idx")) === closestIdx) {
+          bars[b].setAttribute("fill", barColorHover);
+        }
+      }
+
+      var html = "<strong>" + d.year + "</strong><br>" + formatNumber(d.total) + " deaths";
+      if (ANNOTATIONS[d.year]) {
+        html += "<br><span style='opacity:0.7;font-size:9px'>" + ANNOTATIONS[d.year] + "</span>";
+      }
+      tooltip.innerHTML = html;
+      tooltip.classList.add("visible");
+
+      var containerRect = container.getBoundingClientRect();
+      var tx = e.clientX - containerRect.left + 14;
+      var ty = e.clientY - containerRect.top - 44;
+
+      // Keep tooltip within bounds
+      var ttWidth = tooltip.offsetWidth || 160;
+      if (tx + ttWidth > containerRect.width) tx = e.clientX - containerRect.left - ttWidth - 14;
+      if (ty < 0) ty = 10;
+
+      tooltip.style.left = tx + "px";
+      tooltip.style.top = ty + "px";
+    } else {
+      tooltip.classList.remove("visible");
+    }
+  });
+
+  svg.addEventListener("mouseleave", function() {
+    tooltip.classList.remove("visible");
+    for (var b = 0; b < bars.length; b++) {
+      var bIdx = parseInt(bars[b].getAttribute("data-idx"));
+      bars[b].setAttribute("fill", ANNOTATIONS[DATA[bIdx].year] ? barColorAnnotated : barColor);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

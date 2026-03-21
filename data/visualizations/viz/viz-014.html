@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip {
+    position: absolute; pointer-events: none;
+    background: #2B2A27; color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; padding: 6px 10px;
+    border-radius: 2px; white-space: nowrap;
+    opacity: 0; transition: opacity 0.15s; z-index: 10; line-height: 1.5;
+  }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; font-family: 'JetBrains Mono', monospace; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 1px; flex-shrink: 0; }
+</style>
+</head><body>
+<h1>Water Under Stress</h1>
+<p class="subtitle">Freshwater withdrawal as a percentage of available renewable freshwater resources, most recent year (2022). Values above 100% indicate a country withdraws more freshwater than is naturally replenished annually, drawing on non-renewable groundwater or other reserves.</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#8B1A1A;"></div>Critical (&gt;100%)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#D94F2B;"></div>High (75-100%)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#E8973A;"></div>Medium (40-75%)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C8B84A;"></div>Low-Medium (25-40%)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#5A9E6F;"></div>Low (&lt;25%)</div>
+</div>
+
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 6.4.2 / ER_H2O_STRESS &nbsp;|&nbsp; Data: 2022</p>
+
+<script>
+const raw = [
+  { name: "Kuwait",    value: 3850.50 },
+  { name: "Egypt",     value: 141.17 },
+  { name: "Algeria",   value: 97.65 },
+  { name: "Armenia",   value: 61.97 },
+  { name: "India",     value: 60.11 },
+  { name: "Israel",    value: 55.91 },
+  { name: "Azerbaijan",value: 53.06 },
+  { name: "Bahrain",   value: 44.54 },
+  { name: "Bulgaria",  value: 40.24 },
+  { name: "Libya",     value: 39.25 },
+  { name: "Japan",     value: 36.64 },
+  { name: "Kazakhstan",value: 34.63 },
+  { name: "Cabo Verde",value: 23.27 },
+  { name: "Czechia",   value: 21.97 },
+  { name: "Cyprus",    value: 17.63 },
+  { name: "Greece",    value: 16.36 },
+  { name: "Germany",   value: 14.68 },
+  { name: "Estonia",   value: 12.29 },
+  { name: "El Salvador",value: 12.09 },
+  { name: "Denmark",   value: 10.35 },
+  { name: "Iraq",      value: 9.46 },
+  { name: "Jamaica",   value: 9.09 },
+  { name: "Belgium",   value: 8.67 },
+  { name: "China",     value: 8.36 },
+  { name: "Chile",     value: 8.16 },
+  { name: "Lebanon",   value: 7.67 },
+  { name: "Italy",     value: 6.77 },
+  { name: "Hungary",   value: 6.14 }
+];
+
+function stressColor(v) {
+  if (v > 100) return "#8B1A1A";
+  if (v > 75)  return "#D94F2B";
+  if (v > 40)  return "#E8973A";
+  if (v > 25)  return "#C8B84A";
+  return "#5A9E6F";
+}
+
+function stressLabel(v) {
+  if (v > 100) return "Critical";
+  if (v > 75)  return "High";
+  if (v > 40)  return "Medium";
+  if (v > 25)  return "Low-Medium";
+  return "Low";
+}
+
+// Kuwait is a massive outlier at 3850% - cap display axis and mark overflow
+const AXIS_MAX = 200;
+
+const W = 700;
+const barH = 18;
+const barGap = 6;
+const marginTop = 10;
+const marginBottom = 30;
+const marginLeft = 140;
+const marginRight = 90;
+const n = raw.length;
+const H = marginTop + n * (barH + barGap) + marginBottom;
+
+const iw = W - marginLeft - marginRight;
+
+// Scale: clamp display to AXIS_MAX, mark overflow
+function xScale(v) {
+  return marginLeft + Math.min(v, AXIS_MAX) / AXIS_MAX * iw;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+
+function mkEl(tag, attrs, parent) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  (parent || svg).appendChild(el);
+  return el;
+}
+
+function mkText(x, y, txt, opts, parent) {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x);
+  t.setAttribute("y", y);
+  t.setAttribute("font-size", opts.size || "10");
+  t.setAttribute("fill", opts.fill || "#2B2A27");
+  if (opts.anchor) t.setAttribute("text-anchor", opts.anchor);
+  if (opts.mono) t.setAttribute("font-family", "'JetBrains Mono', monospace");
+  if (opts.weight) t.setAttribute("font-weight", opts.weight);
+  if (opts.opacity) t.setAttribute("opacity", opts.opacity);
+  t.textContent = txt;
+  (parent || svg).appendChild(t);
+  return t;
+}
+
+// Background gridlines + axis labels
+const xTicks = [0, 25, 50, 75, 100, 150, 200];
+xTicks.forEach(v => {
+  const x = xScale(v);
+  mkEl("line", {
+    x1: x, y1: marginTop,
+    x2: x, y2: H - marginBottom,
+    stroke: "#E2E0D5", "stroke-width": v === 0 ? 1 : 0.5,
+    "stroke-dasharray": v === 0 ? "none" : "none"
+  });
+  mkText(x, H - marginBottom + 14, v === 200 ? "200+" : String(v),
+    { size: "9", fill: "#7A786F", anchor: "middle", mono: true });
+});
+
+// Reference lines at 25% and 75%
+[25, 75].forEach((threshold, i) => {
+  const x = xScale(threshold);
+  const label = threshold === 25 ? "moderate stress" : "high stress";
+  mkEl("line", {
+    x1: x, y1: marginTop,
+    x2: x, y2: H - marginBottom,
+    stroke: threshold === 25 ? "#5A9E6F" : "#D94F2B",
+    "stroke-width": 1,
+    "stroke-dasharray": "4 3",
+    opacity: 0.7
+  });
+  mkText(x + 3, marginTop + 8 + i * 14, label,
+    { size: "8.5", fill: threshold === 25 ? "#5A9E6F" : "#D94F2B", mono: true });
+});
+
+// Bars
+const barRects = [];
+
+raw.forEach((d, i) => {
+  const y = marginTop + i * (barH + barGap);
+  const cy = y + barH / 2;
+  const col = stressColor(d.value);
+  const displayW = Math.min(d.value, AXIS_MAX) / AXIS_MAX * iw;
+  const overflows = d.value > AXIS_MAX;
+
+  // Country label
+  mkText(marginLeft - 8, cy + 4, d.name,
+    { size: "10.5", fill: "#2B2A27", anchor: "end" });
+
+  // Bar
+  const rect = mkEl("rect", {
+    x: marginLeft,
+    y: y,
+    width: displayW,
+    height: barH,
+    fill: col,
+    rx: 1,
+    opacity: 0.85,
+    style: "cursor:pointer;"
+  });
+  barRects.push({ rect, d, y, barH, col });
+
+  // Overflow indicator: jagged end + arrow
+  if (overflows) {
+    // Draw a small "broken" indicator at the end
+    const ex = marginLeft + displayW;
+    const pts = [
+      `${ex},${y}`, `${ex + 6},${y + barH / 4}`,
+      `${ex},${y + barH / 2}`, `${ex + 6},${y + barH * 3 / 4}`,
+      `${ex},${y + barH}`
+    ].join(" ");
+    mkEl("polyline", {
+      points: pts,
+      fill: "none",
+      stroke: "#F6F5EE",
+      "stroke-width": 1.5
+    });
+    // Overflow arrow text
+    const arrowT = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    arrowT.setAttribute("x", ex + 10);
+    arrowT.setAttribute("y", cy + 4);
+    arrowT.setAttribute("font-size", "9");
+    arrowT.setAttribute("fill", col);
+    arrowT.setAttribute("font-family", "'JetBrains Mono', monospace");
+    arrowT.setAttribute("font-weight", "500");
+    arrowT.textContent = ">>>";
+    svg.appendChild(arrowT);
+  }
+
+  // Value label
+  const labelX = marginLeft + displayW + (overflows ? 36 : 6);
+  const valText = d.value >= 100
+    ? d.value.toFixed(0) + "%"
+    : d.value.toFixed(1) + "%";
+  mkText(labelX, cy + 4, valText,
+    { size: "9.5", fill: "#7A786F", mono: true });
+});
+
+// X-axis label
+mkText(marginLeft + iw / 2, H - 4, "% of available freshwater resources",
+  { size: "9.5", fill: "#7A786F", anchor: "middle" });
+
+document.getElementById("chart").appendChild(svg);
+
+// Tooltip
+const tip = document.getElementById("tip");
+
+barRects.forEach(({ rect, d, y, barH, col }) => {
+  rect.addEventListener("mouseenter", e => {
+    rect.setAttribute("opacity", "1");
+    tip.innerHTML = `<b>${d.name}</b><br>${d.value.toFixed(1)}% &mdash; ${stressLabel(d.value)} stress`;
+    tip.style.opacity = "1";
+  });
+  rect.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 30) + "px";
+  });
+  rect.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "0.85");
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

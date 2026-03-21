@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 620px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 14px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .chart-wrap { position: relative; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #2B2A27; cursor: pointer; user-select: none; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-item.dimmed { opacity: 0.35; }
+  .tooltip {
+    position: absolute;
+    background: #2B2A27;
+    color: #F6F5EE;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 5px 8px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    white-space: nowrap;
+    z-index: 10;
+  }
+</style>
+</head><body>
+
+<h1>The Vaccine Shield: DTP3 Immunization Coverage Among 1-Year-Olds</h1>
+<p class="subtitle">Diphtheria-tetanus-pertussis coverage (%) for 12 countries from 2000 to 2024. Conflict, politics, and health system strength shape very different trajectories. The dashed line marks the WHO 90% target.</p>
+
+<div class="legend" id="legend"></div>
+<div class="chart-wrap">
+  <svg id="chart"></svg>
+  <div class="tooltip" id="tooltip"></div>
+</div>
+<p class="source">Source: WHO GHO WHS4_100 &nbsp;|&nbsp; DTP3: Diphtheria Tetanus Pertussis 3rd dose</p>
+
+<script>
+const COUNTRIES = [
+  {
+    iso: 'ITA', name: 'Italy',
+    category: 'high',
+    series: [{year:2000,v:87},{year:2001,v:93},{year:2002,v:93},{year:2007,v:97},{year:2011,v:96},{year:2017,v:95},{year:2021,v:94},{year:2022,v:95},{year:2024,v:94}]
+  },
+  {
+    iso: 'IRL', name: 'Ireland',
+    category: 'high',
+    series: [{year:2000,v:86},{year:2001,v:84},{year:2009,v:94},{year:2010,v:94},{year:2014,v:96},{year:2015,v:95},{year:2016,v:95},{year:2017,v:95},{year:2018,v:94},{year:2021,v:94},{year:2022,v:93}]
+  },
+  {
+    iso: 'PRK', name: 'North Korea',
+    category: 'improving',
+    series: [{year:2000,v:56},{year:2001,v:62},{year:2003,v:68},{year:2009,v:93},{year:2010,v:93},{year:2012,v:96},{year:2014,v:93},{year:2017,v:97},{year:2018,v:97},{year:2021,v:99}]
+  },
+  {
+    iso: 'RWA', name: 'Rwanda',
+    category: 'high',
+    series: [{year:2000,v:90},{year:2003,v:96},{year:2011,v:97},{year:2016,v:98},{year:2019,v:98},{year:2021,v:88}]
+  },
+  {
+    iso: 'IND', name: 'India',
+    category: 'improving',
+    series: [{year:2002,v:59},{year:2006,v:65},{year:2008,v:70},{year:2011,v:82},{year:2017,v:89},{year:2023,v:91}]
+  },
+  {
+    iso: 'MRT', name: 'Mauritania',
+    category: 'improving',
+    series: [{year:2000,v:51},{year:2004,v:70},{year:2008,v:74},{year:2011,v:75},{year:2018,v:77},{year:2020,v:81},{year:2024,v:86}]
+  },
+  {
+    iso: 'NER', name: 'Niger',
+    category: 'improving',
+    series: [{year:2003,v:41},{year:2007,v:58},{year:2008,v:67},{year:2017,v:85},{year:2024,v:86}]
+  },
+  {
+    iso: 'BRA', name: 'Brazil',
+    category: 'declining',
+    series: [{year:2000,v:98},{year:2003,v:99},{year:2008,v:99},{year:2015,v:96},{year:2017,v:83},{year:2020,v:77}]
+  },
+  {
+    iso: 'ROU', name: 'Romania',
+    category: 'declining',
+    series: [{year:2001,v:99},{year:2004,v:97},{year:2007,v:96},{year:2020,v:87},{year:2023,v:79},{year:2024,v:79}]
+  },
+  {
+    iso: 'SYR', name: 'Syria',
+    category: 'declining',
+    series: [{year:2002,v:86},{year:2009,v:81},{year:2016,v:55},{year:2019,v:67},{year:2022,v:59}]
+  },
+  {
+    iso: 'YEM', name: 'Yemen',
+    category: 'struggling',
+    series: [{year:2001,v:73},{year:2006,v:78},{year:2008,v:78},{year:2013,v:71},{year:2019,v:60},{year:2023,v:46}]
+  },
+  {
+    iso: 'PNG', name: 'Papua New Guinea',
+    category: 'struggling',
+    series: [{year:2002,v:61},{year:2007,v:66},{year:2009,v:64},{year:2014,v:52},{year:2018,v:35},{year:2022,v:37},{year:2024,v:42}]
+  }
+];
+
+// Color palette by category - warm muted tones matching reference style
+const PALETTE = {
+  high:      ['#3A6B4A', '#4E8C5E', '#2D7A5A'],  // greens - above target
+  improving: ['#C07828', '#E8932A', '#A85F1A', '#D4831E'],  // ambers - heading up
+  declining: ['#C84030', '#A03028', '#E05545'],  // reds - heading down
+  struggling:['#7A5698', '#9B6DB8']  // purples - persistently low
+};
+
+const categoryColors = {};
+const catCounts = {high:0, improving:0, declining:0, struggling:0};
+COUNTRIES.forEach(function(c) {
+  var palette = PALETTE[c.category];
+  var idx = catCounts[c.category] % palette.length;
+  catCounts[c.category]++;
+  categoryColors[c.iso] = palette[idx];
+  c.color = palette[idx];
+});
+
+// Chart dimensions
+var W = 760, H = 380;
+var margin = {top: 20, right: 140, bottom: 36, left: 46};
+var innerW = W - margin.left - margin.right;
+var innerH = H - margin.top - margin.bottom;
+
+var xMin = 2000, xMax = 2024;
+var yMin = 20, yMax = 100;
+
+function xScale(year) {
+  return ((year - xMin) / (xMax - xMin)) * innerW;
+}
+function yScale(v) {
+  return innerH - ((v - yMin) / (yMax - yMin)) * innerH;
+}
+
+var svg = document.getElementById('chart');
+svg.setAttribute('width', W);
+svg.setAttribute('height', H);
+svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+var ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs, parent) {
+  var e = document.createElementNS(ns, tag);
+  for (var k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+// Main group
+var g = el('g', {transform: 'translate(' + margin.left + ',' + margin.top + ')'}, svg);
+
+// Background rect for chart area
+el('rect', {x:0, y:0, width:innerW, height:innerH, fill:'#EFEDE4', rx:2}, g);
+
+// Grid lines (horizontal)
+var yTicks = [20,30,40,50,60,70,80,90,100];
+yTicks.forEach(function(v) {
+  var y = yScale(v);
+  el('line', {x1:0, y1:y, x2:innerW, y2:y, stroke:'#DDD9CC', 'stroke-width':'1'}, g);
+  el('text', {x:-8, y:y+4, 'text-anchor':'end', 'font-size':'9', fill:'#9A988F', 'font-family':"'JetBrains Mono',monospace"}, g).textContent = v + '%';
+});
+
+// WHO 90% target reference line
+var y90 = yScale(90);
+el('line', {x1:0, y1:y90, x2:innerW, y2:y90, stroke:'#2B2A27', 'stroke-width':'1.5', 'stroke-dasharray':'4,3', opacity:'0.5'}, g);
+el('text', {x:innerW + 6, y:y90+4, 'font-size':'9', fill:'#2B2A27', opacity:'0.7', 'font-family':"'Inter',sans-serif", 'font-weight':'500'}, g).textContent = '90% target';
+
+// X axis ticks
+var xTicks = [2000, 2005, 2010, 2015, 2020, 2024];
+xTicks.forEach(function(yr) {
+  var x = xScale(yr);
+  el('line', {x1:x, y1:0, x2:x, y2:innerH, stroke:'#DDD9CC', 'stroke-width':'1'}, g);
+  el('text', {x:x, y:innerH+16, 'text-anchor':'middle', 'font-size':'9', fill:'#9A988F', 'font-family':"'JetBrains Mono',monospace"}, g).textContent = yr;
+});
+
+// Bottom border
+el('line', {x1:0, y1:innerH, x2:innerW, y2:innerH, stroke:'#C8C4B5', 'stroke-width':'1'}, g);
+// Left border
+el('line', {x1:0, y1:0, x2:0, y2:innerH, stroke:'#C8C4B5', 'stroke-width':'1'}, g);
+
+// Draw lines
+var lineGroups = {};
+COUNTRIES.forEach(function(c) {
+  var pts = c.series;
+  if (!pts || pts.length < 2) return;
+
+  var pathD = '';
+  pts.forEach(function(p, i) {
+    var x = xScale(p.year);
+    var y = yScale(p.v);
+    pathD += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  });
+
+  var lineEl = el('path', {
+    d: pathD,
+    fill: 'none',
+    stroke: c.color,
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    opacity: '0.9'
+  }, g);
+
+  // Dots at data points
+  var dotEls = [];
+  pts.forEach(function(p) {
+    var dotEl = el('circle', {
+      cx: xScale(p.year).toFixed(1),
+      cy: yScale(p.v).toFixed(1),
+      r: '2.5',
+      fill: c.color,
+      stroke: '#F6F5EE',
+      'stroke-width': '1',
+      opacity: '0.9'
+    }, g);
+    dotEls.push(dotEl);
+  });
+
+  // End label on the right side
+  var lastPt = pts[pts.length - 1];
+  var lastX = xScale(lastPt.year);
+  var lastY = yScale(lastPt.v);
+
+  var labelEl = el('text', {
+    x: (lastX + 8).toFixed(1),
+    y: (lastY + 4).toFixed(1),
+    'font-size': '9',
+    fill: c.color,
+    'font-family': "'Inter',sans-serif",
+    'font-weight': '500'
+  }, g);
+  labelEl.textContent = c.name;
+
+  lineGroups[c.iso] = { line: lineEl, dots: dotEls, label: labelEl, country: c };
+});
+
+// Adjust label positions to avoid overlap
+var labelData = COUNTRIES.map(function(c) {
+  var pts = c.series;
+  var lastPt = pts[pts.length - 1];
+  return { iso: c.iso, y: yScale(lastPt.v), name: c.name };
+}).sort(function(a,b){ return a.y - b.y; });
+
+// Minimum spacing between labels (pixels)
+var minSpacing = 12;
+for (var i = 1; i < labelData.length; i++) {
+  if (labelData[i].y - labelData[i-1].y < minSpacing) {
+    labelData[i].y = labelData[i-1].y + minSpacing;
+  }
+}
+for (var i = labelData.length - 2; i >= 0; i--) {
+  if (labelData[i+1].y - labelData[i].y < minSpacing) {
+    labelData[i].y = labelData[i+1].y - minSpacing;
+  }
+}
+
+labelData.forEach(function(ld) {
+  if (!lineGroups[ld.iso]) return;
+  var labelEl = lineGroups[ld.iso].label;
+  labelEl.setAttribute('y', (ld.y + 4).toFixed(1));
+});
+
+// Tooltip handling
+var tooltip = document.getElementById('tooltip');
+var chartWrap = document.querySelector('.chart-wrap');
+
+var hoveredIso = null;
+
+function updateOpacity(activeIso) {
+  for (var iso in lineGroups) {
+    var grp = lineGroups[iso];
+    var dim = activeIso && iso !== activeIso;
+    var op = dim ? '0.15' : '0.9';
+    var sw = (!dim && activeIso) ? '2.5' : '2';
+    grp.line.setAttribute('opacity', op);
+    grp.dots.forEach(function(d){ d.setAttribute('opacity', op); });
+    grp.label.setAttribute('opacity', dim ? '0.2' : '1');
+    if (!dim && activeIso) grp.line.setAttribute('stroke-width', '2.5');
+    else grp.line.setAttribute('stroke-width', '2');
+  }
+}
+
+// Invisible hit targets for each line
+COUNTRIES.forEach(function(c) {
+  var pts = c.series;
+  if (!pts || pts.length < 2) return;
+
+  var pathD = '';
+  pts.forEach(function(p, i) {
+    pathD += (i === 0 ? 'M' : 'L') + xScale(p.year).toFixed(1) + ',' + yScale(p.v).toFixed(1);
+  });
+
+  var hitEl = el('path', {
+    d: pathD,
+    fill: 'none',
+    stroke: 'transparent',
+    'stroke-width': '12',
+    cursor: 'crosshair'
+  }, g);
+
+  hitEl.addEventListener('mouseenter', function() {
+    hoveredIso = c.iso;
+    updateOpacity(c.iso);
+  });
+  hitEl.addEventListener('mouseleave', function() {
+    hoveredIso = null;
+    updateOpacity(null);
+    tooltip.style.opacity = '0';
+  });
+  hitEl.addEventListener('mousemove', function(ev) {
+    var rect = svg.getBoundingClientRect();
+    var mx = ev.clientX - rect.left - margin.left;
+    var yearRaw = (mx / innerW) * (xMax - xMin) + xMin;
+
+    // Find nearest data point for this country
+    var best = pts[0], bestDist = Math.abs(pts[0].year - yearRaw);
+    pts.forEach(function(p) {
+      var dist = Math.abs(p.year - yearRaw);
+      if (dist < bestDist) { bestDist = dist; best = p; }
+    });
+
+    tooltip.innerHTML = '<strong>' + c.name + '</strong> (' + c.iso + ')  ' + best.year + ': <strong>' + best.v + '%</strong>';
+    tooltip.style.opacity = '1';
+
+    var tx = xScale(best.year) + margin.left;
+    var ty = yScale(best.v) + margin.top;
+    var ttW = tooltip.offsetWidth;
+    var ttH = tooltip.offsetHeight;
+
+    var left = tx + 12;
+    if (left + ttW > W) left = tx - ttW - 8;
+    var top = ty - ttH / 2;
+    if (top < 0) top = 0;
+
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+  });
+});
+
+svg.addEventListener('mouseleave', function() {
+  updateOpacity(null);
+  tooltip.style.opacity = '0';
+});
+
+// Legend
+var legendEl = document.getElementById('legend');
+var categories = [
+  { key: 'high', label: 'Consistently high' },
+  { key: 'improving', label: 'Improving' },
+  { key: 'declining', label: 'Declining' },
+  { key: 'struggling', label: 'Persistently low' }
+];
+
+// Group countries by category
+var byCat = {};
+COUNTRIES.forEach(function(c) { (byCat[c.category] = byCat[c.category]||[]).push(c); });
+
+categories.forEach(function(cat) {
+  var group = byCat[cat.key] || [];
+  group.forEach(function(c) {
+    var item = document.createElement('div');
+    item.className = 'legend-item';
+    item.dataset.iso = c.iso;
+
+    var dot = document.createElement('div');
+    dot.className = 'legend-dot';
+    dot.style.background = c.color;
+
+    var span = document.createElement('span');
+    span.textContent = c.name;
+
+    item.appendChild(dot);
+    item.appendChild(span);
+    legendEl.appendChild(item);
+
+    item.addEventListener('mouseenter', function() {
+      updateOpacity(c.iso);
+      document.querySelectorAll('.legend-item').forEach(function(li) {
+        li.classList.toggle('dimmed', li.dataset.iso !== c.iso);
+      });
+    });
+    item.addEventListener('mouseleave', function() {
+      updateOpacity(null);
+      document.querySelectorAll('.legend-item').forEach(function(li) {
+        li.classList.remove('dimmed');
+      });
+    });
+  });
+});
+</script>
+</body></html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 50%; }
+</style></head><body>
+<h1>The Legal Landscape of Gender Equality</h1>
+<p class="subtitle">How countries score on legal frameworks promoting gender equality in the labour force (SDG 5.1.1), 2024. Scores range from 0 to 100, measuring the percentage of legal provisions in place for overarching frameworks and public life. Twenty countries achieve a perfect score of 100, while several remain below 40.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#D64545;"></div> Below 40</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#D4913A;"></div> 40 - 59</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C4A84B;"></div> 60 - 79</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#6BA368;"></div> 80 - 99</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#2E7D5B;"></div> 100</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG Indicators -- 5.1.1 SG_LGL_GENEQLFP (Legal frameworks and public life)</p>
+<script>
+const regionCodes = new Set(["1","53","62","513","753","747","543","432","419","199","722","202"]);
+
+const allData = [
+  {c:"Albania",v:100},{c:"Antigua and Barbuda",v:30},{c:"Argentina",v:80},{c:"Armenia",v:90},
+  {c:"Australia",v:80},{c:"Austria",v:80},{c:"Azerbaijan",v:50},{c:"Bahamas",v:20},
+  {c:"Bangladesh",v:75},{c:"Barbados",v:40},{c:"Belarus",v:50},{c:"Belgium",v:100},
+  {c:"Belize",v:30},{c:"Bolivia",v:90},{c:"Bosnia and Herzegovina",v:100},{c:"Brazil",v:90},
+  {c:"Bulgaria",v:80},{c:"Cabo Verde",v:60},{c:"Cambodia",v:60},{c:"Cameroon",v:50},
+  {c:"Canada",v:80},{c:"Chile",v:80},{c:"China",v:80},{c:"Colombia",v:70},
+  {c:"Costa Rica",v:80},{c:"Cote d'Ivoire",v:81.8},{c:"Croatia",v:100},{c:"Cyprus",v:70},
+  {c:"Czechia",v:70},{c:"Denmark",v:80},{c:"Dominican Republic",v:70},
+  {c:"Ecuador",v:90},{c:"El Salvador",v:100},{c:"Estonia",v:70},{c:"Ethiopia",v:75},
+  {c:"Fiji",v:60},{c:"Finland",v:70},{c:"France",v:80},{c:"Georgia",v:100},
+  {c:"Germany",v:70},{c:"Ghana",v:45.5},{c:"Greece",v:80},{c:"Grenada",v:40},
+  {c:"Guatemala",v:70},{c:"Guinea",v:70},{c:"Haiti",v:50},{c:"Honduras",v:90},
+  {c:"Hungary",v:70},{c:"Iceland",v:80},{c:"India",v:63.6},{c:"Indonesia",v:100},
+  {c:"Iraq",v:45.5},{c:"Ireland",v:80},{c:"Israel",v:54.5},{c:"Italy",v:80},
+  {c:"Jamaica",v:50},{c:"Japan",v:60},{c:"Jordan",v:54.5},{c:"Kazakhstan",v:60},
+  {c:"Kenya",v:83.3},{c:"Kyrgyzstan",v:100},{c:"Latvia",v:80},{c:"Lebanon",v:27.3},
+  {c:"Liberia",v:72.7},{c:"Lithuania",v:70},{c:"Luxembourg",v:70},{c:"Madagascar",v:30},
+  {c:"Malawi",v:54.5},{c:"Malaysia",v:33.3},{c:"Malta",v:90},{c:"Marshall Islands",v:81.8},
+  {c:"Mauritius",v:58.3},{c:"Mexico",v:90},{c:"Mongolia",v:90},{c:"Montenegro",v:100},
+  {c:"Morocco",v:63.6},{c:"Mozambique",v:72.7},{c:"Namibia",v:72.7},{c:"Nepal",v:70},
+  {c:"Netherlands",v:70},{c:"New Zealand",v:70},{c:"Nicaragua",v:70},{c:"Nigeria",v:58.3},
+  {c:"North Macedonia",v:100},{c:"Norway",v:70},{c:"Pakistan",v:50},{c:"Panama",v:80},
+  {c:"Papua New Guinea",v:63.6},{c:"Paraguay",v:80},{c:"Peru",v:80},{c:"Philippines",v:70},
+  {c:"Poland",v:100},{c:"Portugal",v:100},{c:"Republic of Korea",v:90},
+  {c:"Republic of Moldova",v:100},{c:"Romania",v:80},{c:"Rwanda",v:90.9},
+  {c:"Saint Kitts and Nevis",v:30},{c:"Samoa",v:81.8},{c:"Serbia",v:90},
+  {c:"Seychelles",v:60},{c:"Sierra Leone",v:72.7},{c:"Slovakia",v:70},{c:"Slovenia",v:100},
+  {c:"Solomon Islands",v:63.6},{c:"South Africa",v:83.3},{c:"South Sudan",v:72.7},
+  {c:"Spain",v:100},{c:"State of Palestine",v:63.6},{c:"Sudan",v:50},{c:"Suriname",v:50},
+  {c:"Sweden",v:80},{c:"Switzerland",v:70},{c:"Tajikistan",v:70},{c:"Thailand",v:50},
+  {c:"Timor-Leste",v:90.9},{c:"Trinidad and Tobago",v:70},{c:"Tunisia",v:80},
+  {c:"Turkiye",v:70},{c:"Turkmenistan",v:70},{c:"Uganda",v:83.3},{c:"Ukraine",v:100},
+  {c:"UAE",v:27.3},{c:"United Kingdom",v:70},{c:"Tanzania",v:70},
+  {c:"United States",v:70},{c:"Uruguay",v:50},{c:"Uzbekistan",v:70},{c:"Vanuatu",v:36.4},
+  {c:"Viet Nam",v:70},{c:"Zimbabwe",v:81.8}
+];
+
+allData.sort((a, b) => b.v - a.v || a.c.localeCompare(b.c));
+
+function scoreColor(v) {
+  if (v >= 100) return "#2E7D5B";
+  if (v >= 80) return "#6BA368";
+  if (v >= 60) return "#C4A84B";
+  if (v >= 40) return "#D4913A";
+  return "#D64545";
+}
+
+const rowH = 16;
+const gap = 2;
+const pad = { left: 180, right: 60, top: 20, bottom: 30 };
+const chartW = 480;
+const W = pad.left + chartW + pad.right;
+const chartH = allData.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+const xScale = v => pad.left + (v / 100) * chartW;
+
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 6);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+allData.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap) + rowH / 2;
+  const col = scoreColor(d.v);
+
+  const bg = document.createElementNS(ns, "rect");
+  bg.setAttribute("x", 0);
+  bg.setAttribute("y", y - rowH / 2);
+  bg.setAttribute("width", W);
+  bg.setAttribute("height", rowH);
+  bg.setAttribute("fill", "transparent");
+  bg.style.cursor = "pointer";
+
+  const bar = document.createElementNS(ns, "rect");
+  bar.setAttribute("x", pad.left);
+  bar.setAttribute("y", y - 4);
+  bar.setAttribute("width", Math.max(0, xScale(d.v) - pad.left));
+  bar.setAttribute("height", 8);
+  bar.setAttribute("fill", col);
+  bar.setAttribute("opacity", "0.35");
+  bar.setAttribute("rx", "1");
+
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", xScale(d.v));
+  dot.setAttribute("cy", y);
+  dot.setAttribute("r", 4);
+  dot.setAttribute("fill", col);
+
+  const name = document.createElementNS(ns, "text");
+  name.setAttribute("x", pad.left - 8);
+  name.setAttribute("y", y);
+  name.setAttribute("text-anchor", "end");
+  name.setAttribute("dominant-baseline", "central");
+  name.setAttribute("font-size", "9");
+  name.setAttribute("fill", "#2B2A27");
+  name.textContent = d.c;
+
+  const g = document.createElementNS(ns, "g");
+  g.appendChild(bg);
+  g.appendChild(bar);
+  g.appendChild(dot);
+  g.appendChild(name);
+
+  g.addEventListener("mouseenter", e => {
+    dot.setAttribute("r", 6);
+    bar.setAttribute("opacity", "0.55");
+    const band = d.v >= 100 ? "Full score" : d.v >= 80 ? "Strong" : d.v >= 60 ? "Moderate" : d.v >= 40 ? "Weak" : "Very weak";
+    tip.innerHTML = `<strong>${d.c}</strong> &mdash; ${d.v.toFixed(1)}% (${band})`;
+    tip.style.opacity = 1;
+  });
+  g.addEventListener("mousemove", e => {
+    const rect = document.getElementById("chart").getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 12) + "px";
+    tip.style.top = (e.clientY - rect.top - 10) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    dot.setAttribute("r", 4);
+    bar.setAttribute("opacity", "0.35");
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(g);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

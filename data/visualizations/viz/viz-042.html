@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 660px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Slow Killers</h1>
+<p class="subtitle">Probability (%) of dying between ages 30 and 70 from cardiovascular disease, cancer, diabetes, or chronic respiratory disease. Slope chart comparing the earliest and most recent available year for each country. Green lines show improvement; coral lines show worsening; gray lines show little change.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory -- NCDMORT3070 (NCD mortality, ages 30-70)</p>
+<script>
+const data = [
+  { name: "Mongolia", start: 39.8, end: 19.0, y0: 2002, y1: 2019 },
+  { name: "Sri Lanka", start: 26.7, end: 13.9, y0: 2003, y1: 2021 },
+  { name: "Brazil", start: 24.8, end: 14.7, y0: 2000, y1: 2020 },
+  { name: "Turkey", start: 26.9, end: 16.6, y0: 2002, y1: 2019 },
+  { name: "Malaysia", start: 24.3, end: 16.0, y0: 2001, y1: 2021 },
+  { name: "Ukraine", start: 23.5, end: 15.6, y0: 2000, y1: 2020 },
+  { name: "Vietnam", start: 20.8, end: 13.1, y0: 2005, y1: 2021 },
+  { name: "United States", start: 17.8, end: 10.8, y0: 2000, y1: 2020 },
+  { name: "United Kingdom", start: 19.6, end: 12.7, y0: 2001, y1: 2019 },
+  { name: "Germany", start: 15.0, end: 8.6, y0: 2003, y1: 2020 },
+  { name: "South Africa", start: 28.4, end: 21.6, y0: 2009, y1: 2019 },
+  { name: "Saudi Arabia", start: 19.3, end: 12.9, y0: 2001, y1: 2015 },
+  { name: "France", start: 13.8, end: 10.1, y0: 2001, y1: 2019 },
+  { name: "Australia", start: 9.1, end: 8.3, y0: 2003, y1: 2021 },
+  { name: "Sweden", start: 10.0, end: 9.2, y0: 2003, y1: 2021 },
+  { name: "South Korea", start: 9.6, end: 9.2, y0: 2003, y1: 2013 },
+  { name: "Myanmar", start: 30.7, end: 30.2, y0: 2002, y1: 2015 },
+  { name: "Russia", start: 24.4, end: 28.0, y0: 2000, y1: 2014 },
+  { name: "Kenya", start: 16.9, end: 18.7, y0: 2003, y1: 2017 },
+  { name: "Peru", start: 11.1, end: 12.8, y0: 2000, y1: 2021 }
+];
+
+// Classify: improved a lot (change <= -5), barely moved (-5 < change < 1.5), got worse (>= 1.5)
+data.forEach(d => {
+  d.change = d.end - d.start;
+  if (d.change <= -5) d.group = "improved";
+  else if (d.change >= 1.5) d.group = "worse";
+  else d.group = "stalled";
+});
+
+// Sort: improved first (by magnitude), then stalled, then worse
+const groupOrder = { improved: 0, stalled: 1, worse: 2 };
+data.sort((a, b) => {
+  if (groupOrder[a.group] !== groupOrder[b.group]) return groupOrder[a.group] - groupOrder[b.group];
+  return a.change - b.change;
+});
+
+const colorMap = { improved: "#3A9E8F", stalled: "#9E9A8F", worse: "#E06050" };
+
+const W = 740;
+const rowH = 30;
+const gap = 2;
+const pad = { left: 120, right: 60, top: 50, bottom: 40 };
+const dotColW = 240;
+const leftDotX = pad.left + 30;
+const rightDotX = pad.left + dotColW + 30;
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const allVals = data.flatMap(d => [d.start, d.end]);
+const minV = 0;
+const maxV = Math.ceil(Math.max(...allVals) / 5) * 5;
+
+const xScale = v => {
+  const range = rightDotX - leftDotX;
+  return leftDotX + (v - minV) / (maxV - minV) * range;
+};
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Column headers
+const headerY = pad.top - 20;
+
+const earlyLabel = document.createElementNS(ns, "text");
+earlyLabel.setAttribute("x", leftDotX);
+earlyLabel.setAttribute("y", headerY - 10);
+earlyLabel.setAttribute("text-anchor", "middle");
+earlyLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+earlyLabel.setAttribute("font-size", "9");
+earlyLabel.setAttribute("fill", "#7A786F");
+earlyLabel.setAttribute("letter-spacing", "0.5");
+earlyLabel.textContent = "EARLIEST";
+svg.appendChild(earlyLabel);
+
+const lateLabel = document.createElementNS(ns, "text");
+lateLabel.setAttribute("x", rightDotX);
+lateLabel.setAttribute("y", headerY - 10);
+lateLabel.setAttribute("text-anchor", "middle");
+lateLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+lateLabel.setAttribute("font-size", "9");
+lateLabel.setAttribute("fill", "#7A786F");
+lateLabel.setAttribute("letter-spacing", "0.5");
+lateLabel.textContent = "LATEST";
+svg.appendChild(lateLabel);
+
+// X-axis grid
+const ticks = [];
+for (let v = 0; v <= maxV; v += 5) ticks.push(v);
+
+ticks.forEach(v => {
+  const x = xScale(v);
+  const gridLine = document.createElementNS(ns, "line");
+  gridLine.setAttribute("x1", x);
+  gridLine.setAttribute("x2", x);
+  gridLine.setAttribute("y1", pad.top - 5);
+  gridLine.setAttribute("y2", pad.top + chartH);
+  gridLine.setAttribute("stroke", "#DDD9CE");
+  gridLine.setAttribute("stroke-width", 0.5);
+  svg.appendChild(gridLine);
+
+  const tickLabel = document.createElementNS(ns, "text");
+  tickLabel.setAttribute("x", x);
+  tickLabel.setAttribute("y", pad.top + chartH + 16);
+  tickLabel.setAttribute("text-anchor", "middle");
+  tickLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  tickLabel.setAttribute("font-size", "9");
+  tickLabel.setAttribute("fill", "#7A786F");
+  tickLabel.textContent = v + "%";
+  svg.appendChild(tickLabel);
+});
+
+// Group labels
+let lastGroup = "";
+const groupLabels = { improved: "IMPROVED", stalled: "BARELY MOVED", worse: "GOT WORSE" };
+const groupColors = { improved: "#3A9E8F", stalled: "#9E9A8F", worse: "#E06050" };
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap) + rowH / 2;
+  const color = colorMap[d.group];
+
+  // Group separator label
+  if (d.group !== lastGroup) {
+    lastGroup = d.group;
+    const gLabel = document.createElementNS(ns, "text");
+    const gY = i === 0 ? pad.top - 6 : y - rowH / 2 - 5;
+    gLabel.setAttribute("x", rightDotX + 80);
+    gLabel.setAttribute("y", gY);
+    gLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+    gLabel.setAttribute("font-size", "8");
+    gLabel.setAttribute("fill", groupColors[d.group]);
+    gLabel.setAttribute("font-weight", "500");
+    gLabel.setAttribute("letter-spacing", "1");
+    gLabel.textContent = groupLabels[d.group];
+    svg.appendChild(gLabel);
+  }
+
+  // Country name
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Slope line
+  const slopeX1 = xScale(d.start);
+  const slopeX2 = xScale(d.end);
+
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", slopeX1);
+  line.setAttribute("x2", slopeX2);
+  line.setAttribute("y1", y);
+  line.setAttribute("y2", y);
+  line.setAttribute("stroke", color);
+  line.setAttribute("stroke-width", 2);
+  line.setAttribute("stroke-opacity", 0.5);
+  svg.appendChild(line);
+
+  // Start dot
+  const startDot = document.createElementNS(ns, "circle");
+  startDot.setAttribute("cx", slopeX1);
+  startDot.setAttribute("cy", y);
+  startDot.setAttribute("r", 4);
+  startDot.setAttribute("fill", "#F6F5EE");
+  startDot.setAttribute("stroke", color);
+  startDot.setAttribute("stroke-width", 1.5);
+  svg.appendChild(startDot);
+
+  // End dot
+  const endDot = document.createElementNS(ns, "circle");
+  endDot.setAttribute("cx", slopeX2);
+  endDot.setAttribute("cy", y);
+  endDot.setAttribute("r", 4);
+  endDot.setAttribute("fill", color);
+  endDot.setAttribute("stroke", color);
+  endDot.setAttribute("stroke-width", 1.5);
+  svg.appendChild(endDot);
+
+  // Change annotation
+  const changeStr = (d.change > 0 ? "+" : "") + d.change.toFixed(1);
+  const changeLabel = document.createElementNS(ns, "text");
+  changeLabel.setAttribute("x", rightDotX + 50);
+  changeLabel.setAttribute("y", y + 1);
+  changeLabel.setAttribute("text-anchor", "end");
+  changeLabel.setAttribute("dominant-baseline", "middle");
+  changeLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  changeLabel.setAttribute("font-size", "9");
+  changeLabel.setAttribute("fill", color);
+  changeLabel.textContent = changeStr + " pp";
+  svg.appendChild(changeLabel);
+
+  // Hit area for tooltips
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y - rowH / 2);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    startDot.setAttribute("r", 6);
+    endDot.setAttribute("r", 6);
+    line.setAttribute("stroke-width", 3);
+    line.setAttribute("stroke-opacity", 0.8);
+    const direction = d.change < -5 ? "Improved" : d.change >= 1.5 ? "Worsened" : "Stalled";
+    tip.innerHTML = "<strong>" + d.name + "</strong>  " + d.start.toFixed(1) + "% (" + d.y0 + ") -> " + d.end.toFixed(1) + "% (" + d.y1 + ")  |  " + changeStr + " pp  " + direction;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const rect = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - rect.left + 12) + "px";
+    tip.style.top = (e.clientY - rect.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    startDot.setAttribute("r", 4);
+    endDot.setAttribute("r", 4);
+    line.setAttribute("stroke-width", 2);
+    line.setAttribute("stroke-opacity", 0.5);
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitArea);
+});
+
+// Legend
+const legendY = pad.top + chartH + 30;
+const legendItems = [
+  { label: "Earliest year (hollow)", fill: "#F6F5EE", stroke: "#7A786F" },
+  { label: "Latest year (filled)", fill: "#7A786F", stroke: "#7A786F" }
+];
+let lx = pad.left;
+legendItems.forEach(item => {
+  const dot = document.createElementNS(ns, "circle");
+  dot.setAttribute("cx", lx);
+  dot.setAttribute("cy", legendY);
+  dot.setAttribute("r", 4);
+  dot.setAttribute("fill", item.fill);
+  dot.setAttribute("stroke", item.stroke);
+  dot.setAttribute("stroke-width", 1.5);
+  svg.appendChild(dot);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", lx + 10);
+  label.setAttribute("y", legendY + 1);
+  label.setAttribute("dominant-baseline", "middle");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = item.label;
+  svg.appendChild(label);
+  lx += 150;
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .section-label { font-size: 11px; font-weight: 500; color: #7A786F; margin: 32px 0 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .legend { display: flex; gap: 16px; margin: 0 0 16px; font-size: 10px; color: #7A786F; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+</style></head><body>
+<h1>Where People Move</h1>
+<p class="subtitle">Net migration by country, 2020-2024. Positive values indicate more people arriving than leaving; negative values mean more departures. Germany saw a massive 2022 spike from Ukrainian refugees, while India and Bangladesh are the largest sources of emigration globally.</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3A9E8F"></div> Net immigration (people gained)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#D16B5E"></div> Net emigration (people lost)</div>
+</div>
+
+<div id="bar-chart" style="position:relative;"></div>
+<div class="tooltip" id="tip-bar"></div>
+
+<p class="section-label" style="margin-top:36px;">Five-year trend (2020-2024)</p>
+<div id="line-chart" style="position:relative;"></div>
+<div class="tooltip" id="tip-line"></div>
+
+<p class="source">Source: World Bank -- SM.POP.NETM (Net migration, five-year estimates)</p>
+
+<script>
+// -- DATA --
+const barData = [
+  { name: "Germany", code: "DE", value: 981552, year: 2022 },
+  { name: "Canada", code: "CA", value: 459988, year: 2022 },
+  { name: "Iran", code: "IR", value: 403190, year: 2022 },
+  { name: "Czechia", code: "CZ", value: 329739, year: 2022 },
+  { name: "Italy", code: "IT", value: 231228, year: 2022 },
+  { name: "Colombia", code: "CO", value: 183180, year: 2022 },
+  { name: "France", code: "FR", value: 179377, year: 2022 },
+  { name: "Japan", code: "JP", value: 175003, year: 2022 },
+  { name: "Australia", code: "AU", value: 140972, year: 2022 },
+  { name: "South Korea", code: "KR", value: 87800, year: 2022 },
+  { name: "Cuba", code: "CU", value: -23149, year: 2022 },
+  { name: "Brazil", code: "BR", value: -253639, year: 2022 },
+  { name: "China", code: "CN", value: -293846, year: 2022 },
+  { name: "Bangladesh", code: "BD", value: -549990, year: 2022 },
+  { name: "Afghanistan", code: "AF", value: -647402, year: 2022 },
+  { name: "India", code: "IN", value: -1353478, year: 2022 }
+];
+
+barData.sort((a, b) => b.value - a.value);
+
+const trendData = {
+  "Germany":     [{ y: 2020, v: 203468 }, { y: 2021, v: 310264 }, { y: 2022, v: 981552 }, { y: 2023, v: 609553 }, { y: 2024, v: 36954 }],
+  "Canada":      [{ y: 2020, v: 256592 }, { y: 2021, v: 198867 }, { y: 2022, v: 459988 }, { y: 2023, v: 433842 }, { y: 2024, v: 368599 }],
+  "Japan":       [{ y: 2020, v: 42001 },  { y: 2021, v: -34996 }, { y: 2022, v: 175003 }, { y: 2023, v: 175003 }, { y: 2024, v: 153357 }],
+  "Colombia":    [{ y: 2020, v: 227130 }, { y: 2021, v: 199070 }, { y: 2022, v: 183180 }, { y: 2023, v: 154521 }, { y: 2024, v: 141643 }],
+  "India":       [{ y: 2020, v: -73806 }, { y: 2021, v: -348916 }, { y: 2022, v: -1353478 }, { y: 2023, v: -979179 }, { y: 2024, v: -630830 }],
+  "Afghanistan": [{ y: 2020, v: 143634 }, { y: 2021, v: -548784 }, { y: 2022, v: -647402 }, { y: 2023, v: -48958 }, { y: 2024, v: -44089 }],
+  "Bangladesh":  [{ y: 2020, v: -1002522 }, { y: 2021, v: -994722 }, { y: 2022, v: -549990 }, { y: 2023, v: -549918 }, { y: 2024, v: -473362 }],
+  "China":       [{ y: 2020, v: -91577 }, { y: 2021, v: -379749 }, { y: 2022, v: -293846 }, { y: 2023, v: -567724 }, { y: 2024, v: -318992 }]
+};
+
+const trendColors = {
+  "Germany": "#3A9E8F",
+  "Canada": "#5DB8A9",
+  "Japan": "#8FA5C6",
+  "Colombia": "#E8B960",
+  "India": "#D16B5E",
+  "Afghanistan": "#B85C4A",
+  "Bangladesh": "#C47A3F",
+  "China": "#9E6B8A"
+};
+
+const immColor = "#3A9E8F";
+const emColor = "#D16B5E";
+
+function fmt(v) {
+  const abs = Math.abs(v);
+  if (abs >= 1e6) return (v / 1e6).toFixed(1) + "M";
+  if (abs >= 1e3) return (v / 1e3).toFixed(0) + "K";
+  return v.toString();
+}
+
+function fmtFull(v) {
+  const sign = v >= 0 ? "+" : "";
+  return sign + Math.abs(v).toLocaleString("en-US");
+}
+
+// -- DIVERGING BAR CHART --
+const ns = "http://www.w3.org/2000/svg";
+const W = 740;
+const barH = 26;
+const gap = 4;
+const pad = { left: 120, right: 70, top: 28, bottom: 32 };
+const chartH = barData.length * (barH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+
+const maxAbs = Math.max(...barData.map(d => Math.abs(d.value)));
+const domainMax = Math.ceil(maxAbs / 200000) * 200000;
+
+const chartW = W - pad.left - pad.right;
+const xScale = v => pad.left + ((v + domainMax) / (2 * domainMax)) * chartW;
+const zeroX = xScale(0);
+
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Gridlines
+const tickStep = 400000;
+for (let v = -domainMax; v <= domainMax; v += tickStep) {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top - 5);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1.5 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 10);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = fmt(v);
+  svg.appendChild(label);
+}
+
+const tipBar = document.getElementById("tip-bar");
+
+barData.forEach((d, i) => {
+  const y = pad.top + i * (barH + gap);
+  const isPositive = d.value >= 0;
+  const barStart = isPositive ? zeroX : xScale(d.value);
+  const barWidth = Math.abs(xScale(d.value) - zeroX);
+  const color = isPositive ? immColor : emColor;
+
+  const rect = document.createElementNS(ns, "rect");
+  rect.setAttribute("x", barStart);
+  rect.setAttribute("y", y + 2);
+  rect.setAttribute("width", Math.max(barWidth, 1));
+  rect.setAttribute("height", barH - 4);
+  rect.setAttribute("fill", color);
+  rect.setAttribute("rx", 2);
+  rect.style.transition = "opacity 0.15s";
+
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 8);
+  nameLabel.setAttribute("y", y + barH / 2 + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+
+  const valLabel = document.createElementNS(ns, "text");
+  const valX = isPositive ? xScale(d.value) + 5 : xScale(d.value) - 5;
+  valLabel.setAttribute("x", valX);
+  valLabel.setAttribute("y", y + barH / 2 + 1);
+  valLabel.setAttribute("text-anchor", isPositive ? "start" : "end");
+  valLabel.setAttribute("dominant-baseline", "middle");
+  valLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  valLabel.setAttribute("font-size", "9");
+  valLabel.setAttribute("fill", "#7A786F");
+  valLabel.textContent = (d.value >= 0 ? "+" : "") + fmt(d.value);
+
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", barH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    rect.setAttribute("opacity", "0.75");
+    const label = d.value >= 0 ? "net immigration" : "net emigration";
+    tipBar.innerHTML = `<strong>${d.name}</strong>  ${fmtFull(d.value)} (${label}, ${d.year})`;
+    tipBar.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const el = document.getElementById("bar-chart");
+    const r = el.getBoundingClientRect();
+    tipBar.style.left = (e.clientX - r.left + 12) + "px";
+    tipBar.style.top = (e.clientY - r.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    rect.setAttribute("opacity", "1");
+    tipBar.style.opacity = 0;
+  });
+
+  svg.appendChild(rect);
+  svg.appendChild(nameLabel);
+  svg.appendChild(valLabel);
+  svg.appendChild(hitArea);
+});
+
+// Axis labels
+const emLabel = document.createElementNS(ns, "text");
+emLabel.setAttribute("x", xScale(-domainMax * 0.45));
+emLabel.setAttribute("y", pad.top + chartH + 18);
+emLabel.setAttribute("text-anchor", "middle");
+emLabel.setAttribute("font-size", "9");
+emLabel.setAttribute("fill", emColor);
+emLabel.setAttribute("font-weight", "500");
+emLabel.setAttribute("letter-spacing", "1");
+emLabel.textContent = "EMIGRATION";
+svg.appendChild(emLabel);
+
+const immLabel = document.createElementNS(ns, "text");
+immLabel.setAttribute("x", xScale(domainMax * 0.45));
+immLabel.setAttribute("y", pad.top + chartH + 18);
+immLabel.setAttribute("text-anchor", "middle");
+immLabel.setAttribute("font-size", "9");
+immLabel.setAttribute("fill", immColor);
+immLabel.setAttribute("font-weight", "500");
+immLabel.setAttribute("letter-spacing", "1");
+immLabel.textContent = "IMMIGRATION";
+svg.appendChild(immLabel);
+
+document.getElementById("bar-chart").appendChild(svg);
+
+// -- LINE CHART (trend) --
+const LW = 740;
+const LH = 300;
+const lPad = { left: 70, right: 100, top: 20, bottom: 30 };
+const lChartW = LW - lPad.left - lPad.right;
+const lChartH = LH - lPad.top - lPad.bottom;
+
+const years = [2020, 2021, 2022, 2023, 2024];
+const allVals = Object.values(trendData).flat().map(d => d.v);
+const lMin = Math.min(...allVals);
+const lMax = Math.max(...allVals);
+const lPadVal = (lMax - lMin) * 0.08;
+const lDomMin = lMin - lPadVal;
+const lDomMax = lMax + lPadVal;
+
+const lxScale = yr => lPad.left + ((yr - 2020) / 4) * lChartW;
+const lyScale = v => lPad.top + lChartH - ((v - lDomMin) / (lDomMax - lDomMin)) * lChartH;
+
+const svg2 = document.createElementNS(ns, "svg");
+svg2.setAttribute("viewBox", `0 0 ${LW} ${LH}`);
+svg2.setAttribute("width", "100%");
+svg2.style.maxWidth = LW + "px";
+svg2.style.overflow = "visible";
+
+// Zero line
+const zeroY = lyScale(0);
+if (zeroY >= lPad.top && zeroY <= lPad.top + lChartH) {
+  const zLine = document.createElementNS(ns, "line");
+  zLine.setAttribute("x1", lPad.left);
+  zLine.setAttribute("x2", lPad.left + lChartW);
+  zLine.setAttribute("y1", zeroY);
+  zLine.setAttribute("y2", zeroY);
+  zLine.setAttribute("stroke", "#2B2A27");
+  zLine.setAttribute("stroke-width", 1);
+  zLine.setAttribute("stroke-dasharray", "3,3");
+  svg2.appendChild(zLine);
+
+  const zLabel = document.createElementNS(ns, "text");
+  zLabel.setAttribute("x", lPad.left - 6);
+  zLabel.setAttribute("y", zeroY + 3);
+  zLabel.setAttribute("text-anchor", "end");
+  zLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  zLabel.setAttribute("font-size", "9");
+  zLabel.setAttribute("fill", "#7A786F");
+  zLabel.textContent = "0";
+  svg2.appendChild(zLabel);
+}
+
+// Y-axis gridlines
+const yTicks = [-1200000, -800000, -400000, 0, 400000, 800000];
+yTicks.forEach(v => {
+  const y = lyScale(v);
+  if (y < lPad.top - 5 || y > lPad.top + lChartH + 5) return;
+  if (v === 0) return;
+
+  const gl = document.createElementNS(ns, "line");
+  gl.setAttribute("x1", lPad.left);
+  gl.setAttribute("x2", lPad.left + lChartW);
+  gl.setAttribute("y1", y);
+  gl.setAttribute("y2", y);
+  gl.setAttribute("stroke", "#DDD9CE");
+  gl.setAttribute("stroke-width", 0.5);
+  svg2.appendChild(gl);
+
+  const tl = document.createElementNS(ns, "text");
+  tl.setAttribute("x", lPad.left - 6);
+  tl.setAttribute("y", y + 3);
+  tl.setAttribute("text-anchor", "end");
+  tl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  tl.setAttribute("font-size", "9");
+  tl.setAttribute("fill", "#7A786F");
+  tl.textContent = fmt(v);
+  svg2.appendChild(tl);
+});
+
+// Year labels
+years.forEach(yr => {
+  const x = lxScale(yr);
+  const tl = document.createElementNS(ns, "text");
+  tl.setAttribute("x", x);
+  tl.setAttribute("y", lPad.top + lChartH + 16);
+  tl.setAttribute("text-anchor", "middle");
+  tl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  tl.setAttribute("font-size", "9");
+  tl.setAttribute("fill", "#7A786F");
+  tl.textContent = yr;
+  svg2.appendChild(tl);
+});
+
+const tipLine = document.getElementById("tip-line");
+
+// Draw lines and dots for each country
+Object.entries(trendData).forEach(([name, pts]) => {
+  const color = trendColors[name];
+
+  // Line path
+  const path = document.createElementNS(ns, "path");
+  let d = pts.map((p, i) => {
+    const cmd = i === 0 ? "M" : "L";
+    return `${cmd}${lxScale(p.y)},${lyScale(p.v)}`;
+  }).join(" ");
+  path.setAttribute("d", d);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", color);
+  path.setAttribute("stroke-width", 2);
+  path.setAttribute("stroke-linejoin", "round");
+  path.style.transition = "opacity 0.15s";
+  path.dataset.country = name;
+  svg2.appendChild(path);
+
+  // Dots
+  pts.forEach(p => {
+    const circle = document.createElementNS(ns, "circle");
+    circle.setAttribute("cx", lxScale(p.y));
+    circle.setAttribute("cy", lyScale(p.v));
+    circle.setAttribute("r", 3);
+    circle.setAttribute("fill", color);
+    circle.setAttribute("stroke", "#F6F5EE");
+    circle.setAttribute("stroke-width", 1.5);
+    circle.dataset.country = name;
+    circle.style.transition = "opacity 0.15s";
+
+    const hitDot = document.createElementNS(ns, "circle");
+    hitDot.setAttribute("cx", lxScale(p.y));
+    hitDot.setAttribute("cy", lyScale(p.v));
+    hitDot.setAttribute("r", 10);
+    hitDot.setAttribute("fill", "transparent");
+    hitDot.style.cursor = "pointer";
+
+    hitDot.addEventListener("mouseenter", e => {
+      // Dim other lines
+      svg2.querySelectorAll("path[data-country], circle[data-country]").forEach(el => {
+        if (el.dataset.country !== name) el.style.opacity = "0.15";
+      });
+      tipLine.innerHTML = `<strong>${name}</strong>  ${p.y}: ${fmtFull(p.v)}`;
+      tipLine.style.opacity = 1;
+    });
+
+    hitDot.addEventListener("mousemove", e => {
+      const el = document.getElementById("line-chart");
+      const r = el.getBoundingClientRect();
+      tipLine.style.left = (e.clientX - r.left + 12) + "px";
+      tipLine.style.top = (e.clientY - r.top - 20) + "px";
+    });
+
+    hitDot.addEventListener("mouseleave", () => {
+      svg2.querySelectorAll("path[data-country], circle[data-country]").forEach(el => {
+        el.style.opacity = "1";
+      });
+      tipLine.style.opacity = 0;
+    });
+
+    svg2.appendChild(circle);
+    svg2.appendChild(hitDot);
+  });
+
+  // End label
+  const last = pts[pts.length - 1];
+  const endLabel = document.createElementNS(ns, "text");
+  endLabel.setAttribute("x", lxScale(last.y) + 8);
+  endLabel.setAttribute("y", lyScale(last.v) + 3);
+  endLabel.setAttribute("font-size", "9");
+  endLabel.setAttribute("fill", color);
+  endLabel.setAttribute("font-weight", "500");
+  endLabel.dataset.country = name;
+  endLabel.style.transition = "opacity 0.15s";
+  endLabel.textContent = name;
+  svg2.appendChild(endLabel);
+});
+
+document.getElementById("line-chart").appendChild(svg2);
+</script>
+</body></html>

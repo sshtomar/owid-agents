@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 660px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: absolute; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 20px; margin: 0 0 18px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+  .legend-line { width: 18px; height: 2px; }
+</style></head><body>
+<h1>Cities of Informality</h1>
+<p class="subtitle">Population living in slums as a share of urban population, comparing 2000 with the most recent available year (2022). Connected dots reveal two decades of progress -- or backsliding. Countries sorted by current slum prevalence; arrows show direction of change.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#B8B0A0;"></div>Year 2000</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C93C3C;"></div>Latest (worsened)</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#5A9E6F;"></div>Latest (improved)</div>
+  <div class="legend-item"><div class="legend-line" style="background:#2B2A27; opacity:0.25;"></div>Change</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank -- EN.POP.SLUM.UR.ZS (Population living in slums, % of urban population)</p>
+<script>
+const data = [
+  { name: "Burkina Faso",  v2000: 82.2, vLatest: 87.9, year: 2022 },
+  { name: "Chad",          v2000: 91.6, vLatest: 82.0, year: 2022 },
+  { name: "Ethiopia",      v2000: 92.2, vLatest: 64.3, year: 2022 },
+  { name: "Bangladesh",    v2000: 58.3, vLatest: 51.5, year: 2022 },
+  { name: "Haiti",         v2000: 61.3, vLatest: 51.1, year: 2022 },
+  { name: "Iraq",          v2000: 33.9, vLatest: 49.3, year: 2022 },
+  { name: "Cambodia",      v2000: 84.8, vLatest: 42.3, year: 2022 },
+  { name: "Kenya",         v2000: 63.2, vLatest: 40.5, year: 2022 },
+  { name: "Guatemala",     v2000: 55.5, vLatest: 37.6, year: 2022 },
+  { name: "Ghana",         v2000: 60.4, vLatest: 33.5, year: 2022 },
+  { name: "Cameroon",      v2000: 65.4, vLatest: 32.7, year: 2022 },
+  { name: "Indonesia",     v2000: 35.1, vLatest: 19.4, year: 2022 },
+  { name: "Brazil",        v2000: 34.7, vLatest: 14.9, year: 2022 },
+  { name: "Colombia",      v2000: 21.2, vLatest:  9.7, year: 2022 },
+  { name: "Egypt",         v2000: 42.2, vLatest:  3.8, year: 2022 },
+  { name: "Albania",       v2000: 28.1, vLatest:  2.7, year: 2022 },
+  { name: "Kazakhstan",    v2000: 24.5, vLatest:  0.8, year: 2022 }
+];
+
+data.sort((a, b) => b.vLatest - a.vLatest);
+
+const W = 760;
+const rowH = 30;
+const gap = 4;
+const pad = { left: 140, right: 60, top: 20, bottom: 10 };
+const chartH = data.length * (rowH + gap) - gap;
+const H = chartH + pad.top + pad.bottom;
+const chartW = W - pad.left - pad.right;
+const maxVal = 100;
+const xScale = v => pad.left + (v / maxVal) * chartW;
+
+const ns = "http://www.w3.org/2000/svg";
+const svg = document.createElementNS(ns, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.overflow = "visible";
+
+// Grid lines
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = xScale(v);
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", x);
+  line.setAttribute("x2", x);
+  line.setAttribute("y1", pad.top);
+  line.setAttribute("y2", pad.top + chartH);
+  line.setAttribute("stroke", v === 0 ? "#2B2A27" : "#DDD9CE");
+  line.setAttribute("stroke-width", v === 0 ? 1 : 0.5);
+  svg.appendChild(line);
+
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", x);
+  label.setAttribute("y", pad.top - 6);
+  label.setAttribute("text-anchor", "middle");
+  label.setAttribute("font-family", "'JetBrains Mono', monospace");
+  label.setAttribute("font-size", "9");
+  label.setAttribute("fill", "#7A786F");
+  label.textContent = v + "%";
+  svg.appendChild(label);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (rowH + gap);
+  const cy = y + rowH / 2;
+  const improved = d.vLatest <= d.v2000;
+  const latestColor = improved ? "#5A9E6F" : "#C93C3C";
+  const baseColor = "#B8B0A0";
+
+  // Connector line between the two dots
+  const connector = document.createElementNS(ns, "line");
+  connector.setAttribute("x1", xScale(d.v2000));
+  connector.setAttribute("x2", xScale(d.vLatest));
+  connector.setAttribute("y1", cy);
+  connector.setAttribute("y2", cy);
+  connector.setAttribute("stroke", "#2B2A27");
+  connector.setAttribute("stroke-width", 1.5);
+  connector.setAttribute("stroke-opacity", 0.18);
+  svg.appendChild(connector);
+
+  // Arrow indicator on connector (small triangle at the latest end)
+  const arrowSize = 4;
+  const xLatest = xScale(d.vLatest);
+  const x2000 = xScale(d.v2000);
+  const dir = d.vLatest > d.v2000 ? 1 : -1;
+  const arrow = document.createElementNS(ns, "polygon");
+  const ax = xLatest - dir * 6;
+  arrow.setAttribute("points",
+    `${ax},${cy} ${ax - dir * arrowSize},${cy - arrowSize} ${ax - dir * arrowSize},${cy + arrowSize}`
+  );
+  arrow.setAttribute("fill", "#2B2A27");
+  arrow.setAttribute("fill-opacity", 0.2);
+  svg.appendChild(arrow);
+
+  // Year-2000 dot (background)
+  const dot2000 = document.createElementNS(ns, "circle");
+  dot2000.setAttribute("cx", x2000);
+  dot2000.setAttribute("cy", cy);
+  dot2000.setAttribute("r", 5);
+  dot2000.setAttribute("fill", baseColor);
+  svg.appendChild(dot2000);
+
+  // Latest-year dot (foreground)
+  const dotLatest = document.createElementNS(ns, "circle");
+  dotLatest.setAttribute("cx", xLatest);
+  dotLatest.setAttribute("cy", cy);
+  dotLatest.setAttribute("r", 5);
+  dotLatest.setAttribute("fill", latestColor);
+  svg.appendChild(dotLatest);
+
+  // Country name label
+  const nameLabel = document.createElementNS(ns, "text");
+  nameLabel.setAttribute("x", pad.left - 10);
+  nameLabel.setAttribute("y", cy + 1);
+  nameLabel.setAttribute("text-anchor", "end");
+  nameLabel.setAttribute("dominant-baseline", "middle");
+  nameLabel.setAttribute("font-size", "11");
+  nameLabel.setAttribute("fill", "#2B2A27");
+  nameLabel.textContent = d.name;
+  svg.appendChild(nameLabel);
+
+  // Change annotation at far right
+  const change = d.vLatest - d.v2000;
+  const changeLabel = document.createElementNS(ns, "text");
+  changeLabel.setAttribute("x", W - 8);
+  changeLabel.setAttribute("y", cy + 1);
+  changeLabel.setAttribute("text-anchor", "end");
+  changeLabel.setAttribute("dominant-baseline", "middle");
+  changeLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+  changeLabel.setAttribute("font-size", "9");
+  changeLabel.setAttribute("fill", improved ? "#5A9E6F" : "#C93C3C");
+  const sign = change > 0 ? "+" : "";
+  changeLabel.textContent = sign + change.toFixed(1) + "pp";
+  svg.appendChild(changeLabel);
+
+  // Invisible hit area for tooltip
+  const hitArea = document.createElementNS(ns, "rect");
+  hitArea.setAttribute("x", 0);
+  hitArea.setAttribute("y", y);
+  hitArea.setAttribute("width", W);
+  hitArea.setAttribute("height", rowH + gap);
+  hitArea.setAttribute("fill", "transparent");
+  hitArea.style.cursor = "pointer";
+
+  hitArea.addEventListener("mouseenter", () => {
+    dot2000.setAttribute("r", 7);
+    dotLatest.setAttribute("r", 7);
+    connector.setAttribute("stroke-opacity", 0.4);
+    const chg = d.vLatest - d.v2000;
+    const chgStr = (chg > 0 ? "+" : "") + chg.toFixed(1) + "pp";
+    const dir = chg <= 0 ? "improved" : "worsened";
+    tip.innerHTML = `<strong>${d.name}</strong>  ${d.v2000.toFixed(1)}% (2000) -> ${d.vLatest.toFixed(1)}% (${d.year})  ${chgStr} ${dir}`;
+    tip.style.opacity = 1;
+  });
+
+  hitArea.addEventListener("mousemove", e => {
+    const chartEl = document.getElementById("chart");
+    const r = chartEl.getBoundingClientRect();
+    tip.style.left = (e.clientX - r.left + 12) + "px";
+    tip.style.top = (e.clientY - r.top - 20) + "px";
+  });
+
+  hitArea.addEventListener("mouseleave", () => {
+    dot2000.setAttribute("r", 5);
+    dotLatest.setAttribute("r", 5);
+    connector.setAttribute("stroke-opacity", 0.18);
+    tip.style.opacity = 0;
+  });
+
+  svg.appendChild(hitArea);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>
