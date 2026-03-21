@@ -767,41 +767,16 @@ export default function Landing() {
         gap: mobile ? 24 : 40,
       }}>
         <div style={{ flex: 1, width: mobile ? "100%" : undefined }}>
-          <div style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: 20,
+          <h1 style={{
+            fontSize: 26,
+            fontWeight: 700,
+            letterSpacing: "-0.5px",
+            lineHeight: 1.2,
+            color: "#2B2A27",
             margin: "0 0 10px",
           }}>
-            <h1 style={{
-              fontSize: 26,
-              fontWeight: 700,
-              letterSpacing: "-0.5px",
-              lineHeight: 1.2,
-              color: "#2B2A27",
-              margin: 0,
-            }}>
-              Fieldnotes
-            </h1>
-            <Link to="/gallery" style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
-              color: "#EA5E33",
-              textDecoration: "none",
-              letterSpacing: "0.3px",
-            }}>
-              Gallery {"->"}
-            </Link>
-            <Link to="/datasets" style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
-              color: "#EA5E33",
-              textDecoration: "none",
-              letterSpacing: "0.3px",
-            }}>
-              Datasets {"->"}
-            </Link>
-          </div>
+            Fieldnotes
+          </h1>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -834,6 +809,27 @@ export default function Landing() {
               totalCount={vizList.length}
             />
           </motion.div>
+
+          <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
+            <Link to="/gallery" style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              color: "#EA5E33",
+              textDecoration: "none",
+              letterSpacing: "0.3px",
+            }}>
+              Gallery {"->"}
+            </Link>
+            <Link to="/datasets" style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              color: "#EA5E33",
+              textDecoration: "none",
+              letterSpacing: "0.3px",
+            }}>
+              Datasets {"->"}
+            </Link>
+          </div>
         </div>
 
         {!mobile && (
