@@ -1,4 +1,4 @@
-export type Provider = "world-bank" | "who-gho";
+export type Provider = "world-bank" | "who-gho" | "imf-weo" | "fao" | "open-meteo";
 
 export interface DataPoint {
   country: string;

@@ -1,6 +1,9 @@
 import { parseArgs } from "node:util";
 import * as worldBank from "../src/api-clients/world-bank.js";
 import * as whoGho from "../src/api-clients/who-gho.js";
+import * as imfWeo from "../src/api-clients/imf-weo.js";
+import * as fao from "../src/api-clients/fao.js";
+import * as openMeteo from "../src/api-clients/open-meteo.js";
 import { addDataset } from "../src/catalog.js";
 import type { DatasetEntry, DatasetFile, Provider } from "../src/types.js";
 
@@ -21,11 +24,20 @@ const { values, positionals } = parseArgs({
 
 const command = positionals[0];
 
-function getProvider(): { provider: Provider; client: typeof worldBank } {
+interface ProviderClient {
+  searchIndicators(query: string, limit?: number): Promise<import("../src/types.js").IndicatorSearchResult[]>;
+  fetchIndicatorData(indicatorId: string, countries?: string): Promise<{ name: string; data: import("../src/types.js").DataPoint[] }>;
+  getSourceUrl(indicatorId: string): string;
+}
+
+function getProvider(): { provider: Provider; client: ProviderClient } {
   const p = values.provider as Provider;
   if (p === "world-bank") return { provider: p, client: worldBank };
   if (p === "who-gho") return { provider: p, client: whoGho };
-  console.error("Error: --provider must be 'world-bank' or 'who-gho'");
+  if (p === "imf-weo") return { provider: p, client: imfWeo };
+  if (p === "fao") return { provider: p, client: fao };
+  if (p === "open-meteo") return { provider: p, client: openMeteo };
+  console.error("Error: --provider must be 'world-bank', 'who-gho', 'imf-weo', 'fao', or 'open-meteo'");
   process.exit(1);
 }
 
@@ -100,18 +112,29 @@ async function save() {
 
   const countries = [...new Set(result.data.map((d) => d.country))];
   const years = result.data.map((d) => d.year);
-  const prefix = provider === "world-bank" ? "wb" : "who";
+  const prefixMap: Record<Provider, string> = {
+    "world-bank": "wb",
+    "who-gho": "who",
+    "imf-weo": "imf",
+    "fao": "fao",
+    "open-meteo": "meteo",
+  };
+  const sourceNameMap: Record<Provider, string> = {
+    "world-bank": "World Bank",
+    "who-gho": "WHO GHO",
+    "imf-weo": "IMF World Economic Outlook",
+    "fao": "FAO FAOSTAT",
+    "open-meteo": "Open-Meteo Historical Weather",
+  };
+  const prefix = prefixMap[provider];
   const id = `${prefix}--${indicator.replace(/\./g, "-")}`;
 
-  const sourceUrl =
-    provider === "world-bank"
-      ? worldBank.getSourceUrl(indicator)
-      : whoGho.getSourceUrl(indicator);
+  const sourceUrl = client.getSourceUrl(indicator);
 
   const entry: DatasetEntry = {
     id,
     title: values.title ?? result.name,
-    description: `${result.name} from ${provider === "world-bank" ? "World Bank" : "WHO GHO"}`,
+    description: `${result.name} from ${sourceNameMap[provider]}`,
     source: {
       provider,
       indicatorId: indicator,
@@ -158,21 +181,28 @@ async function main() {
 
 Commands:
   search    Search for indicators
-            --provider <world-bank|who-gho>
+            --provider <world-bank|who-gho|imf-weo|fao|open-meteo>
             --topic <string>        Topic filter
             --query <string>        Keyword search
             --limit <number>        Max results (default: 20)
 
   fetch     Preview data for an indicator
-            --provider <world-bank|who-gho>
+            --provider <world-bank|who-gho|imf-weo|fao|open-meteo>
             --indicator <string>
             --countries <string>    Comma-separated ISO3 codes
 
   save      Fetch and save a dataset to the catalog
-            --provider <world-bank|who-gho>
+            --provider <world-bank|who-gho|imf-weo|fao|open-meteo>
             --indicator <string>
             --title <string>        Human-readable title
-            --topics <string>       Comma-separated topic tags`);
+            --topics <string>       Comma-separated topic tags
+
+Providers:
+  world-bank   World Bank Development Indicators
+  who-gho      WHO Global Health Observatory
+  imf-weo      IMF World Economic Outlook (GDP growth, inflation, etc.)
+  fao          FAO FAOSTAT (agriculture, food, land use)
+  open-meteo   Open-Meteo Historical Weather (temperature, precipitation)`);
   }
 }
 
