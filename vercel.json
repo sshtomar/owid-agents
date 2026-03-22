@@ -9,6 +9,7 @@
   },
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.ts" },
-    { "source": "/embed/:id", "destination": "/api/index.ts" }
+    { "source": "/embed/:id", "destination": "/api/index.ts" },
+    { "source": "/share/:id", "destination": "/api/index.ts" }
   ]
 }

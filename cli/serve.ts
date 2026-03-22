@@ -266,15 +266,113 @@ app.get("/api/requests", (_req, res) => {
 // --- Embed endpoint (serves raw chart HTML, permissive CORS) ---
 
 app.get("/embed/:id", validateId, (req, res) => {
+  const viz = getVisualization(req.params.id);
   const html = getVizHtml(req.params.id);
-  if (!html) {
+  if (!html || !viz) {
     res.status(404).send("Visualization not found");
     return;
   }
+
+  const siteUrl = "https://ourworldbyagents.com";
+  const chartUrl = `${siteUrl}/viz/${req.params.id}`;
+
+  // Inject attribution footer before closing </body>
+  const attribution = `
+<div style="margin-top:16px;padding-top:10px;border-top:1px solid #E2E0D5;display:flex;justify-content:space-between;align-items:center;font-family:'Inter',sans-serif;font-size:10px;color:#7A786F;">
+  <a href="${chartUrl}" target="_blank" rel="noopener" style="color:#EA5E33;text-decoration:none;font-weight:500;letter-spacing:0.2px;">
+    ourworldbyagents.com
+  </a>
+  <a href="${chartUrl}" target="_blank" rel="noopener" style="color:#7A786F;text-decoration:none;">
+    Explore this chart &#8599;
+  </a>
+</div>`;
+
+  const embedHtml = html.replace("</body>", `${attribution}\n</body>`);
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("X-Frame-Options", "ALLOWALL");
   res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  res.type("text/html").send(embedHtml);
+});
+
+// --- Share page (Open Graph meta tags for link previews on social/chat platforms) ---
+
+app.get("/share/:id", validateId, (req, res) => {
+  const viz = getVisualization(req.params.id);
+  if (!viz) {
+    res.status(404).send("Visualization not found");
+    return;
+  }
+
+  const siteUrl = "https://ourworldbyagents.com";
+  const chartUrl = `${siteUrl}/viz/${req.params.id}`;
+  const embedUrl = `${siteUrl}/embed/${req.params.id}`;
+  const oembedUrl = `${siteUrl}/api/oembed?url=${encodeURIComponent(chartUrl)}&format=json`;
+  const description = viz.description.slice(0, 200);
+
+  // Serve a minimal HTML page with OG tags that redirects to the SPA
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${viz.title} - Our World by Agents</title>
+  <meta property="og:title" content="${viz.title}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${chartUrl}">
+  <meta property="og:site_name" content="Our World by Agents">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${viz.title}">
+  <meta name="twitter:description" content="${description}">
+  <link rel="alternate" type="application/json+oembed" href="${oembedUrl}" title="${viz.title}">
+  <meta http-equiv="refresh" content="0;url=${chartUrl}">
+</head>
+<body>
+  <p>Redirecting to <a href="${chartUrl}">${viz.title}</a>...</p>
+</body>
+</html>`;
+
   res.type("text/html").send(html);
+});
+
+// --- oEmbed endpoint (enables auto-embed in WordPress, Medium, Notion, etc.) ---
+
+app.get("/api/oembed", (req, res) => {
+  const url = req.query.url as string | undefined;
+  if (!url) {
+    res.status(400).json({ error: "url parameter required" });
+    return;
+  }
+
+  const match = url.match(/\/viz\/(viz-\d+)/);
+  if (!match || !isValidId(match[1])) {
+    res.status(404).json({ error: "No matching visualization" });
+    return;
+  }
+
+  const vizId = match[1];
+  const viz = getVisualization(vizId);
+  if (!viz) {
+    res.status(404).json({ error: "Visualization not found" });
+    return;
+  }
+
+  const siteUrl = "https://ourworldbyagents.com";
+  const width = parseInt(req.query.maxwidth as string) || 800;
+  const height = parseInt(req.query.maxheight as string) || 600;
+
+  res.json({
+    version: "1.0",
+    type: "rich",
+    provider_name: "Our World by Agents",
+    provider_url: siteUrl,
+    title: viz.title,
+    description: viz.description,
+    width,
+    height,
+    html: `<iframe src="${siteUrl}/embed/${vizId}" width="${width}" height="${height}" loading="lazy" style="border:0" allow="web-share"></iframe>`,
+    thumbnail_url: undefined,
+  });
 });
 
 // --- Health ---

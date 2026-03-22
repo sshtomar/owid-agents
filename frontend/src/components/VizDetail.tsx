@@ -209,52 +209,71 @@ function ReactionBar({ vizId }: { vizId: string }) {
   );
 }
 
-function EmbedBlock({ vizId }: { vizId: string }) {
-  const [copied, setCopied] = useState(false);
+function EmbedBlock({ vizId, title }: { vizId: string; title: string }) {
+  const [copied, setCopied] = useState<"embed" | "share" | null>(null);
   const embedUrl = `${window.location.origin}/embed/${vizId}`;
+  const shareUrl = `${window.location.origin}/share/${vizId}`;
   const iframeCode = `<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;" allow="web-share"></iframe>`;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(iframeCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const copyText = (text: string, type: "embed" | "share") => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(type);
+      setTimeout(() => setCopied(null), 2000);
     });
+  };
+
+  const codeBlock: React.CSSProperties = {
+    fontFamily: FONTS.mono,
+    fontSize: 10,
+    lineHeight: 1.6,
+    color: COLORS.textMid,
+    backgroundColor: COLORS.inputBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 2,
+    padding: "10px 12px",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-all",
+    userSelect: "all",
+  };
+
+  const copyBtn: React.CSSProperties = {
+    ...BUTTON_SECONDARY,
+    fontSize: 9,
+    padding: "3px 8px",
+    marginTop: 6,
   };
 
   return (
     <div style={{ marginTop: 32, borderTop: `1px solid ${COLORS.border}`, paddingTop: 24 }}>
       <span style={{ ...LABEL_STYLE, marginBottom: 16, display: "block" }}>
-        Embed this chart
+        Share & Embed
       </span>
-      <p style={{ fontSize: 11, color: COLORS.textMuted, lineHeight: 1.6, marginTop: 0, marginBottom: 12 }}>
-        Paste this into any webpage. The chart is interactive and self-contained.
-      </p>
-      <div style={{
-        fontFamily: FONTS.mono,
-        fontSize: 10,
-        lineHeight: 1.6,
-        color: COLORS.textMid,
-        backgroundColor: COLORS.inputBg,
-        border: `1px solid ${COLORS.border}`,
-        borderRadius: 2,
-        padding: "10px 12px",
-        whiteSpace: "pre-wrap",
-        wordBreak: "break-all",
-        userSelect: "all",
-      }}>
-        {iframeCode}
+
+      <div style={{ marginBottom: 16 }}>
+        <span style={{ ...LABEL_STYLE, fontSize: 8, marginBottom: 6, display: "block" }}>
+          Share link (with preview)
+        </span>
+        <p style={{ fontSize: 11, color: COLORS.textMuted, lineHeight: 1.6, marginTop: 0, marginBottom: 8 }}>
+          Paste this link on social media, Slack, or Notion for a rich preview.
+        </p>
+        <div style={codeBlock}>{shareUrl}</div>
+        <button onClick={() => copyText(shareUrl, "share")} style={copyBtn}>
+          {copied === "share" ? "Copied" : "Copy share link"}
+        </button>
       </div>
-      <button
-        onClick={handleCopy}
-        style={{
-          ...BUTTON_SECONDARY,
-          fontSize: 9,
-          padding: "3px 8px",
-          marginTop: 6,
-        }}
-      >
-        {copied ? "Copied" : "Copy embed code"}
-      </button>
+
+      <div>
+        <span style={{ ...LABEL_STYLE, fontSize: 8, marginBottom: 6, display: "block" }}>
+          Embed code
+        </span>
+        <p style={{ fontSize: 11, color: COLORS.textMuted, lineHeight: 1.6, marginTop: 0, marginBottom: 8 }}>
+          Paste this into any webpage. The chart is interactive and self-contained.
+        </p>
+        <div style={codeBlock}>{iframeCode}</div>
+        <button onClick={() => copyText(iframeCode, "embed")} style={copyBtn}>
+          {copied === "embed" ? "Copied" : "Copy embed code"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -579,7 +598,7 @@ export default function VizDetail() {
         )}
       </div>
 
-      <EmbedBlock vizId={data.id} />
+      <EmbedBlock vizId={data.id} title={data.title} />
 
       <CitationBlock viz={data} />
 
