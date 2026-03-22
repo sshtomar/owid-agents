@@ -4,7 +4,7 @@
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
-      "includeFiles": "{data/catalog/**,data/visualizations/index.json,data/visualizations/viz/**,data/visualizations/notebooks/*.py,src/**,cli/serve.ts}"
+      "includeFiles": "{data/catalog/index.json,data/visualizations/index.json,data/visualizations/viz/**,src/**,cli/serve.ts}"
     }
   },
   "rewrites": [

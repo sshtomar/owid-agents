@@ -95,12 +95,18 @@ app.get("/api/datasets", (_req, res) => {
 });
 
 app.get("/api/datasets/:id", validateId, (req, res) => {
+  // Try full dataset file first, fall back to index entry (serverless has index only)
   const dataset = getDataset(req.params.id);
-  if (!dataset) {
+  if (dataset) {
+    res.json(dataset);
+    return;
+  }
+  const entry = listDatasets().find((d) => d.id === req.params.id);
+  if (!entry) {
     res.status(404).json({ error: "Dataset not found" });
     return;
   }
-  res.json(dataset);
+  res.json({ meta: entry });
 });
 
 // --- Visualization endpoints ---
@@ -137,7 +143,7 @@ app.get("/api/visualizations/:id/notebook/wasm", validateId, (req, res) => {
 app.get("/api/visualizations/:id/notebook", validateId, (req, res) => {
   const notebook = getVizNotebook(req.params.id);
   if (!notebook) {
-    res.status(404).json({ error: "Notebook not found" });
+    res.status(404).json({ error: "Notebook not available in this environment" });
     return;
   }
   res.type("text/plain").send(notebook);
