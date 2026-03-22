@@ -11,7 +11,8 @@
     "resolveJsonModule": true,
     "declaration": true,
     "sourceMap": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx"
   },
   "include": ["src/**/*", "cli/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist", "frontend"]

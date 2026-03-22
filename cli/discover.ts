@@ -27,7 +27,8 @@ const { values, positionals } = parseArgs({
 
 const command = positionals[0];
 
-function getProvider(): { provider: Provider; client: typeof worldBank } {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- API clients share a loose interface
+function getProvider(): { provider: Provider; client: any } {
   const p = values.provider as Provider;
   if (p === "world-bank") return { provider: p, client: worldBank };
   if (p === "who-gho") return { provider: p, client: whoGho };
@@ -85,8 +86,8 @@ async function fetchData() {
   console.log(`Data points: ${result.data.length}`);
 
   if (result.data.length > 0) {
-    const countries = [...new Set(result.data.map((d) => d.country))];
-    const years = result.data.map((d) => d.year);
+    const countries = [...new Set(result.data.map((d: any) => d.country))];
+    const years = result.data.map((d: any) => d.year);
     console.log(`Countries: ${countries.length}`);
     console.log(`Year range: ${Math.min(...years)} - ${Math.max(...years)}`);
     console.log(`\nSample (first 5 points):`);
@@ -112,8 +113,8 @@ async function save() {
     process.exit(1);
   }
 
-  const countries = [...new Set(result.data.map((d) => d.country))];
-  const years = result.data.map((d) => d.year);
+  const countries: string[] = [...new Set(result.data.map((d: any) => d.country))] as string[];
+  const years = result.data.map((d: any) => d.year);
   const prefixMap: Record<Provider, string> = {
     "world-bank": "wb",
     "who-gho": "who",
@@ -156,7 +157,7 @@ async function save() {
     data: result.data,
   };
 
-  addDataset(entry, file);
+  await addDataset(entry, file);
   console.log(`\nSaved dataset: ${id}`);
   console.log(`  Title: ${entry.title}`);
   console.log(`  Data points: ${result.data.length}`);

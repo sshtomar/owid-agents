@@ -60,7 +60,7 @@ export async function fetchIndicatorData(
   const allValues: GHODataPoint[] = [];
   let nextUrl: string | undefined = url;
   while (nextUrl) {
-    const page = await fetchJSON<GHOResponse<GHODataPoint>>(nextUrl);
+    const page: GHOResponse<GHODataPoint> = await fetchJSON<GHOResponse<GHODataPoint>>(nextUrl);
     allValues.push(...page.value);
     nextUrl = page["@odata.nextLink"];
   }
