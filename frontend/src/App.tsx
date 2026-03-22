@@ -5,6 +5,8 @@ import Landing from "./components/Landing";
 import VizGallery from "./components/VizGallery";
 import VizDetail from "./components/VizDetail";
 import DatasetBrowser from "./components/DatasetBrowser";
+import VizEmbed from "./components/VizEmbed";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const styles: Record<string, React.CSSProperties> = {
   app: {
@@ -28,17 +30,21 @@ const styles: Record<string, React.CSSProperties> = {
 export default function App() {
   const location = useLocation();
   const isLanding = location.pathname === "/";
+  const isEmbed = location.pathname.startsWith("/embed/");
 
   return (
     <div style={styles.app}>
-      {!isLanding && <Header />}
-      <main style={isLanding ? styles.contentFull : styles.content}>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/gallery" element={<VizGallery />} />
-          <Route path="/viz/:id" element={<VizDetail />} />
-          <Route path="/datasets" element={<DatasetBrowser />} />
-        </Routes>
+      {!isLanding && !isEmbed && <Header />}
+      <main style={isLanding || isEmbed ? styles.contentFull : styles.content}>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/gallery" element={<VizGallery />} />
+            <Route path="/viz/:id" element={<VizDetail />} />
+            <Route path="/embed/:id" element={<VizEmbed />} />
+            <Route path="/datasets" element={<DatasetBrowser />} />
+          </Routes>
+        </ErrorBoundary>
       </main>
     </div>
   );

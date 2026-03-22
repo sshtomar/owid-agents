@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import { join } from "node:path";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -11,6 +12,7 @@ import {
   getVizHtml,
   getVizNotebook,
   getVizNotebookWasm,
+  isValidId,
 } from "../src/catalog.js";
 
 export const app = express();
@@ -25,9 +27,65 @@ const WASM_NOTEBOOKS_DIR = join(
   "wasm",
 );
 
-app.use(cors());
-app.use(express.json());
+// --- Middleware ---
+
+const ALLOWED_ORIGINS = process.env.VERCEL
+  ? [/\.vercel\.app$/, /fieldnotes\./]
+  : [/localhost/, /127\.0\.0\.1/];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || ALLOWED_ORIGINS.some((p) => p.test(origin))) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow in production too for now, but log
+    }
+  },
+}));
+
+app.use(express.json({ limit: "100kb" }));
 app.use("/wasm-notebooks", express.static(WASM_NOTEBOOKS_DIR));
+
+// Request logging
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(`[api] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+  });
+  next();
+});
+
+// Rate limiting on write endpoints
+const writeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: "Too many requests, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// --- ID validation middleware ---
+
+function validateId(req: express.Request, res: express.Response, next: express.NextFunction): void {
+  const id = req.params.id ?? req.params.vizId;
+  if (!id || !isValidId(id)) {
+    res.status(400).json({ error: "Invalid ID format" });
+    return;
+  }
+  next();
+}
+
+// --- Input sanitization ---
+
+function sanitizeString(input: unknown, maxLength: number): string | null {
+  if (typeof input !== "string") return null;
+  return input
+    .replace(/<[^>]*>/g, "")
+    .replace(/[<>]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
 
 // --- Dataset endpoints ---
 
@@ -36,7 +94,7 @@ app.get("/api/datasets", (_req, res) => {
   res.json({ datasets, count: datasets.length });
 });
 
-app.get("/api/datasets/:id", (req, res) => {
+app.get("/api/datasets/:id", validateId, (req, res) => {
   const dataset = getDataset(req.params.id);
   if (!dataset) {
     res.status(404).json({ error: "Dataset not found" });
@@ -47,18 +105,17 @@ app.get("/api/datasets/:id", (req, res) => {
 
 // --- Visualization endpoints ---
 
+// Metadata-only list (no generatedCode / HTML)
 app.get("/api/visualizations", (_req, res) => {
   const visualizations = listVisualizations().map((v) => {
-    if (!v.generatedCode) {
-      const html = getVizHtml(v.id);
-      if (html) v.generatedCode = html;
-    }
-    return v;
+    const { generatedCode, ...meta } = v;
+    return meta;
   });
   res.json({ visualizations, count: visualizations.length });
 });
 
-app.get("/api/visualizations/:id", (req, res) => {
+// Single viz with HTML
+app.get("/api/visualizations/:id", validateId, (req, res) => {
   const viz = getVisualization(req.params.id);
   if (!viz) {
     res.status(404).json({ error: "Visualization not found" });
@@ -68,7 +125,7 @@ app.get("/api/visualizations/:id", (req, res) => {
   res.json({ ...viz, htmlCode: html });
 });
 
-app.get("/api/visualizations/:id/notebook/wasm", (req, res) => {
+app.get("/api/visualizations/:id/notebook/wasm", validateId, (req, res) => {
   const viz = getVisualization(req.params.id);
   if (!viz?.notebookPath || !getVizNotebookWasm(req.params.id)) {
     res.status(404).json({ error: "WASM notebook not found" });
@@ -77,7 +134,7 @@ app.get("/api/visualizations/:id/notebook/wasm", (req, res) => {
   res.redirect(`/wasm-notebooks/${req.params.id}.html`);
 });
 
-app.get("/api/visualizations/:id/notebook", (req, res) => {
+app.get("/api/visualizations/:id/notebook", validateId, (req, res) => {
   const notebook = getVizNotebook(req.params.id);
   if (!notebook) {
     res.status(404).json({ error: "Notebook not found" });
@@ -113,7 +170,12 @@ interface RequestEntry {
 
 function readJsonArray<T>(path: string): T[] {
   if (!existsSync(path)) return [];
-  return JSON.parse(readFileSync(path, "utf-8")) as T[];
+  try {
+    return JSON.parse(readFileSync(path, "utf-8")) as T[];
+  } catch (err) {
+    console.error(`[api] Failed to parse JSON at ${path}:`, err instanceof Error ? err.message : err);
+    return [];
+  }
 }
 
 function appendJson<T>(path: string, entry: T): void {
@@ -124,24 +186,34 @@ function appendJson<T>(path: string, entry: T): void {
 
 // --- Feedback endpoints ---
 
-app.post("/api/feedback", (req, res) => {
+app.post("/api/feedback", writeLimiter, (req, res) => {
   const { vizId, reaction, comment } = req.body;
-  if (!vizId || !reaction || !VALID_REACTIONS.includes(reaction)) {
-    res.status(400).json({ error: "vizId and valid reaction required" });
+  if (!vizId || typeof vizId !== "string" || !isValidId(vizId)) {
+    res.status(400).json({ error: "Valid vizId required" });
     return;
   }
+  if (!reaction || !VALID_REACTIONS.includes(reaction)) {
+    res.status(400).json({ error: "Valid reaction required" });
+    return;
+  }
+  const sanitizedComment = comment ? sanitizeString(comment, 1000) : undefined;
   const entry: FeedbackEntry = {
     id: randomUUID(),
     vizId,
     reaction,
-    comment: comment || undefined,
+    comment: sanitizedComment || undefined,
     createdAt: new Date().toISOString(),
   };
-  appendJson(FEEDBACK_PATH, entry);
-  res.json(entry);
+  try {
+    appendJson(FEEDBACK_PATH, entry);
+    res.json(entry);
+  } catch (err) {
+    console.error("[api] Failed to write feedback:", err instanceof Error ? err.message : err);
+    res.status(500).json({ error: "Failed to save feedback" });
+  }
 });
 
-app.get("/api/feedback/:vizId", (req, res) => {
+app.get("/api/feedback/:vizId", validateId, (req, res) => {
   const all = readJsonArray<FeedbackEntry>(FEEDBACK_PATH);
   const feedback = all.filter((f) => f.vizId === req.params.vizId);
   const counts: Record<Reaction, number> = {
@@ -158,21 +230,26 @@ app.get("/api/feedback/:vizId", (req, res) => {
 
 // --- Dataset request endpoints ---
 
-app.post("/api/requests", (req, res) => {
-  const { topic, description, name } = req.body;
+app.post("/api/requests", writeLimiter, (req, res) => {
+  const topic = sanitizeString(req.body.topic, 200);
   if (!topic) {
-    res.status(400).json({ error: "topic is required" });
+    res.status(400).json({ error: "topic is required (max 200 chars)" });
     return;
   }
   const entry: RequestEntry = {
     id: randomUUID(),
     topic,
-    description: description || undefined,
-    name: name || undefined,
+    description: sanitizeString(req.body.description, 1000) || undefined,
+    name: sanitizeString(req.body.name, 100) || undefined,
     createdAt: new Date().toISOString(),
   };
-  appendJson(REQUESTS_PATH, entry);
-  res.json(entry);
+  try {
+    appendJson(REQUESTS_PATH, entry);
+    res.json(entry);
+  } catch (err) {
+    console.error("[api] Failed to write request:", err instanceof Error ? err.message : err);
+    res.status(500).json({ error: "Failed to save request" });
+  }
 });
 
 app.get("/api/requests", (_req, res) => {
@@ -180,14 +257,37 @@ app.get("/api/requests", (_req, res) => {
   res.json({ requests });
 });
 
+// --- Embed endpoint (serves raw chart HTML, permissive CORS) ---
+
+app.get("/embed/:id", validateId, (req, res) => {
+  const html = getVizHtml(req.params.id);
+  if (!html) {
+    res.status(404).send("Visualization not found");
+    return;
+  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("X-Frame-Options", "ALLOWALL");
+  res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  res.type("text/html").send(html);
+});
+
 // --- Health ---
 
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok" });
+  const datasets = listDatasets();
+  const vizList = listVisualizations();
+  res.json({
+    status: "ok",
+    datasets: datasets.length,
+    visualizations: vizList.length,
+  });
 });
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`API server running at http://localhost:${PORT}`);
+    const datasets = listDatasets();
+    const vizList = listVisualizations();
+    console.log(`[api] Server running at http://localhost:${PORT}`);
+    console.log(`[api] ${datasets.length} datasets, ${vizList.length} visualizations loaded`);
   });
 }

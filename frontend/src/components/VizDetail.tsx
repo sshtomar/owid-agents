@@ -1,9 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useApi } from "../hooks/useApi";
-import { postApi } from "../hooks/useApi";
+import { useApi, postApi } from "../hooks/useApi";
 import { useIsMobile } from "../hooks/useIsMobile";
 import ChartRenderer from "./ChartRenderer";
+import ErrorBoundary from "./ErrorBoundary";
+import {
+  COLORS, FONTS,
+  BUTTON_PRIMARY, BUTTON_SECONDARY, BUTTON_ACCENT_OUTLINE,
+  LABEL_STYLE, relativeTime,
+} from "../theme";
+import { VizMeta, VizListResponse, findRelated } from "../search";
 
 interface VizDetailData {
   id: string;
@@ -17,171 +23,34 @@ interface VizDetailData {
   notebookPath?: string;
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    padding: "32px 40px",
-    maxWidth: 960,
-    backgroundColor: "#F6F5EE",
-    minHeight: "100%",
-  },
-  backLink: {
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 10,
-    color: "#EA5E33",
-    textDecoration: "none",
-    letterSpacing: "0.3px",
-    display: "inline-block",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 600,
-    letterSpacing: "-0.3px",
-    color: "#2B2A27",
-    marginBottom: 6,
-  },
-  desc: {
-    fontSize: 11,
-    color: "#7A786F",
-    lineHeight: 1.6,
-    marginBottom: 24,
-    maxWidth: 600,
-  },
-  chartFrame: {
-    border: "1px solid #E2E0D5",
-    borderRadius: 2,
-    overflow: "hidden",
-    marginBottom: 24,
-    position: "relative",
-  },
-  meta: {
-    display: "flex",
-    gap: 32,
-    marginBottom: 24,
-    borderBottom: "1px solid #C2C0B5",
-    paddingBottom: 16,
-  },
-  metaLabel: {
-    fontSize: 9,
-    textTransform: "uppercase" as const,
-    color: "#7A786F",
-    fontWeight: 500,
-    fontFamily: "'JetBrains Mono', monospace",
-    letterSpacing: "0.3px",
-    marginBottom: 4,
-  },
-  metaValue: {
-    fontSize: 11,
-    fontWeight: 500,
-    color: "#2B2A27",
-  },
-  sectionLabel: {
-    fontSize: 9,
-    textTransform: "uppercase" as const,
-    fontWeight: 500,
-    fontFamily: "'JetBrains Mono', monospace",
-    letterSpacing: "0.3px",
-    color: "#7A786F",
-    marginBottom: 12,
-    display: "block",
-  },
-  highlightItem: {
-    fontSize: 11,
-    color: "#5A5850",
-    lineHeight: 1.6,
-    paddingLeft: 12,
-    borderLeft: "2px solid #EA5E33",
-    marginBottom: 10,
-  },
-  notebookRow: {
-    display: "flex",
-    gap: 12,
-    alignItems: "center",
-    marginTop: 24,
-  },
-  notebookLink: {
-    display: "inline-block",
-    padding: "8px 14px",
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 10,
-    fontWeight: 500,
-    letterSpacing: "0.3px",
-    color: "#EA5E33",
-    border: "1px solid #EA5E33",
-    borderRadius: 2,
-    textDecoration: "none",
-    textTransform: "uppercase" as const,
-  },
-  notebookDownload: {
-    display: "inline-block",
-    padding: "8px 14px",
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 10,
-    fontWeight: 500,
-    letterSpacing: "0.3px",
-    color: "#7A786F",
-    border: "1px solid #C2C0B5",
-    borderRadius: 2,
-    textDecoration: "none",
-    textTransform: "uppercase" as const,
-  },
-  downloadBtn: {
-    display: "inline-block",
-    padding: "8px 14px",
-    fontFamily: "'JetBrains Mono', monospace",
-    fontSize: 10,
-    fontWeight: 500,
-    letterSpacing: "0.3px",
-    color: "#fff",
-    backgroundColor: "#EA5E33",
-    border: "1px solid #EA5E33",
-    borderRadius: 2,
-    textTransform: "uppercase" as const,
-    cursor: "pointer",
-  },
-  empty: {
-    textAlign: "center" as const,
-    padding: 64,
-    color: "#7A786F",
-    fontSize: 11,
-    fontFamily: "'JetBrains Mono', monospace",
-  },
-};
-
 function Crosshair({ style }: { style: React.CSSProperties }) {
   return (
-    <div
-      style={{
+    <div style={{
+      position: "absolute",
+      width: 10,
+      height: 10,
+      pointerEvents: "none",
+      zIndex: 2,
+      ...style,
+    }}>
+      <div style={{
         position: "absolute",
-        width: 10,
-        height: 10,
-        pointerEvents: "none",
-        zIndex: 2,
-        ...style,
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: 0,
-          width: "100%",
-          height: 1,
-          backgroundColor: "#C2C0B5",
-          transform: "translateY(-50%)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          top: 0,
-          height: "100%",
-          width: 1,
-          backgroundColor: "#C2C0B5",
-          transform: "translateX(-50%)",
-        }}
-      />
+        top: "50%",
+        left: 0,
+        width: "100%",
+        height: 1,
+        backgroundColor: COLORS.borderStrong,
+        transform: "translateY(-50%)",
+      }} />
+      <div style={{
+        position: "absolute",
+        left: "50%",
+        top: 0,
+        height: "100%",
+        width: 1,
+        backgroundColor: COLORS.borderStrong,
+        transform: "translateX(-50%)",
+      }} />
     </div>
   );
 }
@@ -239,30 +108,23 @@ function ReactionBar({ vizId }: { vizId: string }) {
 
   const handleComment = useCallback(async () => {
     if (!comment.trim()) return;
-    await postApi("/feedback", {
-      vizId,
-      reaction: selected ?? "useful",
-      comment: comment.trim(),
-    }).catch(() => {});
-    setComment("");
-    setCommentSent(true);
-    setTimeout(() => setCommentSent(false), 2000);
+    try {
+      await postApi("/feedback", {
+        vizId,
+        reaction: selected ?? "useful",
+        comment: comment.trim(),
+      });
+      setComment("");
+      setCommentSent(true);
+      setTimeout(() => setCommentSent(false), 2000);
+    } catch {
+      // silent -- user sees no change
+    }
   }, [vizId, selected, comment]);
 
   return (
     <div style={{ marginTop: 28, marginBottom: 24 }}>
-      <span
-        style={{
-          fontSize: 9,
-          textTransform: "uppercase",
-          fontWeight: 500,
-          fontFamily: "'JetBrains Mono', monospace",
-          letterSpacing: "0.3px",
-          color: "#7A786F",
-          marginBottom: 10,
-          display: "block",
-        }}
-      >
+      <span style={{ ...LABEL_STYLE, marginBottom: 10, display: "block" }}>
         Reactions
       </span>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -274,32 +136,18 @@ function ReactionBar({ vizId }: { vizId: string }) {
               onClick={() => handleReaction(key)}
               disabled={!!selected && !isSelected}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
+                ...BUTTON_SECONDARY,
                 gap: 6,
-                padding: "6px 12px",
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: "0.3px",
-                color: isSelected ? "#fff" : "#7A786F",
-                backgroundColor: isSelected ? "#EA5E33" : "transparent",
-                border: `1px solid ${isSelected ? "#EA5E33" : "#C2C0B5"}`,
-                borderRadius: 2,
+                color: isSelected ? COLORS.white : COLORS.textMuted,
+                backgroundColor: isSelected ? COLORS.accent : "transparent",
+                borderColor: isSelected ? COLORS.accent : COLORS.borderStrong,
                 cursor: selected && !isSelected ? "default" : "pointer",
                 opacity: selected && !isSelected ? 0.5 : 1,
-                textTransform: "uppercase",
               }}
             >
               {label}
               {counts[key] > 0 && (
-                <span
-                  style={{
-                    fontSize: 9,
-                    opacity: 0.8,
-                    fontWeight: 400,
-                  }}
-                >
+                <span style={{ fontSize: 9, opacity: 0.8, fontWeight: 400 }}>
                   {counts[key]}
                 </span>
               )}
@@ -315,9 +163,9 @@ function ReactionBar({ vizId }: { vizId: string }) {
               background: "none",
               border: "none",
               padding: 0,
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: FONTS.mono,
               fontSize: 10,
-              color: "#7A786F",
+              color: COLORS.textMuted,
               cursor: "pointer",
               letterSpacing: "0.3px",
             }}
@@ -331,52 +179,229 @@ function ReactionBar({ vizId }: { vizId: string }) {
               onChange={(e) => setComment(e.target.value)}
               placeholder="What did you think?"
               rows={3}
+              maxLength={1000}
               style={{
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: FONTS.mono,
                 fontSize: 11,
                 padding: "8px 10px",
-                border: "1px solid #C2C0B5",
+                border: `1px solid ${COLORS.borderStrong}`,
                 borderRadius: 2,
-                backgroundColor: "#fff",
-                color: "#2B2A27",
+                backgroundColor: COLORS.white,
+                color: COLORS.text,
                 resize: "vertical",
                 outline: "none",
               }}
             />
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <button
-                onClick={handleComment}
-                style={{
-                  display: "inline-block",
-                  padding: "6px 12px",
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: 10,
-                  fontWeight: 500,
-                  letterSpacing: "0.3px",
-                  color: "#fff",
-                  backgroundColor: "#EA5E33",
-                  border: "1px solid #EA5E33",
-                  borderRadius: 2,
-                  cursor: "pointer",
-                  textTransform: "uppercase",
-                }}
-              >
+              <button onClick={handleComment} style={BUTTON_PRIMARY}>
                 Send
               </button>
               {commentSent && (
-                <span
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: 10,
-                    color: "#7A786F",
-                  }}
-                >
+                <span style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.textMuted }}>
                   Sent!
                 </span>
               )}
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function EmbedBlock({ vizId }: { vizId: string }) {
+  const [copied, setCopied] = useState(false);
+  const embedUrl = `${window.location.origin}/embed/${vizId}`;
+  const iframeCode = `<iframe src="${embedUrl}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;" allow="web-share"></iframe>`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(iframeCode).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div style={{ marginTop: 32, borderTop: `1px solid ${COLORS.border}`, paddingTop: 24 }}>
+      <span style={{ ...LABEL_STYLE, marginBottom: 16, display: "block" }}>
+        Embed this chart
+      </span>
+      <p style={{ fontSize: 11, color: COLORS.textMuted, lineHeight: 1.6, marginTop: 0, marginBottom: 12 }}>
+        Paste this into any webpage. The chart is interactive and self-contained.
+      </p>
+      <div style={{
+        fontFamily: FONTS.mono,
+        fontSize: 10,
+        lineHeight: 1.6,
+        color: COLORS.textMid,
+        backgroundColor: COLORS.inputBg,
+        border: `1px solid ${COLORS.border}`,
+        borderRadius: 2,
+        padding: "10px 12px",
+        whiteSpace: "pre-wrap",
+        wordBreak: "break-all",
+        userSelect: "all",
+      }}>
+        {iframeCode}
+      </div>
+      <button
+        onClick={handleCopy}
+        style={{
+          ...BUTTON_SECONDARY,
+          fontSize: 9,
+          padding: "3px 8px",
+          marginTop: 6,
+        }}
+      >
+        {copied ? "Copied" : "Copy embed code"}
+      </button>
+    </div>
+  );
+}
+
+function CitationBlock({ viz }: { viz: VizDetailData }) {
+  const [copied, setCopied] = useState<"cite" | "bibtex" | null>(null);
+  const year = new Date(viz.createdAt).getFullYear();
+  const dateStr = new Date(viz.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const slug = viz.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  const url = `${window.location.origin}/viz/${viz.id}`;
+
+  const citeText =
+    `OWID Agents (${year}) - "${viz.title}". ` +
+    `Published online at OWIDAgents. Retrieved from: '${url}' [Online Resource].`;
+
+  const bibtex =
+    `@article{owid-agents-${slug},\n` +
+    `    author = {OWID Agents},\n` +
+    `    title = {${viz.title}},\n` +
+    `    journal = {OWID Agents},\n` +
+    `    year = {${year}},\n` +
+    `    note = {${url}}\n` +
+    `}`;
+
+  const copyToClipboard = (text: string, type: "cite" | "bibtex") => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(type);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  };
+
+  const sectionLabel: React.CSSProperties = {
+    ...LABEL_STYLE,
+    marginBottom: 8,
+    display: "block",
+  };
+
+  const codeBlock: React.CSSProperties = {
+    fontFamily: FONTS.mono,
+    fontSize: 10,
+    lineHeight: 1.6,
+    color: COLORS.textMid,
+    backgroundColor: COLORS.inputBg,
+    border: `1px solid ${COLORS.border}`,
+    borderRadius: 2,
+    padding: "10px 12px",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    position: "relative",
+  };
+
+  const copyBtn: React.CSSProperties = {
+    ...BUTTON_SECONDARY,
+    fontSize: 9,
+    padding: "3px 8px",
+    marginTop: 6,
+  };
+
+  return (
+    <div style={{ marginTop: 32, borderTop: `1px solid ${COLORS.border}`, paddingTop: 24 }}>
+      <span style={{ ...LABEL_STYLE, marginBottom: 16, display: "block" }}>
+        Cite this work
+      </span>
+      <p style={{ fontSize: 11, color: COLORS.textMuted, lineHeight: 1.6, marginTop: 0, marginBottom: 16 }}>
+        Our visualizations rely on work from many different people and organizations.
+        When citing this visualization, please also cite the underlying data sources.
+      </p>
+
+      <div style={{ marginBottom: 16 }}>
+        <span style={sectionLabel}>Citation</span>
+        <div style={codeBlock}>{citeText}</div>
+        <button style={copyBtn} onClick={() => copyToClipboard(citeText, "cite")}>
+          {copied === "cite" ? "Copied" : "Copy citation"}
+        </button>
+      </div>
+
+      <div>
+        <span style={sectionLabel}>BibTeX</span>
+        <div style={codeBlock}>{bibtex}</div>
+        <button style={copyBtn} onClick={() => copyToClipboard(bibtex, "bibtex")}>
+          {copied === "bibtex" ? "Copied" : "Copy BibTeX"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function RelatedCharts({ current, allViz }: { current: VizMeta; allViz: VizMeta[] }) {
+  const related = useMemo(() => findRelated(current, allViz, 3), [current, allViz]);
+
+  if (related.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 32 }}>
+      <span style={{ ...LABEL_STYLE, marginBottom: 16, display: "block" }}>
+        Related Charts
+      </span>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        {related.map((viz) => (
+          <Link
+            key={viz.id}
+            to={`/viz/${viz.id}`}
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              flex: "1 1 200px",
+              maxWidth: 280,
+              padding: 12,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: 2,
+              backgroundColor: COLORS.bg,
+            }}
+          >
+            <div style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: COLORS.text,
+              marginBottom: 4,
+              letterSpacing: "-0.2px",
+            }}>
+              {viz.title}
+            </div>
+            <div style={{
+              fontSize: 10,
+              color: COLORS.textMuted,
+              lineHeight: 1.5,
+            }}>
+              {viz.description.split(".")[0]}.
+            </div>
+            <div style={{
+              fontSize: 8,
+              fontFamily: FONTS.mono,
+              color: COLORS.textSubtle,
+              marginTop: 6,
+              textTransform: "uppercase",
+            }}>
+              {viz.chartType}
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );
@@ -394,62 +419,129 @@ function downloadHtml(html: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+const emptyStyle: React.CSSProperties = {
+  textAlign: "center",
+  padding: 64,
+  color: COLORS.textMuted,
+  fontSize: 11,
+  fontFamily: FONTS.mono,
+};
+
 export default function VizDetail() {
   const mobile = useIsMobile();
   const { id } = useParams<{ id: string }>();
-  const { data, loading, error } = useApi<VizDetailData>(
-    `/visualizations/${id}`
-  );
+  const { data, loading, error } = useApi<VizDetailData>(`/visualizations/${id}`);
+  const allVizResp = useApi<VizListResponse>("/visualizations");
 
-  if (loading) return <div style={styles.empty}>Loading...</div>;
-  if (error) return <div style={styles.empty}>Error: {error}</div>;
-  if (!data) return <div style={styles.empty}>Not found</div>;
+  if (loading) return <div style={emptyStyle}>Loading...</div>;
+  if (error) return <div style={emptyStyle}>Error: {error}</div>;
+  if (!data) return <div style={emptyStyle}>Not found</div>;
+
+  const allViz = allVizResp.data?.visualizations ?? [];
+  const currentMeta: VizMeta = {
+    id: data.id,
+    title: data.title,
+    description: data.description,
+    chartType: data.chartType,
+    highlights: data.highlights,
+    createdAt: data.createdAt,
+    datasetIds: data.datasetIds,
+    codeFilePath: "",
+    notebookPath: data.notebookPath,
+  };
 
   return (
     <div style={{
-      ...styles.container,
       padding: mobile ? "20px 16px" : "32px 40px",
+      maxWidth: 960,
+      backgroundColor: COLORS.bg,
+      minHeight: "100%",
     }}>
-      <Link to="/gallery" style={styles.backLink}>
+      <Link to="/gallery" style={{
+        fontFamily: FONTS.mono,
+        fontSize: 10,
+        color: COLORS.accent,
+        textDecoration: "none",
+        letterSpacing: "0.3px",
+        display: "inline-block",
+        marginBottom: 20,
+      }}>
         {"<-"} Back to Gallery
       </Link>
-      <h1 style={styles.title}>{data.title}</h1>
-      <p style={styles.desc}>{data.description}</p>
+      <h1 style={{
+        fontSize: 18,
+        fontWeight: 600,
+        letterSpacing: "-0.3px",
+        color: COLORS.text,
+        marginBottom: 6,
+      }}>
+        {data.title}
+      </h1>
+      <p style={{
+        fontSize: 11,
+        color: COLORS.textMuted,
+        lineHeight: 1.6,
+        marginBottom: 24,
+        maxWidth: 600,
+      }}>
+        {data.description}
+      </p>
 
       <div style={{
-        ...styles.meta,
-        flexWrap: "wrap" as const,
+        display: "flex",
         gap: mobile ? 16 : 32,
+        marginBottom: 24,
+        borderBottom: `1px solid ${COLORS.borderStrong}`,
+        paddingBottom: 16,
+        flexWrap: "wrap",
       }}>
         <div>
-          <div style={styles.metaLabel}>Chart Type</div>
-          <div style={styles.metaValue}>{data.chartType}</div>
+          <div style={LABEL_STYLE}>Chart Type</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: COLORS.text }}>{data.chartType}</div>
         </div>
         <div>
-          <div style={styles.metaLabel}>Datasets</div>
-          <div style={styles.metaValue}>{data.datasetIds.join(", ")}</div>
+          <div style={LABEL_STYLE}>Datasets</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: COLORS.text }}>{data.datasetIds.join(", ")}</div>
         </div>
         <div>
-          <div style={styles.metaLabel}>Created</div>
-          <div style={styles.metaValue}>
+          <div style={LABEL_STYLE}>Created</div>
+          <div style={{ fontSize: 11, fontWeight: 500, color: COLORS.text }}>
             {new Date(data.createdAt).toLocaleDateString()}
+            <span style={{ color: COLORS.textSubtle, fontWeight: 400, marginLeft: 6, fontSize: 9 }}>
+              ({relativeTime(data.createdAt)})
+            </span>
           </div>
         </div>
       </div>
 
-      <div style={styles.chartFrame}>
+      <div style={{
+        border: `1px solid ${COLORS.border}`,
+        borderRadius: 2,
+        overflow: "hidden",
+        marginBottom: 24,
+        position: "relative",
+      }}>
         <Crosshair style={{ top: 0, left: 0 }} />
         <Crosshair style={{ top: 0, right: 0 }} />
         <Crosshair style={{ bottom: 0, left: 0 }} />
         <Crosshair style={{ bottom: 0, right: 0 }} />
-        <ChartRenderer html={data.htmlCode} height={520} />
+        <ErrorBoundary>
+          <ChartRenderer html={data.htmlCode} height={520} />
+        </ErrorBoundary>
       </div>
 
       {data.highlights.length > 0 && (
         <div>
-          <span style={styles.sectionLabel}>Key Insights</span>
+          <span style={{ ...LABEL_STYLE, marginBottom: 12, display: "block" }}>Key Insights</span>
           {data.highlights.map((h, i) => (
-            <div key={i} style={styles.highlightItem}>
+            <div key={i} style={{
+              fontSize: 11,
+              color: COLORS.textMid,
+              lineHeight: 1.6,
+              paddingLeft: 12,
+              borderLeft: `2px solid ${COLORS.accent}`,
+              marginBottom: 10,
+            }}>
               {h}
             </div>
           ))}
@@ -458,13 +550,10 @@ export default function VizDetail() {
 
       <ReactionBar vizId={data.id} />
 
-      <div style={{
-        ...styles.notebookRow,
-        flexWrap: "wrap" as const,
-      }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 24 }}>
         <button
           onClick={() => downloadHtml(data.htmlCode, `${data.id}.html`)}
-          style={styles.downloadBtn}
+          style={BUTTON_PRIMARY}
         >
           Download Chart (.html)
         </button>
@@ -474,7 +563,7 @@ export default function VizDetail() {
               href={`/wasm-notebooks/${data.id}.html`}
               target="_blank"
               rel="noopener noreferrer"
-              style={styles.notebookLink}
+              style={{ ...BUTTON_ACCENT_OUTLINE, textDecoration: "none" }}
             >
               Open Marimo Notebook (WASM)
             </a>
@@ -482,13 +571,19 @@ export default function VizDetail() {
               href={`/api/visualizations/${data.id}/notebook`}
               target="_blank"
               rel="noopener noreferrer"
-              style={styles.notebookDownload}
+              style={{ ...BUTTON_SECONDARY, textDecoration: "none" }}
             >
               Download .py
             </a>
           </>
         )}
       </div>
+
+      <EmbedBlock vizId={data.id} />
+
+      <CitationBlock viz={data} />
+
+      <RelatedCharts current={currentMeta} allViz={allViz} />
     </div>
   );
 }
