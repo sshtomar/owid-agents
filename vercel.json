@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install && cd frontend && npm install",
-  "buildCommand": "cd frontend && npm run build && cp -r ../data/visualizations/notebooks/wasm ../frontend/dist/wasm-notebooks",
+  "buildCommand": "cd frontend && npm run build && (cp -r ../data/visualizations/notebooks/wasm ../frontend/dist/wasm-notebooks 2>/dev/null || true)",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
