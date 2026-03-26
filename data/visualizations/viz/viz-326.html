@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>The Renewable Energy Transition</h1>
+  <p class="subtitle">Renewable electricity as % of total output (1990-2021)</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const data = [{"n":"Brazil","y":1990,"v":94.5},{"n":"Kenya","y":1990,"v":92.9},{"n":"India","y":1990,"v":24.8},{"n":"China","y":1990,"v":20.4},{"n":"Japan","y":1990,"v":11.3},{"n":"Australia","y":1990,"v":9.6},{"n":"Germany","y":1990,"v":3.5},{"n":"Denmark","y":1990,"v":3.2},{"n":"Kenya","y":1991,"v":95.3},{"n":"Brazil","y":1991,"v":94.6},{"n":"India","y":1991,"v":23.1},{"n":"China","y":1991,"v":18.5},{"n":"Japan","y":1991,"v":11.9},{"n":"Australia","y":1991,"v":10.6},{"n":"Germany","y":1991,"v":3.1},{"n":"Denmark","y":1991,"v":2.9},{"n":"Kenya","y":1992,"v":95.7},{"n":"Brazil","y":1992,"v":94.4},{"n":"India","y":1992,"v":21},{"n":"China","y":1992,"v":17.6},{"n":"Japan","y":1992,"v":10.2},{"n":"Australia","y":1992,"v":10},{"n":"Denmark","y":1992,"v":4.4},{"n":"Germany","y":1992,"v":3.7},{"n":"Kenya","y":1993,"v":96.4},{"n":"Brazil","y":1993,"v":95.3},{"n":"India","y":1993,"v":19.8},{"n":"China","y":1993,"v":18.1},{"n":"Japan","y":1993,"v":11.5},{"n":"Australia","y":1993,"v":10.5},{"n":"Denmark","y":1993,"v":4.7},{"n":"Germany","y":1993,"v":3.9},{"n":"Brazil","y":1994,"v":95.4},{"n":"Kenya","y":1994,"v":94.3},{"n":"India","y":1994,"v":21.5},{"n":"China","y":1994,"v":18.1},{"n":"Australia","y":1994,"v":10.2},{"n":"Japan","y":1994,"v":8},{"n":"Germany","y":1994,"v":4.4},{"n":"Denmark","y":1994,"v":4.3},{"n":"Brazil","y":1995,"v":94.2},{"n":"Kenya","y":1995,"v":89.3},{"n":"China","y":1995,"v":19.2},{"n":"India","y":1995,"v":17.5},{"n":"Australia","y":1995,"v":9.6},{"n":"Japan","y":1995,"v":9.5},{"n":"Denmark","y":1995,"v":5},{"n":"Germany","y":1995,"v":4.8},{"n":"Brazil","y":1996,"v":93.6},{"n":"Kenya","y":1996,"v":89.9},{"n":"China","y":1996,"v":17.6},{"n":"India","y":1996,"v":16},{"n":"Australia","y":1996,"v":9.2},{"n":"Japan","y":1996,"v":9.2},{"n":"Germany","y":1996,"v":4.8},{"n":"Denmark","y":1996,"v":3.9},{"n":"Brazil","y":1997,"v":93},{"n":"Kenya","y":1997,"v":83},{"n":"China","y":1997,"v":17.5},{"n":"India","y":1997,"v":16.2},{"n":"Japan","y":1997,"v":9.9},{"n":"Australia","y":1997,"v":9.6},{"n":"Denmark","y":1997,"v":6.6},{"n":"Germany","y":1997,"v":4.2},{"n":"Brazil","y":1998,"v":92.9},{"n":"Kenya","y":1998,"v":81.5},{"n":"China","y":1998,"v":18.1},{"n":"India","y":1998,"v":16.9},{"n":"Japan","y":1998,"v":10.1},{"n":"Denmark","y":1998,"v":9.5},{"n":"Australia","y":1998,"v":8.4},{"n":"Germany","y":1998,"v":4.5},{"n":"Brazil","y":1999,"v":90},{"n":"Kenya","y":1999,"v":66.1},{"n":"China","y":1999,"v":16.7},{"n":"India","y":1999,"v":15.5},{"n":"Denmark","y":1999,"v":11.3},{"n":"Japan","y":1999,"v":9.4},{"n":"Australia","y":1999,"v":8.5},{"n":"Germany","y":1999,"v":5.2},{"n":"Brazil","y":2000,"v":89.5},{"n":"Kenya","y":2000,"v":59.1},{"n":"China","y":2000,"v":16.6},{"n":"Denmark","y":2000,"v":15.5},{"n":"India","y":2000,"v":14},{"n":"Japan","y":2000,"v":10.3},{"n":"Australia","y":2000,"v":8.5},{"n":"Germany","y":2000,"v":6.9},{"n":"Brazil","y":2001,"v":84.3},{"n":"Kenya","y":2001,"v":53.2},{"n":"China","y":2001,"v":19},{"n":"Denmark","y":2001,"v":15.5},{"n":"India","y":2001,"v":13.6},{"n":"Japan","y":2001,"v":10.2},{"n":"Australia","y":2001,"v":8.2},{"n":"Germany","y":2001,"v":7.2},{"n":"Brazil","y":2002,"v":85.7},{"n":"Kenya","y":2002,"v":70.3},{"n":"China","y":2002,"v":17.6},{"n":"Denmark","y":2002,"v":17.3},{"n":"India","y":2002,"v":12.8},{"n":"Japan","y":2002,"v":9.9},{"n":"Germany","y":2002,"v":8.4},{"n":"Australia","y":2002,"v":7.9},{"n":"Brazil","y":2003,"v":87.2},{"n":"Kenya","y":2003,"v":77.4},{"n":"Denmark","y":2003,"v":17.5},{"n":"China","y":2003,"v":15},{"n":"India","y":2003,"v":11.5},{"n":"Japan","y":2003,"v":11.2},{"n":"Australia","y":2003,"v":8.5},{"n":"Germany","y":2003,"v":8.4},{"n":"Brazil","y":2004,"v":86},{"n":"Kenya","y":2004,"v":76.1},{"n":"Denmark","y":2004,"v":23.5},{"n":"China","y":2004,"v":16.2},{"n":"India","y":2004,"v":12.9},{"n":"Japan","y":2004,"v":10.9},{"n":"Germany","y":2004,"v":10.3},{"n":"Australia","y":2004,"v":8.3},{"n":"Brazil","y":2005,"v":87.1},{"n":"Kenya","y":2005,"v":71.3},{"n":"Denmark","y":2005,"v":27.1},{"n":"China","y":2005,"v":16.2},{"n":"India","y":2005,"v":14.4},{"n":"Germany","y":2005,"v":11.3},{"n":"Japan","y":2005,"v":9.6},{"n":"Australia","y":2005,"v":8.9},{"n":"Brazil","y":2006,"v":86.8},{"n":"Kenya","y":2006,"v":71.1},{"n":"Denmark","y":2006,"v":20.2},{"n":"India","y":2006,"v":16},{"n":"China","y":2006,"v":15.6},{"n":"Germany","y":2006,"v":12.4},{"n":"Japan","y":2006,"v":10.6},{"n":"Australia","y":2006,"v":9.3},{"n":"Brazil","y":2007,"v":88.2},{"n":"Kenya","y":2007,"v":70.6},{"n":"Denmark","y":2007,"v":26.2},{"n":"India","y":2007,"v":16.9},{"n":"China","y":2007,"v":15.3},{"n":"Germany","y":2007,"v":15},{"n":"Japan","y":2007,"v":9.3},{"n":"Australia","y":2007,"v":8.7},{"n":"Brazil","y":2008,"v":84.3},{"n":"Kenya","y":2008,"v":67.1},{"n":"Denmark","y":2008,"v":27.6},{"n":"China","y":2008,"v":17.6},{"n":"India","y":2008,"v":17.1},{"n":"Germany","y":2008,"v":15.6},{"n":"Japan","y":2008,"v":9.5},{"n":"Australia","y":2008,"v":8.2},{"n":"Brazil","y":2009,"v":89.1},{"n":"Kenya","y":2009,"v":59.7},{"n":"Denmark","y":2009,"v":27.7},{"n":"China","y":2009,"v":17.8},{"n":"Germany","y":2009,"v":17},{"n":"India","y":2009,"v":15.4},{"n":"Japan","y":2009,"v":9.7},{"n":"Australia","y":2009,"v":7.5},{"n":"Brazil","y":2010,"v":84.8},{"n":"Kenya","y":2010,"v":62.7},{"n":"Denmark","y":2010,"v":32},{"n":"China","y":2010,"v":18.8},{"n":"Germany","y":2010,"v":17.6},{"n":"India","y":2010,"v":14.9},{"n":"Japan","y":2010,"v":9.7},{"n":"Australia","y":2010,"v":8.6},{"n":"Brazil","y":2011,"v":87.2},{"n":"Kenya","y":2011,"v":67.8},{"n":"Denmark","y":2011,"v":40.3},{"n":"Germany","y":2011,"v":21.2},{"n":"China","y":2011,"v":16.8},{"n":"India","y":2011,"v":15.3},{"n":"Japan","y":2011,"v":10.5},{"n":"Australia","y":2011,"v":10.4},{"n":"Brazil","y":2012,"v":82.6},{"n":"Kenya","y":2012,"v":72.6},{"n":"Denmark","y":2012,"v":48.3},{"n":"Germany","y":2012,"v":23.7},{"n":"China","y":2012,"v":20.1},{"n":"India","y":2012,"v":16.2},{"n":"Australia","y":2012,"v":10.5},{"n":"Japan","y":2012,"v":10.1},{"n":"Brazil","y":2013,"v":76.8},{"n":"Kenya","y":2013,"v":73.5},{"n":"Denmark","y":2013,"v":46},{"n":"Germany","y":2013,"v":24.8},{"n":"China","y":2013,"v":20.1},{"n":"India","y":2013,"v":15.3},{"n":"Australia","y":2013,"v":13.2},{"n":"Japan","y":2013,"v":10.9},{"n":"Kenya","y":2014,"v":77.2},{"n":"Brazil","y":2014,"v":72.6},{"n":"Denmark","y":2014,"v":55.9},{"n":"Germany","y":2014,"v":26.8},{"n":"China","y":2014,"v":22.1},{"n":"India","y":2014,"v":15.9},{"n":"Australia","y":2014,"v":14.6},{"n":"Japan","y":2014,"v":12.4},{"n":"Kenya","y":2015,"v":85.6},{"n":"Brazil","y":2015,"v":73.5},{"n":"Denmark","y":2015,"v":65.4},{"n":"Germany","y":2015,"v":30},{"n":"China","y":2015,"v":23.9},{"n":"India","y":2015,"v":14.9},{"n":"Japan","y":2015,"v":14.2},{"n":"Australia","y":2015,"v":13.3},{"n":"Kenya","y":2016,"v":83.6},{"n":"Brazil","y":2016,"v":79.7},{"n":"Denmark","y":2016,"v":60.2},{"n":"Germany","y":2016,"v":30},{"n":"China","y":2016,"v":25.1},{"n":"Japan","y":2016,"v":14.7},{"n":"Australia","y":2016,"v":14.6},{"n":"India","y":2016,"v":13.6},{"n":"Kenya","y":2017,"v":81.5},{"n":"Brazil","y":2017,"v":78.4},{"n":"Denmark","y":2017,"v":70.3},{"n":"Germany","y":2017,"v":34},{"n":"China","y":2017,"v":25},{"n":"Japan","y":2017,"v":16.2},{"n":"Australia","y":2017,"v":15.7},{"n":"India","y":2017,"v":14.2},{"n":"Brazil","y":2018,"v":81.6},{"n":"Kenya","y":2018,"v":79.4},{"n":"Denmark","y":2018,"v":68.4},{"n":"Germany","y":2018,"v":35.6},{"n":"China","y":2018,"v":25.8},{"n":"Australia","y":2018,"v":17.1},{"n":"Japan","y":2018,"v":17.1},{"n":"India","y":2018,"v":15},{"n":"Kenya","y":2019,"v":81.6},{"n":"Brazil","y":2019,"v":81.4},{"n":"Denmark","y":2019,"v":78.2},{"n":"Germany","y":2019,"v":40.6},{"n":"China","y":2019,"v":26.9},{"n":"Australia","y":2019,"v":19.7},{"n":"Japan","y":2019,"v":18.6},{"n":"India","y":2019,"v":16.8},{"n":"Brazil","y":2020,"v":83.2},{"n":"Kenya","y":2020,"v":83.2},{"n":"Denmark","y":2020,"v":81.6},{"n":"Germany","y":2020,"v":44.8},{"n":"China","y":2020,"v":28.1},{"n":"Australia","y":2020,"v":22.6},{"n":"Japan","y":2020,"v":20.3},{"n":"India","y":2020,"v":19.8},{"n":"Denmark","y":2021,"v":79},{"n":"Kenya","y":2021,"v":78.1},{"n":"Brazil","y":2021,"v":77.4},{"n":"Germany","y":2021,"v":39.8},{"n":"China","y":2021,"v":28.4},{"n":"Australia","y":2021,"v":26.7},{"n":"Japan","y":2021,"v":21.1},{"n":"India","y":2021,"v":19.1}];
+
+    const countries = [...new Set(data.map(d => d.n))];
+
+    // Get last data point for each country (for labels)
+    const lastPoints = countries.map(c => {
+      const pts = data.filter(d => d.n === c);
+      return pts[pts.length - 1];
+    });
+
+    const chart = Plot.plot({
+      width: 900,
+      height: 520,
+      marginRight: 90,
+      x: {
+        label: "Year",
+        tickFormat: "d"
+      },
+      y: {
+        label: "% of total electricity output",
+        domain: [0, 100],
+        grid: true
+      },
+      color: {
+        domain: ["Brazil", "Kenya", "Denmark", "Germany", "China", "India", "Japan", "Australia"],
+        range: ["#22c55e", "#f97316", "#3b82f6", "#ef4444", "#eab308", "#8b5cf6", "#ec4899", "#06b6d4"]
+      },
+      marks: [
+        Plot.line(data, {
+          x: "y",
+          y: "v",
+          stroke: "n",
+          strokeWidth: 2,
+          curve: "natural"
+        }),
+        Plot.text(lastPoints, {
+          x: "y",
+          y: "v",
+          text: "n",
+          dx: 6,
+          textAnchor: "start",
+          fill: "n",
+          fontSize: 11,
+          fontWeight: 600
+        })
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>The World's Largest CO2 Emitters</h1>
+  <p class="subtitle">CO2 emissions from fuel combustion, millions of tonnes (2000-2022)</p>
+  <div id="chart"></div>
+  <p class="source">Source: UN SDG Indicators</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    // Data exported from notebook -- do not modify
+    const data = [{"n":"Japan","y":2000,"v":1143.9},{"n":"China","y":2000,"v":848.92},{"n":"Germany","y":2000,"v":812.31},{"n":"United States","y":2000,"v":565.49},{"n":"Canada","y":2000,"v":503.64},{"n":"South Korea","y":2000,"v":417.46},{"n":"Iran","y":2000,"v":312.27},{"n":"India","y":2000,"v":191.01},{"n":"Russia","y":2000,"v":161.53},{"n":"Brazil","y":2000,"v":77.79},{"n":"Indonesia","y":2000,"v":54.16},{"n":"United States","y":2001,"v":5702.11},{"n":"China","y":2001,"v":3233.87},{"n":"Russia","y":2001,"v":1474.67},{"n":"India","y":2001,"v":906.09},{"n":"Brazil","y":2001,"v":301.5},{"n":"Indonesia","y":2001,"v":274.28},{"n":"Japan","y":2001,"v":224.15},{"n":"Germany","y":2001,"v":93.8},{"n":"South Korea","y":2001,"v":75.76},{"n":"Canada","y":2001,"v":60.31},{"n":"Iran","y":2001,"v":43.73},{"n":"Japan","y":2002,"v":1169.21},{"n":"China","y":2002,"v":941.35},{"n":"Germany","y":2002,"v":817.9},{"n":"Canada","y":2002,"v":514.63},{"n":"United States","y":2002,"v":468.1},{"n":"South Korea","y":2002,"v":442.87},{"n":"Iran","y":2002,"v":343.06},{"n":"India","y":2002,"v":206.1},{"n":"Russia","y":2002,"v":156.41},{"n":"Brazil","y":2002,"v":78.48},{"n":"Indonesia","y":2002,"v":55.5},{"n":"United States","y":2003,"v":5610.69},{"n":"China","y":2003,"v":4048.01},{"n":"Russia","y":2003,"v":1493.9},{"n":"Indonesia","y":2003,"v":308.63},{"n":"Brazil","y":2003,"v":295.61},{"n":"Japan","y":2003,"v":224.22},{"n":"India","y":2003,"v":196.75},{"n":"Germany","y":2003,"v":97.62},{"n":"South Korea","y":2003,"v":80.3},{"n":"Canada","y":2003,"v":58.96},{"n":"Iran","y":2003,"v":48.99},{"n":"China","y":2004,"v":1425.62},{"n":"Japan","y":2004,"v":1171.32},{"n":"India","y":2004,"v":1029.55},{"n":"Germany","y":2004,"v":804.62},{"n":"Canada","y":2004,"v":519.65},{"n":"United States","y":2004,"v":487.71},{"n":"South Korea","y":2004,"v":468.32},{"n":"Iran","y":2004,"v":385.88},{"n":"Russia","y":2004,"v":149.85},{"n":"Brazil","y":2004,"v":79.43},{"n":"Indonesia","y":2004,"v":74.24},{"n":"United States","y":2005,"v":5703.15},{"n":"China","y":2005,"v":5378.77},{"n":"Russia","y":2005,"v":1481.9},{"n":"Indonesia","y":2005,"v":317.56},{"n":"Brazil","y":2005,"v":314.12},{"n":"India","y":2005,"v":230.96},{"n":"Japan","y":2005,"v":225.84},{"n":"Germany","y":2005,"v":93.9},{"n":"South Korea","y":2005,"v":78.64},{"n":"Iran","y":2005,"v":58},{"n":"Canada","y":2005,"v":57.84},{"n":"China","y":2006,"v":1992.34},{"n":"Japan","y":2006,"v":1156.84},{"n":"India","y":2006,"v":1149.82},{"n":"Germany","y":2006,"v":798.68},{"n":"Canada","y":2006,"v":523.57},{"n":"South Korea","y":2006,"v":472.25},{"n":"United States","y":2006,"v":455.26},{"n":"Iran","y":2006,"v":449.26},{"n":"Russia","y":2006,"v":139.94},{"n":"Indonesia","y":2006,"v":100.01},{"n":"Brazil","y":2006,"v":77.21},{"n":"China","y":2007,"v":6440.25},{"n":"United States","y":2007,"v":5686.67},{"n":"Russia","y":2007,"v":1533.73},{"n":"Indonesia","y":2007,"v":355.16},{"n":"Brazil","y":2007,"v":333.37},{"n":"India","y":2007,"v":291.49},{"n":"Japan","y":2007,"v":223.91},{"n":"Germany","y":2007,"v":95.29},{"n":"South Korea","y":2007,"v":79.52},{"n":"Iran","y":2007,"v":74.76},{"n":"Canada","y":2007,"v":55.4},{"n":"China","y":2008,"v":2314.11},{"n":"India","y":2008,"v":1366.26},{"n":"Japan","y":2008,"v":1126.24},{"n":"Germany","y":2008,"v":773.89},{"n":"Canada","y":2008,"v":534.34},{"n":"South Korea","y":2008,"v":500.78},{"n":"Iran","y":2008,"v":487.34},{"n":"United States","y":2008,"v":440.06},{"n":"Russia","y":2008,"v":158.96},{"n":"Indonesia","y":2008,"v":87.46},{"n":"Brazil","y":2008,"v":85.7},{"n":"China","y":2009,"v":7100.79},{"n":"United States","y":2009,"v":5120.63},{"n":"Russia","y":2009,"v":1440.68},{"n":"Indonesia","y":2009,"v":365.81},{"n":"India","y":2009,"v":336.18},{"n":"Brazil","y":2009,"v":327.78},{"n":"Japan","y":2009,"v":193.43},{"n":"Germany","y":2009,"v":86.18},{"n":"Iran","y":2009,"v":78.51},{"n":"South Korea","y":2009,"v":78.2},{"n":"Canada","y":2009,"v":45.91},{"n":"China","y":2010,"v":2735.17},{"n":"India","y":2010,"v":1558.15},{"n":"Japan","y":2010,"v":1129.15},{"n":"Germany","y":2010,"v":758.85},{"n":"South Korea","y":2010,"v":567.38},{"n":"Canada","y":2010,"v":521.29},{"n":"Iran","y":2010,"v":498.61},{"n":"United States","y":2010,"v":457.4},{"n":"Russia","y":2010,"v":167.7},{"n":"Indonesia","y":2010,"v":122.46},{"n":"Brazil","y":2010,"v":90.74},{"n":"China","y":2011,"v":8541.12},{"n":"United States","y":2011,"v":5128.11},{"n":"Russia","y":2011,"v":1604.74},{"n":"Indonesia","y":2011,"v":450.27},{"n":"India","y":2011,"v":436.94},{"n":"Brazil","y":2011,"v":392.76},{"n":"Japan","y":2011,"v":210.18},{"n":"Germany","y":2011,"v":95.35},{"n":"South Korea","y":2011,"v":89.66},{"n":"Iran","y":2011,"v":84.65},{"n":"Canada","y":2011,"v":53.26},{"n":"China","y":2012,"v":2933.07},{"n":"India","y":2012,"v":1797.05},{"n":"Japan","y":2012,"v":1225.63},{"n":"Germany","y":2012,"v":745.14},{"n":"South Korea","y":2012,"v":593.54},{"n":"Canada","y":2012,"v":529.84},{"n":"Iran","y":2012,"v":514.47},{"n":"United States","y":2012,"v":402.63},{"n":"Russia","y":2012,"v":214.28},{"n":"Indonesia","y":2012,"v":113.28},{"n":"Brazil","y":2012,"v":95.54},{"n":"China","y":2013,"v":9196.63},{"n":"United States","y":2013,"v":5038.52},{"n":"Russia","y":2013,"v":1568.53},{"n":"India","y":2013,"v":460.13},{"n":"Brazil","y":2013,"v":457.51},{"n":"Indonesia","y":2013,"v":422.69},{"n":"Japan","y":2013,"v":208.47},{"n":"Germany","y":2013,"v":92.07},{"n":"Iran","y":2013,"v":87.31},{"n":"South Korea","y":2013,"v":77.58},{"n":"Canada","y":2013,"v":53.04},{"n":"China","y":2014,"v":2973.38},{"n":"India","y":2014,"v":2021.83},{"n":"Japan","y":2014,"v":1188.16},{"n":"Germany","y":2014,"v":723.11},{"n":"South Korea","y":2014,"v":577.21},{"n":"Iran","y":2014,"v":559.17},{"n":"Canada","y":2014,"v":543.29},{"n":"United States","y":2014,"v":401.52},{"n":"Russia","y":2014,"v":231.51},{"n":"Brazil","y":2014,"v":91.12},{"n":"Indonesia","y":2014,"v":84.35},{"n":"China","y":2015,"v":9109.16},{"n":"United States","y":2015,"v":4928.61},{"n":"Russia","y":2015,"v":1533.08},{"n":"India","y":2015,"v":511.19},{"n":"Indonesia","y":2015,"v":458.67},{"n":"Brazil","y":2015,"v":456.16},{"n":"Japan","y":2015,"v":194.4},{"n":"Germany","y":2015,"v":93.36},{"n":"Iran","y":2015,"v":88.44},{"n":"South Korea","y":2015,"v":77.24},{"n":"Canada","y":2015,"v":50.73},{"n":"China","y":2016,"v":2756.45},{"n":"India","y":2016,"v":2076.32},{"n":"Japan","y":2016,"v":1134.87},{"n":"Germany","y":2016,"v":734.49},{"n":"South Korea","y":2016,"v":589.76},{"n":"Iran","y":2016,"v":556.96},{"n":"Canada","y":2016,"v":536.56},{"n":"United States","y":2016,"v":400.95},{"n":"Russia","y":2016,"v":241.3},{"n":"Indonesia","y":2016,"v":82.51},{"n":"Brazil","y":2016,"v":79.67},{"n":"China","y":2017,"v":9296.84},{"n":"United States","y":2017,"v":4761.3},{"n":"Russia","y":2017,"v":1537.18},{"n":"India","y":2017,"v":553.99},{"n":"Indonesia","y":2017,"v":475.21},{"n":"Brazil","y":2017,"v":431.96},{"n":"Japan","y":2017,"v":188.08},{"n":"Iran","y":2017,"v":96.5},{"n":"Germany","y":2017,"v":93.32},{"n":"South Korea","y":2017,"v":74.35},{"n":"Canada","y":2017,"v":55.23},{"n":"China","y":2018,"v":2678.34},{"n":"India","y":2018,"v":2300.3},{"n":"Japan","y":2018,"v":1080.72},{"n":"Germany","y":2018,"v":694.54},{"n":"South Korea","y":2018,"v":627.62},{"n":"Iran","y":2018,"v":569.27},{"n":"Canada","y":2018,"v":557.58},{"n":"United States","y":2018,"v":409.37},{"n":"Russia","y":2018,"v":225.54},{"n":"Indonesia","y":2018,"v":109.63},{"n":"Brazil","y":2018,"v":83.15},{"n":"China","y":2019,"v":9915.55},{"n":"United States","y":2019,"v":4744.81},{"n":"Russia","y":2019,"v":1591.55},{"n":"Indonesia","y":2019,"v":569.44},{"n":"India","y":2019,"v":547.12},{"n":"Brazil","y":2019,"v":407.79},{"n":"Japan","y":2019,"v":180.55},{"n":"Iran","y":2019,"v":110.02},{"n":"Germany","y":2019,"v":87.24},{"n":"South Korea","y":2019,"v":68.63},{"n":"Canada","y":2019,"v":53.91},{"n":"China","y":2020,"v":2743.19},{"n":"India","y":2020,"v":2109.75},{"n":"Japan","y":2020,"v":986.84},{"n":"Iran","y":2020,"v":645.62},{"n":"Germany","y":2020,"v":593.1},{"n":"South Korea","y":2020,"v":558.43},{"n":"Canada","y":2020,"v":502.24},{"n":"United States","y":2020,"v":384.59},{"n":"Russia","y":2020,"v":242.62},{"n":"Indonesia","y":2020,"v":129.64},{"n":"Brazil","y":2020,"v":74.98},{"n":"China","y":2021,"v":10575.17},{"n":"United States","y":2021,"v":4549.26},{"n":"Russia","y":2021,"v":1659.07},{"n":"India","y":2021,"v":584.78},{"n":"Indonesia","y":2021,"v":554.44},{"n":"Brazil","y":2021,"v":439.13},{"n":"Japan","y":2021,"v":172.42},{"n":"Iran","y":2021,"v":131.52},{"n":"Germany","y":2021,"v":87.55},{"n":"South Korea","y":2021,"v":72.17},{"n":"Canada","y":2021,"v":50.65},{"n":"China","y":2022,"v":2647.03},{"n":"India","y":2022,"v":2516.97},{"n":"Japan","y":2022,"v":973.67},{"n":"Iran","y":2022,"v":696.37},{"n":"Germany","y":2022,"v":612},{"n":"South Korea","y":2022,"v":549.31},{"n":"Canada","y":2022,"v":523.33},{"n":"United States","y":2022,"v":392.31},{"n":"Russia","y":2022,"v":250.59},{"n":"Indonesia","y":2022,"v":158.9},{"n":"Brazil","y":2022,"v":85.33}];
+
+    const chart = Plot.plot({
+      width: 928,
+      height: 520,
+      marginRight: 90,
+      x: { label: "Year", tickFormat: "d" },
+      y: { label: "Millions of tonnes", grid: true },
+      color: { type: "categorical", scheme: "Tableau10" },
+      marks: [
+        Plot.ruleY([0]),
+        Plot.lineY(data, {
+          x: "y",
+          y: "v",
+          stroke: "n",
+          strokeWidth: 1.8,
+          tip: true
+        }),
+        Plot.text(data, Plot.selectLast({
+          x: "y",
+          y: "v",
+          z: "n",
+          text: "n",
+          textAnchor: "start",
+          dx: 5,
+          fontSize: 10
+        }))
+      ]
+    });
+
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

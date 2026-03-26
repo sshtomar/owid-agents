@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Malaria Incidence in High-Burden Countries</h1>
+  <p class="subtitle">Estimated cases per 1,000 population at risk (2000-2024)</p>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Health Observatory</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+    const raw = [{"n":"Uganda","y":2000,"v":482.8},{"n":"Mozambique","y":2000,"v":473.7},{"n":"Ghana","y":2000,"v":430.4},{"n":"Cameroon","y":2000,"v":394.8},{"n":"Niger","y":2000,"v":359.2},{"n":"Tanzania","y":2000,"v":334.6},{"n":"Ethiopia","y":2000,"v":189.2},{"n":"Rwanda","y":2000,"v":180.4},{"n":"Niger","y":2001,"v":350.7},{"n":"Ethiopia","y":2001,"v":210.9},{"n":"Rwanda","y":2001,"v":171.3},{"n":"India","y":2001,"v":21.6},{"n":"Mozambique","y":2002,"v":494.7},{"n":"Ghana","y":2002,"v":392.1},{"n":"Niger","y":2002,"v":327.9},{"n":"India","y":2002,"v":19.5},{"n":"Uganda","y":2003,"v":479.4},{"n":"Cameroon","y":2003,"v":441.4},{"n":"Tanzania","y":2003,"v":278.7},{"n":"Ethiopia","y":2003,"v":208.9},{"n":"Rwanda","y":2003,"v":139.2},{"n":"India","y":2003,"v":20.3},{"n":"Mozambique","y":2004,"v":459.3},{"n":"Niger","y":2004,"v":302.8},{"n":"Tanzania","y":2004,"v":264.9},{"n":"India","y":2004,"v":21.8},{"n":"Ghana","y":2005,"v":323.7},{"n":"Niger","y":2005,"v":310.5},{"n":"Uganda","y":2006,"v":425.6},{"n":"Nigeria","y":2006,"v":398.6},{"n":"Ghana","y":2006,"v":311.3},{"n":"Niger","y":2006,"v":307.4},{"n":"Rwanda","y":2006,"v":150.1},{"n":"Uganda","y":2007,"v":417.9},{"n":"Mozambique","y":2007,"v":388},{"n":"Uganda","y":2008,"v":417.7},{"n":"Cameroon","y":2008,"v":391.6},{"n":"Mozambique","y":2008,"v":369.6},{"n":"India","y":2008,"v":14.5},{"n":"Uganda","y":2009,"v":422.8},{"n":"Nigeria","y":2009,"v":390},{"n":"Cameroon","y":2009,"v":351.1},{"n":"Ghana","y":2009,"v":340.4},{"n":"Niger","y":2010,"v":410.1},{"n":"Nigeria","y":2010,"v":363.4},{"n":"India","y":2010,"v":13.1},{"n":"Uganda","y":2011,"v":382.9},{"n":"Mozambique","y":2011,"v":376},{"n":"Nigeria","y":2011,"v":339.5},{"n":"Ethiopia","y":2011,"v":143.7},{"n":"Rwanda","y":2011,"v":36.9},{"n":"Niger","y":2012,"v":428},{"n":"Mozambique","y":2012,"v":375.2},{"n":"Ethiopia","y":2012,"v":159.7},{"n":"India","y":2012,"v":8.1},{"n":"Uganda","y":2013,"v":310.3},{"n":"Tanzania","y":2013,"v":131.8},{"n":"India","y":2013,"v":6.3},{"n":"Cameroon","y":2014,"v":272.5},{"n":"Tanzania","y":2014,"v":146.4},{"n":"Ethiopia","y":2014,"v":144.1},{"n":"Rwanda","y":2015,"v":308},{"n":"Cameroon","y":2015,"v":271.1},{"n":"Tanzania","y":2015,"v":141.8},{"n":"Ethiopia","y":2015,"v":130.1},{"n":"India","y":2015,"v":6.4},{"n":"Nigeria","y":2016,"v":284.8},{"n":"Niger","y":2017,"v":367.8},{"n":"Ghana","y":2017,"v":226.2},{"n":"Tanzania","y":2017,"v":123.2},{"n":"Niger","y":2018,"v":349.8},{"n":"Nigeria","y":2018,"v":291.1},{"n":"Tanzania","y":2018,"v":111.5},{"n":"Ethiopia","y":2018,"v":36.5},{"n":"India","y":2018,"v":3.4},{"n":"Mozambique","y":2019,"v":324},{"n":"Nigeria","y":2019,"v":293},{"n":"Uganda","y":2019,"v":250.8},{"n":"Cameroon","y":2019,"v":243.4},{"n":"Ethiopia","y":2019,"v":33.6},{"n":"Nigeria","y":2020,"v":304.4},{"n":"Ghana","y":2020,"v":219.6},{"n":"Rwanda","y":2020,"v":213.1},{"n":"Ethiopia","y":2020,"v":52.3},{"n":"Mozambique","y":2021,"v":312.4},{"n":"Niger","y":2021,"v":304.2},{"n":"Cameroon","y":2021,"v":270.7},{"n":"Ghana","y":2021,"v":212.5},{"n":"Tanzania","y":2021,"v":133.3},{"n":"Ethiopia","y":2021,"v":45.6},{"n":"Mozambique","y":2022,"v":304.5},{"n":"Uganda","y":2022,"v":266.6},{"n":"Ghana","y":2022,"v":210.8},{"n":"Tanzania","y":2022,"v":132.4},{"n":"Niger","y":2023,"v":305.1},{"n":"Nigeria","y":2023,"v":299},{"n":"Cameroon","y":2023,"v":259.1},{"n":"Ghana","y":2023,"v":194.9},{"n":"Tanzania","y":2023,"v":138.5},{"n":"India","y":2024,"v":1.5}];
+    const data = raw.map(d => ({ country: d.n, year: d.y, value: d.v }));
+    const last = new Map();
+    for (const d of data) {
+      if (!last.has(d.country) || d.year > last.get(d.country).year) {
+        last.set(d.country, d);
+      }
+    }
+    const endpoints = [...last.values()];
+    const chart = Plot.plot({
+      width: 900, height: 500, marginRight: 110, marginTop: 10, marginBottom: 40,
+      x: { label: null, tickFormat: "d" },
+      y: { label: "Cases per 1,000", grid: true },
+      color: {
+        domain: ["Uganda", "Mozambique", "Ghana", "Cameroon", "Niger", "Tanzania", "Ethiopia", "Rwanda", "Nigeria", "India"],
+        range: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#a65628", "#f781bf", "#66c2a5", "#e7298a", "#333333"]
+      },
+      marks: [
+        Plot.ruleY([0]),
+        Plot.line(data, { x: "year", y: "value", stroke: "country", strokeWidth: 1.8, curve: "natural" }),
+        Plot.dot(endpoints, { x: "year", y: "value", fill: "country", r: 3 }),
+        Plot.text(endpoints, { x: "year", y: "value", text: d => d.country, fill: "country", dx: 6, textAnchor: "start", fontSize: 10, fontWeight: 600 })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>
