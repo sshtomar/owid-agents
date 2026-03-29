@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { useApi } from "../hooks/useApi";
 import ChartRenderer from "./ChartRenderer";
+import { captureGalleryCardClick } from "../analytics";
 
 interface VizEntry {
   id: string;
@@ -40,6 +41,7 @@ function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
       <Link
         to={`/viz/${viz.id}`}
         style={{ textDecoration: "none", color: "inherit", display: "block" }}
+        onClick={() => captureGalleryCardClick(viz.id, viz.title)}
       >
         <div style={{
           display: "flex",

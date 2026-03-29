@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Landing from "./components/Landing";
 import VizGallery from "./components/VizGallery";
 import VizDetail from "./components/VizDetail";
 import DatasetBrowser from "./components/DatasetBrowser";
+import { initPostHog, capturePageView } from "./analytics";
+
+initPostHog();
 
 const styles: Record<string, React.CSSProperties> = {
   app: {
@@ -28,6 +31,10 @@ const styles: Record<string, React.CSSProperties> = {
 export default function App() {
   const location = useLocation();
   const isLanding = location.pathname === "/";
+
+  useEffect(() => {
+    capturePageView(location.pathname);
+  }, [location.pathname]);
 
   return (
     <div style={styles.app}>

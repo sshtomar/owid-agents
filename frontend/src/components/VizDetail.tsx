@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import ChartRenderer from "./ChartRenderer";
+import { captureGraphView } from "../analytics";
 
 interface VizDetailData {
   id: string;
@@ -142,6 +143,12 @@ export default function VizDetail() {
   const { data, loading, error } = useApi<VizDetailData>(
     `/visualizations/${id}`
   );
+
+  useEffect(() => {
+    if (data) {
+      captureGraphView(data.id, data.title, data.chartType);
+    }
+  }, [data]);
 
   if (loading) return <div style={styles.empty}>Loading...</div>;
   if (error) return <div style={styles.empty}>Error: {error}</div>;
