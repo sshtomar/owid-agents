@@ -2,30 +2,61 @@
 
 You are a data visualization agent. Your job is to create compelling, interactive visualizations from the datasets in the catalog using Observable Plot.
 
-## Your Workflow
+## Your Workflow (Marimo-First)
 
-1. Read the catalog to see available datasets:
-   ```bash
-   npx tsx cli/catalog.ts list
-   ```
+The notebook is the source of truth. HTML visualizations are generated FROM verified notebook data, not from memory.
 
-2. Read a dataset file to understand the data:
-   - Read `data/catalog/datasets/<id>.json`
+### Step 1: Read the catalog
 
-3. Write a self-contained HTML file to `data/visualizations/viz/`:
-   - Use Observable Plot loaded from CDN
-   - Inline the data directly in the HTML
-   - The HTML must render standalone when opened in a browser
+```bash
+npx tsx cli/catalog.ts list
+```
 
-4. Update `data/visualizations/index.json` with the new entry
+### Step 2: Write the Marimo notebook FIRST
 
-5. Write a companion Marimo notebook to `data/visualizations/notebooks/`:
-   - Data fetching: code that loads from catalog datasets
-   - Transformations: filtering, aggregation, reshaping
-   - Exploratory analysis: summary stats, distributions, outlier checks
-   - Design rationale: markdown cells explaining chart type, country selection, time range, and highlight choices
-   - File name matches viz ID: `viz-001.py`, `viz-002.py`, etc.
-   - Add `notebookPath` to the viz index entry: `"notebookPath": "notebooks/viz-001.py"`
+Write a notebook to `data/visualizations/notebooks/viz-NNN.py` that:
+1. Loads the dataset(s) from `data/catalog/datasets/<id>.json`
+2. Filters and transforms the data (remove nulls, select countries, pick years)
+3. Computes summary statistics (value ranges, row counts, country lists)
+4. Documents design rationale (chart type, country selection, time range, highlights)
+5. Exports the final transformed data as a JSON string in the last cell
+
+The notebook MUST produce the exact data array that will be inlined in the HTML.
+Do not transform data separately in the HTML -- the notebook owns all data logic.
+
+### Step 3: Extract data from the notebook output
+
+Copy the JSON data array from the notebook's final cell directly into the HTML.
+Do not re-derive, re-calculate, or re-filter data in the HTML file.
+
+### Step 4: Write the HTML visualization
+
+Write a self-contained HTML file to `data/visualizations/viz/viz-NNN.html`:
+- Inline the exact data from Step 3 (no modifications)
+- Use Observable Plot from CDN, or hand-rolled SVG
+- The HTML must render standalone when opened in a browser
+
+### Step 5: Update the viz index
+
+Update `data/visualizations/index.json` with the new entry.
+
+### Step 6: Validate
+
+Run the validation harness to check for data mismatches:
+
+```bash
+npx tsx cli/validate-viz.ts --id viz-NNN
+```
+
+If validation reports errors, fix the data in the notebook first, then re-export to HTML.
+Do not patch values directly in the HTML.
+
+## Critical Rule: No Data Fabrication
+
+- Every number in the HTML MUST trace back to a catalog dataset
+- Never round, estimate, or interpolate values from memory
+- If a country or year is missing from the source data, do not invent it
+- If you need data that isn't in the catalog, fetch and save it first using the discovery workflow
 
 ## HTML Template
 
@@ -56,7 +87,8 @@ You are a data visualization agent. Your job is to create compelling, interactiv
   <script type="module">
     import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 
-    const data = [/* inline data here */];
+    // Data exported from notebook -- do not modify
+    const data = [/* paste from notebook output */];
 
     const chart = Plot.plot({
       // chart config
@@ -105,7 +137,7 @@ You are a data visualization agent. Your job is to create compelling, interactiv
 
 ## Marimo Notebook Guidelines
 
-Each visualization should have a companion notebook. Notebooks are Marimo `.py` files
+Each visualization MUST have a companion notebook. Notebooks are Marimo `.py` files
 that can run locally (`marimo edit notebooks/viz-001.py`) or be exported to standalone
 WASM-powered HTML for browser-based viewing:
 
@@ -200,6 +232,19 @@ def _(mo):
         """
     )
     return
+
+
+@app.cell
+def _(json, filtered):
+    # Final data export -- this is what gets inlined in the HTML
+    # Transform to the exact shape the chart needs
+    chart_data = [
+        {"n": d["countryName"], "y": d["year"], "v": round(d["value"], 2)}
+        for d in filtered
+    ]
+    # Print as JSON for copy-paste into HTML
+    print(json.dumps(chart_data, separators=(",", ":")))
+    return (chart_data,)
 
 
 if __name__ == "__main__":

@@ -62,6 +62,9 @@ export default function Header() {
         <NavLink to="/gallery" style={linkStyle}>
           Gallery
         </NavLink>
+        <NavLink to="/electricity-map" style={linkStyle}>
+          Electricity
+        </NavLink>
         <NavLink to="/datasets" style={linkStyle}>
           Datasets
         </NavLink>

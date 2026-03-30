@@ -123,6 +123,14 @@ const DATASETS: EurostatDataset[] = [
     topics: ["migration", "demographics"],
     filters: { age: "TOTAL", sex: "T", citizen: "NEU27_2020_FOR" },
   },
+  {
+    code: "sdg_16_20",
+    name: "Population Reporting Crime, Violence, or Vandalism",
+    description:
+      "Share of population reporting crime, violence or vandalism in their area (%)",
+    topics: ["crime", "safety", "social"],
+    filters: { unit: "PC" },
+  },
 ];
 
 interface EurostatResponse {

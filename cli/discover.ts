@@ -7,6 +7,9 @@ import * as unhcr from "../src/api-clients/unhcr.js";
 import * as imf from "../src/api-clients/imf.js";
 import * as owid from "../src/api-clients/owid.js";
 import * as unesco from "../src/api-clients/unesco.js";
+import * as irena from "../src/api-clients/irena.js";
+import * as ember from "../src/api-clients/ember.js";
+import * as eia from "../src/api-clients/eia.js";
 import { addDataset } from "../src/catalog.js";
 import type { DatasetEntry, DatasetFile, Provider } from "../src/types.js";
 
@@ -38,8 +41,11 @@ function getProvider(): { provider: Provider; client: any } {
   if (p === "imf") return { provider: p, client: imf };
   if (p === "owid") return { provider: p, client: owid };
   if (p === "unesco") return { provider: p, client: unesco };
+  if (p === "irena") return { provider: p, client: irena };
+  if (p === "ember") return { provider: p, client: ember };
+  if (p === "eia") return { provider: p, client: eia };
   console.error(
-    "Error: --provider must be one of: world-bank, who-gho, un-sdg, eurostat, unhcr, imf, owid, unesco"
+    "Error: --provider must be one of: world-bank, who-gho, un-sdg, eurostat, unhcr, imf, owid, unesco, irena, ember, eia"
   );
   process.exit(1);
 }
@@ -124,6 +130,9 @@ async function save() {
     imf: "imf",
     owid: "owid",
     unesco: "unesco",
+    irena: "irena",
+    ember: "ember",
+    eia: "eia",
   };
   const prefix = prefixMap[provider];
   const idSafe = indicator.replace(/[.:]/g, "-");

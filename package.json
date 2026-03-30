@@ -8,19 +8,26 @@
     "catalog": "tsx cli/catalog.ts",
     "serve": "tsx cli/serve.ts",
     "dev": "concurrently \"npm run serve\" \"npm run dev:frontend\"",
-    "dev:frontend": "cd frontend && npm run dev"
+    "dev:frontend": "cd frontend && npm run dev",
+    "validate": "tsx cli/validate-viz.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.0",
+    "express-rate-limit": "^8.3.1",
     "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.0.0",
+    "@types/supertest": "^7.2.0",
     "concurrently": "^9.0.0",
+    "supertest": "^7.2.2",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.0"
   }
 }

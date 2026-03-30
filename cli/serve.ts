@@ -375,6 +375,208 @@ app.get("/api/oembed", (req, res) => {
   });
 });
 
+// --- Electricity Map endpoint ---
+
+interface CountryElectricity {
+  countryName: string;
+  countryCode: string;
+  carbonIntensity: number | null;
+  shareClean: number | null;
+  shareFossil: number | null;
+  shareRenewables: number | null;
+  demandTotal: number | null;
+  demandPerCapita: number | null;
+  emissionsTotal: number | null;
+  generationTotal: number | null;
+  generationMix: {
+    coal: number | null;
+    gas: number | null;
+    nuclear: number | null;
+    hydro: number | null;
+    wind: number | null;
+    solar: number | null;
+    bioenergy: number | null;
+  };
+}
+
+interface MetricInfo {
+  key: string;
+  label: string;
+  unit: string;
+}
+
+const ELECTRICITY_METRICS: MetricInfo[] = [
+  { key: "carbonIntensity", label: "Carbon Intensity", unit: "gCO2/kWh" },
+  { key: "shareClean", label: "Clean Share", unit: "%" },
+  { key: "shareFossil", label: "Fossil Share", unit: "%" },
+  { key: "shareRenewables", label: "Renewables Share", unit: "%" },
+  { key: "demandPerCapita", label: "Demand per Capita", unit: "MWh" },
+  { key: "demandTotal", label: "Total Demand", unit: "TWh" },
+  { key: "emissionsTotal", label: "Total Emissions", unit: "mtCO2" },
+  { key: "generationTotal", label: "Total Generation", unit: "TWh" },
+];
+
+const ELECTRICITY_DATASET_MAP: Record<string, string> = {
+  carbonIntensity: "ember--EMISSIONS-INTENSITY",
+  shareClean: "ember--SHARE-CLEAN",
+  shareFossil: "ember--SHARE-FOSSIL",
+  shareRenewables: "ember--SHARE-RENEWABLES",
+  demandTotal: "ember--DEMAND-TOTAL",
+  demandPerCapita: "ember--DEMAND-PER-CAPITA",
+  emissionsTotal: "ember--EMISSIONS-TOTAL",
+  generationTotal: "ember--GEN-TOTAL",
+  generationClean: "ember--GEN-CLEAN",
+  generationFossil: "ember--GEN-FOSSIL",
+  generationWindSolar: "ember--GEN-WIND-SOLAR",
+  shareCoal: "ember--SHARE-COAL",
+  shareSolar: "ember--SHARE-SOLAR",
+  shareWind: "ember--SHARE-WIND",
+};
+
+interface DataPoint {
+  country: string;
+  countryName: string;
+  year: number;
+  value: number | null;
+}
+
+// Cached aggregation
+let electricityCache: {
+  availableYears: number[];
+  availableMetrics: MetricInfo[];
+  data: Record<number, Record<string, CountryElectricity>>;
+} | null = null;
+
+function buildElectricityData() {
+  if (electricityCache) return electricityCache;
+
+  // Load all datasets and index by (year, country)
+  const dataByField = new Map<string, Map<string, Map<number, number>>>();
+
+  for (const [field, datasetId] of Object.entries(ELECTRICITY_DATASET_MAP)) {
+    const dataset = getDataset(datasetId);
+    if (!dataset) continue;
+
+    const byCountryYear = new Map<string, Map<number, number>>();
+    for (const dp of dataset.data as DataPoint[]) {
+      if (dp.value === null) continue;
+      let yearMap = byCountryYear.get(dp.country);
+      if (!yearMap) {
+        yearMap = new Map();
+        byCountryYear.set(dp.country, yearMap);
+      }
+      yearMap.set(dp.year, dp.value);
+    }
+    dataByField.set(field, byCountryYear);
+  }
+
+  // Collect all years and country names
+  const allYears = new Set<number>();
+  const countryNames = new Map<string, string>();
+
+  for (const [field, datasetId] of Object.entries(ELECTRICITY_DATASET_MAP)) {
+    const dataset = getDataset(datasetId);
+    if (!dataset) continue;
+    for (const dp of dataset.data as DataPoint[]) {
+      allYears.add(dp.year);
+      if (!countryNames.has(dp.country)) {
+        countryNames.set(dp.country, dp.countryName);
+      }
+    }
+  }
+
+  const years = Array.from(allYears).sort((a, b) => a - b);
+  const allCountries = Array.from(countryNames.keys());
+
+  function getValue(field: string, country: string, year: number): number | null {
+    return dataByField.get(field)?.get(country)?.get(year) ?? null;
+  }
+
+  const data: Record<number, Record<string, CountryElectricity>> = {};
+
+  for (const year of years) {
+    const yearData: Record<string, CountryElectricity> = {};
+    for (const code of allCountries) {
+      const total = getValue("generationTotal", code, year);
+      const sCoal = getValue("shareCoal", code, year);
+      const sSolar = getValue("shareSolar", code, year);
+      const sWind = getValue("shareWind", code, year);
+      const sClean = getValue("shareClean", code, year);
+      const sFossil = getValue("shareFossil", code, year);
+      const sRenew = getValue("shareRenewables", code, year);
+
+      // Compute generation mix from shares * total
+      // Clean = nuclear + hydro + wind + solar + bioenergy
+      // Fossil = coal + gas + other fossil
+      const genClean = getValue("generationClean", code, year);
+      const genFossil = getValue("generationFossil", code, year);
+      const genWindSolar = getValue("generationWindSolar", code, year);
+
+      // Estimate individual fuels from shares and total generation
+      const coalTWh = total !== null && sCoal !== null ? total * sCoal / 100 : null;
+      const solarTWh = total !== null && sSolar !== null ? total * sSolar / 100 : null;
+      const windTWh = total !== null && sWind !== null ? total * sWind / 100 : null;
+
+      // Gas = fossil - coal (rough estimate)
+      const gasTWh = genFossil !== null && coalTWh !== null
+        ? Math.max(0, genFossil - coalTWh)
+        : null;
+
+      // Nuclear = clean - renewables (if we have both)
+      const renewTWh = total !== null && sRenew !== null ? total * sRenew / 100 : null;
+      const nuclearTWh = genClean !== null && renewTWh !== null
+        ? Math.max(0, genClean - renewTWh)
+        : null;
+
+      // Hydro = renewables - wind - solar - bioenergy (estimate bio as small remainder)
+      const hydroTWh = renewTWh !== null && windTWh !== null && solarTWh !== null
+        ? Math.max(0, renewTWh - windTWh - solarTWh)
+        : null;
+
+      yearData[code] = {
+        countryName: countryNames.get(code) ?? code,
+        countryCode: code,
+        carbonIntensity: getValue("carbonIntensity", code, year),
+        shareClean: sClean,
+        shareFossil: sFossil,
+        shareRenewables: sRenew,
+        demandTotal: getValue("demandTotal", code, year),
+        demandPerCapita: getValue("demandPerCapita", code, year),
+        emissionsTotal: getValue("emissionsTotal", code, year),
+        generationTotal: total,
+        generationMix: {
+          coal: coalTWh,
+          gas: gasTWh,
+          nuclear: nuclearTWh,
+          hydro: hydroTWh,
+          wind: windTWh,
+          solar: solarTWh,
+          bioenergy: null,
+        },
+      };
+    }
+    data[year] = yearData;
+  }
+
+  electricityCache = {
+    availableYears: years,
+    availableMetrics: ELECTRICITY_METRICS,
+    data,
+  };
+
+  return electricityCache;
+}
+
+app.get("/api/electricity-map", (_req, res) => {
+  try {
+    const result = buildElectricityData();
+    res.json(result);
+  } catch (err) {
+    console.error("[api] Failed to build electricity map data:", err instanceof Error ? err.message : err);
+    res.status(500).json({ error: "Failed to build electricity map data" });
+  }
+});
+
 // --- Health ---
 
 app.get("/api/health", (_req, res) => {

@@ -1,5 +1,11 @@
 data/catalog/datasets/
-data/visualizations/notebooks/
+data/visualizations/notebooks/*.py
+data/visualizations/notebooks/__marimo__/
+data/visualizations/notebooks/__pycache__/
+data/visualizations/notebooks/public/
+.agents/**
+.claude/**
+skills-lock.json
 blog/
 data-viz/
 scripts/

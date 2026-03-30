@@ -6,7 +6,10 @@ export type Provider =
   | "unhcr"
   | "imf"
   | "owid"
-  | "unesco";
+  | "unesco"
+  | "irena"
+  | "ember"
+  | "eia";
 
 export interface DataPoint {
   country: string;
