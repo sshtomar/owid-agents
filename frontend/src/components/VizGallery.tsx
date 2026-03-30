@@ -1,29 +1,22 @@
-import React, { useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { useApi } from "../hooks/useApi";
 import { useIsMobile } from "../hooks/useIsMobile";
-import ChartRenderer from "./ChartRenderer";
+import LazyChart from "./LazyChart";
+import ErrorBoundary from "./ErrorBoundary";
 import SearchBar from "./SearchBar";
-import { VizEntry, VizListResponse, THEMES, matchesSearch, matchesTheme } from "../search";
+import {
+  COLORS, FONTS, SPRING, BUTTON_SECONDARY, BUTTON_ACCENT_OUTLINE,
+  relativeTime,
+} from "../theme";
+import {
+  VizMeta, VizListResponse, THEMES,
+  createFuseIndex, fuzzySearch, matchesTheme, vizSearchable,
+} from "../search";
+import { trackSearch, trackThemeFilter, trackChartClicked, trackNotebookOpened } from "../analytics";
 
-const SPRING = {
-  gentle: { type: "spring" as const, stiffness: 300, damping: 30 },
-};
-
-function downloadHtml(html: string, filename: string) {
-  const blob = new Blob([html], { type: "text/html" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
+function GalleryCard({ viz, index }: { viz: VizMeta; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
 
@@ -40,6 +33,7 @@ function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
       <Link
         to={`/viz/${viz.id}`}
         style={{ textDecoration: "none", color: "inherit", display: "block" }}
+        onClick={() => trackChartClicked(viz.id, viz.title, "gallery_card")}
       >
         <div style={{
           display: "flex",
@@ -51,41 +45,56 @@ function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
             fontSize: 14,
             fontWeight: 600,
             letterSpacing: "-0.2px",
-            color: "#2B2A27",
+            color: COLORS.text,
           }}>
             {viz.title}
           </div>
           <span style={{
             fontSize: 9,
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: FONTS.mono,
             textTransform: "uppercase",
             letterSpacing: "0.3px",
-            color: "#7A786F",
+            color: COLORS.textMuted,
           }}>
             {viz.chartType}
           </span>
         </div>
         <div style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 9,
-          color: "#7A786F",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
           marginBottom: 10,
         }}>
-          {viz.description.split(".")[0]}.
+          <div style={{
+            fontFamily: FONTS.mono,
+            fontSize: 9,
+            color: COLORS.textMuted,
+          }}>
+            {viz.description.split(".")[0]}.
+          </div>
+          <span style={{
+            fontFamily: FONTS.mono,
+            fontSize: 8,
+            color: COLORS.textSubtle,
+            flexShrink: 0,
+            marginLeft: 8,
+          }}>
+            {relativeTime(viz.createdAt)}
+          </span>
         </div>
         <div style={{
-          border: "1px solid #E2E0D5",
+          border: `1px solid ${COLORS.border}`,
           borderRadius: 2,
           overflow: "hidden",
         }}>
-          <ChartRenderer html={viz.generatedCode} hideChrome />
+          <LazyChart vizId={viz.id} hideChrome />
         </div>
         {viz.highlights.length > 0 && (
           <div style={{
             fontSize: 11,
-            color: "#5A5850",
+            color: COLORS.textMid,
             paddingLeft: 10,
-            borderLeft: "2px solid #EA5E33",
+            borderLeft: `2px solid ${COLORS.accent}`,
             marginTop: 10,
             lineHeight: 1.5,
           }}>
@@ -93,64 +102,22 @@ function GalleryCard({ viz, index }: { viz: VizEntry; index: number }) {
           </div>
         )}
       </Link>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          downloadHtml(viz.generatedCode, `${viz.id}.html`);
-        }}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 4,
-          marginTop: 8,
-          padding: "5px 10px",
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: 9,
-          fontWeight: 500,
-          letterSpacing: "0.3px",
-          color: "#7A786F",
-          backgroundColor: "transparent",
-          border: "1px solid #C2C0B5",
-          borderRadius: 2,
-          textTransform: "uppercase" as const,
-          cursor: "pointer",
-        }}
-      >
-        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#7A786F" strokeWidth="1.5">
-          <path d="M6 1v7M3 6l3 3 3-3M1 10h10" />
-        </svg>
-        Download
-      </button>
-      {viz.notebookPath && (
-        <a
-          href={`/wasm-notebooks/${viz.id}.html`}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            marginTop: 8,
-            marginLeft: 8,
-            padding: "5px 10px",
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: 9,
-            fontWeight: 500,
-            letterSpacing: "0.3px",
-            color: "#EA5E33",
-            backgroundColor: "transparent",
-            border: "1px solid #EA5E33",
-            borderRadius: 2,
-            textTransform: "uppercase",
-            textDecoration: "none",
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="#EA5E33" strokeWidth="1.5">
-            <path d="M2 10h8M6 2v6M3.5 5.5 6 8l2.5-2.5" />
-          </svg>
-          Marimo Notebook
-        </a>
-      )}
+      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+        {viz.notebookPath && (
+          <a
+            href={`/wasm-notebooks/${viz.id}.html`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => { e.stopPropagation(); trackNotebookOpened(viz.id); }}
+            style={{ ...BUTTON_ACCENT_OUTLINE, textDecoration: "none", padding: "5px 10px", fontSize: 9, gap: 4 }}
+          >
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke={COLORS.accent} strokeWidth="1.5">
+              <path d="M2 10h8M6 2v6M3.5 5.5 6 8l2.5-2.5" />
+            </svg>
+            Marimo Notebook
+          </a>
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -162,24 +129,48 @@ export default function VizGallery() {
   const [activeThemes, setActiveThemes] = useState<string[]>([]);
 
   const vizList = data?.visualizations ?? [];
+  const fuseIndex = useMemo(() => createFuseIndex(vizList), [vizList]);
 
   const filtered = useMemo(() => {
-    return vizList.filter((viz) => {
-      const passesQuery = !query || matchesSearch(viz, query);
-      const passesTheme = activeThemes.length === 0 ||
-        activeThemes.some((label) => matchesTheme(viz, THEMES.find((t) => t.label === label)!));
-      return passesQuery && passesTheme;
-    });
-  }, [vizList, query, activeThemes]);
+    let results = vizList;
+    if (query) {
+      const fuzzyResults = fuzzySearch(fuseIndex, query);
+      results = fuzzyResults.length > 0 ? fuzzyResults : results.filter(
+        (v) => vizSearchable(v).includes(query.toLowerCase())
+      );
+    }
+    if (activeThemes.length > 0) {
+      results = results.filter((viz) =>
+        activeThemes.some((label) => matchesTheme(viz, THEMES.find((t) => t.label === label)!))
+      );
+    }
+    return results;
+  }, [vizList, query, activeThemes, fuseIndex]);
+
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    if (!query) return;
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      trackSearch(query, filtered.length, vizList.length);
+    }, 800);
+    return () => clearTimeout(searchTimer.current);
+  }, [query, filtered.length, vizList.length]);
+
+  useEffect(() => {
+    if (activeThemes.length > 0) {
+      trackThemeFilter(activeThemes, filtered.length);
+    }
+  }, [activeThemes, filtered.length]);
 
   if (loading) {
     return (
       <div style={{
         textAlign: "center",
         padding: 64,
-        color: "#7A786F",
+        color: COLORS.textMuted,
         fontSize: 11,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: FONTS.mono,
       }}>
         Loading...
       </div>
@@ -191,9 +182,9 @@ export default function VizGallery() {
       <div style={{
         textAlign: "center",
         padding: 64,
-        color: "#7A786F",
+        color: COLORS.textMuted,
         fontSize: 11,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: FONTS.mono,
       }}>
         Error: {error}
       </div>
@@ -203,24 +194,24 @@ export default function VizGallery() {
   return (
     <div style={{
       padding: mobile ? "20px 16px" : "32px 40px",
-      backgroundColor: "#F6F5EE",
+      backgroundColor: COLORS.bg,
       minHeight: "100%",
     }}>
       <div style={{
         marginBottom: 32,
-        borderBottom: "1px solid #C2C0B5",
+        borderBottom: `1px solid ${COLORS.borderStrong}`,
         paddingBottom: 16,
       }}>
         <h1 style={{
           fontSize: 18,
           fontWeight: 600,
           letterSpacing: "-0.3px",
-          color: "#2B2A27",
+          color: COLORS.text,
           marginBottom: 4,
         }}>
           All Charts
         </h1>
-        <p style={{ fontSize: 12, color: "#7A786F", margin: "0 0 16px" }}>
+        <p style={{ fontSize: 12, color: COLORS.textMuted, margin: "0 0 16px" }}>
           {vizList.length} visualizations from public datasets
         </p>
 
@@ -238,9 +229,9 @@ export default function VizGallery() {
         <div style={{
           textAlign: "center",
           padding: 64,
-          color: "#7A786F",
+          color: COLORS.textMuted,
           fontSize: 11,
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: FONTS.mono,
         }}>
           {vizList.length === 0
             ? "No visualizations yet."
@@ -255,8 +246,8 @@ export default function VizGallery() {
               transition={{ duration: 0.2 }}
               style={{
                 fontSize: 11,
-                color: "#7A786F",
-                fontFamily: "'JetBrains Mono', monospace",
+                color: COLORS.textMuted,
+                fontFamily: FONTS.mono,
                 marginBottom: 20,
               }}
             >
@@ -271,7 +262,9 @@ export default function VizGallery() {
             gap: mobile ? 32 : 40,
           }}>
             {filtered.map((viz, i) => (
-              <GalleryCard key={viz.id} viz={viz} index={i} />
+              <ErrorBoundary key={viz.id}>
+                <GalleryCard viz={viz} index={i} />
+              </ErrorBoundary>
             ))}
           </div>
         </>

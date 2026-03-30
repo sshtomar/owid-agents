@@ -10,6 +10,10 @@ import {
   LABEL_STYLE, relativeTime,
 } from "../theme";
 import { VizMeta, VizListResponse, findRelated } from "../search";
+import {
+  trackReaction, trackComment, trackDownload, trackCopy,
+  trackNotebookOpened, trackRelatedChartClicked,
+} from "../analytics";
 
 interface VizDetailData {
   id: string;
@@ -97,6 +101,7 @@ function ReactionBar({ vizId }: { vizId: string }) {
     async (reaction: Reaction) => {
       if (selected) return;
       setSelected(reaction);
+      trackReaction(vizId, reaction);
       try {
         localStorage.setItem(`feedback-${vizId}`, reaction);
       } catch {}
@@ -114,6 +119,7 @@ function ReactionBar({ vizId }: { vizId: string }) {
         reaction: selected ?? "useful",
         comment: comment.trim(),
       });
+      trackComment(vizId);
       setComment("");
       setCommentSent(true);
       setTimeout(() => setCommentSent(false), 2000);
@@ -217,6 +223,7 @@ function EmbedBlock({ vizId, title }: { vizId: string; title: string }) {
 
   const copyText = (text: string, type: "embed" | "share") => {
     navigator.clipboard.writeText(text).then(() => {
+      trackCopy(vizId, type);
       setCopied(type);
       setTimeout(() => setCopied(null), 2000);
     });
@@ -307,6 +314,7 @@ function CitationBlock({ viz }: { viz: VizDetailData }) {
 
   const copyToClipboard = (text: string, type: "cite" | "bibtex") => {
     navigator.clipboard.writeText(text).then(() => {
+      trackCopy(viz.id, type === "cite" ? "citation" : "bibtex");
       setCopied(type);
       setTimeout(() => setCopied(null), 2000);
     });
@@ -383,6 +391,7 @@ function RelatedCharts({ current, allViz }: { current: VizMeta; allViz: VizMeta[
           <Link
             key={viz.id}
             to={`/viz/${viz.id}`}
+            onClick={() => trackRelatedChartClicked(current.id, viz.id, viz.title)}
             style={{
               textDecoration: "none",
               color: "inherit",
@@ -571,7 +580,7 @@ export default function VizDetail() {
 
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 24 }}>
         <button
-          onClick={() => downloadHtml(data.htmlCode, `${data.id}.html`)}
+          onClick={() => { trackDownload(data.id, "html"); downloadHtml(data.htmlCode, `${data.id}.html`); }}
           style={BUTTON_PRIMARY}
         >
           Download Chart (.html)
@@ -583,6 +592,7 @@ export default function VizDetail() {
               target="_blank"
               rel="noopener noreferrer"
               style={{ ...BUTTON_ACCENT_OUTLINE, textDecoration: "none" }}
+              onClick={() => trackNotebookOpened(data.id)}
             >
               Open Marimo Notebook (WASM)
             </a>
@@ -591,6 +601,7 @@ export default function VizDetail() {
               target="_blank"
               rel="noopener noreferrer"
               style={{ ...BUTTON_SECONDARY, textDecoration: "none" }}
+              onClick={() => trackDownload(data.id, "py")}
             >
               Download .py
             </a>
