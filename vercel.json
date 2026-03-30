@@ -1,10 +1,11 @@
 {
   "installCommand": "npm install && cd frontend && npm install",
-  "buildCommand": "cd frontend && npm run build && (cp -r ../data/visualizations/notebooks/wasm ../frontend/dist/wasm-notebooks 2>/dev/null || true)",
+  "buildCommand": "cd frontend && npm run build && cp -r ../data/visualizations/viz ../frontend/dist/viz-html && (cp -r ../data/visualizations/notebooks/wasm ../frontend/dist/wasm-notebooks 2>/dev/null || true)",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
-      "includeFiles": "{data/catalog/index.json,data/visualizations/index.json,data/visualizations/viz/**,src/**,cli/serve.ts}"
+      "includeFiles": "{data/catalog/index.json,data/visualizations/index.json,src/**,cli/serve.ts}",
+      "excludeFiles": "frontend/**"
     }
   },
   "rewrites": [

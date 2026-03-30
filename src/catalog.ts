@@ -193,6 +193,11 @@ export function listVisualizations(): VizEntry[] {
 
 export function getVizHtml(id: string): string | null {
   assertValidId(id);
+  // Prefer inline HTML stored in the index (used in serverless where
+  // individual viz files are excluded from the function bundle).
+  const viz = getVisualization(id);
+  if (viz?.generatedCode) return viz.generatedCode;
+  // Fall back to reading the standalone file (local dev).
   const filePath = safePath(VIZ_FILES_DIR, id, ".html");
   if (!existsSync(filePath)) return null;
   try {
