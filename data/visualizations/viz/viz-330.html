@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 6px; line-height: 1.5; max-width: 820px; }
+    .context-bar {
+      display: flex; gap: 24px; margin: 12px 0 16px; padding: 10px 14px;
+      background: #fef2f2; border-left: 3px solid #dc2626; border-radius: 4px;
+      font-size: 12px; color: #991b1b; flex-wrap: wrap;
+    }
+    .context-bar strong { color: #7f1d1d; }
+    #map-container { position: relative; width: 100%; max-width: 860px; }
+    svg { width: 100%; height: auto; display: block; }
+    .country { stroke: #fff; stroke-width: 0.4; cursor: pointer; }
+    .country:hover { stroke: #0f172a; stroke-width: 1.2; }
+    .no-data { fill: #f1f5f9; }
+    .tooltip {
+      position: absolute; pointer-events: none; background: #0f172a; color: #fff;
+      padding: 8px 12px; border-radius: 6px; font-size: 12px; line-height: 1.5;
+      max-width: 260px; opacity: 0; transition: opacity 0.15s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tooltip .country-name { font-weight: 700; font-size: 13px; }
+    .tooltip .pct { color: #fca5a5; font-weight: 700; }
+    .tooltip .note { color: #94a3b8; font-size: 11px; margin-top: 2px; }
+    .legend { margin: 16px 0 8px; display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
+    .legend-bar { display: flex; height: 10px; border-radius: 2px; overflow: hidden; }
+    .legend-bar div { width: 36px; }
+    .legend-labels { display: flex; gap: 0; width: 252px; justify-content: space-between; font-size: 10px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 8px; line-height: 1.6; }
+    .source a { color: #64748b; }
+    .callouts { display: flex; gap: 16px; margin: 14px 0 0; flex-wrap: wrap; }
+    .callout {
+      flex: 1; min-width: 140px; padding: 10px 14px; background: #fafafa;
+      border-radius: 6px; border: 1px solid #e2e8f0;
+    }
+    .callout .label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .callout .value { font-size: 22px; font-weight: 700; color: #dc2626; margin: 2px 0; }
+    .callout .detail { font-size: 11px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <h1>Gasoline Prices Surge Worldwide After the Iran War</h1>
+  <p class="subtitle">
+    Percentage increase in gasoline pump prices by country since the US-Israeli strikes on Iran began on February 28, 2026.
+    At least 95 countries have reported price increases. The Strait of Hormuz closure disrupted 20% of global oil supply --
+    the largest supply disruption in the history of the global oil market.
+  </p>
+
+  <div class="context-bar">
+    <span><strong>War began:</strong> Feb 28, 2026</span>
+    <span><strong>Brent crude:</strong> $73 &rarr; $100+/bbl (+37%)</span>
+    <span><strong>US avg gas:</strong> $2.98 &rarr; $4.02/gal</span>
+    <span><strong>Data as of:</strong> Mar 31, 2026</span>
+  </div>
+
+  <div id="map-container">
+    <div class="tooltip" id="tooltip"></div>
+  </div>
+
+  <div class="legend">
+    <span>Gasoline price increase:</span>
+    <div>
+      <div class="legend-bar">
+        <div style="background:#fee2e2"></div>
+        <div style="background:#fecaca"></div>
+        <div style="background:#fca5a5"></div>
+        <div style="background:#f87171"></div>
+        <div style="background:#ef4444"></div>
+        <div style="background:#dc2626"></div>
+        <div style="background:#991b1b"></div>
+      </div>
+      <div class="legend-labels">
+        <span>5%</span><span>20%</span><span>35%</span><span>50%</span><span>68%</span>
+      </div>
+    </div>
+    <span style="margin-left:12px; color:#cbd5e1;">&#9632;</span> No data
+  </div>
+
+  <div class="callouts">
+    <div class="callout">
+      <div class="label">Hardest hit</div>
+      <div class="value">+68%</div>
+      <div class="detail">Cambodia -- highest increase globally</div>
+    </div>
+    <div class="callout">
+      <div class="label">US gasoline</div>
+      <div class="value">+35%</div>
+      <div class="detail">$4.02/gal avg; California $5.87</div>
+    </div>
+    <div class="callout">
+      <div class="label">Least affected</div>
+      <div class="value">+5%</div>
+      <div class="detail">India -- government price controls</div>
+    </div>
+    <div class="callout">
+      <div class="label">Oil supply drop</div>
+      <div class="value">10%+</div>
+      <div class="detail">Largest disruption in history (IEA)</div>
+    </div>
+  </div>
+
+  <p class="source">
+    Sources: Al Jazeera, IRU, PBS NewsHour, NPR, Time, CNBC, IMF, Yale Climate Connections, Bloomberg (Feb-Mar 2026).
+    Confirmed % increases from news reporting. Some estimates based on reported shortages and import dependency.
+    Gray countries: no data available.
+  </p>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script>
+    // Data exported from notebook viz-330.py
+    const priceData = [
+      {"iso3":"KHM","name":"Cambodia","pct":68,"source":"Al Jazeera","note":"Highest increase globally; $1.11 to $1.32/L (95-octane)"},
+      {"iso3":"VNM","name":"Vietnam","pct":50,"source":"Al Jazeera","note":""},
+      {"iso3":"BGD","name":"Bangladesh","pct":45,"source":"Al Jazeera","note":"Est.; 95% oil imported, pumps running dry"},
+      {"iso3":"NGA","name":"Nigeria","pct":35,"source":"Al Jazeera","note":""},
+      {"iso3":"USA","name":"United States","pct":35,"source":"Time/CNBC","note":"$2.98 to $4.02/gal (Mar 31); CA at $5.87"},
+      {"iso3":"LAO","name":"Laos","pct":33,"source":"Al Jazeera","note":""},
+      {"iso3":"LKA","name":"Sri Lanka","pct":30,"source":"Al Jazeera","note":"Est.; 60% energy imported, fuel passes introduced"},
+      {"iso3":"CAN","name":"Canada","pct":28,"source":"Al Jazeera","note":""},
+      {"iso3":"SWZ","name":"Eswatini","pct":28,"source":"Al Jazeera","note":"E2.90/L increase for unleaded"},
+      {"iso3":"ESP","name":"Spain","pct":27,"source":"IRU","note":"EUR 1.79/L"},
+      {"iso3":"KEN","name":"Kenya","pct":25,"source":"Al Jazeera/Bloomberg","note":"Est.; fuel shortages at filling stations"},
+      {"iso3":"ETH","name":"Ethiopia","pct":25,"source":"Al Jazeera/Bloomberg","note":"Est.; fuel shortages reported"},
+      {"iso3":"ZMB","name":"Zambia","pct":25,"source":"Al Jazeera/Bloomberg","note":"Est.; fuel shortages reported"},
+      {"iso3":"PAK","name":"Pakistan","pct":22,"source":"Al Jazeera","note":"55 rupee/L increase; 80% energy from Gulf"},
+      {"iso3":"ZAF","name":"South Africa","pct":22,"source":"Bloomberg","note":"R3.06/L increase; govt cut fuel levy"},
+      {"iso3":"DEU","name":"Germany","pct":20,"source":"IRU","note":"EU weighted avg; diesel exceeded EUR 2/L"},
+      {"iso3":"FRA","name":"France","pct":20,"source":"IRU","note":"EU weighted avg; partially shielded by nuclear"},
+      {"iso3":"ITA","name":"Italy","pct":20,"source":"IRU/IMF","note":"Especially exposed per IMF; diesel exceeded EUR 2/L"},
+      {"iso3":"NLD","name":"Netherlands","pct":20,"source":"IRU","note":"Diesel exceeded EUR 2/L; EUR 2.33/L highest EU price"},
+      {"iso3":"FIN","name":"Finland","pct":20,"source":"IRU","note":"EU avg; diesel exceeded EUR 2/L"},
+      {"iso3":"IRL","name":"Ireland","pct":20,"source":"IRU","note":"EUR 2.3/L -- highest price in EU"},
+      {"iso3":"JPN","name":"Japan","pct":20,"source":"IRU/IMF","note":"Est.; 95% oil from Gulf, highly vulnerable"},
+      {"iso3":"NAM","name":"Namibia","pct":20,"source":"Al Jazeera","note":"Slashed fuel levies 50% for 3 months"},
+      {"iso3":"JOR","name":"Jordan","pct":20,"source":"CGD/IMF","note":"Identified as highly vulnerable"},
+      {"iso3":"SEN","name":"Senegal","pct":20,"source":"CGD/IMF","note":"Identified as highly vulnerable"},
+      {"iso3":"KOR","name":"South Korea","pct":18,"source":"IRU/IMF","note":"Est.; 70% oil from Gulf"},
+      {"iso3":"EGY","name":"Egypt","pct":18,"source":"Al Jazeera","note":"15-22% range; shops closed early to save energy"},
+      {"iso3":"AGO","name":"Angola","pct":15,"source":"CGD/IMF","note":"Vulnerable; oil exporter but refining limited"},
+      {"iso3":"GBR","name":"United Kingdom","pct":13,"source":"IRU","note":""},
+      {"iso3":"CHN","name":"China","pct":11,"source":"IRU","note":"Govt price controls; suspended fuel exports"},
+      {"iso3":"IND","name":"India","pct":5,"source":"IRU","note":"Govt pricing limits spikes"}
+    ];
+
+    const byIso = new Map(priceData.map(d => [d.iso3, d]));
+
+    // Color scale: sequential reds
+    const colorScale = d3.scaleSequential()
+      .domain([0, 70])
+      .interpolator(d3.interpolateReds);
+
+    const width = 860, height = 460;
+
+    const svg = d3.select("#map-container")
+      .append("svg")
+      .attr("viewBox", `0 0 ${width} ${height}`)
+      .attr("preserveAspectRatio", "xMidYMid meet");
+
+    const projection = d3.geoNaturalEarth1()
+      .scale(150)
+      .translate([width / 2, height / 2 + 20]);
+
+    const path = d3.geoPath().projection(projection);
+
+    const tooltip = d3.select("#tooltip");
+
+    // Load world topojson
+    d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world => {
+      const countries = topojson.feature(world, world.objects.countries);
+
+      // ISO numeric to ISO alpha-3 mapping for the countries we care about
+      const numToAlpha3 = {
+        "4":"AFG","8":"ALB","12":"DZA","24":"AGO","32":"ARG","36":"AUS","40":"AUT",
+        "50":"BGD","56":"BEL","68":"BOL","76":"BRA","100":"BGR","104":"MMR",
+        "108":"BDI","116":"KHM","120":"CMR","124":"CAN","140":"CAF","144":"LKA",
+        "148":"TCD","152":"CHL","156":"CHN","170":"COL","178":"COG","180":"COD",
+        "188":"CRI","191":"HRV","192":"CUB","196":"CYP","203":"CZE","208":"DNK",
+        "214":"DOM","218":"ECU","818":"EGY","222":"SLV","226":"GNQ","231":"ETH",
+        "232":"ERI","233":"EST","246":"FIN","250":"FRA","266":"GAB","270":"GMB",
+        "276":"DEU","288":"GHA","300":"GRC","320":"GTM","324":"GIN","328":"GUY",
+        "332":"HTI","340":"HND","348":"HUN","352":"ISL","356":"IND","360":"IDN",
+        "364":"IRN","368":"IRQ","372":"IRL","376":"ISR","380":"ITA","384":"CIV",
+        "388":"JAM","392":"JPN","400":"JOR","398":"KAZ","404":"KEN","408":"PRK",
+        "410":"KOR","414":"KWT","418":"LAO","422":"LBN","426":"LSO","430":"LBR",
+        "434":"LBY","440":"LTU","442":"LUX","450":"MDG","454":"MWI","458":"MYS",
+        "466":"MLI","478":"MRT","484":"MEX","496":"MNG","504":"MAR","508":"MOZ",
+        "512":"OMN","516":"NAM","524":"NPL","528":"NLD","540":"NCL","554":"NZL",
+        "558":"NIC","562":"NER","566":"NGA","578":"NOR","586":"PAK","591":"PAN",
+        "598":"PNG","600":"PRY","604":"PER","608":"PHL","616":"POL","620":"PRT",
+        "630":"PRI","634":"QAT","642":"ROU","643":"RUS","646":"RWA","682":"SAU",
+        "686":"SEN","688":"SRB","694":"SLE","702":"SGP","703":"SVK","704":"VNM",
+        "705":"SVN","706":"SOM","710":"ZAF","716":"ZWE","724":"ESP","728":"SSD",
+        "729":"SDN","740":"SUR","748":"SWZ","752":"SWE","756":"CHE","760":"SYR",
+        "762":"TJK","764":"THA","768":"TGO","780":"TTO","788":"TUN","792":"TUR",
+        "795":"TKM","800":"UGA","804":"UKR","784":"ARE","826":"GBR","834":"TZA",
+        "840":"USA","858":"URY","860":"UZB","862":"VEN","887":"YEM","894":"ZMB"
+      };
+
+      svg.selectAll(".country")
+        .data(countries.features)
+        .join("path")
+        .attr("class", "country")
+        .attr("d", path)
+        .attr("fill", d => {
+          const alpha3 = numToAlpha3[d.id];
+          const entry = alpha3 ? byIso.get(alpha3) : null;
+          return entry ? colorScale(entry.pct) : "#f1f5f9";
+        })
+        .on("mouseenter", (event, d) => {
+          const alpha3 = numToAlpha3[d.id];
+          const entry = alpha3 ? byIso.get(alpha3) : null;
+          if (!entry) return;
+          tooltip.style("opacity", 1).html(
+            `<div class="country-name">${entry.name}</div>` +
+            `<div>Gasoline price increase: <span class="pct">+${entry.pct}%</span></div>` +
+            (entry.note ? `<div class="note">${entry.note}</div>` : "") +
+            `<div class="note">Source: ${entry.source}</div>`
+          );
+        })
+        .on("mousemove", event => {
+          const container = document.getElementById("map-container");
+          const rect = container.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          tooltip
+            .style("left", (x + 12) + "px")
+            .style("top", (y - 10) + "px");
+        })
+        .on("mouseleave", () => {
+          tooltip.style("opacity", 0);
+        });
+
+      // Add country borders
+      svg.append("path")
+        .datum(topojson.mesh(world, world.objects.countries, (a, b) => a !== b))
+        .attr("fill", "none")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 0.4)
+        .attr("d", path);
+
+      // Annotate key countries with labels
+      const labels = [
+        {iso3: "USA", dx: -20, dy: -8},
+        {iso3: "KHM", dx: 10, dy: -12},
+        {iso3: "IND", dx: 5, dy: 10},
+        {iso3: "CHN", dx: 15, dy: -8},
+      ];
+
+      labels.forEach(l => {
+        const entry = byIso.get(l.iso3);
+        if (!entry) return;
+        const feat = countries.features.find(f => numToAlpha3[f.id] === l.iso3);
+        if (!feat) return;
+        const centroid = path.centroid(feat);
+        if (!centroid || isNaN(centroid[0])) return;
+
+        svg.append("text")
+          .attr("x", centroid[0] + l.dx)
+          .attr("y", centroid[1] + l.dy)
+          .attr("text-anchor", "middle")
+          .attr("font-size", "9px")
+          .attr("font-weight", "700")
+          .attr("fill", "#7f1d1d")
+          .attr("paint-order", "stroke")
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 2.5)
+          .text(`+${entry.pct}%`);
+      });
+    });
+  </script>
+</body>
+</html>
