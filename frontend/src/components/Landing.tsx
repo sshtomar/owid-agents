@@ -235,15 +235,6 @@ export default function Landing() {
             }}>
               Gallery {"->"}
             </Link>
-            <Link to="/electricity-map" onClick={() => trackNavigation("electricity_map")} style={{
-              fontFamily: FONTS.mono,
-              fontSize: 10,
-              color: COLORS.accent,
-              textDecoration: "none",
-              letterSpacing: "0.3px",
-            }}>
-              Electricity Map {"->"}
-            </Link>
             <Link to="/datasets" onClick={() => trackNavigation("datasets")} style={{
               fontFamily: FONTS.mono,
               fontSize: 10,

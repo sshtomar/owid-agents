@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Tobacco Use 2000 to 2022</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 920px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+    .legend { display: flex; gap: 20px; font-size: 12px; color: #475569; margin: 8px 0 16px; }
+    .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <h1>Where Smoking Is Falling, and Where It Isn't</h1>
+  <p class="subtitle">Adult tobacco use prevalence (%), 2000 vs 2022. The 12 steepest declines lost 20+ percentage points; a handful of countries moved the wrong way.</p>
+  <div class="legend">
+    <span><span class="swatch" style="background:#0ea5e9"></span>Decline</span>
+    <span><span class="swatch" style="background:#dc2626"></span>Increase</span>
+  </div>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank (WHO Global Health Observatory) - SH.PRV.SMOK</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+    const data = [{"n":"Comoros","v0":50.2,"y0":2000,"v1":17.2,"y1":2022,"d":-33.0},{"n":"India","v0":55.8,"y0":2000,"v1":24.3,"y1":2022,"d":-31.5},{"n":"Kiribati","v0":68,"y0":2000,"v1":39.7,"y1":2022,"d":-28.3},{"n":"Austria","v0":52.5,"y0":2000,"v1":24.9,"y1":2022,"d":-27.6},{"n":"Bangladesh","v0":58.1,"y0":2000,"v1":32.9,"y1":2022,"d":-25.2},{"n":"Cambodia","v0":42,"y0":2000,"v1":17.2,"y1":2022,"d":-24.8},{"n":"Greece","v0":55.8,"y0":2000,"v1":32.8,"y1":2022,"d":-23.0},{"n":"Iceland","v0":32.2,"y0":2000,"v1":9.4,"y1":2022,"d":-22.8},{"n":"Bolivia","v0":35.1,"y0":2000,"v1":12.4,"y1":2022,"d":-22.7},{"n":"Cuba","v0":39.6,"y0":2000,"v1":17.4,"y1":2022,"d":-22.2},{"n":"Denmark","v0":37.8,"y0":2000,"v1":16.2,"y1":2022,"d":-21.6},{"n":"Guyana","v0":31.3,"y0":2000,"v1":11.1,"y1":2022,"d":-20.2},{"n":"Egypt, Arab Rep.","v0":19.4,"y0":2000,"v1":24.7,"y1":2022,"d":5.3},{"n":"Jordan","v0":31.5,"y0":2000,"v1":35.6,"y1":2022,"d":4.1},{"n":"Congo, Rep.","v0":12.3,"y0":2000,"v1":15.4,"y1":2022,"d":3.1},{"n":"Indonesia","v0":35.2,"y0":2000,"v1":38.2,"y1":2022,"d":3.0},{"n":"Croatia","v0":34.8,"y0":2000,"v1":37,"y1":2022,"d":2.2}];
+
+    const long = data.flatMap(d => [
+      { n: d.n, year: d.y0, value: d.v0, delta: d.d },
+      { n: d.n, year: d.y1, value: d.v1, delta: d.d }
+    ]);
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 560,
+      marginLeft: 110,
+      marginRight: 90,
+      marginTop: 40,
+      marginBottom: 36,
+      x: { domain: [1998, 2024], ticks: [2000, 2022], label: null, labelOffset: 30 },
+      y: { label: "Tobacco use (% of adults)", grid: true, domain: [0, 75] },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.line(long, {
+          x: "year",
+          y: "value",
+          z: "n",
+          stroke: d => d.delta < 0 ? "#0ea5e9" : "#dc2626",
+          strokeWidth: 1.6,
+          opacity: 0.85
+        }),
+        Plot.dot(long, {
+          x: "year",
+          y: "value",
+          fill: d => d.delta < 0 ? "#0ea5e9" : "#dc2626",
+          r: 3.5
+        }),
+        Plot.text(long.filter(d => d.year === 2000), {
+          x: "year",
+          y: "value",
+          text: "n",
+          dx: -8,
+          textAnchor: "end",
+          fontSize: 11,
+          fill: "#334155"
+        }),
+        Plot.text(long.filter(d => d.year === 2022), {
+          x: "year",
+          y: "value",
+          text: d => `${d.value}%`,
+          dx: 8,
+          textAnchor: "start",
+          fontSize: 11,
+          fill: d => d.delta < 0 ? "#0369a1" : "#991b1b",
+          fontWeight: 600
+        })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>The Bachelor's Boom</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 920px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>The Bachelor's Boom</h1>
+  <p class="subtitle">Share of adults age 25+ holding at least a Bachelor's degree, 2000-2024. In two decades, Canada and Australia roughly doubled their tertiary-educated population, and Ireland leapfrogged into the lead.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank - SE.TER.CUAT.BA.ZS (Educational attainment, at least Bachelor's or equivalent, population 25+)</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+    const series = [{"n":"Canada","points":[{"y":2000,"v":17.8},{"y":2001,"v":18.3},{"y":2002,"v":18.8},{"y":2003,"v":19.7},{"y":2004,"v":19.8},{"y":2005,"v":20.7},{"y":2006,"v":21.5},{"y":2007,"v":22.0},{"y":2008,"v":22.4},{"y":2009,"v":22.7},{"y":2010,"v":23.6},{"y":2011,"v":24.1},{"y":2012,"v":24.8},{"y":2013,"v":25.4},{"y":2014,"v":25.7},{"y":2015,"v":26.6},{"y":2016,"v":25.8},{"y":2017,"v":27.9},{"y":2018,"v":28.5},{"y":2019,"v":29.8},{"y":2020,"v":31.0},{"y":2021,"v":29.3},{"y":2022,"v":32.4},{"y":2023,"v":32.9},{"y":2024,"v":34.7}]},{"n":"Australia","points":[{"y":2001,"v":19.9},{"y":2002,"v":20.0},{"y":2003,"v":20.5},{"y":2004,"v":21.0},{"y":2005,"v":21.9},{"y":2006,"v":22.1},{"y":2007,"v":22.7},{"y":2008,"v":23.9},{"y":2009,"v":24.0},{"y":2010,"v":25.1},{"y":2011,"v":28.2},{"y":2012,"v":29.0},{"y":2013,"v":26.7},{"y":2014,"v":28.6},{"y":2015,"v":29.8},{"y":2016,"v":30.0},{"y":2017,"v":31.4},{"y":2018,"v":31.7},{"y":2019,"v":33.1},{"y":2020,"v":35.0},{"y":2021,"v":36.0},{"y":2022,"v":36.8},{"y":2023,"v":35.8},{"y":2024,"v":36.8}]},{"n":"Korea, Rep.","points":[{"y":2003,"v":22.0},{"y":2004,"v":22.3},{"y":2005,"v":23.0},{"y":2006,"v":23.9},{"y":2007,"v":24.8},{"y":2008,"v":25.7},{"y":2009,"v":26.5},{"y":2010,"v":24.4},{"y":2011,"v":27.4},{"y":2012,"v":27.8},{"y":2013,"v":28.8},{"y":2014,"v":30.1},{"y":2015,"v":28.7},{"y":2016,"v":31.8},{"y":2017,"v":32.2},{"y":2018,"v":33.0},{"y":2019,"v":33.6},{"y":2020,"v":33.9},{"y":2021,"v":34.2},{"y":2022,"v":34.5},{"y":2023,"v":35.6},{"y":2024,"v":36.5}]},{"n":"Ireland","points":[{"y":2006,"v":30.8},{"y":2007,"v":33.8},{"y":2010,"v":33.1},{"y":2011,"v":26.8},{"y":2014,"v":31.1},{"y":2015,"v":31.2},{"y":2016,"v":31.8},{"y":2017,"v":31.2},{"y":2018,"v":35.2},{"y":2019,"v":35.5},{"y":2020,"v":37.2},{"y":2021,"v":38.5},{"y":2022,"v":38.4},{"y":2023,"v":41.9}]},{"n":"Greece","points":[{"y":2014,"v":22.2},{"y":2015,"v":22.9},{"y":2016,"v":20.1},{"y":2017,"v":23.6},{"y":2018,"v":24.2},{"y":2019,"v":24.4},{"y":2020,"v":26.0},{"y":2021,"v":28.2},{"y":2022,"v":28.9},{"y":2023,"v":28.0},{"y":2024,"v":28.9}]}];
+    const flat = series.flatMap(s => s.points.map(p => ({ n: s.n, y: p.y, v: p.v })));
+    const colors = {"Canada":"#dc2626","Australia":"#0891b2","Korea, Rep.":"#7c3aed","Ireland":"#16a34a","Greece":"#ea580c"};
+
+    const lastPoints = series.map(s => ({ n: s.n, y: s.points[s.points.length-1].y, v: s.points[s.points.length-1].v }));
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 520,
+      marginLeft: 50,
+      marginRight: 110,
+      marginTop: 24,
+      marginBottom: 36,
+      x: { label: "Year", grid: true, tickFormat: "d" },
+      y: { label: "% of adults 25+ with a Bachelor's or higher", grid: true, domain: [15, 45] },
+      color: { domain: Object.keys(colors), range: Object.values(colors) },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.line(flat, { x: "y", y: "v", z: "n", stroke: "n", strokeWidth: 2.2, curve: "monotone-x" }),
+        Plot.dot(flat, { x: "y", y: "v", fill: "n", r: 2.5 }),
+        Plot.text(lastPoints, { x: "y", y: "v", text: d => `${d.n}  ${d.v}%`, dx: 8, textAnchor: "start", fontSize: 11, fontWeight: 600, fill: d => colors[d.n] })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

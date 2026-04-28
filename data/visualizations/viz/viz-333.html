@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Most Water-Stressed Countries</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 920px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 12px; line-height: 1.5; }
+    .note { font-size: 12px; color: #64748b; margin: 0 0 20px; padding: 10px 12px; background: #f1f5f9; border-left: 3px solid #0284c7; border-radius: 4px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Living Beyond Their Water Means</h1>
+  <p class="subtitle">Annual freshwater withdrawal as a share of internally available freshwater resources, latest year. Values above 100% mean a country withdraws more freshwater than it renews each year - the gap is bridged by aquifer depletion, desalination, or imports.</p>
+  <div class="note">A withdrawal ratio above 25% indicates "high water stress" by UN standards. Above 100% is unsustainable without external sources.</div>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank / FAO AQUASTAT - ER.H2O.FWST.ZS</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+    const data = [{"n":"Algeria","v":144.8,"y":2022},{"n":"Egypt, Arab Rep.","v":141.2,"y":2022},{"n":"Bahrain","v":133.7,"y":2022},{"n":"Israel","v":132.0,"y":2021},{"n":"Jordan","v":105.2,"y":2022},{"n":"Barbados","v":87.5,"y":2022},{"n":"Korea, Rep.","v":85.2,"y":2022},{"n":"Iran, Islamic Rep.","v":81.3,"y":2022},{"n":"Eswatini","v":77.6,"y":2022},{"n":"India","v":66.5,"y":2022},{"n":"Armenia","v":62.0,"y":2022},{"n":"Cabo Verde","v":59.7,"y":2022},{"n":"Iraq","v":59.6,"y":2022},{"n":"Azerbaijan","v":57.5,"y":2022},{"n":"Afghanistan","v":54.8,"y":2022},{"n":"Belgium","v":52.8,"y":2022},{"n":"China","v":41.5,"y":2022},{"n":"Bulgaria","v":40.2,"y":2022},{"n":"Dominican Republic","v":39.6,"y":2022},{"n":"Japan","v":36.6,"y":2022}];
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 540,
+      marginLeft: 150,
+      marginRight: 70,
+      marginTop: 30,
+      marginBottom: 36,
+      x: { label: "Withdrawal as % of available freshwater", grid: true, domain: [0, 160] },
+      y: { label: null },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.ruleX([100], { stroke: "#dc2626", strokeDasharray: "4 3", strokeWidth: 1 }),
+        Plot.text([{x: 100, label: "100% (renewable limit)"}], { x: "x", y: () => 19, text: "label", textAnchor: "start", dx: 6, fontSize: 11, fill: "#dc2626", fontWeight: 600 }),
+        Plot.ruleX([25], { stroke: "#f59e0b", strokeDasharray: "3 3", strokeWidth: 1, opacity: 0.6 }),
+        Plot.barX(data, {
+          x: "v",
+          y: "n",
+          fill: d => d.v >= 100 ? "#dc2626" : d.v >= 50 ? "#ea580c" : "#f59e0b",
+          sort: { y: "x", reverse: true }
+        }),
+        Plot.text(data, {
+          x: "v",
+          y: "n",
+          text: d => `${d.v}%`,
+          textAnchor: "start",
+          dx: 6,
+          fontSize: 11,
+          fill: "#0f172a",
+          fontWeight: 600
+        })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

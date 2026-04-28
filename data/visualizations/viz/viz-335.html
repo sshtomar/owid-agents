@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Global Weight Gain 1990-2022</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 920px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>The Global Weight Gain</h1>
+  <p class="subtitle">Adult overweight prevalence (BMI &ge; 25), 1990 vs 2022. Once a problem of rich countries, overweight has surged across emerging economies. China, India, and Indonesia each gained more than 23 percentage points in three decades.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank / WHO Global Health Observatory - SH.STA.OWAD.ZS</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+    const data = [{"n":"Chile","v0":45.7,"y0":1990,"v1":78.8,"y1":2022,"d":33.1},{"n":"Egypt, Arab Rep.","v0":52.2,"y0":1990,"v1":73.3,"y1":2022,"d":21.1},{"n":"Argentina","v0":43.4,"y0":1990,"v1":68.4,"y1":2022,"d":25.0},{"n":"Australia","v0":45.9,"y0":1990,"v1":64.0,"y1":2022,"d":18.0},{"n":"Brazil","v0":35.3,"y0":1990,"v1":63,"y1":2022,"d":27.7},{"n":"Iran, Islamic Rep.","v0":39.2,"y0":1990,"v1":60.4,"y1":2022,"d":21.2},{"n":"Germany","v0":47.5,"y0":1990,"v1":53.8,"y1":2022,"d":6.4},{"n":"Italy","v0":46.0,"y0":1990,"v1":49.1,"y1":2022,"d":3.2},{"n":"Indonesia","v0":10.2,"y0":1990,"v1":38.1,"y1":2022,"d":27.9},{"n":"China","v0":13.3,"y0":1990,"v1":37.5,"y1":2022,"d":24.1},{"n":"Korea, Rep.","v0":22.4,"y0":1990,"v1":35.9,"y1":2022,"d":13.5},{"n":"France","v0":40.9,"y0":1990,"v1":34.3,"y1":2022,"d":-6.6},{"n":"India","v0":6.2,"y0":1990,"v1":29.5,"y1":2022,"d":23.3},{"n":"Japan","v0":18.9,"y0":1990,"v1":24.0,"y1":2022,"d":5.1},{"n":"Ethiopia","v0":3.6,"y0":1990,"v1":10.9,"y1":2022,"d":7.2}];
+
+    const long = data.flatMap(d => [
+      { n: d.n, year: d.y0, value: d.v0, delta: d.d },
+      { n: d.n, year: d.y1, value: d.v1, delta: d.d }
+    ]);
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 600,
+      marginLeft: 110,
+      marginRight: 100,
+      marginTop: 32,
+      marginBottom: 36,
+      x: { domain: [1986, 2026], ticks: [1990, 2022], label: null },
+      y: { label: "Adult overweight prevalence (%)", grid: true, domain: [0, 85] },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.line(long, {
+          x: "year",
+          y: "value",
+          z: "n",
+          stroke: d => d.delta < 0 ? "#94a3b8" : d.delta >= 25 ? "#dc2626" : d.delta >= 15 ? "#ea580c" : "#0891b2",
+          strokeWidth: 1.6,
+          opacity: 0.85
+        }),
+        Plot.dot(long, {
+          x: "year",
+          y: "value",
+          fill: d => d.delta < 0 ? "#94a3b8" : d.delta >= 25 ? "#dc2626" : d.delta >= 15 ? "#ea580c" : "#0891b2",
+          r: 3.5
+        }),
+        Plot.text(long.filter(d => d.year === 1990), {
+          x: "year",
+          y: "value",
+          text: "n",
+          dx: -8,
+          textAnchor: "end",
+          fontSize: 11,
+          fill: "#334155"
+        }),
+        Plot.text(long.filter(d => d.year === 2022), {
+          x: "year",
+          y: "value",
+          text: d => `${d.value}%`,
+          dx: 8,
+          textAnchor: "start",
+          fontSize: 11,
+          fontWeight: 600,
+          fill: d => d.delta < 0 ? "#475569" : d.delta >= 25 ? "#991b1b" : d.delta >= 15 ? "#9a3412" : "#075985"
+        })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>
