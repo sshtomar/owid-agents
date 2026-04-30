@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>A Generation of Forest Loss</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 940px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>A Generation of Forest Loss</h1>
+  <p class="subtitle">Forest area as a share of total land, 1990 vs 2023. Cambodia, Indonesia, and Côte d'Ivoire each lost more than a sixth of their land to deforestation in 33 years. Bhutan, Cuba, Fiji, and China expanded their forests over the same period.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Forest area, % of land area (AG.LND.FRST.ZS)</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    // Data exported from viz-338.py - do not modify
+    const data = [{"n":"Cambodia","v0":62.3,"y0":1990,"v1":43.1,"y1":2023,"d":-19.3},{"n":"Gambia, The","v0":41.0,"y0":1990,"v1":22.3,"y1":2023,"d":-18.7},{"n":"Indonesia","v0":65.4,"y0":1990,"v1":47.7,"y1":2023,"d":-17.7},{"n":"Cote d'Ivoire","v0":24.7,"y0":1990,"v1":7.9,"y1":2023,"d":-16.8},{"n":"Benin","v0":42.9,"y0":1990,"v1":26.5,"y1":2023,"d":-16.4},{"n":"Belize","v0":70.1,"y0":1990,"v1":54.5,"y1":2023,"d":-15.6},{"n":"Congo, Dem. Rep.","v0":66.4,"y0":1990,"v1":54.2,"y1":2023,"d":-12.3},{"n":"Guatemala","v0":44.6,"y0":1990,"v1":32.6,"y1":2023,"d":-12.0},{"n":"China","v0":16.7,"y0":1990,"v1":24.0,"y1":2023,"d":7.3},{"n":"Jamaica","v0":48.1,"y0":1990,"v1":56.2,"y1":2023,"d":8.1},{"n":"Dominican Republic","v0":33.0,"y0":1990,"v1":45.0,"y1":2023,"d":12.0},{"n":"Cuba","v0":19.2,"y0":1990,"v1":31.2,"y1":2023,"d":12.1},{"n":"Fiji","v0":51.4,"y0":1990,"v1":63.5,"y1":2023,"d":12.1},{"n":"Bhutan","v0":53.7,"y0":1990,"v1":71.6,"y1":2023,"d":18.0}];
+
+    const order = data.map(d => d.n);
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 480,
+      marginLeft: 130,
+      marginRight: 80,
+      marginTop: 24,
+      marginBottom: 40,
+      x: { label: "Forest area (% of land)", domain: [0, 90], grid: true },
+      y: { domain: order, label: null },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.ruleY(data, {
+          x1: "v0",
+          x2: "v1",
+          y: "n",
+          stroke: d => d.d < 0 ? "#dc2626" : "#16a34a",
+          strokeWidth: 3,
+          opacity: 0.5
+        }),
+        Plot.dot(data, { x: "v0", y: "n", fill: "#94a3b8", r: 4.5 }),
+        Plot.dot(data, {
+          x: "v1",
+          y: "n",
+          fill: d => d.d < 0 ? "#dc2626" : "#16a34a",
+          r: 5
+        }),
+        Plot.text(data, {
+          x: d => Math.max(d.v0, d.v1),
+          y: "n",
+          text: d => `${d.d > 0 ? "+" : ""}${d.d.toFixed(1)} pp`,
+          dx: 8,
+          textAnchor: "start",
+          fontSize: 11,
+          fontWeight: 600,
+          fill: d => d.d < 0 ? "#991b1b" : "#15803d"
+        })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

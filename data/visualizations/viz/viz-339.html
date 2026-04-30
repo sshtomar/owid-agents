@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Guns versus GDP - Military Spending in 2024</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 940px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Guns versus GDP</h1>
+  <p class="subtitle">Top spenders on the military as a share of national income, 2024. Israel commits nearly 9% of GDP to defence — more than four times NATO's 2% target. The list is otherwise dominated by countries with ongoing or recent conflicts and by frontline NATO members.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Military expenditure (% of GDP) (MS.MIL.XPND.GD.ZS)</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    // Data exported from viz-339.py - do not modify
+    const data = [{"n":"Israel","v":8.78,"y":2024},{"n":"Algeria","v":7.97,"y":2024},{"n":"Armenia","v":5.48,"y":2024},{"n":"Azerbaijan","v":4.99,"y":2024},{"n":"Jordan","v":4.8,"y":2024},{"n":"Burkina Faso","v":4.68,"y":2024},{"n":"Burundi","v":3.8,"y":2024},{"n":"Brunei Darussalam","v":3.58,"y":2024},{"n":"Estonia","v":3.37,"y":2024},{"n":"Colombia","v":3.36,"y":2024},{"n":"Greece","v":3.13,"y":2024},{"n":"Chad","v":2.98,"y":2024},{"n":"Bahrain","v":2.89,"y":2024},{"n":"Botswana","v":2.83,"y":2024},{"n":"Korea, Rep.","v":2.56,"y":2024},{"n":"Central African Republic","v":2.52,"y":2024},{"n":"Denmark","v":2.42,"y":2024},{"n":"Iraq","v":2.36,"y":2024}];
+
+    const order = data.map(d => d.n);
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 540,
+      marginLeft: 170,
+      marginRight: 80,
+      marginTop: 24,
+      marginBottom: 40,
+      x: { label: "Military expenditure (% of GDP, 2024)", domain: [0, 10], grid: true },
+      y: { domain: order, label: null },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.ruleX([2.0], { stroke: "#0f172a", strokeDasharray: "3,3", strokeOpacity: 0.45 }),
+        Plot.barX(data, {
+          y: "n",
+          x: "v",
+          fill: d => d.v >= 5 ? "#991b1b" : d.v >= 3 ? "#dc2626" : "#f97316"
+        }),
+        Plot.text(data, {
+          x: "v",
+          y: "n",
+          text: d => `${d.v.toFixed(2)}%`,
+          dx: 6,
+          textAnchor: "start",
+          fontSize: 11,
+          fontWeight: 600,
+          fill: "#0f172a"
+        }),
+        Plot.text([{x: 2.0, label: "NATO 2% target"}], {
+          x: "x",
+          y: () => order[order.length - 1],
+          text: "label",
+          dy: 18,
+          fontSize: 10,
+          fill: "#475569"
+        })
+      ]
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>
