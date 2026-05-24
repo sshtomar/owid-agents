@@ -1,4 +1,4 @@
-# viz-336: The World's Happiest Countries in 2025
+# viz-336: The Happiness Shift - life satisfaction 2011 vs 2025
 # Dataset: owid--1210090 (Cantril Ladder, 0-10) from Gallup World Poll / WHR
 
 import json
@@ -8,43 +8,40 @@ dataset_path = Path(__file__).resolve().parents[2] / "catalog" / "datasets" / "o
 raw = json.loads(dataset_path.read_text())
 data = [r for r in raw["data"] if r["value"] is not None]
 
-# Latest year only
-latest_year = max(r["year"] for r in data)
-latest = [r for r in data if r["year"] == latest_year]
-latest.sort(key=lambda r: -r["value"])
-
-# Pull rank-anchored slices: top 15, plus a middle and bottom selection so
-# the chart spans the full distribution without 160 bars.
-top = latest[:15]
-
-# Middle: ranks 30, 50, 75, 100
-n = len(latest)
-mid_ranks = [29, 49, 74, 99]
-middle = [latest[i] for i in mid_ranks if i < n]
-
-# Bottom 10
-bottom = latest[-10:]
-
-# Earliest year for each selected country - to show change since 2011
 by_country = {}
 for r in data:
     by_country.setdefault(r["countryName"], []).append(r)
 
-selected = top + middle + bottom
-chart_data = []
-for rank, r in enumerate(selected, start=1):
-    name = r["countryName"]
-    rows = sorted(by_country[name], key=lambda x: x["year"])
-    earliest = rows[0]
-    chart_data.append({
-        "n": name,
-        "v": round(r["value"], 2),
-        "y": r["year"],
-        "v0": round(earliest["value"], 2),
-        "y0": earliest["year"],
-        "rank": latest.index(r) + 1,
-        "group": "top" if r in top else ("mid" if r in middle else "bottom"),
+# Regionally diverse, recognizable mix of major countries -- same selection
+# pattern as viz-335 (overweight) so the visual frame is consistent.
+selected = [
+    "Finland", "Denmark", "Sweden", "Norway", "Iceland",
+    "United States", "Canada", "Mexico", "Brazil", "Argentina",
+    "United Kingdom", "Germany", "France", "Italy", "Spain",
+    "Israel", "Saudi Arabia", "Iran", "Turkey", "Egypt",
+    "China", "India", "Japan", "South Korea", "Indonesia",
+    "Australia", "South Africa", "Nigeria", "Lebanon", "Afghanistan",
+]
+
+points = []
+for n in selected:
+    rows = sorted(by_country.get(n, []), key=lambda r: r["year"])
+    if not rows:
+        continue
+    early = next((r for r in rows if r["year"] == 2011), None) or rows[0]
+    late = next((r for r in rows if r["year"] == 2025), None) or rows[-1]
+    if late["year"] == early["year"]:
+        continue
+    points.append({
+        "n": n,
+        "v0": round(early["value"], 2),
+        "y0": early["year"],
+        "v1": round(late["value"], 2),
+        "y1": late["year"],
+        "d": round(late["value"] - early["value"], 2),
     })
+
+chart_data = sorted(points, key=lambda r: -r["v1"])
 
 if __name__ == "__main__":
     print(json.dumps(chart_data, separators=(",", ":")))
