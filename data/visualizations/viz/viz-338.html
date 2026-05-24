@@ -38,8 +38,12 @@
         Plot.ruleY([0.5], { stroke: "#cbd5e1", strokeDasharray: "3,3" }),
         Plot.line(data, {
           x: "y", y: "v", stroke: "n",
-          strokeWidth: 1.6, strokeOpacity: 0.85
+          strokeWidth: 1.6, strokeOpacity: 0.85,
+          tip: true,
         }),
+        Plot.dot(data, Plot.pointerX({
+          x: "y", y: "v", fill: "n", r: 3.5,
+        })),
         Plot.text(
           (() => {
             const last = {};

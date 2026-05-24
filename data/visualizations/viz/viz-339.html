@@ -41,6 +41,8 @@
           fillOpacity: 0.55,
           stroke: "white",
           strokeWidth: 0.8,
+          tip: true,
+          channels: { Country: "n", Democracy: "d", Corruption: "c" },
         }),
         Plot.text(data.filter(d => d.label), {
           x: "c", y: "d",

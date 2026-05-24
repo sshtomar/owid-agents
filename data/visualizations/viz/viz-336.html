@@ -40,7 +40,11 @@
           x: "y", y: "v", stroke: "n",
           strokeWidth: 1.5,
           strokeOpacity: 0.85,
+          tip: true,
         }),
+        Plot.dot(data, Plot.pointerX({
+          x: "y", y: "v", fill: "n", r: 3.5,
+        })),
         Plot.text(
           (() => {
             const last = {};

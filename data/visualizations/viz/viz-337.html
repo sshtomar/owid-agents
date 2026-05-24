@@ -35,7 +35,11 @@
       style: { fontSize: "12px" },
       color: { domain: ["danger", "ref"], range: ["#e15759", "#a0cbe8"] },
       marks: [
-        Plot.barX(data, { x: "v", y: "n", fill: "g", fillOpacity: 0.85 }),
+        Plot.barX(data, {
+          x: "v", y: "n", fill: "g", fillOpacity: 0.85,
+          tip: true,
+          channels: { Country: "n", "Deaths per 100k": "v" },
+        }),
         Plot.text(data, {
           x: "v", y: "n",
           text: d => d.v.toFixed(1),
