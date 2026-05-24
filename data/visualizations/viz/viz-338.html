@@ -2,79 +2,55 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Democratic Backsliding 2000-2025</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       margin: 0; padding: 24px; background: #fff; color: #0f172a;
-      max-width: 920px;
     }
-    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
-    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; line-height: 1.5; }
     #chart { width: 100%; }
-    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
-    .legend { display: flex; gap: 18px; font-size: 12px; color: #475569; margin-bottom: 10px; }
-    .legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .legend i { width: 14px; height: 3px; display: inline-block; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>Democratic Backsliding, 2000-2025</h1>
-  <p class="subtitle">V-Dem Electoral Democracy Index (0-1) for nine countries. Hungary fell from 0.81 to 0.42 under Orban; Turkey from 0.65 to 0.29 under Erdogan; India from 0.74 to 0.38; Hong Kong collapsed from 0.37 to 0.15 after the 2020 security law. Sri Lanka is a rare counter-trend, rising to 0.78. Sweden remains the stable anchor.</p>
-  <div class="legend">
-    <span><i style="background:#b91c1c"></i> Backsliding democracies</span>
-    <span><i style="background:#0891b2"></i> Stable / reference</span>
-    <span><i style="background:#15803d"></i> Democratic gains</span>
-  </div>
+  <p class="subtitle">V-Dem Electoral Democracy Index (0-1) for nine countries. Hungary fell from 0.81 to 0.42 under Orban; Turkey from 0.65 to 0.29 under Erdogan; India from 0.74 to 0.38; Hong Kong collapsed to 0.15 after the 2020 security law. Sri Lanka is a rare counter-trend; Sweden remains the global benchmark.</p>
   <div id="chart"></div>
-  <p class="source">Source: Our World in Data / V-Dem Electoral Democracy Index (1968-2025).</p>
+  <p class="source">Source: Our World in Data / V-Dem Electoral Democracy Index (1209753)</p>
   <script type="module">
     import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 
     const data = [{"n":"El Salvador","y":2000,"v":0.522,"g":"decline"},{"n":"El Salvador","y":2001,"v":0.534,"g":"decline"},{"n":"El Salvador","y":2002,"v":0.543,"g":"decline"},{"n":"El Salvador","y":2003,"v":0.537,"g":"decline"},{"n":"El Salvador","y":2004,"v":0.539,"g":"decline"},{"n":"El Salvador","y":2005,"v":0.542,"g":"decline"},{"n":"El Salvador","y":2006,"v":0.557,"g":"decline"},{"n":"El Salvador","y":2007,"v":0.56,"g":"decline"},{"n":"El Salvador","y":2008,"v":0.561,"g":"decline"},{"n":"El Salvador","y":2009,"v":0.594,"g":"decline"},{"n":"El Salvador","y":2010,"v":0.613,"g":"decline"},{"n":"El Salvador","y":2011,"v":0.613,"g":"decline"},{"n":"El Salvador","y":2012,"v":0.615,"g":"decline"},{"n":"El Salvador","y":2013,"v":0.626,"g":"decline"},{"n":"El Salvador","y":2014,"v":0.665,"g":"decline"},{"n":"El Salvador","y":2015,"v":0.658,"g":"decline"},{"n":"El Salvador","y":2016,"v":0.659,"g":"decline"},{"n":"El Salvador","y":2017,"v":0.672,"g":"decline"},{"n":"El Salvador","y":2018,"v":0.631,"g":"decline"},{"n":"El Salvador","y":2019,"v":0.599,"g":"decline"},{"n":"El Salvador","y":2020,"v":0.518,"g":"decline"},{"n":"El Salvador","y":2021,"v":0.403,"g":"decline"},{"n":"El Salvador","y":2022,"v":0.378,"g":"decline"},{"n":"El Salvador","y":2023,"v":0.377,"g":"decline"},{"n":"El Salvador","y":2024,"v":0.335,"g":"decline"},{"n":"El Salvador","y":2025,"v":0.321,"g":"decline"},{"n":"Hong Kong","y":2000,"v":0.371,"g":"decline"},{"n":"Hong Kong","y":2001,"v":0.372,"g":"decline"},{"n":"Hong Kong","y":2002,"v":0.372,"g":"decline"},{"n":"Hong Kong","y":2003,"v":0.372,"g":"decline"},{"n":"Hong Kong","y":2004,"v":0.371,"g":"decline"},{"n":"Hong Kong","y":2005,"v":0.369,"g":"decline"},{"n":"Hong Kong","y":2006,"v":0.369,"g":"decline"},{"n":"Hong Kong","y":2007,"v":0.369,"g":"decline"},{"n":"Hong Kong","y":2008,"v":0.369,"g":"decline"},{"n":"Hong Kong","y":2009,"v":0.371,"g":"decline"},{"n":"Hong Kong","y":2010,"v":0.369,"g":"decline"},{"n":"Hong Kong","y":2011,"v":0.367,"g":"decline"},{"n":"Hong Kong","y":2012,"v":0.362,"g":"decline"},{"n":"Hong Kong","y":2013,"v":0.358,"g":"decline"},{"n":"Hong Kong","y":2014,"v":0.354,"g":"decline"},{"n":"Hong Kong","y":2015,"v":0.345,"g":"decline"},{"n":"Hong Kong","y":2016,"v":0.333,"g":"decline"},{"n":"Hong Kong","y":2017,"v":0.325,"g":"decline"},{"n":"Hong Kong","y":2018,"v":0.318,"g":"decline"},{"n":"Hong Kong","y":2019,"v":0.3,"g":"decline"},{"n":"Hong Kong","y":2020,"v":0.255,"g":"decline"},{"n":"Hong Kong","y":2021,"v":0.205,"g":"decline"},{"n":"Hong Kong","y":2022,"v":0.16,"g":"decline"},{"n":"Hong Kong","y":2023,"v":0.149,"g":"decline"},{"n":"Hong Kong","y":2024,"v":0.158,"g":"decline"},{"n":"Hong Kong","y":2025,"v":0.151,"g":"decline"},{"n":"Hungary","y":2000,"v":0.839,"g":"decline"},{"n":"Hungary","y":2001,"v":0.839,"g":"decline"},{"n":"Hungary","y":2002,"v":0.842,"g":"decline"},{"n":"Hungary","y":2003,"v":0.843,"g":"decline"},{"n":"Hungary","y":2004,"v":0.843,"g":"decline"},{"n":"Hungary","y":2005,"v":0.843,"g":"decline"},{"n":"Hungary","y":2006,"v":0.831,"g":"decline"},{"n":"Hungary","y":2007,"v":0.85,"g":"decline"},{"n":"Hungary","y":2008,"v":0.85,"g":"decline"},{"n":"Hungary","y":2009,"v":0.85,"g":"decline"},{"n":"Hungary","y":2010,"v":0.808,"g":"decline"},{"n":"Hungary","y":2011,"v":0.778,"g":"decline"},{"n":"Hungary","y":2012,"v":0.773,"g":"decline"},{"n":"Hungary","y":2013,"v":0.738,"g":"decline"},{"n":"Hungary","y":2014,"v":0.669,"g":"decline"},{"n":"Hungary","y":2015,"v":0.617,"g":"decline"},{"n":"Hungary","y":2016,"v":0.613,"g":"decline"},{"n":"Hungary","y":2017,"v":0.555,"g":"decline"},{"n":"Hungary","y":2018,"v":0.481,"g":"decline"},{"n":"Hungary","y":2019,"v":0.466,"g":"decline"},{"n":"Hungary","y":2020,"v":0.46,"g":"decline"},{"n":"Hungary","y":2021,"v":0.45,"g":"decline"},{"n":"Hungary","y":2022,"v":0.447,"g":"decline"},{"n":"Hungary","y":2023,"v":0.434,"g":"decline"},{"n":"Hungary","y":2024,"v":0.444,"g":"decline"},{"n":"Hungary","y":2025,"v":0.421,"g":"decline"},{"n":"India","y":2000,"v":0.735,"g":"decline"},{"n":"India","y":2001,"v":0.735,"g":"decline"},{"n":"India","y":2002,"v":0.739,"g":"decline"},{"n":"India","y":2003,"v":0.736,"g":"decline"},{"n":"India","y":2004,"v":0.731,"g":"decline"},{"n":"India","y":2005,"v":0.723,"g":"decline"},{"n":"India","y":2006,"v":0.721,"g":"decline"},{"n":"India","y":2007,"v":0.721,"g":"decline"},{"n":"India","y":2008,"v":0.721,"g":"decline"},{"n":"India","y":2009,"v":0.683,"g":"decline"},{"n":"India","y":2010,"v":0.671,"g":"decline"},{"n":"India","y":2011,"v":0.671,"g":"decline"},{"n":"India","y":2012,"v":0.659,"g":"decline"},{"n":"India","y":2013,"v":0.65,"g":"decline"},{"n":"India","y":2014,"v":0.617,"g":"decline"},{"n":"India","y":2015,"v":0.543,"g":"decline"},{"n":"India","y":2016,"v":0.524,"g":"decline"},{"n":"India","y":2017,"v":0.488,"g":"decline"},{"n":"India","y":2018,"v":0.482,"g":"decline"},{"n":"India","y":2019,"v":0.43,"g":"decline"},{"n":"India","y":2020,"v":0.39,"g":"decline"},{"n":"India","y":2021,"v":0.398,"g":"decline"},{"n":"India","y":2022,"v":0.384,"g":"decline"},{"n":"India","y":2023,"v":0.374,"g":"decline"},{"n":"India","y":2024,"v":0.381,"g":"decline"},{"n":"India","y":2025,"v":0.377,"g":"decline"},{"n":"Sri Lanka","y":2000,"v":0.494,"g":"rise"},{"n":"Sri Lanka","y":2001,"v":0.496,"g":"rise"},{"n":"Sri Lanka","y":2002,"v":0.529,"g":"rise"},{"n":"Sri Lanka","y":2003,"v":0.529,"g":"rise"},{"n":"Sri Lanka","y":2004,"v":0.513,"g":"rise"},{"n":"Sri Lanka","y":2005,"v":0.435,"g":"rise"},{"n":"Sri Lanka","y":2006,"v":0.373,"g":"rise"},{"n":"Sri Lanka","y":2007,"v":0.373,"g":"rise"},{"n":"Sri Lanka","y":2008,"v":0.368,"g":"rise"},{"n":"Sri Lanka","y":2009,"v":0.366,"g":"rise"},{"n":"Sri Lanka","y":2010,"v":0.386,"g":"rise"},{"n":"Sri Lanka","y":2011,"v":0.384,"g":"rise"},{"n":"Sri Lanka","y":2012,"v":0.39,"g":"rise"},{"n":"Sri Lanka","y":2013,"v":0.418,"g":"rise"},{"n":"Sri Lanka","y":2014,"v":0.417,"g":"rise"},{"n":"Sri Lanka","y":2015,"v":0.55,"g":"rise"},{"n":"Sri Lanka","y":2016,"v":0.595,"g":"rise"},{"n":"Sri Lanka","y":2017,"v":0.591,"g":"rise"},{"n":"Sri Lanka","y":2018,"v":0.612,"g":"rise"},{"n":"Sri Lanka","y":2019,"v":0.564,"g":"rise"},{"n":"Sri Lanka","y":2020,"v":0.579,"g":"rise"},{"n":"Sri Lanka","y":2021,"v":0.572,"g":"rise"},{"n":"Sri Lanka","y":2022,"v":0.602,"g":"rise"},{"n":"Sri Lanka","y":2023,"v":0.585,"g":"rise"},{"n":"Sri Lanka","y":2024,"v":0.677,"g":"rise"},{"n":"Sri Lanka","y":2025,"v":0.783,"g":"rise"},{"n":"Sweden","y":2000,"v":0.909,"g":"stable"},{"n":"Sweden","y":2001,"v":0.909,"g":"stable"},{"n":"Sweden","y":2002,"v":0.91,"g":"stable"},{"n":"Sweden","y":2003,"v":0.911,"g":"stable"},{"n":"Sweden","y":2004,"v":0.911,"g":"stable"},{"n":"Sweden","y":2005,"v":0.911,"g":"stable"},{"n":"Sweden","y":2006,"v":0.912,"g":"stable"},{"n":"Sweden","y":2007,"v":0.914,"g":"stable"},{"n":"Sweden","y":2008,"v":0.914,"g":"stable"},{"n":"Sweden","y":2009,"v":0.914,"g":"stable"},{"n":"Sweden","y":2010,"v":0.914,"g":"stable"},{"n":"Sweden","y":2011,"v":0.914,"g":"stable"},{"n":"Sweden","y":2012,"v":0.917,"g":"stable"},{"n":"Sweden","y":2013,"v":0.916,"g":"stable"},{"n":"Sweden","y":2014,"v":0.915,"g":"stable"},{"n":"Sweden","y":2015,"v":0.915,"g":"stable"},{"n":"Sweden","y":2016,"v":0.914,"g":"stable"},{"n":"Sweden","y":2017,"v":0.914,"g":"stable"},{"n":"Sweden","y":2018,"v":0.908,"g":"stable"},{"n":"Sweden","y":2019,"v":0.899,"g":"stable"},{"n":"Sweden","y":2020,"v":0.901,"g":"stable"},{"n":"Sweden","y":2021,"v":0.9,"g":"stable"},{"n":"Sweden","y":2022,"v":0.892,"g":"stable"},{"n":"Sweden","y":2023,"v":0.883,"g":"stable"},{"n":"Sweden","y":2024,"v":0.881,"g":"stable"},{"n":"Sweden","y":2025,"v":0.889,"g":"stable"},{"n":"Turkey","y":2000,"v":0.586,"g":"decline"},{"n":"Turkey","y":2001,"v":0.591,"g":"decline"},{"n":"Turkey","y":2002,"v":0.636,"g":"decline"},{"n":"Turkey","y":2003,"v":0.651,"g":"decline"},{"n":"Turkey","y":2004,"v":0.657,"g":"decline"},{"n":"Turkey","y":2005,"v":0.643,"g":"decline"},{"n":"Turkey","y":2006,"v":0.643,"g":"decline"},{"n":"Turkey","y":2007,"v":0.616,"g":"decline"},{"n":"Turkey","y":2008,"v":0.554,"g":"decline"},{"n":"Turkey","y":2009,"v":0.545,"g":"decline"},{"n":"Turkey","y":2010,"v":0.525,"g":"decline"},{"n":"Turkey","y":2011,"v":0.522,"g":"decline"},{"n":"Turkey","y":2012,"v":0.508,"g":"decline"},{"n":"Turkey","y":2013,"v":0.469,"g":"decline"},{"n":"Turkey","y":2014,"v":0.426,"g":"decline"},{"n":"Turkey","y":2015,"v":0.388,"g":"decline"},{"n":"Turkey","y":2016,"v":0.308,"g":"decline"},{"n":"Turkey","y":2017,"v":0.29,"g":"decline"},{"n":"Turkey","y":2018,"v":0.295,"g":"decline"},{"n":"Turkey","y":2019,"v":0.289,"g":"decline"},{"n":"Turkey","y":2020,"v":0.292,"g":"decline"},{"n":"Turkey","y":2021,"v":0.287,"g":"decline"},{"n":"Turkey","y":2022,"v":0.285,"g":"decline"},{"n":"Turkey","y":2023,"v":0.285,"g":"decline"},{"n":"Turkey","y":2024,"v":0.289,"g":"decline"},{"n":"Turkey","y":2025,"v":0.293,"g":"decline"},{"n":"United States","y":2000,"v":0.867,"g":"stable"},{"n":"United States","y":2001,"v":0.828,"g":"stable"},{"n":"United States","y":2002,"v":0.829,"g":"stable"},{"n":"United States","y":2003,"v":0.86,"g":"stable"},{"n":"United States","y":2004,"v":0.862,"g":"stable"},{"n":"United States","y":2005,"v":0.856,"g":"stable"},{"n":"United States","y":2006,"v":0.862,"g":"stable"},{"n":"United States","y":2007,"v":0.897,"g":"stable"},{"n":"United States","y":2008,"v":0.9,"g":"stable"},{"n":"United States","y":2009,"v":0.9,"g":"stable"},{"n":"United States","y":2010,"v":0.9,"g":"stable"},{"n":"United States","y":2011,"v":0.896,"g":"stable"},{"n":"United States","y":2012,"v":0.896,"g":"stable"},{"n":"United States","y":2013,"v":0.905,"g":"stable"},{"n":"United States","y":2014,"v":0.901,"g":"stable"},{"n":"United States","y":2015,"v":0.9,"g":"stable"},{"n":"United States","y":2016,"v":0.885,"g":"stable"},{"n":"United States","y":2017,"v":0.834,"g":"stable"},{"n":"United States","y":2018,"v":0.824,"g":"stable"},{"n":"United States","y":2019,"v":0.818,"g":"stable"},{"n":"United States","y":2020,"v":0.815,"g":"stable"},{"n":"United States","y":2021,"v":0.821,"g":"stable"},{"n":"United States","y":2022,"v":0.833,"g":"stable"},{"n":"United States","y":2023,"v":0.857,"g":"stable"},{"n":"United States","y":2024,"v":0.843,"g":"stable"},{"n":"United States","y":2025,"v":0.735,"g":"stable"},{"n":"Venezuela","y":2000,"v":0.573,"g":"decline"},{"n":"Venezuela","y":2001,"v":0.529,"g":"decline"},{"n":"Venezuela","y":2002,"v":0.495,"g":"decline"},{"n":"Venezuela","y":2003,"v":0.487,"g":"decline"},{"n":"Venezuela","y":2004,"v":0.475,"g":"decline"},{"n":"Venezuela","y":2005,"v":0.474,"g":"decline"},{"n":"Venezuela","y":2006,"v":0.45,"g":"decline"},{"n":"Venezuela","y":2007,"v":0.434,"g":"decline"},{"n":"Venezuela","y":2008,"v":0.432,"g":"decline"},{"n":"Venezuela","y":2009,"v":0.431,"g":"decline"},{"n":"Venezuela","y":2010,"v":0.419,"g":"decline"},{"n":"Venezuela","y":2011,"v":0.415,"g":"decline"},{"n":"Venezuela","y":2012,"v":0.399,"g":"decline"},{"n":"Venezuela","y":2013,"v":0.327,"g":"decline"},{"n":"Venezuela","y":2014,"v":0.312,"g":"decline"},{"n":"Venezuela","y":2015,"v":0.3,"g":"decline"},{"n":"Venezuela","y":2016,"v":0.293,"g":"decline"},{"n":"Venezuela","y":2017,"v":0.233,"g":"decline"},{"n":"Venezuela","y":2018,"v":0.213,"g":"decline"},{"n":"Venezuela","y":2019,"v":0.209,"g":"decline"},{"n":"Venezuela","y":2020,"v":0.206,"g":"decline"},{"n":"Venezuela","y":2021,"v":0.215,"g":"decline"},{"n":"Venezuela","y":2022,"v":0.209,"g":"decline"},{"n":"Venezuela","y":2023,"v":0.206,"g":"decline"},{"n":"Venezuela","y":2024,"v":0.196,"g":"decline"},{"n":"Venezuela","y":2025,"v":0.181,"g":"decline"}];
 
-    const colorFor = g => g === "decline" ? "#b91c1c" : g === "rise" ? "#15803d" : "#0891b2";
-
-    // Label positions: pick the last value for each country
-    const last = Object.values(
-      data.reduce((acc, d) => {
-        if (!acc[d.n] || acc[d.n].y < d.y) acc[d.n] = d;
-        return acc;
-      }, {})
-    );
-
     const chart = Plot.plot({
-      width: 880,
-      height: 560,
-      marginLeft: 50,
-      marginRight: 140,
-      marginTop: 24,
-      marginBottom: 40,
-      x: { domain: [2000, 2025], label: null, tickFormat: "d" },
-      y: { domain: [0, 1], grid: true, label: "Electoral Democracy Index (0-1)" },
-      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      width: Math.min(960, (typeof window !== "undefined" ? window.innerWidth - 48 : 912)),
+      height: 480,
+      marginRight: 130,
+      y: { label: "Electoral democracy index (0 = autocracy, 1 = democracy)", grid: true, domain: [0, 1] },
+      x: { label: "Year", tickFormat: "d" },
+      style: { fontSize: "12px" },
+      color: {
+        domain: ["Sweden","United States","Sri Lanka","Hungary","India","El Salvador","Turkey","Venezuela","Hong Kong"],
+        range: ["#4e79a7","#76b7b2","#59a14f","#e15759","#f28e2b","#b07aa1","#9c755f","#edc948","#bab0ac"]
+      },
       marks: [
         Plot.ruleY([0.5], { stroke: "#cbd5e1", strokeDasharray: "3,3" }),
         Plot.line(data, {
-          x: "y",
-          y: "v",
-          z: "n",
-          stroke: d => colorFor(d.g),
-          strokeWidth: d => d.g === "stable" ? 1.6 : 2.1,
-          opacity: 0.92,
+          x: "y", y: "v", stroke: "n",
+          strokeWidth: 1.6, strokeOpacity: 0.85
         }),
-        Plot.text(last, {
-          x: "y",
-          y: "v",
-          text: d => `${d.n} ${d.v.toFixed(2)}`,
-          dx: 8,
-          textAnchor: "start",
-          fontSize: 11,
-          fontWeight: 600,
-          fill: d => colorFor(d.g),
-        }),
-      ],
+        Plot.text(
+          (() => {
+            const last = {};
+            data.forEach(d => { if (!last[d.n] || d.y > last[d.n].y) last[d.n] = d; });
+            return Object.values(last);
+          })(),
+          { x: "y", y: "v", text: d => `${d.n} ${d.v.toFixed(2)}`, dx: 6, textAnchor: "start", fontSize: 10, fill: "n" }
+        ),
+      ]
     });
+
     document.getElementById("chart").appendChild(chart);
   </script>
 </body>

@@ -2,31 +2,22 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>The World's Most Dangerous Roads</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       margin: 0; padding: 24px; background: #fff; color: #0f172a;
-      max-width: 920px;
     }
-    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
-    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; line-height: 1.5; }
     #chart { width: 100%; }
-    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
-    .legend { display: flex; gap: 18px; font-size: 12px; color: #475569; margin-bottom: 10px; }
-    .legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
   </style>
 </head>
 <body>
-  <h1>The World's Most Dangerous Roads, 2021</h1>
-  <p class="subtitle">Estimated road traffic deaths per 100,000 population. A driver in Guinea faces a death rate 25x that of a driver in Norway. The deadliest roads cluster in low-income West Africa and conflict zones; Thailand is a striking outlier among middle-income economies.</p>
-  <div class="legend">
-    <span><i style="background:#b91c1c"></i> Top 25 deadliest</span>
-    <span><i style="background:#0891b2"></i> Selected major economies (for reference)</span>
-  </div>
+  <h1>The World's Most Dangerous Roads</h1>
+  <p class="subtitle">Estimated road traffic deaths per 100,000 population in 2021. Top 25 deadliest countries, with nine major economies plotted in light blue for reference. A driver in Guinea faces a death rate 25x that of a driver in Norway.</p>
   <div id="chart"></div>
-  <p class="source">Source: WHO Global Health Observatory (RS_198), Global Status Report on Road Safety 2023.</p>
+  <p class="source">Source: WHO Global Status Report on Road Safety (RS_198)</p>
   <script type="module">
     import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 
@@ -35,31 +26,25 @@
     const order = data.map(d => d.n);
 
     const chart = Plot.plot({
-      width: 880,
+      width: Math.min(960, (typeof window !== "undefined" ? window.innerWidth - 48 : 912)),
       height: 720,
-      marginLeft: 200,
-      marginRight: 80,
-      marginTop: 32,
-      marginBottom: 36,
-      x: { domain: [0, 40], grid: true, label: "Road traffic deaths per 100,000 population" },
+      marginLeft: 180,
+      marginRight: 60,
+      x: { label: "Road traffic deaths (per 100,000 population)", grid: true, domain: [0, 40] },
       y: { domain: order, label: null },
-      color: { domain: ["danger", "ref"], range: ["#b91c1c", "#0891b2"] },
-      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      style: { fontSize: "12px" },
+      color: { domain: ["danger", "ref"], range: ["#e15759", "#a0cbe8"] },
       marks: [
         Plot.barX(data, { x: "v", y: "n", fill: "g", fillOpacity: 0.85 }),
         Plot.text(data, {
-          x: "v",
-          y: "n",
+          x: "v", y: "n",
           text: d => d.v.toFixed(1),
-          dx: 6,
-          textAnchor: "start",
-          fontSize: 11,
-          fontWeight: 600,
-          fill: "#0f172a",
+          dx: 6, textAnchor: "start", fontSize: 10, fill: "#334155"
         }),
         Plot.ruleX([0]),
       ],
     });
+
     document.getElementById("chart").appendChild(chart);
   </script>
 </body>

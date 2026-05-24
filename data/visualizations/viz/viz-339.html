@@ -2,75 +2,58 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Democracy vs Corruption 2025</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       margin: 0; padding: 24px; background: #fff; color: #0f172a;
-      max-width: 960px;
     }
-    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
-    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; line-height: 1.5; }
     #chart { width: 100%; }
-    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>Democracy and Corruption Move Together</h1>
-  <p class="subtitle">Each dot is a country in 2025. The Nordic cluster (top-left) combines high democracy with near-zero political corruption. Venezuela, Nicaragua, and Yemen anchor the autocracy-corruption corner (bottom-right). Singapore is the famous exception: an autocratic state with Nordic-level clean governance.</p>
+  <p class="subtitle">All 174 countries plotted by V-Dem Electoral Democracy Index vs Political Corruption Index, 2025. Nordics cluster in the top-left; Venezuela, Nicaragua, and Yemen anchor the autocracy-corruption corner. Singapore is the famous exception: low democracy, near-zero corruption.</p>
   <div id="chart"></div>
-  <p class="source">Source: Our World in Data / V-Dem - Electoral Democracy Index and Political Corruption Index, 2025.</p>
+  <p class="source">Source: Our World in Data / V-Dem - Electoral Democracy (1209753) and Political Corruption (1209730), 2025</p>
   <script type="module">
     import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 
     const data = [{"n":"Denmark","d":0.913,"c":0.004,"label":"Denmark"},{"n":"Norway","d":0.89,"c":0.01,"label":"Norway"},{"n":"Belgium","d":0.889,"c":0.031,"label":""},{"n":"Sweden","d":0.889,"c":0.009,"label":"Sweden"},{"n":"Estonia","d":0.887,"c":0.025,"label":"Estonia"},{"n":"Ireland","d":0.887,"c":0.032,"label":""},{"n":"Switzerland","d":0.882,"c":0.02,"label":"Switzerland"},{"n":"Luxembourg","d":0.869,"c":0.025,"label":""},{"n":"France","d":0.865,"c":0.056,"label":"France"},{"n":"Costa Rica","d":0.862,"c":0.206,"label":""},{"n":"Uruguay","d":0.862,"c":0.055,"label":""},{"n":"Finland","d":0.852,"c":0.031,"label":"Finland"},{"n":"Czechia","d":0.849,"c":0.171,"label":""},{"n":"New Zealand","d":0.849,"c":0.014,"label":""},{"n":"Australia","d":0.844,"c":0.029,"label":"Australia"},{"n":"Canada","d":0.84,"c":0.026,"label":"Canada"},{"n":"Austria","d":0.839,"c":0.095,"label":""},{"n":"Chile","d":0.839,"c":0.075,"label":""},{"n":"Latvia","d":0.834,"c":0.07,"label":""},{"n":"Netherlands","d":0.832,"c":0.027,"label":""},{"n":"Germany","d":0.828,"c":0.024,"label":"Germany"},{"n":"Portugal","d":0.822,"c":0.166,"label":""},{"n":"Spain","d":0.822,"c":0.113,"label":""},{"n":"Japan","d":0.819,"c":0.05,"label":"Japan"},{"n":"South Korea","d":0.819,"c":0.156,"label":"South Korea"},{"n":"Iceland","d":0.807,"c":0.014,"label":""},{"n":"Jamaica","d":0.805,"c":0.207,"label":""},{"n":"Taiwan","d":0.801,"c":0.214,"label":""},{"n":"Barbados","d":0.797,"c":0.073,"label":""},{"n":"Lithuania","d":0.786,"c":0.159,"label":""},{"n":"Trinidad and Tobago","d":0.786,"c":0.1,"label":""},{"n":"Brazil","d":0.784,"c":0.423,"label":"Brazil"},{"n":"Malta","d":0.783,"c":0.186,"label":""},{"n":"Sri Lanka","d":0.783,"c":0.278,"label":"Sri Lanka"},{"n":"Suriname","d":0.781,"c":0.172,"label":""},{"n":"Cyprus","d":0.773,"c":0.166,"label":""},{"n":"United Kingdom","d":0.772,"c":0.042,"label":"United Kingdom"},{"n":"Poland","d":0.768,"c":0.081,"label":""},{"n":"Seychelles","d":0.76,"c":0.054,"label":""},{"n":"Cape Verde","d":0.745,"c":0.288,"label":""},{"n":"Italy","d":0.745,"c":0.157,"label":""},{"n":"South Africa","d":0.743,"c":0.538,"label":"South Africa"},{"n":"Greece","d":0.741,"c":0.276,"label":""},{"n":"Mauritius","d":0.738,"c":0.356,"label":""},{"n":"East Timor","d":0.736,"c":0.25,"label":""},{"n":"Dominican Republic","d":0.735,"c":0.588,"label":""},{"n":"United States","d":0.735,"c":0.06,"label":"United States"},{"n":"Slovakia","d":0.733,"c":0.29,"label":""},{"n":"Vanuatu","d":0.729,"c":0.332,"label":""},{"n":"Panama","d":0.728,"c":0.485,"label":""},{"n":"Ghana","d":0.711,"c":0.615,"label":""},{"n":"Solomon Islands","d":0.696,"c":0.602,"label":""},{"n":"Israel","d":0.694,"c":0.107,"label":"Israel"},{"n":"Slovenia","d":0.692,"c":0.078,"label":""},{"n":"Argentina","d":0.69,"c":0.415,"label":"Argentina"},{"n":"Croatia","d":0.686,"c":0.254,"label":""},{"n":"Colombia","d":0.679,"c":0.388,"label":""},{"n":"Peru","d":0.667,"c":0.63,"label":""},{"n":"Botswana","d":0.665,"c":0.204,"label":""},{"n":"Lesotho","d":0.661,"c":0.472,"label":""},{"n":"Nepal","d":0.656,"c":0.561,"label":""},{"n":"Gambia","d":0.641,"c":0.271,"label":""},{"n":"Guatemala","d":0.637,"c":0.616,"label":""},{"n":"Montenegro","d":0.636,"c":0.43,"label":""},{"n":"Namibia","d":0.633,"c":0.274,"label":""},{"n":"Senegal","d":0.633,"c":0.404,"label":""},{"n":"Sao Tome and Principe","d":0.632,"c":0.289,"label":""},{"n":"Armenia","d":0.614,"c":0.472,"label":""},{"n":"Ecuador","d":0.607,"c":0.652,"label":""},{"n":"Bolivia","d":0.605,"c":0.763,"label":""},{"n":"Romania","d":0.605,"c":0.419,"label":""},{"n":"Bulgaria","d":0.599,"c":0.643,"label":""},{"n":"Liberia","d":0.597,"c":0.877,"label":""},{"n":"Paraguay","d":0.581,"c":0.801,"label":""},{"n":"Bhutan","d":0.566,"c":0.148,"label":""},{"n":"Kenya","d":0.563,"c":0.564,"label":"Kenya"},{"n":"North Macedonia","d":0.562,"c":0.753,"label":""},{"n":"Malawi","d":0.557,"c":0.628,"label":""},{"n":"Maldives","d":0.556,"c":0.312,"label":""},{"n":"Moldova","d":0.553,"c":0.325,"label":""},{"n":"Mongolia","d":0.535,"c":0.693,"label":""},{"n":"Guyana","d":0.515,"c":0.507,"label":""},{"n":"Honduras","d":0.511,"c":0.752,"label":""},{"n":"Fiji","d":0.507,"c":0.289,"label":""},{"n":"Nigeria","d":0.505,"c":0.834,"label":"Nigeria"},{"n":"Malaysia","d":0.504,"c":0.322,"label":""},{"n":"Bosnia and Herzegovina","d":0.498,"c":0.726,"label":""},{"n":"Zambia","d":0.497,"c":0.428,"label":""},{"n":"Benin","d":0.493,"c":0.191,"label":""},{"n":"Albania","d":0.484,"c":0.624,"label":""},{"n":"Sierra Leone","d":0.471,"c":0.571,"label":""},{"n":"Mexico","d":0.469,"c":0.574,"label":"Mexico"},{"n":"Papua New Guinea","d":0.467,"c":0.684,"label":""},{"n":"Indonesia","d":0.462,"c":0.795,"label":"Indonesia"},{"n":"Singapore","d":0.434,"c":0.013,"label":"Singapore"},{"n":"Thailand","d":0.424,"c":0.635,"label":""},{"n":"Hungary","d":0.421,"c":0.488,"label":"Hungary"},{"n":"Lebanon","d":0.419,"c":0.83,"label":""},{"n":"Georgia","d":0.401,"c":0.289,"label":""},{"n":"Tunisia","d":0.395,"c":0.41,"label":""},{"n":"Cote d'Ivoire","d":0.394,"c":0.598,"label":""},{"n":"Philippines","d":0.392,"c":0.841,"label":"Philippines"},{"n":"Ukraine","d":0.386,"c":0.641,"label":""},{"n":"India","d":0.377,"c":0.684,"label":"India"},{"n":"Iraq","d":0.369,"c":0.892,"label":"Iraq"},{"n":"Tanzania","d":0.365,"c":0.329,"label":""},{"n":"Madagascar","d":0.361,"c":0.882,"label":""},{"n":"Togo","d":0.351,"c":0.757,"label":""},{"n":"Angola","d":0.344,"c":0.57,"label":""},{"n":"Mauritania","d":0.328,"c":0.825,"label":""},{"n":"El Salvador","d":0.321,"c":0.682,"label":"El Salvador"},{"n":"Kyrgyzstan","d":0.313,"c":0.793,"label":""},{"n":"Democratic Republic of Congo","d":0.306,"c":0.886,"label":""},{"n":"Gabon","d":0.302,"c":0.72,"label":""},{"n":"Pakistan","d":0.302,"c":0.802,"label":"Pakistan"},{"n":"Serbia","d":0.3,"c":0.794,"label":""},{"n":"Central African Republic","d":0.293,"c":0.854,"label":""},{"n":"Comoros","d":0.293,"c":0.774,"label":""},{"n":"Turkey","d":0.293,"c":0.804,"label":"Turkey"},{"n":"Jordan","d":0.282,"c":0.422,"label":""},{"n":"Mozambique","d":0.279,"c":0.695,"label":""},{"n":"Zimbabwe","d":0.268,"c":0.852,"label":""},{"n":"Algeria","d":0.265,"c":0.662,"label":""},{"n":"Cameroon","d":0.26,"c":0.939,"label":""},{"n":"Kazakhstan","d":0.259,"c":0.736,"label":""},{"n":"Morocco","d":0.259,"c":0.671,"label":""},{"n":"Ethiopia","d":0.257,"c":0.529,"label":"Ethiopia"},{"n":"Uganda","d":0.253,"c":0.889,"label":""},{"n":"Guinea-Bissau","d":0.252,"c":0.828,"label":""},{"n":"Djibouti","d":0.25,"c":0.706,"label":""},{"n":"Congo","d":0.243,"c":0.841,"label":""},{"n":"Chad","d":0.242,"c":0.952,"label":""},{"n":"Haiti","d":0.238,"c":0.786,"label":""},{"n":"Niger","d":0.227,"c":0.591,"label":""},{"n":"Uzbekistan","d":0.218,"c":0.823,"label":""},{"n":"Bangladesh","d":0.195,"c":0.78,"label":"Bangladesh"},{"n":"Libya","d":0.193,"c":0.811,"label":""},{"n":"Rwanda","d":0.193,"c":0.418,"label":""},{"n":"Egypt","d":0.187,"c":0.729,"label":"Egypt"},{"n":"Guinea","d":0.187,"c":0.808,"label":""},{"n":"Burundi","d":0.185,"c":0.845,"label":""},{"n":"Cambodia","d":0.183,"c":0.904,"label":""},{"n":"Venezuela","d":0.181,"c":0.968,"label":"Venezuela"},{"n":"Cuba","d":0.176,"c":0.641,"label":""},{"n":"Oman","d":0.175,"c":0.253,"label":""},{"n":"Equatorial Guinea","d":0.172,"c":0.858,"label":""},{"n":"Azerbaijan","d":0.171,"c":0.89,"label":""},{"n":"Russia","d":0.17,"c":0.783,"label":"Russia"},{"n":"Somalia","d":0.165,"c":0.87,"label":""},{"n":"Mali","d":0.164,"c":0.72,"label":""},{"n":"Belarus","d":0.163,"c":0.41,"label":""},{"n":"Iran","d":0.159,"c":0.768,"label":"Iran"},{"n":"Tajikistan","d":0.158,"c":0.893,"label":""},{"n":"Hong Kong","d":0.151,"c":0.085,"label":"Hong Kong"},{"n":"Nicaragua","d":0.151,"c":0.942,"label":"Nicaragua"},{"n":"Turkmenistan","d":0.148,"c":0.899,"label":""},{"n":"Vietnam","d":0.146,"c":0.466,"label":"Vietnam"},{"n":"Bahrain","d":0.139,"c":0.477,"label":""},{"n":"Kuwait","d":0.138,"c":0.346,"label":""},{"n":"Laos","d":0.135,"c":0.765,"label":""},{"n":"Burkina Faso","d":0.134,"c":0.373,"label":""},{"n":"South Sudan","d":0.133,"c":0.893,"label":""},{"n":"Sudan","d":0.13,"c":0.719,"label":""},{"n":"Eswatini","d":0.128,"c":0.554,"label":""},{"n":"Syria","d":0.128,"c":0.619,"label":""},{"n":"Yemen","d":0.127,"c":0.902,"label":"Yemen"},{"n":"United Arab Emirates","d":0.104,"c":0.105,"label":""},{"n":"North Korea","d":0.083,"c":0.67,"label":"North Korea"},{"n":"Myanmar","d":0.08,"c":0.859,"label":""},{"n":"China","d":0.072,"c":0.554,"label":"China"},{"n":"Afghanistan","d":0.069,"c":0.769,"label":"Afghanistan"},{"n":"Eritrea","d":0.069,"c":0.752,"label":""},{"n":"Qatar","d":0.034,"c":0.331,"label":""},{"n":"Saudi Arabia","d":0.016,"c":0.326,"label":"Saudi Arabia"}];
 
-    // Color by quadrant for visual texture
-    const colorFor = d => {
-      if (d.d >= 0.5 && d.c <= 0.4) return "#0891b2"; // democratic & clean
-      if (d.d >= 0.5 && d.c > 0.4)  return "#ea580c"; // democratic but corrupt
-      if (d.d < 0.5 && d.c <= 0.4)  return "#7c3aed"; // autocratic but clean
-      return "#b91c1c";                                // autocratic & corrupt
-    };
-
-    const tagged = data.map(d => ({ ...d, color: colorFor(d) }));
-
     const chart = Plot.plot({
-      width: 900,
-      height: 640,
+      width: Math.min(960, (typeof window !== "undefined" ? window.innerWidth - 48 : 912)),
+      height: 600,
       marginLeft: 60,
       marginRight: 30,
-      marginTop: 28,
-      marginBottom: 50,
-      x: { domain: [0, 1], grid: true, label: "<- more corrupt        Political corruption index        less corrupt ->", reverse: true },
-      y: { domain: [0, 1], grid: true, label: "Electoral democracy index ->" },
-      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      x: { label: "Political corruption index (lower = cleaner)", grid: true, domain: [0, 1] },
+      y: { label: "Electoral democracy index (higher = more democratic)", grid: true, domain: [0, 1] },
+      style: { fontSize: "12px" },
       marks: [
-        Plot.ruleX([0.5], { stroke: "#cbd5e1", strokeDasharray: "4,3" }),
-        Plot.ruleY([0.5], { stroke: "#cbd5e1", strokeDasharray: "4,3" }),
-        Plot.dot(tagged, {
-          x: "c",
-          y: "d",
-          r: 4.5,
-          fill: "color",
-          fillOpacity: 0.75,
+        Plot.ruleX([0.5], { stroke: "#cbd5e1", strokeDasharray: "3,3" }),
+        Plot.ruleY([0.5], { stroke: "#cbd5e1", strokeDasharray: "3,3" }),
+        Plot.dot(data, {
+          x: "c", y: "d",
+          r: 3.5,
+          fill: "#4e79a7",
+          fillOpacity: 0.55,
           stroke: "white",
           strokeWidth: 0.8,
         }),
-        Plot.text(tagged.filter(d => d.label), {
-          x: "c",
-          y: "d",
+        Plot.text(data.filter(d => d.label), {
+          x: "c", y: "d",
           text: "label",
-          dx: 0,
-          dy: -9,
-          fontSize: 10.5,
-          fontWeight: 500,
+          dx: 0, dy: -8,
+          fontSize: 10,
           fill: "#0f172a",
           stroke: "white",
           strokeWidth: 3,
         }),
       ],
     });
+
     document.getElementById("chart").appendChild(chart);
   </script>
 </body>

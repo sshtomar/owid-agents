@@ -2,79 +2,56 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>The Happiness Shift 2011-2025</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       margin: 0; padding: 24px; background: #fff; color: #0f172a;
-      max-width: 920px;
     }
-    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
-    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; line-height: 1.5; }
     #chart { width: 100%; }
-    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
   </style>
 </head>
 <body>
   <h1>The Happiness Shift</h1>
-  <p class="subtitle">Self-reported life satisfaction (Cantril ladder, 0-10), 2011 vs 2025. China gained 1.4 points as living standards rose, while Afghanistan collapsed by 2.8 after the 2021 Taliban takeover. The US, Canada, and Australia all slid; Iceland and Germany climbed.</p>
+  <p class="subtitle">Self-reported life satisfaction (Cantril ladder, 0-10) for ten countries, 2011-2025. Finland holds the top spot; China rose 1.4 points as living standards improved; Afghanistan collapsed by 2.8 after the 2021 Taliban takeover.</p>
   <div id="chart"></div>
   <p class="source">Source: Our World in Data / Gallup World Poll - Cantril Ladder (1210090)</p>
   <script type="module">
     import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
-    const data = [{"n":"Finland","v0":7.58,"y0":2011,"v1":7.76,"y1":2025,"d":0.19},{"n":"Denmark","v0":7.86,"y0":2011,"v1":7.54,"y1":2025,"d":-0.32},{"n":"Iceland","v0":6.89,"y0":2011,"v1":7.54,"y1":2025,"d":0.65},{"n":"Sweden","v0":7.38,"y0":2011,"v1":7.25,"y1":2025,"d":-0.12},{"n":"Norway","v0":7.52,"y0":2011,"v1":7.24,"y1":2025,"d":-0.28},{"n":"Israel","v0":7.2,"y0":2011,"v1":7.19,"y1":2025,"d":-0.01},{"n":"Mexico","v0":6.74,"y0":2011,"v1":6.97,"y1":2025,"d":0.23},{"n":"Australia","v0":7.34,"y0":2011,"v1":6.92,"y1":2025,"d":-0.43},{"n":"Germany","v0":6.57,"y0":2011,"v1":6.88,"y1":2025,"d":0.31},{"n":"United States","v0":7.27,"y0":2011,"v1":6.82,"y1":2025,"d":-0.45},{"n":"Saudi Arabia","v0":6.6,"y0":2011,"v1":6.82,"y1":2025,"d":0.22},{"n":"Canada","v0":7.5,"y0":2011,"v1":6.74,"y1":2025,"d":-0.76},{"n":"United Kingdom","v0":6.94,"y0":2011,"v1":6.69,"y1":2025,"d":-0.24},{"n":"Brazil","v0":6.7,"y0":2011,"v1":6.63,"y1":2025,"d":-0.06},{"n":"France","v0":6.75,"y0":2011,"v1":6.59,"y1":2025,"d":-0.16},{"n":"Italy","v0":6.58,"y0":2011,"v1":6.57,"y1":2025,"d":-0.0},{"n":"Spain","v0":6.76,"y0":2011,"v1":6.54,"y1":2025,"d":-0.22},{"n":"Argentina","v0":6.24,"y0":2011,"v1":6.43,"y1":2025,"d":0.19},{"n":"Japan","v0":6.06,"y0":2011,"v1":6.13,"y1":2025,"d":0.07},{"n":"China","v0":4.68,"y0":2011,"v1":6.07,"y1":2025,"d":1.39},{"n":"South Korea","v0":5.64,"y0":2011,"v1":6.04,"y1":2025,"d":0.4},{"n":"Indonesia","v0":5.16,"y0":2011,"v1":5.62,"y1":2025,"d":0.46},{"n":"Turkey","v0":5.23,"y0":2011,"v1":5.3,"y1":2025,"d":0.07},{"n":"Iran","v0":5.15,"y0":2011,"v1":5.15,"y1":2025,"d":0.0},{"n":"South Africa","v0":5.1,"y0":2011,"v1":5.01,"y1":2025,"d":-0.09},{"n":"Nigeria","v0":4.86,"y0":2011,"v1":4.79,"y1":2025,"d":-0.07},{"n":"India","v0":4.97,"y0":2011,"v1":4.54,"y1":2025,"d":-0.44},{"n":"Egypt","v0":4.85,"y0":2011,"v1":3.86,"y1":2025,"d":-0.99},{"n":"Lebanon","v0":5.05,"y0":2011,"v1":3.72,"y1":2025,"d":-1.33},{"n":"Afghanistan","v0":4.26,"y0":2011,"v1":1.45,"y1":2025,"d":-2.81}];
 
-    const long = data.flatMap(d => [
-      { n: d.n, year: d.y0, value: d.v0, delta: d.d },
-      { n: d.n, year: d.y1, value: d.v1, delta: d.d }
-    ]);
+    const data = [{"n":"Afghanistan","y":2011,"v":4.26},{"n":"Afghanistan","y":2012,"v":4.04},{"n":"Afghanistan","y":2014,"v":3.58},{"n":"Afghanistan","y":2015,"v":3.36},{"n":"Afghanistan","y":2016,"v":3.79},{"n":"Afghanistan","y":2017,"v":3.63},{"n":"Afghanistan","y":2018,"v":3.2},{"n":"Afghanistan","y":2019,"v":2.57},{"n":"Afghanistan","y":2020,"v":2.52},{"n":"Afghanistan","y":2021,"v":2.4},{"n":"Afghanistan","y":2022,"v":1.86},{"n":"Afghanistan","y":2023,"v":1.72},{"n":"Afghanistan","y":2024,"v":1.36},{"n":"Afghanistan","y":2025,"v":1.45},{"n":"Canada","y":2011,"v":7.5},{"n":"Canada","y":2012,"v":7.48},{"n":"Canada","y":2014,"v":7.43},{"n":"Canada","y":2015,"v":7.4},{"n":"Canada","y":2016,"v":7.32},{"n":"Canada","y":2017,"v":7.33},{"n":"Canada","y":2018,"v":7.28},{"n":"Canada","y":2019,"v":7.23},{"n":"Canada","y":2020,"v":7.1},{"n":"Canada","y":2021,"v":7.03},{"n":"Canada","y":2022,"v":6.96},{"n":"Canada","y":2023,"v":6.9},{"n":"Canada","y":2024,"v":6.8},{"n":"Canada","y":2025,"v":6.74},{"n":"China","y":2011,"v":4.68},{"n":"China","y":2012,"v":4.98},{"n":"China","y":2014,"v":5.14},{"n":"China","y":2015,"v":5.25},{"n":"China","y":2016,"v":5.27},{"n":"China","y":2017,"v":5.25},{"n":"China","y":2018,"v":5.19},{"n":"China","y":2019,"v":5.12},{"n":"China","y":2020,"v":5.34},{"n":"China","y":2021,"v":5.58},{"n":"China","y":2022,"v":5.82},{"n":"China","y":2023,"v":5.97},{"n":"China","y":2024,"v":5.92},{"n":"China","y":2025,"v":6.07},{"n":"Egypt","y":2011,"v":4.85},{"n":"Egypt","y":2012,"v":4.27},{"n":"Egypt","y":2014,"v":4.19},{"n":"Egypt","y":2015,"v":4.36},{"n":"Egypt","y":2016,"v":4.74},{"n":"Egypt","y":2017,"v":4.42},{"n":"Egypt","y":2018,"v":4.17},{"n":"Egypt","y":2019,"v":4.15},{"n":"Egypt","y":2020,"v":4.28},{"n":"Egypt","y":2021,"v":4.29},{"n":"Egypt","y":2022,"v":4.17},{"n":"Egypt","y":2023,"v":3.98},{"n":"Egypt","y":2024,"v":3.82},{"n":"Egypt","y":2025,"v":3.86},{"n":"Finland","y":2011,"v":7.58},{"n":"Finland","y":2012,"v":7.39},{"n":"Finland","y":2014,"v":7.41},{"n":"Finland","y":2015,"v":7.41},{"n":"Finland","y":2016,"v":7.47},{"n":"Finland","y":2017,"v":7.63},{"n":"Finland","y":2018,"v":7.77},{"n":"Finland","y":2019,"v":7.81},{"n":"Finland","y":2020,"v":7.84},{"n":"Finland","y":2021,"v":7.82},{"n":"Finland","y":2022,"v":7.8},{"n":"Finland","y":2023,"v":7.74},{"n":"Finland","y":2024,"v":7.74},{"n":"Finland","y":2025,"v":7.76},{"n":"Germany","y":2011,"v":6.57},{"n":"Germany","y":2012,"v":6.67},{"n":"Germany","y":2014,"v":6.75},{"n":"Germany","y":2015,"v":6.99},{"n":"Germany","y":2016,"v":6.95},{"n":"Germany","y":2017,"v":6.96},{"n":"Germany","y":2018,"v":6.99},{"n":"Germany","y":2019,"v":7.08},{"n":"Germany","y":2020,"v":7.16},{"n":"Germany","y":2021,"v":7.03},{"n":"Germany","y":2022,"v":6.89},{"n":"Germany","y":2023,"v":6.72},{"n":"Germany","y":2024,"v":6.75},{"n":"Germany","y":2025,"v":6.88},{"n":"India","y":2011,"v":4.97},{"n":"India","y":2012,"v":4.77},{"n":"India","y":2014,"v":4.57},{"n":"India","y":2015,"v":4.4},{"n":"India","y":2016,"v":4.32},{"n":"India","y":2017,"v":4.19},{"n":"India","y":2018,"v":4.01},{"n":"India","y":2019,"v":3.57},{"n":"India","y":2020,"v":3.82},{"n":"India","y":2021,"v":3.78},{"n":"India","y":2022,"v":4.04},{"n":"India","y":2023,"v":4.05},{"n":"India","y":2024,"v":4.39},{"n":"India","y":2025,"v":4.54},{"n":"Lebanon","y":2011,"v":5.05},{"n":"Lebanon","y":2012,"v":4.93},{"n":"Lebanon","y":2014,"v":4.84},{"n":"Lebanon","y":2015,"v":5.13},{"n":"Lebanon","y":2016,"v":5.22},{"n":"Lebanon","y":2017,"v":5.2},{"n":"Lebanon","y":2018,"v":5.2},{"n":"Lebanon","y":2019,"v":4.77},{"n":"Lebanon","y":2020,"v":4.58},{"n":"Lebanon","y":2021,"v":2.96},{"n":"Lebanon","y":2022,"v":2.39},{"n":"Lebanon","y":2023,"v":2.71},{"n":"Lebanon","y":2024,"v":3.19},{"n":"Lebanon","y":2025,"v":3.72},{"n":"Mexico","y":2011,"v":6.74},{"n":"Mexico","y":2012,"v":7.09},{"n":"Mexico","y":2014,"v":7.19},{"n":"Mexico","y":2015,"v":6.78},{"n":"Mexico","y":2016,"v":6.58},{"n":"Mexico","y":2017,"v":6.49},{"n":"Mexico","y":2018,"v":6.59},{"n":"Mexico","y":2019,"v":6.46},{"n":"Mexico","y":2020,"v":6.32},{"n":"Mexico","y":2021,"v":6.13},{"n":"Mexico","y":2022,"v":6.33},{"n":"Mexico","y":2023,"v":6.68},{"n":"Mexico","y":2024,"v":6.98},{"n":"Mexico","y":2025,"v":6.97},{"n":"United States","y":2011,"v":7.27},{"n":"United States","y":2012,"v":7.08},{"n":"United States","y":2014,"v":7.12},{"n":"United States","y":2015,"v":7.1},{"n":"United States","y":2016,"v":6.99},{"n":"United States","y":2017,"v":6.89},{"n":"United States","y":2018,"v":6.89},{"n":"United States","y":2019,"v":6.94},{"n":"United States","y":2020,"v":6.95},{"n":"United States","y":2021,"v":6.98},{"n":"United States","y":2022,"v":6.89},{"n":"United States","y":2023,"v":6.72},{"n":"United States","y":2024,"v":6.72},{"n":"United States","y":2025,"v":6.82}];
 
     const chart = Plot.plot({
-      width: 880,
-      height: 600,
-      marginLeft: 110,
-      marginRight: 100,
-      marginTop: 32,
-      marginBottom: 36,
-      x: { domain: [2007, 2029], ticks: [2011, 2025], label: null },
-      y: { label: "Happiness score (Cantril ladder, 0-10)", grid: true, domain: [0, 9] },
-      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      width: Math.min(960, (typeof window !== "undefined" ? window.innerWidth - 48 : 912)),
+      height: 480,
+      marginRight: 110,
+      y: { label: "Happiness score (Cantril ladder, 0-10)", grid: true, domain: [0, 8.5] },
+      x: { label: "Year", tickFormat: "d" },
+      style: { fontSize: "12px" },
+      color: {
+        domain: ["Finland","Germany","China","Mexico","United States","Canada","India","Egypt","Lebanon","Afghanistan"],
+        range: ["#4e79a7","#76b7b2","#59a14f","#edc948","#f28e2b","#9c755f","#b07aa1","#ff9da7","#e15759","#bab0ac"]
+      },
       marks: [
-        Plot.line(long, {
-          x: "year",
-          y: "value",
-          z: "n",
-          stroke: d => d.delta <= -1 ? "#dc2626" : d.delta <= -0.3 ? "#ea580c" : d.delta >= 0.3 ? "#0891b2" : "#94a3b8",
-          strokeWidth: 1.6,
-          opacity: 0.85
+        Plot.ruleY([0]),
+        Plot.line(data, {
+          x: "y", y: "v", stroke: "n",
+          strokeWidth: 1.5,
+          strokeOpacity: 0.85,
         }),
-        Plot.dot(long, {
-          x: "year",
-          y: "value",
-          fill: d => d.delta <= -1 ? "#dc2626" : d.delta <= -0.3 ? "#ea580c" : d.delta >= 0.3 ? "#0891b2" : "#94a3b8",
-          r: 3.5
-        }),
-        Plot.text(long.filter(d => d.year === 2011), {
-          x: "year",
-          y: "value",
-          text: "n",
-          dx: -8,
-          textAnchor: "end",
-          fontSize: 11,
-          fill: "#334155"
-        }),
-        Plot.text(long.filter(d => d.year === 2025), {
-          x: "year",
-          y: "value",
-          text: d => `${d.value.toFixed(2)}`,
-          dx: 8,
-          textAnchor: "start",
-          fontSize: 11,
-          fontWeight: 600,
-          fill: d => d.delta <= -1 ? "#991b1b" : d.delta <= -0.3 ? "#9a3412" : d.delta >= 0.3 ? "#075985" : "#475569"
-        })
+        Plot.text(
+          (() => {
+            const last = {};
+            data.forEach(d => { if (!last[d.n] || d.y > last[d.n].y) last[d.n] = d; });
+            return Object.values(last);
+          })(),
+          { x: "y", y: "v", text: "n", dx: 6, textAnchor: "start", fontSize: 10, fill: "n" }
+        ),
       ]
     });
+
     document.getElementById("chart").appendChild(chart);
   </script>
 </body>
