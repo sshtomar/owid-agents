@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>The World's Most Dangerous Roads</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 920px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+    .legend { display: flex; gap: 18px; font-size: 12px; color: #475569; margin-bottom: 10px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <h1>The World's Most Dangerous Roads, 2021</h1>
+  <p class="subtitle">Estimated road traffic deaths per 100,000 population. A driver in Guinea faces a death rate 25x that of a driver in Norway. The deadliest roads cluster in low-income West Africa and conflict zones; Thailand is a striking outlier among middle-income economies.</p>
+  <div class="legend">
+    <span><i style="background:#b91c1c"></i> Top 25 deadliest</span>
+    <span><i style="background:#0891b2"></i> Selected major economies (for reference)</span>
+  </div>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Health Observatory (RS_198), Global Status Report on Road Safety 2023.</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const data = [{"n":"Guinea","iso":"GIN","v":37.4,"g":"danger"},{"n":"Libya","iso":"LBY","v":34,"g":"danger"},{"n":"Haiti","iso":"HTI","v":31.3,"g":"danger"},{"n":"Guinea-Bissau","iso":"GNB","v":30.5,"g":"danger"},{"n":"Zimbabwe","iso":"ZWE","v":29.9,"g":"danger"},{"n":"Syria","iso":"SYR","v":29.9,"g":"danger"},{"n":"Yemen","iso":"YEM","v":29.8,"g":"danger"},{"n":"Comoros","iso":"COM","v":29,"g":"danger"},{"n":"Nepal","iso":"NPL","v":28.2,"g":"danger"},{"n":"Kenya","iso":"KEN","v":28.2,"g":"danger"},{"n":"Burkina Faso","iso":"BFA","v":27.8,"g":"danger"},{"n":"Dominican Republic","iso":"DOM","v":27.4,"g":"danger"},{"n":"Chad","iso":"TCD","v":26.4,"g":"danger"},{"n":"Central African Republic","iso":"CAF","v":25.9,"g":"danger"},{"n":"Ghana","iso":"GHA","v":25.9,"g":"danger"},{"n":"Thailand","iso":"THA","v":25.4,"g":"danger"},{"n":"Niger","iso":"NER","v":24.9,"g":"danger"},{"n":"Benin","iso":"BEN","v":24.8,"g":"danger"},{"n":"Eswatini","iso":"SWZ","v":24.7,"g":"danger"},{"n":"South Africa","iso":"ZAF","v":24.5,"g":"danger"},{"n":"Afghanistan","iso":"AFG","v":24.1,"g":"danger"},{"n":"Ecuador","iso":"ECU","v":23.4,"g":"danger"},{"n":"South Sudan","iso":"SSD","v":23.3,"g":"danger"},{"n":"Djibouti","iso":"DJI","v":23.3,"g":"danger"},{"n":"St. Kitts and Nevis","iso":"KNA","v":23.1,"g":"danger"},{"n":"United States","iso":"USA","v":14.2,"g":"ref"},{"n":"France","iso":"FRA","v":4.7,"g":"ref"},{"n":"Australia","iso":"AUS","v":4.5,"g":"ref"},{"n":"Spain","iso":"ESP","v":3.5,"g":"ref"},{"n":"Germany","iso":"DEU","v":3.3,"g":"ref"},{"n":"Japan","iso":"JPN","v":2.7,"g":"ref"},{"n":"United Kingdom","iso":"GBR","v":2.4,"g":"ref"},{"n":"Sweden","iso":"SWE","v":2.1,"g":"ref"},{"n":"Norway","iso":"NOR","v":1.5,"g":"ref"}];
+
+    const order = data.map(d => d.n);
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 720,
+      marginLeft: 200,
+      marginRight: 80,
+      marginTop: 32,
+      marginBottom: 36,
+      x: { domain: [0, 40], grid: true, label: "Road traffic deaths per 100,000 population" },
+      y: { domain: order, label: null },
+      color: { domain: ["danger", "ref"], range: ["#b91c1c", "#0891b2"] },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 12 },
+      marks: [
+        Plot.barX(data, { x: "v", y: "n", fill: "g", fillOpacity: 0.85 }),
+        Plot.text(data, {
+          x: "v",
+          y: "n",
+          text: d => d.v.toFixed(1),
+          dx: 6,
+          textAnchor: "start",
+          fontSize: 11,
+          fontWeight: 600,
+          fill: "#0f172a",
+        }),
+        Plot.ruleX([0]),
+      ],
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>

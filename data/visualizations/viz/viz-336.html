@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>The World's Happiest Countries 2025</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px; background: #fff; color: #0f172a;
+      max-width: 920px;
+    }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 24px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>The World's Happiest Countries, 2025</h1>
+  <p class="subtitle">Self-reported life satisfaction (Cantril ladder, 0-10). Finland tops the ranking for the eighth straight year. Mexico breaks into the top 15 ahead of Australia. Afghanistan, at 1.45, has collapsed from 4.26 in 2011.</p>
+  <div id="chart"></div>
+  <p class="source">Source: Our World in Data / Gallup World Poll (Cantril Ladder). Values for 2025 with arrow indicating change since 2011.</p>
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+
+    const data = [{"n":"Finland","v":7.76,"y":2025,"v0":7.58,"y0":2011,"rank":1,"group":"top"},{"n":"Iceland","v":7.54,"y":2025,"v0":6.89,"y0":2011,"rank":2,"group":"top"},{"n":"Denmark","v":7.54,"y":2025,"v0":7.86,"y0":2011,"rank":3,"group":"top"},{"n":"Costa Rica","v":7.44,"y":2025,"v0":7.25,"y0":2011,"rank":4,"group":"top"},{"n":"Sweden","v":7.25,"y":2025,"v0":7.38,"y0":2011,"rank":5,"group":"top"},{"n":"Norway","v":7.24,"y":2025,"v0":7.52,"y0":2011,"rank":6,"group":"top"},{"n":"Netherlands","v":7.22,"y":2025,"v0":7.51,"y0":2011,"rank":7,"group":"top"},{"n":"Israel","v":7.19,"y":2025,"v0":7.2,"y0":2011,"rank":8,"group":"top"},{"n":"Luxembourg","v":7.06,"y":2025,"v0":7.05,"y0":2011,"rank":9,"group":"top"},{"n":"Switzerland","v":7.02,"y":2025,"v0":7.5,"y0":2011,"rank":10,"group":"top"},{"n":"New Zealand","v":7.0,"y":2025,"v0":7.37,"y0":2011,"rank":11,"group":"top"},{"n":"Mexico","v":6.97,"y":2025,"v0":6.74,"y0":2011,"rank":12,"group":"top"},{"n":"Ireland","v":6.93,"y":2025,"v0":7.28,"y0":2011,"rank":13,"group":"top"},{"n":"Belgium","v":6.93,"y":2025,"v0":7.11,"y0":2011,"rank":14,"group":"top"},{"n":"Australia","v":6.92,"y":2025,"v0":7.34,"y0":2011,"rank":15,"group":"top"},{"n":"Uruguay","v":6.63,"y":2025,"v0":5.9,"y0":2011,"rank":30,"group":"mid"},{"n":"Nicaragua","v":6.3,"y":2025,"v0":5.12,"y0":2011,"rank":50,"group":"mid"},{"n":"Trinidad and Tobago","v":5.91,"y":2025,"v0":6.26,"y0":2011,"rank":75,"group":"mid"},{"n":"South Africa","v":5.01,"y":2025,"v0":5.1,"y0":2011,"rank":100,"group":"mid"},{"n":"Tanzania","v":3.9,"y":2025,"v0":3.8,"y0":2011,"rank":137,"group":"bottom"},{"n":"Egypt","v":3.86,"y":2025,"v0":4.85,"y0":2011,"rank":138,"group":"bottom"},{"n":"Democratic Republic of Congo","v":3.76,"y":2025,"v0":3.98,"y0":2011,"rank":139,"group":"bottom"},{"n":"Lebanon","v":3.72,"y":2025,"v0":5.05,"y0":2011,"rank":140,"group":"bottom"},{"n":"Yemen","v":3.53,"y":2025,"v0":4.45,"y0":2011,"rank":141,"group":"bottom"},{"n":"Botswana","v":3.46,"y":2025,"v0":4.58,"y0":2011,"rank":142,"group":"bottom"},{"n":"Zimbabwe","v":3.35,"y":2025,"v0":3.98,"y0":2011,"rank":143,"group":"bottom"},{"n":"Malawi","v":3.28,"y":2025,"v0":4.62,"y0":2011,"rank":144,"group":"bottom"},{"n":"Sierra Leone","v":3.25,"y":2025,"v0":3.59,"y0":2011,"rank":145,"group":"bottom"},{"n":"Afghanistan","v":1.45,"y":2025,"v0":4.26,"y0":2011,"rank":146,"group":"bottom"}];
+
+    const labels = data.map(d => ({
+      ...d,
+      delta: +(d.v - d.v0).toFixed(2),
+      label: `#${d.rank}  ${d.n}`,
+    }));
+
+    const chart = Plot.plot({
+      width: 880,
+      height: 640,
+      marginLeft: 230,
+      marginRight: 130,
+      marginTop: 32,
+      marginBottom: 36,
+      x: { domain: [0, 8.4], grid: true, label: "Happiness score (0-10)" },
+      y: { domain: labels.map(d => d.label), label: null },
+      color: {
+        domain: ["top", "mid", "bottom"],
+        range: ["#0891b2", "#94a3b8", "#dc2626"],
+      },
+      style: { fontFamily: "-apple-system, BlinkMacSystemFont, Inter, sans-serif", fontSize: 11.5 },
+      marks: [
+        Plot.barX(labels, {
+          x: "v",
+          y: "label",
+          fill: "group",
+          fillOpacity: 0.85,
+        }),
+        // Marker for 2011 starting value
+        Plot.tickX(labels.filter(d => d.y0 !== d.y), {
+          x: "v0",
+          y: "label",
+          stroke: "#0f172a",
+          strokeWidth: 1.5,
+          strokeOpacity: 0.7,
+        }),
+        Plot.text(labels, {
+          x: "v",
+          y: "label",
+          text: d => `${d.v.toFixed(2)}`,
+          dx: 6,
+          textAnchor: "start",
+          fontSize: 11,
+          fontWeight: 600,
+          fill: "#0f172a",
+        }),
+        Plot.text(labels.filter(d => Math.abs(d.delta) >= 0.5), {
+          x: "v",
+          y: "label",
+          text: d => d.delta > 0 ? `+${d.delta}` : `${d.delta}`,
+          dx: 48,
+          textAnchor: "start",
+          fontSize: 10,
+          fontWeight: 600,
+          fill: d => d.delta > 0 ? "#15803d" : "#b91c1c",
+        }),
+      ],
+    });
+    document.getElementById("chart").appendChild(chart);
+  </script>
+</body>
+</html>
