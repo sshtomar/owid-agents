@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Age-Standardized Suicide Mortality Rate, 2019</h1>
+<p class="subtitle">Deaths per 100,000 population, age-standardized to remove demographic composition effects. Top 20 countries from the WHO GHO dataset (2019). Rates vary more than 50-fold across the full sample of 47 countries.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO GHO &#x2014; MH_12 &#xB7; 195 countries &#xB7; 2000-2021</p>
+<script>
+const data=[{"n":"Suriname","v":42.0},{"n":"Zimbabwe","v":35.9},{"n":"Solomon Islands","v":34.2},{"n":"Vanuatu","v":29.3},{"n":"Burkina Faso","v":26.3},{"n":"Togo","v":25.7},{"n":"Benin","v":19.7},{"n":"Kenya","v":17.6},{"n":"Samoa","v":15.1},{"n":"India","v":14.2},{"n":"Ecuador","v":13.7},{"n":"Nigeria","v":13.5},{"n":"Luxembourg","v":12.4},{"n":"Ireland","v":11.2},{"n":"Chad","v":11.0},{"n":"Guatemala","v":9.9},{"n":"Singapore","v":9.9},{"n":"Micronesia","v":9.9},{"n":"Liberia","v":9.6},{"n":"Paraguay","v":8.1}];
+const W=700,H=460,margin={top:20,right:60,bottom:36,left:140},cw=W-margin.left-margin.right,ch=H-margin.top-margin.bottom;
+const maxVal=Math.max(...data.map(d=>d.v));
+const barH=Math.floor((ch-(data.length-1)*3)/data.length),gap=3;
+function scaleX(v){return(v/(maxVal*1.05))*cw;}
+function barColor(v){const p=v/maxVal;if(p>0.7)return'#EA5E33';if(p>0.4)return'#F29A44';if(p>0.2)return'#D4A843';return'#A6C4A2';}
+const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width','100%');svg.style.maxWidth=W+'px';svg.style.display='block';
+const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+g.setAttribute('transform','translate('+margin.left+','+margin.top+')');svg.appendChild(g);
+[0,10,20,30,40].forEach(v=>{const x=scaleX(v);const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',x);line.setAttribute('x2',x);line.setAttribute('y1',0);line.setAttribute('y2',ch);line.setAttribute('stroke','#E2E0D5');line.setAttribute('stroke-width','1');g.appendChild(line);const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');lbl.setAttribute('x',x);lbl.setAttribute('y',ch+16);lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','9');lbl.setAttribute('fill','#7A786F');lbl.setAttribute('font-family','JetBrains Mono, monospace');lbl.textContent=v;g.appendChild(lbl);});
+const barEls=[];
+data.forEach((d,i)=>{const y=i*(barH+gap);const w=scaleX(d.v);const color=barColor(d.v);const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');rect.setAttribute('x',0);rect.setAttribute('y',y);rect.setAttribute('width',w);rect.setAttribute('height',barH);rect.setAttribute('fill',color);rect.setAttribute('rx','2');rect.setAttribute('opacity','0.85');rect.style.cursor='pointer';rect.dataset.name=d.n;rect.dataset.val=d.v;rect.dataset.color=color;g.appendChild(rect);barEls.push(rect);const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');lbl.setAttribute('x',-6);lbl.setAttribute('y',y+barH/2+3);lbl.setAttribute('text-anchor','end');lbl.setAttribute('font-size','9.5');lbl.setAttribute('fill','#2B2A27');lbl.textContent=d.n;g.appendChild(lbl);const valLbl=document.createElementNS('http://www.w3.org/2000/svg','text');valLbl.setAttribute('x',w+5);valLbl.setAttribute('y',y+barH/2+3);valLbl.setAttribute('font-size','9');valLbl.setAttribute('fill','#7A786F');valLbl.setAttribute('font-family','JetBrains Mono, monospace');valLbl.textContent=d.v.toFixed(1);g.appendChild(valLbl);});
+document.getElementById('chart').appendChild(svg);
+const tip=document.getElementById('tip');
+barEls.forEach((rect,i)=>{rect.addEventListener('mouseenter',e=>{barEls.forEach((b,j)=>b.setAttribute('opacity',j===i?'1':'0.2'));tip.style.opacity='1';tip.textContent=data[i].n+': '+data[i].v.toFixed(1)+' per 100,000 (age-standardized, 2019)';});rect.addEventListener('mousemove',e=>{tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';});rect.addEventListener('mouseleave',()=>{barEls.forEach(b=>b.setAttribute('opacity','0.85'));tip.style.opacity='0';});});
+</script>
+</body></html>
