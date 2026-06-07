@@ -9,110 +9,27 @@
   svg text { font-family: 'Inter', sans-serif; }
   .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
 </style></head><body>
-<h1>The Labor Force Gender Gap, 2022</h1>
-<p class="subtitle">Male and female labor force participation rates (% of population 15+). The widest gaps appear in the Middle East and South Asia — Afghanistan (65 pp), Iraq (61 pp). Many Sub-Saharan African countries show near-parity.</p>
+<h1>Age-Standardized Suicide Mortality Rate, 2019</h1>
+<p class="subtitle">Deaths per 100,000 population, age-standardized to remove demographic composition effects. Top 20 countries from the WHO GHO dataset (2019). Rates vary more than 50-fold across the full sample of 47 countries.</p>
 <div id="chart" style="position:relative;"></div>
 <div class="tooltip" id="tip"></div>
-<p class="source">Source: World Bank — Labor Force Participation Rate, Male &amp; Female (ILO estimate)</p>
+<p class="source">Source: WHO GHO &#x2014; MH_12 &#xB7; 195 countries &#xB7; 2000-2021</p>
 <script>
-const data = [{"n":"Afghanistan","m":70.2,"f":5.2,"gap":65.0},{"n":"Iraq","m":72.4,"f":11.2,"gap":61.2},{"n":"Egypt","m":70.3,"f":15.2,"gap":55.1},{"n":"Algeria","m":68.2,"f":14.3,"gap":53.9},{"n":"Iran","m":66.9,"f":13.5,"gap":53.4},{"n":"Jordan","m":61.3,"f":13.9,"gap":47.4},{"n":"India","m":76.5,"f":29.3,"gap":47.2},{"n":"Bahrain","m":85.7,"f":42.2,"gap":43.5},{"n":"Guatemala","m":80.7,"f":40.5,"gap":40.2},{"n":"Fiji","m":76.6,"f":38.2,"gap":38.4},{"n":"Bahamas","m":77.8,"f":70.9,"gap":6.9},{"n":"Eswatini","m":53.8,"f":47.2,"gap":6.6},{"n":"Finland","m":63.7,"f":57.3,"gap":6.4},{"n":"Congo, Dem. Rep.","m":67.4,"f":61.4,"gap":6.0},{"n":"Azerbaijan","m":67.6,"f":62.2,"gap":5.4},{"n":"Gambia","m":50.1,"f":45.1,"gap":5.0},{"n":"Congo, Rep.","m":70.2,"f":65.7,"gap":4.5},{"n":"Benin","m":77.9,"f":74.6,"gap":3.3},{"n":"Angola","m":76.5,"f":74.0,"gap":2.5},{"n":"Burundi","m":77.9,"f":80.2,"gap":-2.3}];
-
-const W = 700, H = 540;
-const ml = 110, mr = 90, mt = 30, mb = 10;
-const rowH = (H - mt - mb) / data.length;
-const barMaxW = W - ml - mr;
-
-const maxVal = 100;
-function xScale(v) { return ml + (v / maxVal) * barMaxW; }
-
-const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-svg.setAttribute("width", "100%");
-svg.style.maxWidth = W + "px";
-document.getElementById("chart").appendChild(svg);
-
-function mkEl(tag, attrs) {
-  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
-  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
-  return el;
-}
-
-// Divider between large-gap and small-gap groups
-const divY = mt + rowH * 10 - rowH * 0.2;
-svg.appendChild(mkEl("line", { x1: ml - 10, y1: divY, x2: W - mr + 10, y2: divY, stroke: "#C2C0B5", "stroke-width": "0.8", "stroke-dasharray": "4,3" }));
-
-[0, 25, 50, 75, 100].forEach(v => {
-  const x = xScale(v);
-  svg.appendChild(mkEl("line", { x1: x, y1: mt - 6, x2: x, y2: H - mb, stroke: "#E2E0D5", "stroke-width": "0.5" }));
-  svg.appendChild(mkEl("text", { x, y: mt - 8, "text-anchor": "middle", "font-size": "9", fill: "#9A9890", "font-family": "JetBrains Mono, monospace" })).textContent = v + "%";
-});
-
-const tip = document.getElementById("tip");
-
-data.forEach((d, i) => {
-  const cy = mt + rowH * i + rowH * 0.5;
-  const barH = rowH * 0.28;
-  const isBigGap = i < 10;
-  const maleCol = isBigGap ? "#EA5E33" : "#A6C4A2";
-  const femaleCol = isBigGap ? "#F5D38A" : "#5B9E78";
-
-  const maleBar = mkEl("rect", { x: ml, y: cy - barH * 1.1 - 1, width: xScale(d.m) - ml, height: barH, fill: maleCol, rx: "1.5" });
-  svg.appendChild(maleBar);
-
-  const femaleBar = mkEl("rect", { x: ml, y: cy + 1, width: xScale(d.f) - ml, height: barH, fill: femaleCol, rx: "1.5" });
-  svg.appendChild(femaleBar);
-
-  const xM = xScale(d.m);
-  const xF = xScale(d.f);
-  if (Math.abs(d.gap) > 3) {
-    const xMin = Math.min(xM, xF) + 1;
-    const xMax = Math.max(xM, xF) - 1;
-    if (xMax > xMin) {
-      svg.appendChild(mkEl("line", { x1: xMin, y1: cy, x2: xMax, y2: cy, stroke: "#C2C0B5", "stroke-width": "0.8" }));
-    }
-  }
-
-  const gapDot = mkEl("circle", { cx: xScale((d.m + d.f) / 2), cy, r: "2", fill: "#2B2A27" });
-  svg.appendChild(gapDot);
-
-  const lbl = mkEl("text", { x: ml - 5, y: cy + 3, "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27" });
-  lbl.textContent = d.n.replace("Congo, Dem. Rep.", "D.R. Congo");
-  svg.appendChild(lbl);
-
-  const mLbl = mkEl("text", { x: xM + 3, y: cy - barH * 0.6 - 1, "text-anchor": "start", "font-size": "8.5", fill: maleCol, "font-weight": "500" });
-  mLbl.textContent = d.m;
-  svg.appendChild(mLbl);
-
-  const fLbl = mkEl("text", { x: xF + 3, y: cy + barH * 0.6 + 4, "text-anchor": "start", "font-size": "8.5", fill: femaleCol, "font-weight": "500" });
-  fLbl.textContent = d.f;
-  svg.appendChild(fLbl);
-
-  const gapLbl = mkEl("text", { x: W - mr + 4, y: cy + 4, "text-anchor": "start", "font-size": "9", fill: isBigGap ? "#EA5E33" : "#5B9E78", "font-weight": "500" });
-  gapLbl.textContent = (d.gap >= 0 ? "+" : "") + d.gap.toFixed(0) + " pp";
-  svg.appendChild(gapLbl);
-
-  function showTip(e) {
-    tip.textContent = `${d.n}: Male ${d.m}%, Female ${d.f}%, gap ${d.gap >= 0 ? "+" : ""}${d.gap.toFixed(1)} pp`;
-    tip.style.opacity = "1";
-    tip.style.left = (e.clientX + 12) + "px";
-    tip.style.top = (e.clientY - 20) + "px";
-  }
-  function hideTip() { tip.style.opacity = "0"; }
-
-  [maleBar, femaleBar, gapDot].forEach(el => {
-    el.addEventListener("mouseenter", showTip);
-    el.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; });
-    el.addEventListener("mouseleave", hideTip);
-    el.style.cursor = "pointer";
-  });
-});
-
-// Legend
-const legendY = mt - 14;
-[["Male", "#EA5E33"], ["Female", "#F5D38A"]].forEach(([label, col], i) => {
-  const lx = ml + 200 + i * 90;
-  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 6, width: 10, height: 6, fill: col, rx: "1" }));
-  svg.appendChild(mkEl("text", { x: lx + 14, y: legendY, "font-size": "9", fill: "#7A786F" })).textContent = label;
-});
+const data=[{"n":"Suriname","v":42.0},{"n":"Zimbabwe","v":35.9},{"n":"Solomon Islands","v":34.2},{"n":"Vanuatu","v":29.3},{"n":"Burkina Faso","v":26.3},{"n":"Togo","v":25.7},{"n":"Benin","v":19.7},{"n":"Kenya","v":17.6},{"n":"Samoa","v":15.1},{"n":"India","v":14.2},{"n":"Ecuador","v":13.7},{"n":"Nigeria","v":13.5},{"n":"Luxembourg","v":12.4},{"n":"Ireland","v":11.2},{"n":"Chad","v":11.0},{"n":"Guatemala","v":9.9},{"n":"Singapore","v":9.9},{"n":"Micronesia","v":9.9},{"n":"Liberia","v":9.6},{"n":"Paraguay","v":8.1}];
+const W=700,H=460,margin={top:20,right:60,bottom:36,left:140},cw=W-margin.left-margin.right,ch=H-margin.top-margin.bottom;
+const maxVal=Math.max(...data.map(d=>d.v));
+const barH=Math.floor((ch-(data.length-1)*3)/data.length),gap=3;
+function scaleX(v){return(v/(maxVal*1.05))*cw;}
+function barColor(v){const p=v/maxVal;if(p>0.7)return'#EA5E33';if(p>0.4)return'#F29A44';if(p>0.2)return'#D4A843';return'#A6C4A2';}
+const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width','100%');svg.style.maxWidth=W+'px';svg.style.display='block';
+const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+g.setAttribute('transform','translate('+margin.left+','+margin.top+')');svg.appendChild(g);
+[0,10,20,30,40].forEach(v=>{const x=scaleX(v);const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',x);line.setAttribute('x2',x);line.setAttribute('y1',0);line.setAttribute('y2',ch);line.setAttribute('stroke','#E2E0D5');line.setAttribute('stroke-width','1');g.appendChild(line);const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');lbl.setAttribute('x',x);lbl.setAttribute('y',ch+16);lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','9');lbl.setAttribute('fill','#7A786F');lbl.setAttribute('font-family','JetBrains Mono, monospace');lbl.textContent=v;g.appendChild(lbl);});
+const barEls=[];
+data.forEach((d,i)=>{const y=i*(barH+gap);const w=scaleX(d.v);const color=barColor(d.v);const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');rect.setAttribute('x',0);rect.setAttribute('y',y);rect.setAttribute('width',w);rect.setAttribute('height',barH);rect.setAttribute('fill',color);rect.setAttribute('rx','2');rect.setAttribute('opacity','0.85');rect.style.cursor='pointer';rect.dataset.name=d.n;rect.dataset.val=d.v;rect.dataset.color=color;g.appendChild(rect);barEls.push(rect);const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');lbl.setAttribute('x',-6);lbl.setAttribute('y',y+barH/2+3);lbl.setAttribute('text-anchor','end');lbl.setAttribute('font-size','9.5');lbl.setAttribute('fill','#2B2A27');lbl.textContent=d.n;g.appendChild(lbl);const valLbl=document.createElementNS('http://www.w3.org/2000/svg','text');valLbl.setAttribute('x',w+5);valLbl.setAttribute('y',y+barH/2+3);valLbl.setAttribute('font-size','9');valLbl.setAttribute('fill','#7A786F');valLbl.setAttribute('font-family','JetBrains Mono, monospace');valLbl.textContent=d.v.toFixed(1);g.appendChild(valLbl);});
+document.getElementById('chart').appendChild(svg);
+const tip=document.getElementById('tip');
+barEls.forEach((rect,i)=>{rect.addEventListener('mouseenter',e=>{barEls.forEach((b,j)=>b.setAttribute('opacity',j===i?'1':'0.2'));tip.style.opacity='1';tip.textContent=data[i].n+': '+data[i].v.toFixed(1)+' per 100,000 (age-standardized, 2019)';});rect.addEventListener('mousemove',e=>{tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-28)+'px';});rect.addEventListener('mouseleave',()=>{barEls.forEach(b=>b.setAttribute('opacity','0.85'));tip.style.opacity='0';});});
 </script>
 </body></html>

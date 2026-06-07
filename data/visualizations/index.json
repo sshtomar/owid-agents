@@ -5570,40 +5570,92 @@
     },
     {
       "id": "viz-340",
-      "title": "Infant Mortality: Thirty Years of Progress",
-      "description": "Slope chart showing infant mortality rates (per 1,000 live births) in 1990 vs 2022 for the 15 countries with the highest rates in 1990. Highlights dramatic progress across Sub-Saharan Africa and Asia, with Central African Republic as a stark outlier.",
+      "title": "Crude Birth Rate, 1960-2024",
+      "description": "Trend lines for 12 countries showing crude birth rate (live births per 1,000 people) from 1960 to 2024. Sub-Saharan Africa remains the highest-birth-rate region while East Asia has fallen to historic lows. South Korea reached 4.5 in 2023, Japan 5.7.",
       "datasetIds": [
-        "wb--SP-DYN-IMRT-IN"
+        "wb--SP-DYN-CBRT-IN"
       ],
-      "chartType": "slope",
-      "codeFilePath": "viz/viz-340.html",
+      "chartType": "line",
       "highlights": [
-        "Angola cut infant mortality by 71% \u2014 from 118 to 34 per 1,000",
-        "Bangladesh achieved a 75% reduction, from 96 to 24",
-        "Central African Republic is the only country where rates worsened (109 to 207)"
+        "Kenya's birth rate halved from 55 in 1960 to 27 in 2024",
+        "South Korea fell from 31 in 1970 to 4.5 in 2023 \u2014 the lowest recorded rate globally",
+        "Chad's birth rate barely changed from 46 in 1960 to 43 in 2024",
+        "Iran dropped from 51 in 1960 to 13 in 2024 after the 1979 revolution and subsequent family planning"
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
       "notebookPath": "notebooks/viz-340.py"
     },
     {
       "id": "viz-341",
-      "title": "The Graying Planet",
-      "description": "Trend lines showing the share of population aged 65 and above (%) from 1970 to 2024 for eight major economies. Japan's unprecedented demographic transformation leads, while South Korea and China are on steep upward trajectories.",
+      "title": "Male vs. Female Labor Force Participation, 2023",
+      "description": "Slope chart connecting female LFPR (left) to male LFPR (right) for 15 countries in 2023. The steeper the line, the wider the gender gap. Afghanistan shows the largest gap (65 pp); Burundi shows female participation exceeding male.",
       "datasetIds": [
-        "wb--SP-POP-65UP-TO-ZS"
+        "wb--SL-TLF-CACT-MA-ZS",
+        "wb--SL-TLF-CACT-FE-ZS"
       ],
-      "chartType": "trend lines",
-      "codeFilePath": "viz/viz-341.html",
+      "chartType": "slope",
       "highlights": [
-        "Japan: from 7% in 1970 to nearly 30% in 2024 \u2014 fastest aging in history",
-        "South Korea is now aging faster than Japan did at the same age share",
-        "India and Brazil still under 8%, but rising steadily"
+        "Afghanistan gap: 70.1% male vs 5.1% female \u2014 a 65 percentage-point difference",
+        "Iraq and Iran follow with 62 and 54 percentage-point gaps respectively",
+        "Burundi: female LFPR (80%) exceeds male (77.6%) \u2014 one of few countries where this is true",
+        "India's 46-point gap (77% male, 31% female) reflects one of Asia's largest gender disparities"
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
       "notebookPath": "notebooks/viz-341.py"
     },
     {
       "id": "viz-342",
+      "title": "Age-Standardized Suicide Mortality Rate, 2019",
+      "description": "Horizontal bar chart of top 20 countries by age-standardized suicide mortality rate (per 100,000 population) in 2019. Age-standardization removes demographic composition effects, making cross-country comparisons more valid than crude rates.",
+      "datasetIds": [
+        "who--MH_12"
+      ],
+      "chartType": "bar",
+      "highlights": [
+        "Suriname at 42.0 per 100,000 is the highest in this sample",
+        "Rates vary more than 50-fold across the 47 countries with 2019 data",
+        "Ireland (11.2) and Luxembourg (12.4) are notable high-income outliers",
+        "India at 14.2 represents one of the largest absolute burdens given its population size"
+      ],
+      "createdAt": "2026-06-07T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-342.py"
+    },
+    {
+      "id": "viz-344",
+      "title": "Infant Mortality: Thirty Years of Progress",
+      "description": "Slope chart showing infant mortality rates (per 1,000 live births) in 1990 vs 2022 for the 15 countries with the highest rates in 1990. Highlights dramatic progress across Sub-Saharan Africa and Asia, with Central African Republic as a stark outlier.",
+      "datasetIds": [
+        "wb--SP-DYN-IMRT-IN"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-344.html",
+      "highlights": [
+        "Angola cut infant mortality by 71% \u2014 from 118 to 34 per 1,000",
+        "Bangladesh achieved a 75% reduction, from 96 to 24",
+        "Central African Republic is the only country where rates worsened (109 to 207)"
+      ],
+      "createdAt": "2026-06-07T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-344.py"
+    },
+    {
+      "id": "viz-345",
+      "title": "The Graying Planet",
+      "description": "Trend lines showing the share of population aged 65 and above (%) from 1970 to 2024 for eight major economies. Japan's unprecedented demographic transformation leads, while South Korea and China are on steep upward trajectories.",
+      "datasetIds": [
+        "wb--SP-POP-65UP-TO-ZS"
+      ],
+      "chartType": "trend lines",
+      "codeFilePath": "viz/viz-345.html",
+      "highlights": [
+        "Japan: from 7% in 1970 to nearly 30% in 2024 \u2014 fastest aging in history",
+        "South Korea is now aging faster than Japan did at the same age share",
+        "India and Brazil still under 8%, but rising steadily"
+      ],
+      "createdAt": "2026-06-07T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-345.py"
+    },
+    {
+      "id": "viz-346",
       "title": "The Labor Force Gender Gap, 2022",
       "description": "Paired bar chart comparing male and female labor force participation rates (% of population 15+) in 2022. Shows the 10 countries with the widest gender gap and 10 with the narrowest.",
       "datasetIds": [
@@ -5611,31 +5663,31 @@
         "wb--SL-TLF-CACT-FE-ZS"
       ],
       "chartType": "paired bar",
-      "codeFilePath": "viz/viz-342.html",
+      "codeFilePath": "viz/viz-346.html",
       "highlights": [
         "Afghanistan has the widest gap: men 70%, women 5% (65 percentage points)",
         "All top-10 widest gaps are in the Middle East, North Africa, or South Asia",
         "In Burundi, women actually participate more than men (80% vs 78%)"
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
-      "notebookPath": "notebooks/viz-342.py"
+      "notebookPath": "notebooks/viz-346.py"
     },
     {
-      "id": "viz-343",
+      "id": "viz-347",
       "title": "Who Registers Their Newborns?",
       "description": "Horizontal bar chart showing birth registration completeness (% of children under 5) circa 2014. Without a birth certificate, children are invisible to governments \u2014 unable to access schools, healthcare, or legal protections.",
       "datasetIds": [
         "wb--SP-REG-BRTH-ZS"
       ],
       "chartType": "bar",
-      "codeFilePath": "viz/viz-343.html",
+      "codeFilePath": "viz/viz-347.html",
       "highlights": [
         "Bangladesh (20%) and Guinea-Bissau (24%) register fewer than 1 in 4 births",
         "Most of Europe achieves 100% registration through universal civil registration",
         "India at 72% represents over a billion people with incomplete birth records"
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
-      "notebookPath": "notebooks/viz-343.py"
+      "notebookPath": "notebooks/viz-347.py"
     }
   ],
   "lastUpdated": "2026-04-05T00:00:00.000Z"
