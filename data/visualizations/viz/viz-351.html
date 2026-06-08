@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 32px 40px;
+      background: #1a1a2e;
+      color: #e8e6e3;
+    }
+    h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin: 0 0 4px;
+      color: #e8e6e3;
+    }
+    .subtitle {
+      font-size: 11px;
+      color: #9b9890;
+      margin: 0 0 24px;
+      max-width: 560px;
+      line-height: 1.5;
+    }
+    .source {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: #6b6966;
+      margin-top: 20px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: #0d0d1a;
+      color: #e8e6e3;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 6px 10px;
+      border-radius: 2px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 10;
+      border: 1px solid #2e2e4a;
+    }
+  </style>
+</head>
+<body>
+  <h1>Protecting More of the Planet</h1>
+  <p class="subtitle">Terrestrial and marine protected areas as a percentage of total territorial area, 2013 vs 2024. Each line traces one country's decade of conservation commitments.</p>
+  <div id="chart" style="position:relative;"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: World Bank — ER.PTD.TOTL.ZS</p>
+
+  <script>
+    // Data from catalog: wb--ER-PTD-TOTL-ZS
+    const data = [{"n":"Bhutan","a":28.8,"b":51.6},{"n":"Chile","a":6.8,"b":37.9},{"n":"Costa Rica","a":3,"b":28.2},{"n":"Germany","a":38.9,"b":40.1},{"n":"France","a":23.5,"b":36.8},{"n":"Australia","a":28.1,"b":33.5},{"n":"Brazil","a":18.9,"b":29.4},{"n":"Colombia","a":18.1,"b":26.4},{"n":"Cambodia","a":20.9,"b":31.8},{"n":"Bolivia","a":21.4,"b":30.9},{"n":"Armenia","a":23.3,"b":38.9},{"n":"Gabon","a":12,"b":24.5},{"n":"Austria","a":24,"b":29.6},{"n":"Belize","a":18.3,"b":26.8},{"n":"Bulgaria","a":35,"b":35.6},{"n":"Botswana","a":29.1,"b":29.1},{"n":"Kenya","a":12.1,"b":11.8},{"n":"India","a":3.4,"b":4.5},{"n":"China","a":15.8,"b":14.7},{"n":"Ecuador","a":15.4,"b":20.1}];
+
+    const W = 720, H = 600;
+    const pad = { left: 130, right: 140, top: 50, bottom: 40 };
+    const minV = 0, maxV = 56;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = W + "px";
+    svg.style.cursor = "crosshair";
+    svg.style.display = "block";
+
+    // Background
+    const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    bg.setAttribute("width", W); bg.setAttribute("height", H);
+    bg.setAttribute("fill", "#1a1a2e");
+    svg.appendChild(bg);
+
+    // Gridlines
+    [10, 20, 30, 40, 50].forEach(v => {
+      const y = scale(v);
+      const gl = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      gl.setAttribute("x1", pad.left); gl.setAttribute("y1", y);
+      gl.setAttribute("x2", W - pad.right); gl.setAttribute("y2", y);
+      gl.setAttribute("stroke", "#2a2a42"); gl.setAttribute("stroke-width", "1");
+      svg.appendChild(gl);
+      const gt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      gt.setAttribute("x", pad.left - 6); gt.setAttribute("y", y + 3.5);
+      gt.setAttribute("text-anchor", "end");
+      gt.setAttribute("font-family", "'JetBrains Mono', monospace");
+      gt.setAttribute("font-size", "8"); gt.setAttribute("fill", "#4a4a62");
+      gt.textContent = v + "%";
+      svg.appendChild(gt);
+    });
+
+    // Axis year headers
+    const hdr = (x, txt) => {
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("x", x); t.setAttribute("y", 28);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("font-family", "'JetBrains Mono', monospace");
+      t.setAttribute("font-size", "11"); t.setAttribute("fill", "#9b9890");
+      t.setAttribute("letter-spacing", "1");
+      t.textContent = txt;
+      svg.appendChild(t);
+    };
+    hdr(pad.left, "2013");
+    hdr(W - pad.right, "2024");
+
+    // Vertical axis lines
+    [pad.left, W - pad.right].forEach(x => {
+      const ax = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      ax.setAttribute("x1", x); ax.setAttribute("y1", pad.top - 10);
+      ax.setAttribute("x2", x); ax.setAttribute("y2", H - pad.bottom);
+      ax.setAttribute("stroke", "#2e2e4a"); ax.setAttribute("stroke-width", "1");
+      svg.appendChild(ax);
+    });
+
+    // Color by magnitude of change
+    const colorForChange = d => {
+      const ch = d.b - d.a;
+      if (ch > 20) return "#4ecdc4";    // accent teal — big gainer
+      if (ch > 10) return "#6eb5a0";    // mid green
+      if (ch > 2)  return "#8fa88a";    // muted green
+      if (ch > -2) return "#7a7870";    // near-flat: neutral
+      return "#c06060";                  // slight decline: warm red
+    };
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const leftItems  = data.map(d => ({ n: d.n, y: scale(d.a), v: d.a, d }));
+    const rightItems = data.map(d => ({ n: d.n, y: scale(d.b), v: d.b, d }));
+    resolveCollisions(leftItems,  13);
+    resolveCollisions(rightItems, 13);
+
+    const rows = [];
+
+    data.forEach((d, i) => {
+      const x1 = pad.left + 4;
+      const x2 = W - pad.right - 4;
+      const y1 = scale(d.a);
+      const y2 = scale(d.b);
+      const col = colorForChange(d);
+
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+      line.setAttribute("stroke", col); line.setAttribute("stroke-width", "1.5");
+      line.setAttribute("opacity", "0.75");
+      g.appendChild(line);
+
+      [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("cx", p.x); c.setAttribute("cy", p.y); c.setAttribute("r", "3");
+        c.setAttribute("fill", col);
+        g.appendChild(c);
+      });
+
+      const ll = leftItems.find(l => l.n === d.n);
+      const lt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      lt.setAttribute("x", x1 - 8); lt.setAttribute("y", ll.y + 3.5);
+      lt.setAttribute("text-anchor", "end"); lt.setAttribute("font-size", "10");
+      lt.setAttribute("fill", "#c8c6c3");
+      lt.textContent = `${d.n}  ${d.a.toFixed(1)}`;
+      g.appendChild(lt);
+
+      const rl = rightItems.find(l => l.n === d.n);
+      const rt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      rt.setAttribute("x", x2 + 8); rt.setAttribute("y", rl.y + 3.5);
+      rt.setAttribute("text-anchor", "start"); rt.setAttribute("font-size", "10");
+      rt.setAttribute("fill", "#c8c6c3");
+      rt.textContent = `${d.b.toFixed(1)}  ${d.n}`;
+      g.appendChild(rt);
+
+      // Wide invisible hit area
+      const hit = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      hit.setAttribute("x1", x1); hit.setAttribute("y1", y1);
+      hit.setAttribute("x2", x2); hit.setAttribute("y2", y2);
+      hit.setAttribute("stroke", "transparent"); hit.setAttribute("stroke-width", "14");
+      hit.style.cursor = "pointer";
+      g.appendChild(hit);
+
+      svg.appendChild(g);
+      rows.push({ g, line, d, col, y1, y2, x1, x2 });
+    });
+
+    // Legend
+    const legendItems = [
+      { col: "#4ecdc4", label: "> 20 pp gained" },
+      { col: "#6eb5a0", label: "10-20 pp gained" },
+      { col: "#8fa88a", label: "2-10 pp gained" },
+      { col: "#7a7870", label: "Stable" },
+      { col: "#c06060", label: "Slight decline" },
+    ];
+    const lx0 = pad.left;
+    const ly  = H - 10;
+    legendItems.forEach((l, i) => {
+      const x = lx0 + i * 126;
+      const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      r.setAttribute("x", x); r.setAttribute("y", ly - 6);
+      r.setAttribute("width", 14); r.setAttribute("height", 3);
+      r.setAttribute("fill", l.col); r.setAttribute("rx", 1);
+      svg.appendChild(r);
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("x", x + 18); t.setAttribute("y", ly);
+      t.setAttribute("font-size", "9"); t.setAttribute("fill", "#6b6966");
+      t.setAttribute("font-family", "'JetBrains Mono', monospace");
+      t.textContent = l.label;
+      svg.appendChild(t);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+
+    // Interactivity
+    const tip = document.getElementById("tip");
+    let activeIdx = -1;
+
+    function highlight(idx) {
+      if (idx === activeIdx) return;
+      activeIdx = idx;
+      rows.forEach((row, i) => {
+        if (idx === -1) {
+          row.g.style.opacity = "1";
+          row.line.setAttribute("stroke-width", "1.5");
+          row.line.setAttribute("opacity", "0.75");
+        } else if (i === idx) {
+          row.g.style.opacity = "1";
+          row.line.setAttribute("stroke-width", "3");
+          row.line.setAttribute("opacity", "1");
+        } else {
+          row.g.style.opacity = "0.12";
+          row.line.setAttribute("stroke-width", "1");
+          row.line.setAttribute("opacity", "0.4");
+        }
+      });
+    }
+
+    svg.addEventListener("mousemove", e => {
+      const rect = svg.getBoundingClientRect();
+      const scaleX = W / rect.width;
+      const scaleY = H / rect.height;
+      const sx = (e.clientX - rect.left) * scaleX;
+      const sy = (e.clientY - rect.top)  * scaleY;
+
+      let best = -1, bestDist = 18;
+      rows.forEach((row, i) => {
+        const span = row.x2 - row.x1;
+        const t = Math.max(0, Math.min(1, (sx - row.x1) / span));
+        const lineY = row.y1 + (row.y2 - row.y1) * t;
+        const dist = Math.abs(sy - lineY);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+
+      highlight(best);
+
+      if (best >= 0) {
+        const d = rows[best].d;
+        const ch = (d.b - d.a).toFixed(1);
+        const sign = d.b >= d.a ? "+" : "";
+        tip.textContent = `${d.n}: ${d.a.toFixed(1)}% → ${d.b.toFixed(1)}% (${sign}${ch} pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top  = (e.clientY - 22) + "px";
+      } else {
+        tip.style.opacity = "0";
+      }
+    });
+
+    svg.addEventListener("mouseleave", () => {
+      highlight(-1);
+      tip.style.opacity = "0";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Health Spending as % of GDP, 2000-2022</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 28px 36px 24px;
+      background: #1a1a2e;
+      color: #e8e6e3;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      color: #e8e6e3;
+      letter-spacing: -0.2px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #a09e9b;
+      margin: 0 0 20px;
+      max-width: 580px;
+      line-height: 1.5;
+    }
+
+    #chart-area {
+      position: relative;
+      width: 100%;
+    }
+
+    svg {
+      width: 100%;
+      max-width: 780px;
+      display: block;
+    }
+
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: #0d0d1a;
+      color: #e8e6e3;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 7px 11px;
+      border-radius: 3px;
+      border: 1px solid #2e2e4a;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 100;
+    }
+
+    .source {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: #5a5868;
+      margin-top: 14px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <h1>Health Spending as a Share of GDP, 2000-2022</h1>
+  <p class="subtitle">Current health expenditure as a percentage of GDP across 14 countries. Rich economies surged after COVID-19; low-income countries remain below 4%.</p>
+  <div id="chart-area">
+    <div class="tooltip" id="tip"></div>
+  </div>
+  <p class="source">Source: World Bank &mdash; SH.XPD.CHEX.GD.ZS</p>
+
+  <script>
+    // Data exported from catalog wb--SH-XPD-CHEX-GD-ZS -- do not modify
+    const data = [{"n":"Germany","s":[9.76,9.78,10.03,10.22,9.97,10.11,9.96,9.83,10.03,10.97,10.83,10.52,10.59,10.74,10.77,10.92,10.97,11.05,11.18,11.43,12.47,12.72,12.45],"y0":2000},{"n":"France","s":[9.62,9.76,10.08,10.13,10.21,10.24,10.4,10.33,10.51,11.29,11.22,11.18,11.34,11.38,11.58,11.5,11.57,11.45,11.31,11.17,12.13,12.25,11.83],"y0":2000},{"n":"Japan","s":[7.03,7.24,7.35,7.49,7.54,7.66,7.69,7.78,8.09,8.96,9.06,10.49,10.67,10.67,10.73,10.75,10.66,10.66,10.74,10.97,11.45,12.08,12.32],"y0":2000},{"n":"Canada","s":[8.25,8.62,8.86,9.01,9.07,9.04,9.33,9.43,9.59,10.7,10.7,10.41,10.54,10.44,10.28,10.76,11.06,10.92,10.92,11.05,13.02,12.38,11.08],"y0":2000},{"n":"Australia","s":[7.59,7.67,7.87,7.88,8.08,7.96,7.97,8.05,8.25,8.54,8.42,8.53,8.67,8.75,9.83,10.14,10.09,10.11,10.09,10.25,10.7,10.52,9.89],"y0":2000},{"n":"South Korea","s":[3.72,4.17,3.91,4.47,4.43,4.65,4.96,4.96,5.25,5.69,5.79,5.9,5.96,6.07,6.24,6.46,6.64,6.8,7.14,7.69,8.03,8.34,8.86],"y0":2000},{"n":"China","s":[4.45,4.2,4.32,4.35,4.23,4.11,3.89,3.62,3.84,4.28,4.16,4.27,4.49,4.64,4.7,4.85,4.88,4.97,5.07,5.27,5.5,5.26,5.88],"y0":2000},{"n":"Brazil","s":[8.33,8.55,8.7,8.19,8.12,8.04,8.25,8.2,8.01,8.39,7.95,7.79,7.74,7.98,8.4,8.91,9.17,9.47,9.46,9.61,9.62,9.64,9.39],"y0":2000},{"n":"India","s":[4.11,4.34,4.31,4.08,4.03,3.86,3.67,3.58,3.59,3.55,3.34,3.25,3.33,3.75,3.62,3.6,3.5,2.94,2.86,2.95,3.34,3.35,3.4],"y0":2000},{"n":"Ethiopia","s":[4.37,4.72,4.71,4.9,4.31,4.1,4.46,5.0,4.28,4.65,5.47,4.47,4.54,4.08,4.03,3.82,3.6,3.45,3.3,3.24,3.48,3.21,2.85],"y0":2000},{"n":"Bangladesh","s":[1.81,1.77,1.93,1.96,2.0,2.06,2.11,2.17,2.12,2.18,2.29,2.36,2.35,2.3,2.28,2.27,2.39,2.37,2.32,2.13,2.18,2.27,2.22],"y0":2000},{"n":"Argentina","s":[8.22,8.27,7.33,6.93,7.09,7.73,7.71,7.86,8.24,9.57,9.49,9.51,9.89,9.92,9.8,10.27,10.05,10.26,10.17,10.12,10.67,11.01,10.16],"y0":2000},{"n":"Chile","s":[7.0,7.1,7.21,7.25,6.91,6.62,6.07,6.21,6.74,7.25,6.82,6.8,7.02,7.48,7.84,8.35,8.56,9.09,9.15,9.31,9.7,9.72,10.01],"y0":2000},{"n":"Iran","s":[4.72,5.16,4.65,4.96,5.13,5.3,5.16,4.91,5.04,6.11,6.29,6.1,6.12,5.74,6.82,8.38,7.8,7.72,6.64,6.23,4.96,4.86,5.63],"y0":2000}];
+
+    const W = 780, H = 480;
+    const pad = { top: 30, right: 100, bottom: 40, left: 48 };
+    const years = Array.from({ length: 23 }, (_, i) => 2000 + i);
+
+    // Color palette (dark theme)
+    const palette = [
+      "#4ecdc4", // teal accent
+      "#f7b731", // amber
+      "#a29bfe", // lavender
+      "#fd79a8", // pink
+      "#55efc4", // mint
+      "#fdcb6e", // yellow
+      "#74b9ff", // sky blue
+      "#e17055", // coral
+      "#b2bec3", // silver
+      "#00b894", // green
+      "#6c5ce7", // purple
+      "#fab1a0", // peach
+      "#81ecec", // light cyan
+      "#ff7675", // red
+    ];
+
+    // Compute scales
+    const allVals = data.flatMap(d => d.s.filter(v => v !== null));
+    const minV = 0;
+    const maxV = 14;
+
+    const xScale = i => pad.left + (i / (years.length - 1)) * (W - pad.left - pad.right);
+    const yScale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+    // Sort by last value descending for label placement
+    const sorted = data.slice().sort((a, b) => b.s[b.s.length - 1] - a.s[a.s.length - 1]);
+
+    const ns = (tag) => document.createElementNS("http://www.w3.org/2000/svg", tag);
+
+    const svg = ns("svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = W + "px";
+    svg.style.cursor = "crosshair";
+
+    // Grid lines
+    const gridVals = [2, 4, 6, 8, 10, 12, 14];
+    gridVals.forEach(v => {
+      const y = yScale(v);
+      const line = ns("line");
+      line.setAttribute("x1", pad.left);
+      line.setAttribute("x2", W - pad.right);
+      line.setAttribute("y1", y);
+      line.setAttribute("y2", y);
+      line.setAttribute("stroke", "#2a2a40");
+      line.setAttribute("stroke-width", "1");
+      svg.appendChild(line);
+
+      const label = ns("text");
+      label.setAttribute("x", pad.left - 6);
+      label.setAttribute("y", y + 4);
+      label.setAttribute("text-anchor", "end");
+      label.setAttribute("font-family", "'JetBrains Mono', monospace");
+      label.setAttribute("font-size", "10");
+      label.setAttribute("fill", "#5a5868");
+      label.textContent = v + "%";
+      svg.appendChild(label);
+    });
+
+    // X axis ticks
+    [2000, 2005, 2010, 2015, 2020, 2022].forEach(yr => {
+      const i = yr - 2000;
+      if (i < 0 || i >= years.length) return;
+      const x = xScale(i);
+      const tick = ns("line");
+      tick.setAttribute("x1", x);
+      tick.setAttribute("x2", x);
+      tick.setAttribute("y1", H - pad.bottom);
+      tick.setAttribute("y2", H - pad.bottom + 4);
+      tick.setAttribute("stroke", "#5a5868");
+      tick.setAttribute("stroke-width", "1");
+      svg.appendChild(tick);
+
+      const label = ns("text");
+      label.setAttribute("x", x);
+      label.setAttribute("y", H - pad.bottom + 15);
+      label.setAttribute("text-anchor", "middle");
+      label.setAttribute("font-family", "'JetBrains Mono', monospace");
+      label.setAttribute("font-size", "10");
+      label.setAttribute("fill", "#5a5868");
+      label.textContent = yr;
+      svg.appendChild(label);
+    });
+
+    // COVID annotation
+    const covidX = xScale(20); // 2020
+    const covidLine = ns("line");
+    covidLine.setAttribute("x1", covidX);
+    covidLine.setAttribute("x2", covidX);
+    covidLine.setAttribute("y1", pad.top);
+    covidLine.setAttribute("y2", H - pad.bottom);
+    covidLine.setAttribute("stroke", "#3a3a5a");
+    covidLine.setAttribute("stroke-width", "1");
+    covidLine.setAttribute("stroke-dasharray", "4 3");
+    svg.appendChild(covidLine);
+
+    const covidLabel = ns("text");
+    covidLabel.setAttribute("x", covidX + 4);
+    covidLabel.setAttribute("y", pad.top + 12);
+    covidLabel.setAttribute("font-family", "'JetBrains Mono', monospace");
+    covidLabel.setAttribute("font-size", "9");
+    covidLabel.setAttribute("fill", "#5a5868");
+    covidLabel.textContent = "COVID-19";
+    svg.appendChild(covidLabel);
+
+    // Build paths and end labels
+    function resolveCollisions(items, minGap) {
+      const sortedItems = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sortedItems.length; i++) {
+          const gap = sortedItems[i].y - sortedItems[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sortedItems[i - 1].y -= shift;
+            sortedItems[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sortedItems;
+    }
+
+    const rows = [];
+    const endLabels = [];
+
+    data.forEach((d, idx) => {
+      const color = palette[idx % palette.length];
+      const lastVal = d.s[d.s.length - 1];
+      endLabels.push({ n: d.n, y: yScale(lastVal), idx });
+    });
+
+    resolveCollisions(endLabels, 13);
+
+    data.forEach((d, idx) => {
+      const color = palette[idx % palette.length];
+
+      const g = ns("g");
+      g.setAttribute("data-idx", idx);
+
+      // Build path points
+      const points = d.s.map((v, i) => ({ x: xScale(i), y: yScale(v) }));
+      const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+
+      const path = ns("path");
+      path.setAttribute("d", pathD);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", color);
+      path.setAttribute("stroke-width", "1.8");
+      path.setAttribute("stroke-linejoin", "round");
+      path.setAttribute("stroke-linecap", "round");
+      path.setAttribute("opacity", "0.85");
+      g.appendChild(path);
+
+      // Endpoint dot
+      const lastPt = points[points.length - 1];
+      const dot = ns("circle");
+      dot.setAttribute("cx", lastPt.x);
+      dot.setAttribute("cy", lastPt.y);
+      dot.setAttribute("r", "3");
+      dot.setAttribute("fill", color);
+      g.appendChild(dot);
+
+      // End label
+      const labelInfo = endLabels.find(l => l.idx === idx);
+      const lbl = ns("text");
+      lbl.setAttribute("x", lastPt.x + 8);
+      lbl.setAttribute("y", labelInfo.y + 4);
+      lbl.setAttribute("font-family", "'Inter', sans-serif");
+      lbl.setAttribute("font-size", "10");
+      lbl.setAttribute("fill", color);
+      lbl.setAttribute("font-weight", "500");
+      lbl.textContent = d.n;
+      g.appendChild(lbl);
+
+      // Wide invisible hit area
+      const hitPath = ns("path");
+      hitPath.setAttribute("d", pathD);
+      hitPath.setAttribute("fill", "none");
+      hitPath.setAttribute("stroke", "transparent");
+      hitPath.setAttribute("stroke-width", "16");
+      hitPath.style.cursor = "pointer";
+      g.appendChild(hitPath);
+
+      svg.appendChild(g);
+      rows.push({ g, path, dot, d, color, points, idx });
+    });
+
+    document.getElementById("chart-area").insertBefore(svg, document.getElementById("tip"));
+
+    // Interactivity
+    const tip = document.getElementById("tip");
+    let activeIdx = -1;
+
+    function highlight(idx) {
+      if (idx === activeIdx) return;
+      activeIdx = idx;
+      rows.forEach(row => {
+        if (idx === -1) {
+          row.g.style.opacity = "1";
+          row.path.setAttribute("stroke-width", "1.8");
+        } else if (row.idx === idx) {
+          row.g.style.opacity = "1";
+          row.path.setAttribute("stroke-width", "3");
+        } else {
+          row.g.style.opacity = "0.12";
+          row.path.setAttribute("stroke-width", "1.5");
+        }
+      });
+    }
+
+    svg.addEventListener("mousemove", e => {
+      const rect = svg.getBoundingClientRect();
+      const sx = (e.clientX - rect.left) / rect.width * W;
+      const sy = (e.clientY - rect.top) / rect.height * H;
+
+      // Clamp to chart area
+      if (sx < pad.left || sx > W - pad.right || sy < pad.top || sy > H - pad.bottom) {
+        highlight(-1);
+        tip.style.opacity = "0";
+        return;
+      }
+
+      // Which year index?
+      const tRaw = (sx - pad.left) / (W - pad.left - pad.right);
+      const t = Math.max(0, Math.min(1, tRaw));
+      const yearIdx = Math.round(t * (years.length - 1));
+      const yr = years[yearIdx];
+
+      // Find closest line vertically at this year
+      let best = -1, bestDist = 25;
+      rows.forEach(row => {
+        const v = row.d.s[yearIdx];
+        if (v === null || v === undefined) return;
+        const lineY = yScale(v);
+        const dist = Math.abs(sy - lineY);
+        if (dist < bestDist) { bestDist = dist; best = row.idx; }
+      });
+
+      highlight(best);
+
+      if (best >= 0) {
+        const d = rows[best].d;
+        const val = d.s[yearIdx];
+        tip.textContent = `${d.n}  ${yr}: ${val !== null ? val.toFixed(1) + "% of GDP" : "no data"}`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      } else {
+        tip.style.opacity = "0";
+      }
+    });
+
+    svg.addEventListener("mouseleave", () => {
+      highlight(-1);
+      tip.style.opacity = "0";
+    });
+  </script>
+</body>
+</html>
