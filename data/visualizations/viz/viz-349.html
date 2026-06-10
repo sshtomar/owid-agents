@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; line-height: 1.6; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>Crop Production Index, 1961–2022</h1>
+  <p class="subtitle">Indexed to 2014–2016 = 100. China and India have multiplied their crop output 7–8× since 1961, driven by green revolution technology, irrigation, and hybrid seeds. Brazil and Argentina emerged as agricultural powerhouses. Japan has declined as farmland shrinks.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: World Bank — AG.PRD.CROP.XD (Crop Production Index, 2014–2016 = 100)</p>
+<script>
+const series = [
+  {"n":"China","pts":[{"y":1961,"v":14.2},{"y":1966,"v":19.1},{"y":1971,"v":21.3},{"y":1976,"v":23.3},{"y":1981,"v":27.7},{"y":1986,"v":34.7},{"y":1991,"v":41.3},{"y":1996,"v":53.4},{"y":2001,"v":63.2},{"y":2006,"v":74.4},{"y":2011,"v":91.0},{"y":2016,"v":101.1},{"y":2022,"v":111.8}]},
+  {"n":"India","pts":[{"y":1961,"v":24.7},{"y":1966,"v":24.1},{"y":1971,"v":30.6},{"y":1976,"v":32.7},{"y":1981,"v":38.3},{"y":1986,"v":43.1},{"y":1991,"v":53.3},{"y":1996,"v":62.3},{"y":2001,"v":67.6},{"y":2006,"v":75.3},{"y":2011,"v":94.2},{"y":2016,"v":101.0},{"y":2022,"v":123.3}]},
+  {"n":"Brazil","pts":[{"y":1961,"v":17.0},{"y":1966,"v":18.9},{"y":1971,"v":23.6},{"y":1976,"v":26.1},{"y":1981,"v":33.7},{"y":1986,"v":37.6},{"y":1991,"v":41.9},{"y":1996,"v":45.5},{"y":2001,"v":57.2},{"y":2006,"v":71.6},{"y":2011,"v":93.5},{"y":2016,"v":98.5},{"y":2022,"v":115.9}]},
+  {"n":"Indonesia","pts":[{"y":1961,"v":16.9},{"y":1966,"v":18.7},{"y":1971,"v":22.8},{"y":1976,"v":25.1},{"y":1981,"v":33.7},{"y":1986,"v":41.3},{"y":1991,"v":49.2},{"y":1996,"v":59.9},{"y":2001,"v":62.3},{"y":2006,"v":79.2},{"y":2011,"v":94.5},{"y":2016,"v":99.0},{"y":2022,"v":111.4}]},
+  {"n":"Bangladesh","pts":[{"y":1961,"v":27.0},{"y":1966,"v":27.9},{"y":1971,"v":28.8},{"y":1976,"v":32.3},{"y":1981,"v":36.8},{"y":1986,"v":41.5},{"y":1991,"v":47.1},{"y":1996,"v":49.0},{"y":2001,"v":61.1},{"y":2006,"v":73.4},{"y":2011,"v":93.8},{"y":2016,"v":100.5},{"y":2022,"v":119.1}]},
+  {"n":"Argentina","pts":[{"y":1961,"v":19.6},{"y":1966,"v":22.6},{"y":1971,"v":26.3},{"y":1976,"v":31.2},{"y":1981,"v":34.3},{"y":1986,"v":38.4},{"y":1991,"v":42.3},{"y":1996,"v":47.4},{"y":2001,"v":63.9},{"y":2006,"v":75.4},{"y":2011,"v":93.5},{"y":2016,"v":101.7},{"y":2022,"v":107.3}]},
+  {"n":"Australia","pts":[{"y":1961,"v":20.9},{"y":1966,"v":33.5},{"y":1971,"v":33.0},{"y":1976,"v":37.6},{"y":1981,"v":48.5},{"y":1986,"v":54.6},{"y":1991,"v":56.2},{"y":1996,"v":69.8},{"y":2001,"v":89.7},{"y":2006,"v":93.3},{"y":2011,"v":99.8},{"y":2016,"v":99.2},{"y":2022,"v":146.1}]},
+  {"n":"France","pts":[{"y":1961,"v":65.8},{"y":1966,"v":73.7},{"y":1971,"v":81.7},{"y":1976,"v":77.8},{"y":1981,"v":84.2},{"y":1986,"v":94.3},{"y":1991,"v":91.1},{"y":1996,"v":101.5},{"y":2001,"v":95.4},{"y":2006,"v":96.2},{"y":2011,"v":100.8},{"y":2016,"v":90.8},{"y":2022,"v":94.7}]},
+  {"n":"Germany","pts":[{"y":1961,"v":74.6},{"y":1966,"v":84.9},{"y":1971,"v":86.7},{"y":1976,"v":74.2},{"y":1981,"v":79.9},{"y":1986,"v":96.2},{"y":1991,"v":81.2},{"y":1996,"v":87.5},{"y":2001,"v":100.6},{"y":2006,"v":90.6},{"y":2011,"v":90.7},{"y":2016,"v":94.9},{"y":2022,"v":91.5}]},
+  {"n":"Japan","pts":[{"y":1961,"v":129.5},{"y":1966,"v":138.6},{"y":1971,"v":129.9},{"y":1976,"v":134.0},{"y":1981,"v":126.9},{"y":1986,"v":134.7},{"y":1991,"v":123.2},{"y":1996,"v":120.2},{"y":2001,"v":113.4},{"y":2006,"v":105.1},{"y":2011,"v":100.4},{"y":2016,"v":98.3},{"y":2022,"v":94.6}]}
+];
+
+const COLORS = ["#D06B5C","#3A9E8F","#5B8FA8","#E88C5A","#7B68A8","#4A9E6A","#C47DB5","#8B7355","#D4A017","#6B9FD4"];
+const W = 800, H = 460;
+const M = {top: 36, right: 120, bottom: 40, left: 52};
+const PW = W - M.left - M.right;
+const PH = H - M.top - M.bottom;
+
+const yearMin = 1961, yearMax = 2022;
+const valMin = 0, valMax = 160;
+
+function xS(y) { return M.left + (y - yearMin) / (yearMax - yearMin) * PW; }
+function yS(v) { return M.top + (valMax - v) / (valMax - valMin) * PH; }
+
+function mkEl(tag, attrs, parent) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(M.top + 6, Math.min(H - M.bottom - 6, item.y));
+  }
+  return sorted;
+}
+
+const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:800px;display:block;"});
+document.getElementById("chart").appendChild(svg);
+
+// Reference line at 100 (baseline period)
+mkEl("line", {x1: M.left, y1: yS(100), x2: W - M.right, y2: yS(100), stroke: "#A8A49A", "stroke-dasharray": "4,3", "stroke-width": "0.8"}, svg);
+mkEl("text", {x: M.left + 4, y: yS(100) - 4, "font-size": "8", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = "2014–16 baseline";
+
+// Grid
+const yTicks = [0, 40, 80, 120, 160];
+for (const tick of yTicks) {
+  const cy = yS(tick);
+  mkEl("line", {x1: M.left, y1: cy, x2: W - M.right, y2: cy, stroke: "#E8E6DC", "stroke-width": "0.5"}, svg);
+  mkEl("text", {x: M.left - 6, y: cy + 4, "text-anchor": "end", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = tick;
+}
+
+for (let yr = 1961; yr <= 2022; yr += 10) {
+  const cx = xS(yr);
+  mkEl("line", {x1: cx, y1: H - M.bottom, x2: cx, y2: H - M.bottom + 4, stroke: "#A8A49A", "stroke-width": "0.8"}, svg);
+  mkEl("text", {x: cx, y: H - M.bottom + 14, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = yr;
+}
+
+mkEl("line", {x1: M.left, y1: H - M.bottom, x2: W - M.right, y2: H - M.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+series.forEach((s, idx) => {
+  const color = COLORS[idx % COLORS.length];
+  const g = mkEl("g", {opacity: "1"}, svg);
+  groups.push(g);
+
+  const pathD = s.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.y).toFixed(1)} ${yS(p.v).toFixed(1)}`).join(" ");
+  mkEl("path", {d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"}, g);
+
+  const hitPath = mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none", style: "cursor:pointer"}, g);
+
+  hitPath.addEventListener("mousemove", (e) => {
+    groups.forEach((gg, i) => gg.setAttribute("opacity", i === idx ? "1" : "0.08"));
+    g.querySelector("path").setAttribute("stroke-width", "3");
+    const svgRect = svg.getBoundingClientRect();
+    const mx = e.clientX - svgRect.left;
+    const yr = yearMin + Math.max(0, Math.min(1, (mx - M.left) / PW)) * (yearMax - yearMin);
+    let nearest = s.pts[0];
+    for (const p of s.pts) {
+      if (Math.abs(p.y - yr) < Math.abs(nearest.y - yr)) nearest = p;
+    }
+    tip.innerHTML = `<b>${s.n}</b><br>${nearest.y}: index ${nearest.v.toFixed(1)}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    groups.forEach(gg => gg.setAttribute("opacity", "1"));
+    g.querySelector("path").setAttribute("stroke-width", "1.8");
+    tip.style.opacity = "0";
+  });
+});
+
+const labelItems = series.map((s, idx) => {
+  const last = s.pts[s.pts.length - 1];
+  return {y: yS(last.v), label: s.n, value: last.v.toFixed(0), color: COLORS[idx % COLORS.length]};
+});
+const resolved = resolveCollisions(labelItems, 13);
+for (const item of resolved) {
+  const lastPt = series.find(s => s.n === item.label).pts.slice(-1)[0];
+  const rawY = yS(lastPt.v);
+  mkEl("text", {
+    x: W - M.right + 8, y: item.y + 4,
+    "font-size": "9", fill: item.color,
+    "font-family": "JetBrains Mono, monospace", "font-weight": "500"
+  }, svg).textContent = `${item.value}  ${item.label}`;
+  if (Math.abs(item.y - rawY) > 3) {
+    mkEl("line", {x1: W - M.right + 4, y1: rawY, x2: W - M.right + 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.4"}, svg);
+  }
+}
+</script>
+</body>
+</html>

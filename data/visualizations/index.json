@@ -5688,6 +5688,91 @@
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
       "notebookPath": "notebooks/viz-346.py"
+    },
+    {
+      "id": "viz-347",
+      "title": "Neonatal Mortality: Six Decades of Progress",
+      "description": "Trend lines showing neonatal mortality rate (deaths per 1,000 live births) for 9 countries from 1960 to 2024, highlighting dramatic declines in Bangladesh, China, and India.",
+      "datasetIds": [
+        "wb--SH-DYN-NMRT"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-347.html",
+      "highlights": [
+        "Bangladesh cut neonatal mortality from 103 to 18 per 1,000 over 64 years",
+        "China fell 90% from 30 to under 3 after 1990",
+        "Japan reached 0.9 per 1,000; Kenya plateaued 1990-2010 due to HIV/AIDS"
+      ],
+      "createdAt": "2026-06-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-347.py"
+    },
+    {
+      "id": "viz-348",
+      "title": "International Tourism Arrivals, 1995-2020",
+      "description": "Trend lines of annual tourist arrivals (millions) for top-10 destination countries, revealing steady growth through 2019 and the COVID-19 collapse in 2020.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-348.html",
+      "highlights": [
+        "France consistently topped 200M arrivals per year",
+        "China grew from 46M (1995) to 163M (2019), nearly tripling",
+        "COVID-19 cut arrivals 46-94% in 2020; Hong Kong fell from 56M to 4M"
+      ],
+      "createdAt": "2026-06-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-348.py"
+    },
+    {
+      "id": "viz-349",
+      "title": "Crop Production Index, 1961-2022",
+      "description": "Trend lines showing the crop production index (2014-2016 = 100) for 10 countries over six decades, showing Asia's agricultural revolution and Japan's decline.",
+      "datasetIds": [
+        "wb--AG-PRD-CROP-XD"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-349.html",
+      "highlights": [
+        "China multiplied crop output 8x since 1961; India and Bangladesh close behind",
+        "Australia surged to index 146 in 2022, its highest ever",
+        "Japan's crop production has steadily fallen since 1966 as farmland shrinks"
+      ],
+      "createdAt": "2026-06-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-349.py"
+    },
+    {
+      "id": "viz-350",
+      "title": "Energy Use per Capita: 1990 vs 2020",
+      "description": "Slope chart comparing energy consumption per capita (kg oil equivalent) in 1990 vs 2020 for 19 countries, colored by percentage change.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-350.html",
+      "highlights": [
+        "Iceland more than doubled energy use to 16,084 kg/cap, the world's highest",
+        "South Korea (+149%) and Iran (+174%) surged; Western Europe mostly declined",
+        "India and Bangladesh consume 25x less per capita than Iceland"
+      ],
+      "createdAt": "2026-06-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-350.py"
+    },
+    {
+      "id": "viz-351",
+      "title": "Adult Mortality Rate: ~2000 vs ~2019",
+      "description": "Slope chart showing the probability of dying between ages 15 and 60 (per 1,000) for 26 countries, comparing near-2000 to near-2019 estimates.",
+      "datasetIds": [
+        "who--WHOSIS_000004"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-351.html",
+      "highlights": [
+        "Uzbekistan cut adult mortality 65%, from 323 to 114 per 1,000",
+        "France and Switzerland each halved their rates over two decades",
+        "Some countries show increases partly due to COVID-era data in 2019-2020"
+      ],
+      "createdAt": "2026-06-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-351.py"
     }
   ],
   "lastUpdated": "2026-04-05T00:00:00.000Z"
