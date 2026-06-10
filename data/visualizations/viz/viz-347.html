@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; line-height: 1.6; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>Neonatal Mortality: Six Decades of Progress</h1>
+  <p class="subtitle">Deaths in the first 28 days of life per 1,000 live births, 1960–2024. Bangladesh cut its rate from 103 to 18; China from 30 to 3. High-income countries plateaued near 1–2 by the 2000s, while Sub-Saharan Africa still lags far behind.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: World Bank — SH.DYN.NMRT (Neonatal Mortality Rate)</p>
+<script>
+const series = [
+  {"n":"Bangladesh","pts":[{"y":1960,"v":103.2},{"y":1965,"v":94.3},{"y":1970,"v":93.9},{"y":1975,"v":96.2},{"y":1980,"v":89.7},{"y":1985,"v":77.2},{"y":1990,"v":65.7},{"y":1995,"v":54.0},{"y":2000,"v":43.4},{"y":2005,"v":34.9},{"y":2010,"v":28.8},{"y":2015,"v":23.5},{"y":2020,"v":18.6},{"y":2024,"v":17.9}]},
+  {"n":"India","pts":[{"y":1970,"v":84.7},{"y":1975,"v":80.3},{"y":1980,"v":72.2},{"y":1985,"v":64.2},{"y":1990,"v":57.0},{"y":1995,"v":50.4},{"y":2000,"v":43.8},{"y":2005,"v":37.4},{"y":2010,"v":31.7},{"y":2015,"v":26.0},{"y":2020,"v":20.6},{"y":2024,"v":16.7}]},
+  {"n":"Ethiopia","pts":[{"y":1980,"v":67.3},{"y":1985,"v":65.5},{"y":1990,"v":59.5},{"y":1995,"v":53.7},{"y":2000,"v":48.1},{"y":2005,"v":43.2},{"y":2010,"v":37.6},{"y":2015,"v":32.3},{"y":2020,"v":27.9},{"y":2024,"v":25.2}]},
+  {"n":"Kenya","pts":[{"y":1960,"v":48.6},{"y":1965,"v":42.0},{"y":1970,"v":39.2},{"y":1975,"v":35.2},{"y":1980,"v":32.1},{"y":1985,"v":29.4},{"y":1990,"v":26.7},{"y":1995,"v":26.4},{"y":2000,"v":26.3},{"y":2005,"v":24.7},{"y":2010,"v":23.4},{"y":2015,"v":23.2},{"y":2020,"v":22.0},{"y":2024,"v":20.7}]},
+  {"n":"Indonesia","pts":[{"y":1960,"v":58.0},{"y":1965,"v":53.6},{"y":1970,"v":48.5},{"y":1975,"v":43.3},{"y":1980,"v":38.2},{"y":1985,"v":33.4},{"y":1990,"v":30.1},{"y":1995,"v":26.7},{"y":2000,"v":22.5},{"y":2005,"v":19.5},{"y":2010,"v":16.6},{"y":2015,"v":13.4},{"y":2020,"v":10.8},{"y":2024,"v":9.2}]},
+  {"n":"Brazil","pts":[{"y":1965,"v":48.8},{"y":1970,"v":46.9},{"y":1975,"v":41.4},{"y":1980,"v":35.0},{"y":1985,"v":29.8},{"y":1990,"v":25.1},{"y":1995,"v":21.1},{"y":2000,"v":18.1},{"y":2005,"v":13.9},{"y":2010,"v":11.1},{"y":2015,"v":9.5},{"y":2020,"v":9.2},{"y":2024,"v":7.1}]},
+  {"n":"China","pts":[{"y":1990,"v":29.6},{"y":1995,"v":26.7},{"y":2000,"v":21.4},{"y":2005,"v":13.9},{"y":2010,"v":8.4},{"y":2015,"v":5.3},{"y":2020,"v":3.5},{"y":2024,"v":2.6}]},
+  {"n":"Germany","pts":[{"y":1970,"v":14.1},{"y":1975,"v":10.4},{"y":1980,"v":5.5},{"y":1985,"v":3.7},{"y":1990,"v":3.4},{"y":1995,"v":3.1},{"y":2000,"v":2.8},{"y":2005,"v":2.6},{"y":2010,"v":2.3},{"y":2015,"v":2.3},{"y":2020,"v":2.3},{"y":2024,"v":2.3}]},
+  {"n":"Japan","pts":[{"y":1970,"v":8.7},{"y":1975,"v":6.7},{"y":1980,"v":4.9},{"y":1985,"v":3.4},{"y":1990,"v":2.5},{"y":1995,"v":2.2},{"y":2000,"v":1.8},{"y":2005,"v":1.4},{"y":2010,"v":1.1},{"y":2015,"v":0.9},{"y":2020,"v":0.8},{"y":2024,"v":0.9}]}
+];
+
+const COLORS = ["#D06B5C","#3A9E8F","#5B8FA8","#E88C5A","#7B68A8","#4A9E6A","#C47DB5","#8B7355","#D4A017"];
+const W = 800, H = 460;
+const M = {top: 36, right: 130, bottom: 40, left: 52};
+const PW = W - M.left - M.right;
+const PH = H - M.top - M.bottom;
+
+const allPts = series.flatMap(s => s.pts);
+const yearMin = Math.min(...allPts.map(p => p.y));
+const yearMax = Math.max(...allPts.map(p => p.y));
+const valMax = Math.ceil(Math.max(...allPts.map(p => p.v)) / 10) * 10;
+const valMin = 0;
+
+function xS(y) { return M.left + (y - yearMin) / (yearMax - yearMin) * PW; }
+function yS(v) { return M.top + (valMax - v) / (valMax - valMin) * PH; }
+
+function mkEl(tag, attrs, parent) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // clamp
+  for (const item of sorted) {
+    item.y = Math.max(M.top + 6, Math.min(H - M.bottom - 6, item.y));
+  }
+  return sorted;
+}
+
+const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:800px;display:block;"});
+document.getElementById("chart").appendChild(svg);
+
+// Y-axis grid + ticks
+const yTicks = [0, 20, 40, 60, 80, 100];
+for (const tick of yTicks) {
+  const cy = yS(tick);
+  mkEl("line", {x1: M.left, y1: cy, x2: W - M.right, y2: cy, stroke: "#E8E6DC", "stroke-width": "0.5"}, svg);
+  mkEl("text", {x: M.left - 6, y: cy + 4, "text-anchor": "end", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = tick;
+}
+
+// X-axis ticks
+for (let yr = 1960; yr <= 2024; yr += 10) {
+  const cx = xS(yr);
+  mkEl("line", {x1: cx, y1: H - M.bottom, x2: cx, y2: H - M.bottom + 4, stroke: "#A8A49A", "stroke-width": "0.8"}, svg);
+  mkEl("text", {x: cx, y: H - M.bottom + 14, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = yr;
+}
+
+// Axis lines
+mkEl("line", {x1: M.left, y1: H - M.bottom, x2: W - M.right, y2: H - M.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+mkEl("line", {x1: M.left, y1: M.top, x2: M.left, y2: H - M.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+
+// Y-axis label
+const ylEl = mkEl("text", {x: 12, y: M.top + PH/2, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", transform: `rotate(-90,12,${M.top + PH/2})`}, svg);
+ylEl.textContent = "Deaths per 1,000 live births";
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+// Draw lines
+series.forEach((s, idx) => {
+  const color = COLORS[idx % COLORS.length];
+  const g = mkEl("g", {opacity: "1"}, svg);
+  groups.push(g);
+
+  const pathD = s.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.y).toFixed(1)} ${yS(p.v).toFixed(1)}`).join(" ");
+  mkEl("path", {d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"}, g);
+
+  // invisible wide hit path
+  const hitPath = mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none", style: "cursor:pointer"}, g);
+
+  hitPath.addEventListener("mousemove", (e) => {
+    groups.forEach((gg, i) => gg.setAttribute("opacity", i === idx ? "1" : "0.08"));
+    g.querySelector("path").setAttribute("stroke-width", "3");
+    const svgRect = svg.getBoundingClientRect();
+    const mx = e.clientX - svgRect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - M.left) / PW));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    // find nearest data point
+    let nearest = s.pts[0];
+    for (const p of s.pts) {
+      if (Math.abs(p.y - yr) < Math.abs(nearest.y - yr)) nearest = p;
+    }
+    tip.innerHTML = `<b>${s.n}</b><br>${nearest.y}: ${nearest.v.toFixed(1)} per 1,000`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    groups.forEach(gg => gg.setAttribute("opacity", "1"));
+    g.querySelector("path").setAttribute("stroke-width", "1.8");
+    tip.style.opacity = "0";
+  });
+});
+
+// Endpoint labels
+const labelItems = series.map((s, idx) => {
+  const last = s.pts[s.pts.length - 1];
+  return {y: yS(last.v), label: s.n, value: last.v.toFixed(1), color: COLORS[idx % COLORS.length]};
+});
+const resolved = resolveCollisions(labelItems, 13);
+for (const item of resolved) {
+  const lastPt = series.find(s => s.n === item.label).pts.slice(-1)[0];
+  const rawY = yS(lastPt.v);
+  mkEl("text", {
+    x: W - M.right + 8, y: item.y + 4,
+    "font-size": "9", fill: item.color,
+    "font-family": "JetBrains Mono, monospace", "font-weight": "500"
+  }, svg).textContent = `${item.value}  ${item.label}`;
+  // faint leader line if displaced
+  if (Math.abs(item.y - rawY) > 3) {
+    mkEl("line", {x1: W - M.right + 4, y1: rawY, x2: W - M.right + 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.4"}, svg);
+  }
+}
+</script>
+</body>
+</html>

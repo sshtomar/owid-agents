@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; line-height: 1.6; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>Energy Use per Capita: 1990 vs 2020</h1>
+  <p class="subtitle">Kilograms of oil equivalent per person. Iceland more than doubled its already-high consumption. South Korea and China tripled theirs. Most Western economies declined slightly. India and Bangladesh started very low and grew modestly, consuming 15–25× less than the highest users.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: World Bank — EG.USE.PCAP.KG.OE (Energy Use per Capita, kg of Oil Equivalent)</p>
+<script>
+const data = [
+  {"n":"Bahrain","a":10576,"b":10834},
+  {"n":"Iceland","a":9058,"b":16084},
+  {"n":"Canada","a":7642,"b":7495},
+  {"n":"Brunei","a":6766,"b":9176},
+  {"n":"Finland","a":5692,"b":5739},
+  {"n":"Australia","a":5048,"b":5159},
+  {"n":"Belgium","a":4804,"b":4386},
+  {"n":"Germany","a":4422,"b":3349},
+  {"n":"France","a":3840,"b":3228},
+  {"n":"Japan","a":3538,"b":3047},
+  {"n":"South Korea","a":2088,"b":5196},
+  {"n":"Iran","a":1188,"b":3257},
+  {"n":"Brazil","a":942,"b":1379},
+  {"n":"China","a":773,"b":2466},
+  {"n":"Kenya","a":473,"b":535},
+  {"n":"Indonesia","a":461,"b":856},
+  {"n":"Ethiopia","a":368,"b":380},
+  {"n":"India","a":324,"b":632},
+  {"n":"Bangladesh","a":114,"b":279}
+];
+
+const W = 700, H = 600;
+const pad = {left: 130, right: 150, top: 50, bottom: 30};
+const PH = H - pad.top - pad.bottom;
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0;
+const maxV = Math.ceil(Math.max(...allVals) / 1000) * 1000;
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * PH;
+}
+
+function colorForChange(d) {
+  const pct = (d.b - d.a) / d.a * 100;
+  if (pct > 60) return "#EA5E33";
+  if (pct > 20) return "#F29A44";
+  if (pct > -5) return "#8BAD72";
+  return "#5B9E78";
+}
+
+function mkEl(tag, attrs, parent) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 4, Math.min(H - pad.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:700px;display:block;"});
+document.getElementById("chart").appendChild(svg);
+
+// Column headers
+mkEl("text", {x: leftX, y: pad.top - 14, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-weight": "500"}, svg).textContent = "1990";
+mkEl("text", {x: rightX, y: pad.top - 14, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-weight": "500"}, svg).textContent = "2020";
+
+// Axis lines
+mkEl("line", {x1: leftX, y1: pad.top - 8, x2: leftX, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+mkEl("line", {x1: rightX, y1: pad.top - 8, x2: rightX, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+
+const tip = document.getElementById("tip");
+const rowGroups = [];
+
+data.forEach((d, idx) => {
+  const ay = scale(d.a);
+  const by = scale(d.b);
+  const color = colorForChange(d);
+
+  const g = mkEl("g", {opacity: "1"}, svg);
+  rowGroups.push(g);
+
+  // connecting line
+  mkEl("line", {x1: leftX, y1: ay, x2: rightX, y2: by, stroke: color, "stroke-width": "1.5", opacity: "0.8"}, g);
+
+  // dots
+  mkEl("circle", {cx: leftX, cy: ay, r: "3.5", fill: color}, g);
+  mkEl("circle", {cx: rightX, cy: by, r: "3.5", fill: color}, g);
+
+  // wide invisible hit area
+  const hitLine = mkEl("line", {x1: leftX, y1: ay, x2: rightX, y2: by, stroke: "transparent", "stroke-width": "16", style: "cursor:pointer"}, g);
+
+  hitLine.addEventListener("mouseenter", () => {
+    rowGroups.forEach((gg, i) => gg.setAttribute("opacity", i === idx ? "1" : "0.1"));
+    const change = d.b - d.a;
+    const sign = change >= 0 ? "+" : "";
+    tip.innerHTML = `<b>${d.n}</b><br>1990: ${d.a.toLocaleString()} kg/cap<br>2020: ${d.b.toLocaleString()} kg/cap<br>${sign}${change.toLocaleString()} kg (${sign}${Math.round((change/d.a)*100)}%)`;
+    tip.style.opacity = "1";
+  });
+  hitLine.addEventListener("mousemove", (e) => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hitLine.addEventListener("mouseleave", () => {
+    rowGroups.forEach(gg => gg.setAttribute("opacity", "1"));
+    tip.style.opacity = "0";
+  });
+});
+
+// Left labels
+const leftItems = data.map((d, idx) => ({y: scale(d.a), label: d.n, value: d.a, idx}));
+const leftResolved = resolveCollisions(leftItems, 14);
+for (const item of leftResolved) {
+  const rawY = scale(data[item.idx].a);
+  const color = colorForChange(data[item.idx]);
+  mkEl("text", {x: leftX - 6, y: item.y + 4, "text-anchor": "end", "font-size": "9.5", fill: color,
+    "font-family": "JetBrains Mono, monospace"}, svg).textContent = `${item.label}  ${item.value.toLocaleString()}`;
+  if (Math.abs(item.y - rawY) > 3) {
+    mkEl("line", {x1: leftX - 4, y1: rawY, x2: leftX - 2, y2: item.y, stroke: color, "stroke-width": "0.5", opacity: "0.4"}, svg);
+  }
+}
+
+// Right labels
+const rightItems = data.map((d, idx) => ({y: scale(d.b), label: d.n, value: d.b, idx}));
+const rightResolved = resolveCollisions(rightItems, 14);
+for (const item of rightResolved) {
+  const rawY = scale(data[item.idx].b);
+  const color = colorForChange(data[item.idx]);
+  mkEl("text", {x: rightX + 6, y: item.y + 4, "text-anchor": "start", "font-size": "9.5", fill: color,
+    "font-family": "JetBrains Mono, monospace"}, svg).textContent = `${item.value.toLocaleString()}  ${item.label}`;
+  if (Math.abs(item.y - rawY) > 3) {
+    mkEl("line", {x1: rightX + 2, y1: rawY, x2: rightX + 4, y2: item.y, stroke: color, "stroke-width": "0.5", opacity: "0.4"}, svg);
+  }
+}
+
+// Legend
+const legendItems = [
+  {color: "#EA5E33", label: ">60% increase"},
+  {color: "#F29A44", label: "20–60% increase"},
+  {color: "#8BAD72", label: "Roughly stable"},
+  {color: "#5B9E78", label: "Decrease"},
+];
+legendItems.forEach((li, i) => {
+  const lx = pad.left + i * 155;
+  const ly = H - 8;
+  mkEl("rect", {x: lx, y: ly - 7, width: 8, height: 8, fill: li.color, rx: "1"}, svg);
+  mkEl("text", {x: lx + 11, y: ly, "font-size": "8.5", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = li.label;
+});
+</script>
+</body>
+</html>

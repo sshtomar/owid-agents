@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 680px; line-height: 1.5; }
+    #chart { width: 100%; position: relative; }
+    .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    svg text { font-family: 'Inter', sans-serif; }
+    .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px 12px; border-radius: 2px; line-height: 1.6; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+  </style>
+</head>
+<body>
+  <h1>Adult Mortality: Probability of Dying Between Ages 15–60</h1>
+  <p class="subtitle">Per 1,000 population, near 2000 vs near 2019. Uzbekistan and Greece cut premature death by 65%+. France and Switzerland halved theirs. Some countries saw increases — particularly during COVID-related disruptions in 2019–2020 data.</p>
+  <div id="chart"></div>
+  <div class="tooltip" id="tip"></div>
+  <p class="source">Source: WHO Global Health Observatory — WHOSIS_000004 (Adult Mortality Rate)</p>
+<script>
+const data = [
+  {"n":"Afghanistan","a":373.0,"b":281.6},
+  {"n":"Haiti","a":349.8,"b":265.2},
+  {"n":"Uzbekistan","a":322.9,"b":114.3},
+  {"n":"Pakistan","a":229.6,"b":211.5},
+  {"n":"Egypt","a":223.7,"b":172.0},
+  {"n":"Senegal","a":215.2,"b":159.4},
+  {"n":"Indonesia","a":208.0,"b":180.9},
+  {"n":"Vietnam","a":200.3,"b":187.1},
+  {"n":"Hungary","a":184.0,"b":124.2},
+  {"n":"Mauritius","a":176.4,"b":195.7},
+  {"n":"Bolivia","a":162.0,"b":135.3},
+  {"n":"Portugal","a":155.2,"b":97.8},
+  {"n":"Bangladesh","a":135.8,"b":130.0},
+  {"n":"France","a":134.5,"b":45.1},
+  {"n":"Malaysia","a":134.2,"b":118.3},
+  {"n":"Dominican Rep.","a":113.2,"b":197.8},
+  {"n":"Greece","a":112.6,"b":45.6},
+  {"n":"Brazil","a":107.0,"b":189.2},
+  {"n":"Lithuania","a":103.1,"b":207.3},
+  {"n":"Cuba","a":91.9,"b":99.0},
+  {"n":"Peru","a":90.1,"b":116.5},
+  {"n":"Spain","a":86.1,"b":56.9},
+  {"n":"Switzerland","a":73.4,"b":43.4},
+  {"n":"Iceland","a":72.4,"b":54.7},
+  {"n":"UK","a":67.2,"b":75.4},
+  {"n":"UAE","a":64.3,"b":61.5}
+];
+
+const W = 700, H = 620;
+const pad = {left: 130, right: 150, top: 50, bottom: 40};
+const PH = H - pad.top - pad.bottom;
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0;
+const maxV = Math.ceil(Math.max(...allVals) / 50) * 50;
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * PH;
+}
+
+function colorForChange(d) {
+  const pct = (d.b - d.a) / d.a * 100;
+  if (pct < -50) return "#3A9E8F";
+  if (pct < -25) return "#5B8FA8";
+  if (pct < 0) return "#8BAD72";
+  return "#D06B5C";
+}
+
+function mkEl(tag, attrs, parent) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 4, Math.min(H - pad.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:700px;display:block;"});
+document.getElementById("chart").appendChild(svg);
+
+// Column headers
+mkEl("text", {x: leftX, y: pad.top - 14, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-weight": "500"}, svg).textContent = "~2000";
+mkEl("text", {x: rightX, y: pad.top - 14, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-weight": "500"}, svg).textContent = "~2019";
+
+// Axis lines
+mkEl("line", {x1: leftX, y1: pad.top - 8, x2: leftX, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+mkEl("line", {x1: rightX, y1: pad.top - 8, x2: rightX, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}, svg);
+
+const tip = document.getElementById("tip");
+const rowGroups = [];
+
+data.forEach((d, idx) => {
+  const ay = scale(d.a);
+  const by = scale(d.b);
+  const color = colorForChange(d);
+
+  const g = mkEl("g", {opacity: "1"}, svg);
+  rowGroups.push(g);
+
+  mkEl("line", {x1: leftX, y1: ay, x2: rightX, y2: by, stroke: color, "stroke-width": "1.5", opacity: "0.8"}, g);
+  mkEl("circle", {cx: leftX, cy: ay, r: "3.5", fill: color}, g);
+  mkEl("circle", {cx: rightX, cy: by, r: "3.5", fill: color}, g);
+
+  const hitLine = mkEl("line", {x1: leftX, y1: ay, x2: rightX, y2: by, stroke: "transparent", "stroke-width": "16", style: "cursor:pointer"}, g);
+
+  hitLine.addEventListener("mouseenter", () => {
+    rowGroups.forEach((gg, i) => gg.setAttribute("opacity", i === idx ? "1" : "0.1"));
+    const change = d.b - d.a;
+    const sign = change >= 0 ? "+" : "";
+    tip.innerHTML = `<b>${d.n}</b><br>~2000: ${d.a} per 1,000<br>~2019: ${d.b} per 1,000<br>${sign}${change.toFixed(1)} (${sign}${Math.round((change/d.a)*100)}%)`;
+    tip.style.opacity = "1";
+  });
+  hitLine.addEventListener("mousemove", (e) => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hitLine.addEventListener("mouseleave", () => {
+    rowGroups.forEach(gg => gg.setAttribute("opacity", "1"));
+    tip.style.opacity = "0";
+  });
+});
+
+// Left labels
+const leftItems = data.map((d, idx) => ({y: scale(d.a), label: d.n, value: d.a, idx}));
+const leftResolved = resolveCollisions(leftItems, 14);
+for (const item of leftResolved) {
+  const rawY = scale(data[item.idx].a);
+  const color = colorForChange(data[item.idx]);
+  mkEl("text", {x: leftX - 6, y: item.y + 4, "text-anchor": "end", "font-size": "9.5", fill: color,
+    "font-family": "JetBrains Mono, monospace"}, svg).textContent = `${item.label}  ${item.value}`;
+  if (Math.abs(item.y - rawY) > 3) {
+    mkEl("line", {x1: leftX - 4, y1: rawY, x2: leftX - 2, y2: item.y, stroke: color, "stroke-width": "0.5", opacity: "0.4"}, svg);
+  }
+}
+
+// Right labels
+const rightItems = data.map((d, idx) => ({y: scale(d.b), label: d.n, value: d.b, idx}));
+const rightResolved = resolveCollisions(rightItems, 14);
+for (const item of rightResolved) {
+  const rawY = scale(data[item.idx].b);
+  const color = colorForChange(data[item.idx]);
+  mkEl("text", {x: rightX + 6, y: item.y + 4, "text-anchor": "start", "font-size": "9.5", fill: color,
+    "font-family": "JetBrains Mono, monospace"}, svg).textContent = `${item.value}  ${item.label}`;
+  if (Math.abs(item.y - rawY) > 3) {
+    mkEl("line", {x1: rightX + 2, y1: rawY, x2: rightX + 4, y2: item.y, stroke: color, "stroke-width": "0.5", opacity: "0.4"}, svg);
+  }
+}
+
+// Legend
+const legendItems = [
+  {color: "#3A9E8F", label: ">50% decline"},
+  {color: "#5B8FA8", label: "25–50% decline"},
+  {color: "#8BAD72", label: "0–25% decline"},
+  {color: "#D06B5C", label: "Increase"},
+];
+legendItems.forEach((li, i) => {
+  const lx = pad.left + i * 148;
+  const ly = H - 12;
+  mkEl("rect", {x: lx, y: ly - 7, width: 8, height: 8, fill: li.color, rx: "1"}, svg);
+  mkEl("text", {x: lx + 11, y: ly, "font-size": "8.5", fill: "#7A786F", "font-family": "JetBrains Mono, monospace"}, svg).textContent = li.label;
+});
+</script>
+</body>
+</html>
