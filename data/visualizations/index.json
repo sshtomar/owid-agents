@@ -5688,6 +5688,87 @@
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
       "notebookPath": "notebooks/viz-346.py"
+    },
+    {
+      "id": "viz-347",
+      "title": "Diverging Paths: Population Growth 1965-2020",
+      "description": "Trend lines showing annual population growth rates for 13 countries across four groups: fast-growing Sub-Saharan Africa, slowing South Asia, major economies, and near-zero/negative Europe.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend lines",
+      "codeFilePath": "viz/viz-347.html",
+      "highlights": [
+        "Niger and Chad sustain growth above 3.5%/yr while Germany and Bulgaria turn negative",
+        "China dropped from 2.8% in 1965 to 0.2% in 2020 due to the one-child policy",
+        "Bangladesh halved its growth rate from 2.6% to 0.8% over 55 years"
+      ],
+      "createdAt": "2026-06-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-347.py"
+    },
+    {
+      "id": "viz-348",
+      "title": "China's Scientific Output Explosion, 1996-2022",
+      "description": "Trend lines showing scientific and technical journal articles published per year for 12 countries, with China growing 27x from 33,000 articles in 1996 to 899,000 in 2022.",
+      "datasetIds": [
+        "wb--IP-JRN-ARTC-SC"
+      ],
+      "chartType": "trend lines",
+      "highlights": [
+        "China grew from 7th place (33k articles) in 1996 to global leader (899k) by 2022",
+        "India surpassed Japan and Germany in output, reaching 207k articles in 2022",
+        "Iran grew 94x from just 649 articles in 1996 to 61k in 2022"
+      ],
+      "createdAt": "2026-06-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-348.py"
+    },
+    {
+      "id": "viz-349",
+      "title": "COVID-19 Erased a Decade of Tourism Growth",
+      "description": "Slope chart comparing international tourist arrivals in 2019 vs 2020 for 13 major destinations, showing drops of 46-94% in a single year.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "slope chart",
+      "highlights": [
+        "Japan and Korea lost 87-86% of visitors; Hong Kong lost 94%",
+        "France, the world's most visited country, still lost 46% despite partial openings",
+        "China lost 81% despite being the destination with the second most arrivals (162M in 2019)"
+      ],
+      "createdAt": "2026-06-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-349.py"
+    },
+    {
+      "id": "viz-350",
+      "title": "Energy Hunger: Per-Capita Use 1990-2020",
+      "description": "Trend lines showing primary energy use per person (kg of oil equivalent) for 8 countries, contrasting the plateauing of rich nations with China's tripling and South Asia's persistently low levels.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend lines",
+      "highlights": [
+        "China tripled per-capita energy use from 773 to 2,466 kg between 1990 and 2020",
+        "Germany and Japan both declined \u2014 efficiency gains and deindustrialization",
+        "Bangladesh uses 279 kg/person, barely a quarter of China's current level"
+      ],
+      "createdAt": "2026-06-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-350.py"
+    },
+    {
+      "id": "viz-351",
+      "title": "The Decade of Financial Inclusion, 2011-2021",
+      "description": "Slope chart showing the share of adults with a bank account or mobile-money service in 2011 vs 2021 for 18 countries, highlighting the mobile-money revolution in East Africa and South Asia.",
+      "datasetIds": [
+        "wb--FX-OWN-TOTL-ZS"
+      ],
+      "chartType": "slope chart",
+      "highlights": [
+        "India jumped from 35% to 78% in one decade, driven by Aadhaar digital-ID and UPI",
+        "Kenya rose from 42% to 79%, largely on M-Pesa mobile money adoption",
+        "Afghanistan barely moved: 9.0% in 2011 to 9.7% in 2021, the lowest in the dataset"
+      ],
+      "createdAt": "2026-06-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-351.py"
     }
   ],
   "lastUpdated": "2026-04-05T00:00:00.000Z"
