@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0; padding: 24px;
+      background: #faf9f7;
+      color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; color: #1e293b; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 4px; }
+    .note { font-size: 12px; color: #94a3b8; margin: 0 0 20px; font-style: italic; }
+    #chart { width: 100%; max-width: 700px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      pointer-events: none; opacity: 0; transition: opacity 0.1s;
+      white-space: nowrap; z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>The Decade of Financial Inclusion, 2011–2021</h1>
+  <p class="subtitle">Share of adults with a bank account or mobile-money service (%) — mobile money lifted hundreds of millions into formal finance</p>
+  <p class="note">Hover a line to see country details. Color encodes percentage-point gain.</p>
+  <svg id="chart" viewBox="0 0 700 580" width="100%"></svg>
+  <p class="source">Source: World Bank — Account Ownership at Financial/Mobile-Money Institution (FX.OWN.TOTL.ZS)</p>
+  <div id="tip"></div>
+  <script>
+    // Data from wb--FX-OWN-TOTL-ZS: {n, a: 2011 value (%), b: 2021 value (%)}
+    // Selected: biggest gainers + some persistently low + some very high
+    const data = [
+      // Big gainers
+      {n:"India",         a:35.2,  b:77.5},
+      {n:"Kenya",         a:42.3,  b:79.2},
+      {n:"Chile",         a:42.2,  b:87.1},
+      {n:"Bolivia",       a:28.0,  b:68.9},
+      {n:"Ghana",         a:29.4,  b:68.2},
+      {n:"Indonesia",     a:19.6,  b:51.8},
+      {n:"Cameroon",      a:14.8,  b:51.7},
+      {n:"Argentina",     a:33.1,  b:71.6},
+      {n:"Kazakhstan",    a:42.1,  b:81.1},
+      // Middle movers
+      {n:"Brazil",        a:55.9,  b:84.1},
+      {n:"South Africa",  a:53.8,  b:85.0},
+      {n:"Bangladesh",    a:31.7,  b:53.7},
+      {n:"Tanzania",      a:17.3,  b:45.5},
+      // Already high
+      {n:"Germany",       a:98.0,  b:99.6},
+      {n:"Thailand",      a:72.7,  b:95.7},
+      // Still low
+      {n:"Nigeria",       a:29.7,  b:45.3},
+      {n:"Congo, D.R.",   a:3.7,   b:27.4},
+      {n:"Afghanistan",   a:9.0,   b:9.7},
+    ].sort((a, b) => b.a - a.a);
+
+    function colorForGain(gain) {
+      if (gain > 40) return "#065F46";
+      if (gain > 30) return "#059669";
+      if (gain > 20) return "#34D399";
+      if (gain > 10) return "#FCD34D";
+      if (gain > 3) return "#FB923C";
+      return "#94A3B8";
+    }
+
+    const W = 700, H = 580;
+    const pad = {left: 120, right: 130, top: 50, bottom: 40};
+    const NS = "http://www.w3.org/2000/svg";
+
+    const allVals = data.flatMap(d => [d.a, d.b]);
+    const maxV = 102;
+    const minV = 0;
+
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    const xL = pad.left;
+    const xR = W - pad.right;
+
+    function mkEl(tag, attrs, text) {
+      const el = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = document.getElementById("chart");
+
+    // Column headers
+    svg.appendChild(mkEl("text", {x: xL, y: pad.top - 18, "text-anchor": "middle", "font-size": "11", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-weight": "500"}, "2011"));
+    svg.appendChild(mkEl("text", {x: xR, y: pad.top - 18, "text-anchor": "middle", "font-size": "11", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-weight": "500"}, "2021"));
+
+    // Axis lines
+    svg.appendChild(mkEl("line", {x1: xL, y1: pad.top - 28, x2: xL, y2: H - pad.bottom, stroke: "#E2E8F0", "stroke-width": "1"}));
+    svg.appendChild(mkEl("line", {x1: xR, y1: pad.top - 28, x2: xR, y2: H - pad.bottom, stroke: "#E2E8F0", "stroke-width": "1"}));
+
+    // Horizontal guide lines
+    [0, 25, 50, 75, 100].forEach(v => {
+      const y = scale(v);
+      svg.appendChild(mkEl("line", {x1: xL, y1: y, x2: xR, y2: y, stroke: "#F1F5F9", "stroke-width": "0.7"}));
+      svg.appendChild(mkEl("text", {x: (xL + xR) / 2, y: y - 3, "text-anchor": "middle", "font-size": "8.5", fill: "#CBD5E1", "font-family": "JetBrains Mono, monospace"}, v + "%"}));
+    });
+
+    // Collision resolution
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 50; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      for (const item of sorted) {
+        item.y = Math.max(pad.top + 4, Math.min(H - pad.bottom - 4, item.y));
+      }
+      return sorted;
+    }
+
+    const leftLabels = data.map(d => ({n: d.n, y: scale(d.a), rawY: scale(d.a)}));
+    const rightLabels = data.map(d => ({n: d.n, y: scale(d.b), rawY: scale(d.b)}));
+    const resolvedLeft = resolveCollisions(leftLabels, 13);
+    const resolvedRight = resolveCollisions(rightLabels, 13);
+
+    const groups = [];
+    for (const d of data) {
+      const gain = d.b - d.a;
+      const color = colorForGain(gain);
+      const g = mkEl("g", {class: "row"});
+
+      const ya = scale(d.a);
+      const yb = scale(d.b);
+
+      g.appendChild(mkEl("line", {x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"}));
+      g.appendChild(mkEl("circle", {cx: xL, cy: ya, r: "3.5", fill: color}));
+      g.appendChild(mkEl("circle", {cx: xR, cy: yb, r: "3.5", fill: color}));
+
+      const hit = mkEl("line", {x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer"});
+      g.appendChild(hit);
+
+      const leftLabelY = resolvedLeft.find(l => l.n === d.n).y;
+      const rightLabelY = resolvedRight.find(l => l.n === d.n).y;
+
+      if (Math.abs(leftLabelY - ya) > 2) {
+        g.appendChild(mkEl("line", {x1: xL - 3, y1: ya, x2: xL - 10, y2: leftLabelY, stroke: color, "stroke-width": "0.6", opacity: "0.5"}));
+      }
+      if (Math.abs(rightLabelY - yb) > 2) {
+        g.appendChild(mkEl("line", {x1: xR + 3, y1: yb, x2: xR + 10, y2: rightLabelY, stroke: color, "stroke-width": "0.6", opacity: "0.5"}));
+      }
+
+      const gainSign = gain >= 0 ? "+" : "";
+      g.appendChild(mkEl("text", {x: xL - 13, y: leftLabelY + 4, "text-anchor": "end", "font-size": "9.5", fill: color, "font-family": "JetBrains Mono, monospace"},
+        `${d.n}  ${d.a.toFixed(0)}%`));
+      g.appendChild(mkEl("text", {x: xR + 13, y: rightLabelY + 4, "text-anchor": "start", "font-size": "9.5", fill: color, "font-family": "JetBrains Mono, monospace"},
+        `${d.b.toFixed(0)}%  ${gainSign}${gain.toFixed(0)}pp`));
+
+      groups.push({g, d, color, gain});
+      svg.appendChild(g);
+    }
+
+    // Legend
+    const legendData = [
+      {label: ">40pp gain", color: "#065F46"},
+      {label: "30–40pp", color: "#059669"},
+      {label: "20–30pp", color: "#34D399"},
+      {label: "10–20pp", color: "#FCD34D"},
+      {label: "3–10pp", color: "#FB923C"},
+      {label: "<3pp", color: "#94A3B8"}
+    ];
+    let lx = pad.left;
+    const ly = H - 8;
+    for (const {label, color} of legendData) {
+      svg.appendChild(mkEl("rect", {x: lx, y: ly - 9, width: 14, height: 3, rx: "1", fill: color}));
+      svg.appendChild(mkEl("text", {x: lx + 18, y: ly, "font-size": "9", fill: "#94A3B8", "font-family": "Inter, sans-serif"}, label));
+      lx += 80;
+    }
+
+    const tip = document.getElementById("tip");
+    for (const {g, d, gain} of groups) {
+      const hit = g.children[3];
+      hit.addEventListener("mouseenter", e => {
+        const gainSign = gain >= 0 ? "+" : "";
+        tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${gainSign}${gain.toFixed(1)}pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+        for (const {g: gg} of groups) gg.style.opacity = "0.1";
+        g.style.opacity = "1";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        tip.style.opacity = "0";
+        for (const {g: gg} of groups) gg.style.opacity = "1";
+      });
+    }
+  </script>
+</body>
+</html>

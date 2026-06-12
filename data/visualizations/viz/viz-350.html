@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0; padding: 24px;
+      background: #faf9f7;
+      color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; color: #1e293b; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 4px; }
+    .note { font-size: 12px; color: #94a3b8; margin: 0 0 20px; font-style: italic; }
+    #chart { width: 100%; max-width: 820px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      pointer-events: none; opacity: 0; transition: opacity 0.1s;
+      white-space: nowrap; z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>Energy Hunger: Per-Capita Use 1990–2020</h1>
+  <p class="subtitle">Primary energy use per person (kg of oil equivalent) — rich nations plateau while China triples and South Asia remains far below</p>
+  <p class="note">Hover a line to isolate it</p>
+  <svg id="chart" viewBox="0 0 820 460" width="100%"></svg>
+  <p class="source">Source: World Bank — Energy Use per Capita (EG.USE.PCAP.KG.OE)</p>
+  <div id="tip"></div>
+  <script>
+    // Data from wb--EG-USE-PCAP-KG-OE, annual 1990-2020
+    const raw = {
+      "Canada":     [7642,7543,7584,7637,7617,7764,7920,8169,8284,8356,8454,8511,8421,8452,8511,8450,8298,8094,7893,7786,7696,7677,7534,7534,7540,7615,7544,7420,7513,7590,7495],
+      "Germany":    [4422,4282,4200,4138,4096,4136,4139,4109,4107,4131,4118,4161,4098,4085,4088,4124,4094,4090,4081,4026,4030,3977,3955,3929,3800,3840,3741,3700,3662,3614,3349],
+      "Japan":      [3538,3635,3729,3816,3965,4105,4198,4213,4265,4326,4396,4415,4450,4302,4326,4380,4067,4146,4081,4018,3900,3781,3728,3742,3739,3758,3752,3729,3658,3561,3047],
+      "Korea, Rep.":[2088,2242,2427,2593,2784,2998,3211,3397,3513,3679,3806,3985,4129,4044,4094,4232,4337,4403,4544,4673,4804,4853,4867,4973,4942,4929,4986,5020,5157,5242,5196],
+      "China":      [773,793,812,838,840,860,866,907,927,937,898,968,1034,1111,1199,1338,1489,1597,1671,1718,1900,2023,2122,2175,2246,2279,2282,2337,2396,2427,2466],
+      "Brazil":     [942,959,968,981,1001,1031,1053,1076,1093,1111,1137,1150,1175,1169,1211,1268,1299,1332,1366,1381,1384,1391,1384,1421,1428,1419,1394,1396,1399,1396,1379],
+      "India":      [324,334,345,355,370,383,393,402,413,422,433,440,453,467,477,503,519,531,533,533,532,549,558,573,580,593,601,616,627,629,632],
+      "Bangladesh": [114,118,120,124,126,130,130,131,136,138,139,141,143,146,149,153,157,161,166,172,179,185,191,196,204,210,218,231,244,257,279]
+    };
+
+    const years = Array.from({length: 31}, (_, i) => 1990 + i);
+
+    const COLORS = {
+      "Canada":     "#B45309",
+      "Germany":    "#1D4ED8",
+      "Japan":      "#7C3AED",
+      "Korea, Rep.":"#0891B2",
+      "China":      "#DC2626",
+      "Brazil":     "#059669",
+      "India":      "#D97706",
+      "Bangladesh": "#64748B"
+    };
+
+    const W = 820, H = 460;
+    const margin = {top: 30, right: 120, bottom: 40, left: 62};
+    const NS = "http://www.w3.org/2000/svg";
+
+    const allVals = Object.values(raw).flat();
+    const yMin = 0;
+    const yMax = 9000;
+
+    const xScale = yr => margin.left + (yr - 1990) / (2020 - 1990) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (yMax - v) / (yMax - yMin) * (H - margin.top - margin.bottom);
+
+    function mkEl(tag, attrs, text) {
+      const el = document.createElementNS(NS, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = document.getElementById("chart");
+
+    // Grid lines
+    const yTicks = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000];
+    for (const v of yTicks) {
+      const y = yScale(v);
+      if (y < margin.top - 2 || y > H - margin.bottom + 2) continue;
+      svg.appendChild(mkEl("line", {x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: v === 0 ? "#CBD5E1" : "#E2E8F0", "stroke-width": v === 0 ? "0.8" : "0.5"}));
+      const label = v === 0 ? "0" : (v / 1000).toFixed(0) + "k";
+      svg.appendChild(mkEl("text", {x: margin.left - 6, y: y + 4, "text-anchor": "end", "font-size": "10", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace"}, label));
+    }
+
+    // Y axis unit label
+    svg.appendChild(mkEl("text", {x: margin.left - 50, y: margin.top - 8, "font-size": "9", fill: "#94A3B8", "font-family": "Inter, sans-serif"}, "kg oil eq."));
+
+    // X axis
+    [1990, 1995, 2000, 2005, 2010, 2015, 2020].forEach(yr => {
+      const x = xScale(yr);
+      svg.appendChild(mkEl("line", {x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#CBD5E1", "stroke-width": "0.8"}));
+      svg.appendChild(mkEl("text", {x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "10", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace"}, yr}));
+    });
+
+    // Collision resolution
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      for (const item of sorted) {
+        item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+      }
+      return sorted;
+    }
+
+    const names = Object.keys(raw);
+    const labelItems = names.map(n => {
+      const lastVal = raw[n][raw[n].length - 1];
+      return {n, y: yScale(lastVal), rawY: yScale(lastVal)};
+    });
+    const resolvedLabels = resolveCollisions(labelItems, 13);
+
+    const groups = [];
+    for (const n of names) {
+      const color = COLORS[n];
+      const vals = raw[n];
+      const pts = vals.map((v, i) => ({year: 1990 + i, value: v}));
+      const g = mkEl("g", {class: "series"});
+
+      const isChina = n === "China";
+      const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+
+      g.appendChild(mkEl("path", {d: pathD, stroke: color, "stroke-width": isChina ? "2.5" : "1.6", fill: "none", "stroke-linejoin": "round"}));
+      g.appendChild(mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer"}));
+
+      const lastX = xScale(2020);
+      const rawY = labelItems.find(l => l.n === n).rawY;
+      const labelY = resolvedLabels.find(l => l.n === n).y;
+
+      if (Math.abs(labelY - rawY) > 2) {
+        g.appendChild(mkEl("line", {x1: lastX + 3, y1: rawY, x2: lastX + 10, y2: labelY, stroke: color, "stroke-width": "0.6", opacity: "0.5"}));
+      }
+
+      const lastVal = vals[vals.length - 1];
+      const dispName = n === "Korea, Rep." ? "Korea" : n;
+      g.appendChild(mkEl("text", {
+        x: lastX + 13, y: labelY + 4,
+        "font-size": "9.5", fill: color,
+        "font-family": "JetBrains Mono, monospace",
+        "font-weight": isChina ? "600" : "400"
+      }, `${lastVal.toLocaleString()}  ${dispName}`));
+
+      groups.push({g, n, color, pts});
+      svg.appendChild(g);
+    }
+
+    const tip = document.getElementById("tip");
+    for (let i = 0; i < groups.length; i++) {
+      const {g, n, color, pts} = groups[i];
+      const hitEl = g.children[1];
+
+      hitEl.addEventListener("mousemove", e => {
+        const svgRect = svg.getBoundingClientRect();
+        const mx = e.clientX - svgRect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const idx = Math.min(pts.length - 1, Math.round(ratio * (pts.length - 1)));
+        const pt = pts[idx];
+        tip.textContent = `${n} ${pt.year}: ${pt.value.toLocaleString()} kg/person`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+        for (let j = 0; j < groups.length; j++) groups[j].g.style.opacity = j === i ? "1" : "0.08";
+        hitEl.parentElement.querySelector("path").setAttribute("stroke-width", "3");
+      });
+
+      hitEl.addEventListener("mouseleave", () => {
+        tip.style.opacity = "0";
+        for (const {g: gg, n: nn} of groups) {
+          gg.style.opacity = "1";
+          gg.querySelector("path").setAttribute("stroke-width", nn === "China" ? "2.5" : "1.6");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
