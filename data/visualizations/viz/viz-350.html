@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; max-width: 760px; }
+  .cell { padding: 12px 10px 10px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:hover { background: #EEECe4; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .cell-canvas-wrap { position: relative; height: 44px; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 3px; }
+  .cell-val { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; }
+</style></head><body>
+<h1>Neonatal Mortality: 24 Highest-Burden Countries, 1990–2023</h1>
+<p class="subtitle">Deaths in the first 28 days of life per 1,000 live births. Each sparkline covers 1990 to 2023 at 5-year intervals. Botswana's mid-period bump reflects the HIV/AIDS crisis.</p>
+<div id="chart" style="position:relative;max-width:760px;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Neonatal Mortality Rate (SH.DYN.NMRT)</p>
+<script>
+const data = [{"n":"Afghanistan","s":[75.8,68.4,62.2,55.4,48,41.5,36.5,33.9],"e":75.8,"l":33.9,"y0":1990},{"n":"Guinea-Bissau","s":[63.9,60.5,55.2,51,45.1,39.1,34.9,32.7],"e":63.9,"l":32.7,"y0":1990},{"n":"Chad","s":[51.6,47.9,43.7,39.5,37.6,35.4,32.7,30.9],"e":51.6,"l":30.9,"y0":1990},{"n":"Central African Republic","s":[50.9,47.1,42.9,39.4,36.4,33.9,32.4,30.4],"e":50.9,"l":30.4,"y0":1990},{"n":"Guinea","s":[61.6,57,46.1,39.3,36,33.7,31.8,30.3],"e":61.6,"l":30.3,"y0":1990},{"n":"Cote d'Ivoire","s":[47.6,44.5,40.7,38.2,35.3,32.2,29.5,27.9],"e":47.6,"l":27.9,"y0":1990},{"n":"Benin","s":[44.5,41.1,38.2,35,33.4,31.4,29.2,27.7],"e":44.5,"l":27.7,"y0":1990},{"n":"Djibouti","s":[48,45.6,42.6,39.9,36.8,33.2,29.8,27.7],"e":48,"l":27.7,"y0":1990},{"n":"Equatorial Guinea","s":[49.9,48.4,46.1,41.8,35,31.5,28.6,26.7],"e":49.9,"l":26.7,"y0":1990},{"n":"Ethiopia","s":[59.5,53.7,48.1,43.2,37.6,32.3,27.9,25.9],"e":59.5,"l":25.9,"y0":1990},{"n":"Eswatini","s":[21,21.3,24.9,27.2,27.3,26.6,26.8,25.5],"e":21,"l":25.5,"y0":1990},{"n":"Cameroon","s":[40.4,39.2,35.4,33.1,31.6,29.5,26.8,25.2],"e":40.4,"l":25.2,"y0":1990},{"n":"Burkina Faso","s":[45.2,42.8,40.1,35.5,30.8,28.1,25.6,24.2],"e":45.2,"l":24.2,"y0":1990},{"n":"Congo, Dem. Rep.","s":[38.7,36.5,34.1,29.8,26,24,24.1,23.9],"e":38.7,"l":23.9,"y0":1990},{"n":"Gambia, The","s":[49.5,45,40.2,36.7,32.8,29,25.3,23.5],"e":49.5,"l":23.5,"y0":1990},{"n":"Haiti","s":[38.7,33,29.5,29.1,29.1,26.7,24.5,23.1],"e":38.7,"l":23.1,"y0":1990},{"n":"Comoros","s":[48.7,39.8,34.8,31.7,28.9,26.3,24.1,22.7],"e":48.7,"l":22.7,"y0":1990},{"n":"Kiribati","s":[34.4,30.5,27.1,24.2,23.2,23.3,23,22.2],"e":34.4,"l":22.2,"y0":1990},{"n":"Dominican Republic","s":[24.3,22.7,22.9,23.1,24,24.4,23.5,21.8],"e":24.3,"l":21.8,"y0":1990},{"n":"Kenya","s":[26.7,26.4,26.3,24.7,23.4,23.2,22,21.1],"e":26.7,"l":21.1,"y0":1990},{"n":"Burundi","s":[39.1,38.4,36.3,32.8,27.9,23.5,20.7,19.4],"e":39.1,"l":19.4,"y0":1990},{"n":"Ghana","s":[42,38.9,35.2,32.1,29,24.3,20.4,18.7],"e":42,"l":18.7,"y0":1990},{"n":"Angola","s":[45.8,44.8,39.1,33,26.1,20.9,19.2,18.4],"e":45.8,"l":18.4,"y0":1990},{"n":"Botswana","s":[21.6,12.3,9.1,19.4,25.5,22,19.3,18.1],"e":21.6,"l":18.1,"y0":1990}];
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const yearLabels = [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2023];
+const grid = document.createElement("div");
+grid.className = "grid";
+document.getElementById("chart").appendChild(grid);
+
+const DPR = window.devicePixelRatio || 1;
+const CELL_W = 170;
+const CELL_H = 44;
+
+data.forEach((d, idx) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const name = document.createElement("div");
+  name.className = "cell-name";
+  const shortName = d.n.replace(", The", "").replace(", Dem. Rep.", "")
+    .replace("Central African Republic", "C. African Rep.")
+    .replace("Equatorial Guinea", "Eq. Guinea")
+    .replace("Dominican Republic", "Dom. Republic");
+  name.textContent = shortName;
+  cell.appendChild(name);
+
+  const wrap = document.createElement("div");
+  wrap.className = "cell-canvas-wrap";
+
+  const canvas = document.createElement("canvas");
+  canvas.width = CELL_W * DPR;
+  canvas.height = CELL_H * DPR;
+  canvas.style.width = CELL_W + "px";
+  canvas.style.height = CELL_H + "px";
+  wrap.appendChild(canvas);
+  cell.appendChild(wrap);
+
+  const valRow = document.createElement("div");
+  valRow.className = "cell-vals";
+  const startVal = document.createElement("span");
+  startVal.className = "cell-val";
+  startVal.textContent = d.e;
+  const endVal = document.createElement("span");
+  endVal.className = "cell-val";
+  endVal.textContent = d.l;
+  valRow.appendChild(startVal);
+  valRow.appendChild(endVal);
+  cell.appendChild(valRow);
+
+  grid.appendChild(cell);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(DPR, DPR);
+
+  const series = d.s;
+  const minV = Math.min(...series);
+  const maxV = Math.max(...series);
+  const range = maxV - minV || 1;
+  const norm = v => CELL_H - ((v - minV) / range) * (CELL_H * 0.85) - CELL_H * 0.05;
+
+  function drawBase(highlight) {
+    ctx.clearRect(0, 0, CELL_W, CELL_H);
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.2;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * CELL_W;
+      const y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    if (highlight !== null) {
+      const hx = (highlight / (series.length - 1)) * CELL_W;
+      ctx.strokeStyle = "#C2C0B5";
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([3, 2]);
+      ctx.beginPath();
+      ctx.moveTo(hx, 0);
+      ctx.lineTo(hx, CELL_H);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#EA5E33";
+      ctx.beginPath();
+      ctx.arc(hx, norm(series[highlight]), 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  drawBase(null);
+
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const idx2 = Math.round(mx / CELL_W * (series.length - 1));
+    const clamped = Math.max(0, Math.min(series.length - 1, idx2));
+    drawBase(clamped);
+    showTip(`${d.n} (${yearLabels[clamped]}): ${series[clamped]}`, e);
+  });
+  canvas.addEventListener("mouseleave", () => {
+    drawBase(null);
+    hideTip();
+  });
+});
+</script>
+</body></html>
