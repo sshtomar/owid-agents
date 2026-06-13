@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Adult Male Mortality, 1990 vs 2023</h1>
+<p class="subtitle">Probability of dying between ages 15 and 60 (per 1,000 male adults), for the 25 highest-burden countries in 1990. Iraq fell 66%; Kenya and Eswatini worsened due to HIV/AIDS.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Adult Mortality Rate, Male (SP.DYN.AMRT.MA)</p>
+<script>
+const data = [{"n":"Angola","y":1990,"a":562.0,"b":271.1},{"n":"Afghanistan","y":1990,"a":528.5,"b":224.2},{"n":"Chad","y":1990,"a":503.0,"b":379.6},{"n":"Burundi","y":1990,"a":498.2,"b":285.7},{"n":"Iraq","y":1990,"a":455.8,"b":154.7},{"n":"Botswana","y":1990,"a":454.9,"b":224.8},{"n":"Ethiopia","y":1990,"a":452.5,"b":246.1},{"n":"Eritrea","y":1990,"a":434.5,"b":216.6},{"n":"Central African Republic","y":1990,"a":414.7,"b":393.5},{"n":"Guinea-Bissau","y":1990,"a":406.4,"b":272.8},{"n":"Congo, Dem. Rep.","y":1990,"a":393.6,"b":287.0},{"n":"Cote d'Ivoire","y":1990,"a":383.8,"b":319.9},{"n":"El Salvador","y":1990,"a":374.9,"b":281.2},{"n":"Cambodia","y":1990,"a":373.4,"b":208.4},{"n":"Equatorial Guinea","y":1990,"a":373.2,"b":260.8},{"n":"Congo, Rep.","y":1990,"a":372.3,"b":273.1},{"n":"Haiti","y":1990,"a":369.3,"b":281.3},{"n":"Gambia, The","y":1990,"a":361.0,"b":245.6},{"n":"Cameroon","y":1990,"a":360.5,"b":275.0},{"n":"Burkina Faso","y":1990,"a":357.6,"b":303.6},{"n":"Benin","y":1990,"a":352.8,"b":289.5},{"n":"Guinea","y":1990,"a":352.4,"b":267.6},{"n":"Djibouti","y":1990,"a":350.8,"b":249.4},{"n":"Eswatini","y":1990,"a":345.7,"b":348.9},{"n":"Kenya","y":1990,"a":341.9,"b":356.1}];
+
+const W = 700, H = 720;
+const pad = { left: 155, right: 165, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const maxV = Math.max(...allVals) * 1.02;
+const minV = Math.min(...allVals) * 0.98;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+function colorForPct(d) {
+  const pct = (d.a - d.b) / d.a * 100;
+  if (pct >= 60) return "#3D7A5A";
+  if (pct >= 45) return "#5B9E78";
+  if (pct >= 30) return "#8BAD72";
+  if (pct >= 20) return "#C49A45";
+  if (pct >= 10) return "#C4715A";
+  if (pct >= 0) return "#B34B3B";
+  return "#7A0000";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const chartTop = pad.top + 4;
+  const chartBot = H - pad.bottom - 4;
+  for (const item of sorted) {
+    item.y = Math.max(chartTop, Math.min(chartBot, item.y));
+  }
+  return sorted;
+}
+
+// Grid lines
+[100, 150, 200, 250, 300, 350, 400, 450, 500, 550].forEach(v => {
+  if (v >= minV && v <= maxV) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+      stroke: "#E2E0D5", "stroke-width": "0.5"
+    }));
+    const t = mkEl("text", {
+      x: xLeft - 6, y: scale(v) + 3,
+      "text-anchor": "end",
+      "font-family": "'JetBrains Mono', monospace",
+      "font-size": "8", fill: "#9A9890"
+    });
+    t.textContent = v;
+    svg.appendChild(t);
+  }
+});
+
+// Axis lines
+[xLeft, xRight].forEach(x => {
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 6, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.8"
+  }));
+});
+
+// Column headers
+["1990", "2023"].forEach((yr, i) => {
+  const t = mkEl("text", {
+    x: i === 0 ? xLeft : xRight,
+    y: pad.top - 14,
+    "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "10", fill: "#7A786F"
+  });
+  t.textContent = yr;
+  svg.appendChild(t);
+});
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+const leftResolved = resolveCollisions(leftLabels, 13);
+const rightResolved = resolveCollisions(rightLabels, 13);
+const leftMap = new Map(leftResolved.map(item => [item.d.n, item.y]));
+const rightMap = new Map(rightResolved.map(item => [item.d.n, item.y]));
+
+const groups = [];
+data.forEach(d => {
+  const color = colorForPct(d);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  const dotL = mkEl("circle", { cx: xLeft, cy: ya, r: "2.5", fill: color });
+  const dotR = mkEl("circle", { cx: xRight, cy: yb, r: "2.5", fill: color });
+
+  g.appendChild(line); g.appendChild(dotL); g.appendChild(dotR); g.appendChild(hit);
+  groups.push({ g, d, line, dotL, dotR });
+  svg.appendChild(g);
+});
+
+data.forEach(d => {
+  const color = colorForPct(d);
+  const lya = leftMap.get(d.n), rya = rightMap.get(d.n);
+  const ya = scale(d.a), yb = scale(d.b);
+
+  const shortN = d.n.replace(", The", "").replace(", Dem. Rep.", "")
+    .replace(", Rep.", "").replace("Central African Republic", "C. Afr. Rep.")
+    .replace("Equatorial Guinea", "Eq. Guinea");
+
+  const lt = mkEl("text", { x: xLeft - 8, y: lya + 3.5, "text-anchor": "end", "font-size": "9", fill: "#2B2A27" });
+  lt.textContent = `${shortN}  ${d.a}`;
+  svg.appendChild(lt);
+
+  if (Math.abs(lya - ya) > 2) {
+    svg.appendChild(mkEl("line", { x1: xLeft - 4, y1: lya, x2: xLeft - 4, y2: ya,
+      stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+
+  const rt = mkEl("text", { x: xRight + 8, y: rya + 3.5, "text-anchor": "start", "font-size": "9", fill: "#2B2A27" });
+  rt.textContent = `${d.b}  ${shortN}`;
+  svg.appendChild(rt);
+
+  if (Math.abs(rya - yb) > 2) {
+    svg.appendChild(mkEl("line", { x1: xRight + 4, y1: rya, x2: xRight + 4, y2: yb,
+      stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+});
+
+groups.forEach(({ g, d, line, dotL, dotR }) => {
+  g.addEventListener("mouseenter", e => {
+    groups.forEach(other => {
+      if (other.d.n !== d.n) {
+        other.line.style.opacity = "0.12";
+        other.dotL.style.opacity = "0.12";
+        other.dotR.style.opacity = "0.12";
+      } else {
+        other.line.setAttribute("stroke-width", "2.5");
+      }
+    });
+    const pct = Math.round((d.a - d.b) / d.a * 100);
+    const dir = pct >= 0 ? `-${pct}%` : `+${Math.abs(pct)}%`;
+    showTip(`${d.n}: ${d.a} → ${d.b} (${dir})`, e);
+  });
+  g.addEventListener("mousemove", e => {
+    const pct = Math.round((d.a - d.b) / d.a * 100);
+    const dir = pct >= 0 ? `-${pct}%` : `+${Math.abs(pct)}%`;
+    showTip(`${d.n}: ${d.a} → ${d.b} (${dir})`, e);
+  });
+  g.addEventListener("mouseleave", () => {
+    groups.forEach(other => {
+      other.line.style.opacity = "1";
+      other.dotL.style.opacity = "1";
+      other.dotR.style.opacity = "1";
+      other.line.setAttribute("stroke-width", "1.5");
+    });
+    hideTip();
+  });
+});
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "60%+ improvement" },
+  { color: "#5B9E78", label: "45–60%" },
+  { color: "#8BAD72", label: "30–45%" },
+  { color: "#C49A45", label: "20–30%" },
+  { color: "#C4715A", label: "10–20%" },
+  { color: "#B34B3B", label: "0–10% or worsened" },
+];
+let lx = pad.left;
+const ly = pad.top - 30;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: ly, width: 8, height: 8, fill: item.color, rx: "1" }));
+  const lt = mkEl("text", { x: lx + 11, y: ly + 7.5, "font-size": "8.5", fill: "#7A786F" });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+  lx += 89;
+});
+</script>
+</body></html>

@@ -5688,7 +5688,92 @@
       ],
       "createdAt": "2026-06-07T00:00:00.000Z",
       "notebookPath": "notebooks/viz-346.py"
+    },
+    {
+      "id": "viz-347",
+      "title": "Maternal Mortality Progress, 1990 to 2023",
+      "description": "Slope chart comparing maternal mortality ratios in the 25 highest-burden countries between 1990 and 2023, showing dramatic declines in most countries while Chad and Central African Republic still lag far behind.",
+      "datasetIds": [
+        "wb--SH-STA-MMRT"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-347.html",
+      "highlights": [
+        "Bhutan cut maternal deaths by 93%, from 704 to 47 per 100,000",
+        "Chad improved only 33%, still at 748 in 2023 \u2014 one of the world's worst",
+        "Bangladesh dropped from 870 to 115, a 87% improvement"
+      ],
+      "createdAt": "2026-06-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-347.py"
+    },
+    {
+      "id": "viz-348",
+      "title": "Road Traffic Deaths: Which Countries Got Worse?",
+      "description": "Slope chart showing road traffic mortality rates (per 100,000 people) in 2000 vs 2019 for the 25 highest-burden countries, revealing that many countries saw their rates rise rather than fall.",
+      "datasetIds": [
+        "wb--SH-STA-TRAF-P5"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-348.html",
+      "highlights": [
+        "Dominican Republic's rate more than doubled, from 29.4 to 64.6 per 100,000",
+        "Korea, Rep. cut its rate by 66%, from 25.6 to 8.6",
+        "Eritrea, CAR, and Burundi all saw rates rise significantly"
+      ],
+      "createdAt": "2026-06-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-348.py"
+    },
+    {
+      "id": "viz-349",
+      "title": "Health Spending as Share of GDP, 2000\u20132024",
+      "description": "Trend lines showing current health expenditure as % of GDP for 11 countries spanning high, middle, and low income levels, illustrating the wide gap in health system investment.",
+      "datasetIds": [
+        "wb--SH-XPD-CHEX-GD-ZS"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-349.html",
+      "highlights": [
+        "South Korea more than doubled its health share from 3.7% to 8.7% in 24 years",
+        "Germany and France consistently above 10%, peaking during COVID-19 in 2020-21",
+        "India's share fell from 4.1% to 3.3% despite economic growth"
+      ],
+      "createdAt": "2026-06-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-349.py"
+    },
+    {
+      "id": "viz-350",
+      "title": "Neonatal Mortality: 24 Highest-Burden Countries, 1990\u20132023",
+      "description": "Sparkline grid showing neonatal mortality rates for the 24 countries with the highest current rates, each trend covering 1990 to 2023 at 5-year intervals.",
+      "datasetIds": [
+        "wb--SH-DYN-NMRT"
+      ],
+      "chartType": "sparkline",
+      "codeFilePath": "viz/viz-350.html",
+      "highlights": [
+        "Afghanistan leads with 33.9 neonatal deaths per 1,000 live births in 2023",
+        "Eswatini is the only country where rates worsened, rising from 21 to 25.5 \u2014 an HIV/AIDS signature",
+        "Botswana's unique V-shape dip and recovery also reflects HIV/AIDS impacts"
+      ],
+      "createdAt": "2026-06-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-350.py"
+    },
+    {
+      "id": "viz-351",
+      "title": "Adult Male Mortality, 1990 vs 2023",
+      "description": "Slope chart of adult male mortality rates for the 25 highest-burden countries in 1990, with color encoding the percentage improvement over 33 years.",
+      "datasetIds": [
+        "wb--SP-DYN-AMRT-MA"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-351.html",
+      "highlights": [
+        "Iraq dropped 66% \u2014 the sharpest fall in the group \u2014 from 456 to 155 per 1,000",
+        "Kenya and Eswatini are the only countries where rates worsened, driven by HIV/AIDS",
+        "Central African Republic improved just 5%, still at 394 per 1,000 men"
+      ],
+      "createdAt": "2026-06-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-351.py"
     }
   ],
-  "lastUpdated": "2026-04-05T00:00:00.000Z"
+  "lastUpdated": "2026-06-13T00:00:00.000Z"
 }
