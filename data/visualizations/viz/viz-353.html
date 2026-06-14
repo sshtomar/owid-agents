@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Electric Power Grid Losses: 1990 vs 2020</h1>
+<p class="subtitle">Electricity lost during transmission and distribution as a share of total output. Iraq's grid collapsed from 5% to 64% losses amid decades of war. Albania cut losses from 51% to 17% through grid modernisation. Advanced economies maintain near-perfect efficiency.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EG.ELC.LOSS.ZS</p>
+<script>
+const data = [
+  {"n":"Iraq","a":5.0,"b":63.9},
+  {"n":"Congo, Rep.","a":19.7,"b":45.4},
+  {"n":"Honduras","a":7.0,"b":35.1},
+  {"n":"Chad","a":7.5,"b":27.4},
+  {"n":"Jamaica","a":14.6,"b":27.1},
+  {"n":"Kenya","a":15.0,"b":23.9},
+  {"n":"Cameroon","a":13.1,"b":22.0},
+  {"n":"Egypt","a":8.5,"b":21.9},
+  {"n":"Ethiopia","a":10.0,"b":19.3},
+  {"n":"India","a":19.5,"b":17.7},
+  {"n":"Albania","a":51.2,"b":17.1},
+  {"n":"Bangladesh","a":33.6,"b":8.1},
+  {"n":"Bolivia","a":24.6,"b":8.8},
+  {"n":"Colombia","a":21.2,"b":7.7},
+  {"n":"France","a":6.6,"b":6.7},
+  {"n":"Germany","a":4.3,"b":4.7},
+  {"n":"Japan","a":4.7,"b":4.5},
+  {"n":"China","a":7.0,"b":4.2},
+  {"n":"S. Korea","a":3.3,"b":3.1},
+  {"n":"Australia","a":6.1,"b":3.9}
+];
+
+const W = 700, H = 620;
+const pad = { left: 148, right: 148, top: 50, bottom: 36 };
+const minV = 0, maxV = 70;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const xL = pad.left, xR = W - pad.right;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function colorForChange(d) {
+  const c = d.b - d.a;
+  if (c > 15) return "#EA5E33";
+  if (c > 5) return "#F29A44";
+  if (c > -5) return "#A6C4A2";
+  return "#5B9E78";
+}
+
+// Grid lines
+[0, 10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xL, y1: scale(v), x2: xR, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xL - 6, y: scale(v) + 3.5,
+    "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  })).textContent = v + "%";
+});
+
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+const hdrStyle = { "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F", "font-weight": "500" };
+svg.appendChild(mkEl("text", { x: xL, y: pad.top - 12, "text-anchor": "middle", ...hdrStyle })).textContent = "1990";
+svg.appendChild(mkEl("text", { x: xR, y: pad.top - 12, "text-anchor": "middle", ...hdrStyle })).textContent = "2020";
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const yMin = pad.top + 6, yMax = H - pad.bottom - 2;
+  sorted.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+resolveCollisions(leftLabels, 12);
+resolveCollisions(rightLabels, 12);
+
+const leftMap = {}, rightMap = {};
+leftLabels.forEach(item => { leftMap[item.d.n] = item.y; });
+rightLabels.forEach(item => { rightMap[item.d.n] = item.y; });
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g", {});
+
+  g.appendChild(mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.4", "stroke-linecap": "round" }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "2.5", fill: color }));
+
+  const lLabel = mkEl("text", {
+    x: xL - 8, y: leftMap[d.n] + 3.5,
+    "text-anchor": "end", fill: "#2B2A27", "font-size": "9.5", "font-weight": "500"
+  });
+  lLabel.textContent = `${d.n}  ${d.a}%`;
+  g.appendChild(lLabel);
+
+  if (Math.abs(leftMap[d.n] - ya) > 2) {
+    g.appendChild(mkEl("line", { x1: xL - 6, y1: leftMap[d.n], x2: xL - 2, y2: ya, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const rLabel = mkEl("text", {
+    x: xR + 8, y: rightMap[d.n] + 3.5,
+    "text-anchor": "start", fill: "#2B2A27", "font-size": "9.5", "font-weight": "500"
+  });
+  rLabel.textContent = `${d.b}%  ${d.n}`;
+  g.appendChild(rLabel);
+
+  if (Math.abs(rightMap[d.n] - yb) > 2) {
+    g.appendChild(mkEl("line", { x1: xR + 6, y1: rightMap[d.n], x2: xR + 2, y2: yb, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12", cursor: "pointer" });
+  g.appendChild(hit);
+  groups.push({ g, d, color });
+  svg.appendChild(g);
+
+  const change = d.b - d.a;
+  const sign = change >= 0 ? "+" : "";
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach(item => item.g.style.opacity = item.d.n === d.n ? "1" : "0.12");
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${sign}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(item => item.g.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+});
+
+// Legend
+const legendData = [
+  { color: "#EA5E33", label: "Worsened (>+15pp)" },
+  { color: "#F29A44", label: "Slight increase (+5–15pp)" },
+  { color: "#A6C4A2", label: "Stable (±5pp)" },
+  { color: "#5B9E78", label: "Improved (<-5pp)" }
+];
+let lx = pad.left;
+const ly = H - 8;
+legendData.forEach(({ color, label }) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 8, height: 8, fill: color, rx: "1" }));
+  const lt = mkEl("text", { x: lx + 11, y: ly, fill: "#7A786F", "font-size": "8.5", "font-family": "JetBrains Mono, monospace" });
+  lt.textContent = label;
+  svg.appendChild(lt);
+  lx += 132;
+});
+</script>
+</body></html>

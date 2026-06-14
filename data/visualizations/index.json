@@ -5773,7 +5773,92 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "Energy Use per Capita: 1990 vs 2020",
+      "description": "Slope chart comparing energy consumption per capita (kg of oil equivalent) across 18 countries. South Korea nearly tripled its energy use as it industrialized, while Germany and Denmark cut consumption through efficiency gains.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-352.html",
+      "highlights": [
+        "South Korea surged from 2,088 to 5,196 kg/cap \u2014 energy mirroring its economic boom",
+        "Germany cut energy use from 4,422 to 3,349 kg/cap through efficiency and deindustrialization",
+        "China more than tripled from 773 to 2,466 kg/cap as it became the world's factory"
+      ],
+      "createdAt": "2026-06-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Electric Power Grid Losses: 1990 vs 2020",
+      "description": "Slope chart of electric power transmission and distribution losses as a percentage of output. Iraq's grid collapsed under decades of war. Albania modernized from 51% to 17% losses. Advanced-economy grids operate near 4% efficiency.",
+      "datasetIds": [
+        "wb--EG-ELC-LOSS-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-353.html",
+      "highlights": [
+        "Iraq's grid losses exploded from 5% to 64% \u2014 a direct signal of infrastructure destruction",
+        "Albania cut losses from 51% to 17% through targeted grid modernization investment",
+        "South Korea maintains 3% losses \u2014 among the world's most efficient grids"
+      ],
+      "createdAt": "2026-06-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "Financial Inclusion: Bank Account Ownership 2011 vs 2021",
+      "description": "Slope chart showing the share of adults (15+) with a bank or mobile-money account. India's Jan Dhan drive pushed ownership from 35% to 78%. Gabon, Bolivia, and Kenya made similarly dramatic gains, while Afghanistan barely moved.",
+      "datasetIds": [
+        "wb--FX-OWN-TOTL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-354.html",
+      "highlights": [
+        "India added 42 percentage points in a decade, reaching 78% through the Jan Dhan scheme",
+        "Gabon jumped from 19% to 66%, largely driven by mobile-money adoption",
+        "Germany and Australia are at near-universal 99-100% coverage"
+      ],
+      "createdAt": "2026-06-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "International Tourism Arrivals, 1995\u20132020",
+      "description": "Trend lines for 8 top destinations showing 25 years of tourism growth followed by the COVID-19 collapse. Japan's meteoric rise to 32M arrivals in 2019, then a 87% single-year crash, tells the starkest story.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-355.html",
+      "highlights": [
+        "China grew from 46M to 163M arrivals (1995\u20132019) then fell to 30M in 2020",
+        "Japan's tourism nearly quintupled in the last decade before COVID erased 87% of visitors",
+        "COVID-19 wiped out more arrivals than all previous downturns combined"
+      ],
+      "createdAt": "2026-06-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Primary School Completion Rate, 1990\u20132024",
+      "description": "Trend lines for 6 countries showing decades of progress in primary education. Bhutan climbed from 23% to 87%, Cabo Verde reached near-universal 99%, while Ethiopia tripled its rate to 54% but still lags far behind.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-356.html",
+      "highlights": [
+        "Cabo Verde achieved near-universal completion (99%) in just three decades",
+        "Ghana's rate climbed from 58% to 98% through sustained education investment",
+        "Ethiopia tripled its rate from 15% to 54% \u2014 dramatic progress, but still 45 points behind Ghana"
+      ],
+      "createdAt": "2026-06-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
     }
   ],
-  "lastUpdated": "2026-06-13T00:00:00.000Z"
+  "lastUpdated": "2026-06-14T00:00:00.000Z"
 }
