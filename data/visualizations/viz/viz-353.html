@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; max-width: 750px; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:hover { background: #EFEEE7; }
+  .cell-name { font-size: 8.5px; font-weight: 500; color: #2B2A27; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 4px; }
+  .cell-val { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; }
+  .cell-change { font-family: 'JetBrains Mono', monospace; font-size: 8px; }
+</style></head><body>
+<h1>Measles Immunization Coverage, 1990–2023</h1>
+<p class="subtitle">% of children ages 12–23 months immunized against measles. Most countries made gains over three decades, but several — including Central African Republic and Benin — regressed.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Immunization, measles (SH.IMM.MEAS)</p>
+<script>
+const data = [{"n":"Central African Republic","s":[82,42,44,37,42,62,58,49,47,41,36,39],"e":82,"l":39,"y0":1990,"step":3},{"n":"Congo, Dem. Rep.","s":[38,33,21,15,41,61,64,66,69,65,62,52],"e":38,"l":52,"y0":1990,"step":3},{"n":"Guinea","s":[35,55,61,40,46,51,55,62,51,48,50,52],"e":35,"l":52,"y0":1990,"step":3},{"n":"Benin","s":[79,67,60,69,66,61,66,70,65,65,54,52],"e":79,"l":52,"y0":1990,"step":3},{"n":"Afghanistan","s":[20,25,42,31,35,50,59,64,60,64,57,55],"e":20,"l":55,"y0":1990,"step":3},{"n":"Equatorial Guinea","s":[88,79,81,51,49,47,45,46,53,52,50,61],"e":88,"l":61,"y0":1990,"step":3},{"n":"Angola","s":[38,47,62,46,74,45,58,59,56,47,54,63],"e":38,"l":63,"y0":1990,"step":3},{"n":"Chad","s":[32,19,22,30,25,27,27,54,45,37,45,63],"e":32,"l":63,"y0":1990,"step":3},{"n":"Comoros","s":[87,56,43,69,71,67,76,79,80,75,75,70],"e":87,"l":70,"y0":1990,"step":3},{"n":"Argentina","s":[93,95,99,97,95,98,96,95,95,90,77,80],"e":93,"l":80,"y0":1990,"step":3},{"n":"Honduras","s":[90,94,91,98,97,96,93,97,97,98,82,77],"e":90,"l":77,"y0":1990,"step":3},{"n":"Italy","s":[43,50,55,70,81,87,90,90,87,92,92,95],"e":43,"l":95,"y0":1990,"step":3},{"n":"Cambodia","s":[34,36,56,63,52,79,89,88,83,85,83,79],"e":34,"l":79,"y0":1990,"step":3},{"n":"Haiti","s":[31,44,50,54,53,53,59,65,69,65,74,72],"e":31,"l":72,"y0":1990,"step":3},{"n":"India","s":[56,59,66,56,56,68,72,84,85,90,89,93],"e":56,"l":93,"y0":1990,"step":3},{"n":"Bahrain","s":[87,90,95,94,99,99,99,99,99,99,99,99],"e":87,"l":99,"y0":1990,"step":3},{"n":"Bhutan","s":[93,84,85,77,78,93,99,95,97,97,93,99],"e":93,"l":99,"y0":1990,"step":3},{"n":"Cuba","s":[94,96,99,96,98,98,98,99,99,99,98,99],"e":94,"l":99,"y0":1990,"step":3},{"n":"El Salvador","s":[98,86,94,94,93,99,95,89,96,89,84,99],"e":98,"l":99,"y0":1990,"step":3},{"n":"Hungary","s":[99,99,99,99,99,99,99,99,99,99,99,99],"e":99,"l":99,"y0":1990,"step":3},{"n":"Iran, Islamic Rep.","s":[85,96,99,99,99,94,98,99,99,99,99,99],"e":85,"l":99,"y0":1990,"step":3},{"n":"Korea, Dem. People's Rep.","s":[98,99,50,63,98,96,98,99,99,99,99,99],"e":98,"l":99,"y0":1990,"step":3},{"n":"Algeria","s":[83,87,90,83,81,83,88,95,95,88,80,99],"e":83,"l":99,"y0":1990,"step":3}];
+
+const cellW = 130, cellH = 44;
+const tip = document.getElementById("tip");
+const grid = document.getElementById("grid");
+const years = Array.from({length: 12}, (_, i) => 1990 + i * 3);
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const name = document.createElement("div");
+  name.className = "cell-name";
+  name.textContent = d.n;
+  cell.appendChild(name);
+
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = cellW * dpr;
+  canvas.height = cellH * dpr;
+  canvas.style.width = cellW + "px";
+  canvas.style.height = cellH + "px";
+  canvas.style.display = "block";
+  cell.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const valid = d.s.filter(v => v !== null);
+  const minV = Math.max(0, Math.min(...valid) - 5);
+  const maxV = Math.min(100, Math.max(...valid) + 5);
+  const norm = v => cellH - ((v - minV) / (maxV - minV)) * cellH;
+
+  // Draw 80% threshold line
+  if (maxV >= 80 && minV <= 80) {
+    ctx.strokeStyle = "#E2E0D5";
+    ctx.lineWidth = 0.8;
+    ctx.setLineDash([2, 2]);
+    const y80 = norm(80);
+    ctx.beginPath();
+    ctx.moveTo(0, y80);
+    ctx.lineTo(cellW, y80);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Fill area under line
+  const pts = d.s.map((v, i) => ({ x: (i / (d.s.length - 1)) * cellW, y: v !== null ? norm(v) : null }));
+  const change = d.l - d.e;
+  const lineColor = change >= 20 ? "#EA5E33" : change >= 0 ? "#F29A44" : "#A6C4A2";
+
+  ctx.fillStyle = lineColor + "18";
+  ctx.beginPath();
+  let started = false;
+  pts.forEach((p, i) => {
+    if (p.y === null) return;
+    if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+    else ctx.lineTo(p.x, p.y);
+  });
+  const lastValid = pts.filter(p => p.y !== null);
+  if (lastValid.length) {
+    ctx.lineTo(lastValid[lastValid.length - 1].x, cellH);
+    ctx.lineTo(lastValid[0].x, cellH);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  // Draw line
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = 1.4;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  started = false;
+  pts.forEach(p => {
+    if (p.y === null) { started = false; return; }
+    if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+    else ctx.lineTo(p.x, p.y);
+  });
+  ctx.stroke();
+
+  const valRow = document.createElement("div");
+  valRow.className = "cell-vals";
+  const startVal = document.createElement("span");
+  startVal.className = "cell-val";
+  startVal.textContent = d.e + "%";
+  const chgSpan = document.createElement("span");
+  chgSpan.className = "cell-change";
+  const chg = d.l - d.e;
+  chgSpan.textContent = (chg > 0 ? "+" : "") + chg + "pp";
+  chgSpan.style.color = chg >= 10 ? "#EA5E33" : chg >= 0 ? "#7A786F" : "#A6C4A2";
+  const endVal = document.createElement("span");
+  endVal.className = "cell-val";
+  endVal.textContent = d.l + "%";
+  valRow.appendChild(startVal);
+  valRow.appendChild(chgSpan);
+  valRow.appendChild(endVal);
+  cell.appendChild(valRow);
+
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, mx / cellW));
+    const idx = Math.round(ratio * (d.s.length - 1));
+    const yr = years[idx];
+    const val = d.s[idx];
+    if (val !== null) {
+      tip.textContent = `${d.n} (${yr}): ${val}%`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - 28) + "px";
+    }
+  });
+  cell.addEventListener("mouseleave", () => { tip.style.opacity = "0"; });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>

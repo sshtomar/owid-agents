@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; font-family: 'JetBrains Mono', monospace; }
+  .legend-swatch { width: 22px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>Adult Female Mortality, 1990 vs 2020</h1>
+<p class="subtitle">Deaths per 1,000 women aged 15–60. Most countries made large gains over thirty years — but Central African Republic and Chad saw virtually no improvement.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A"></div>Fell 50%+</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#8BAD72"></div>Fell 30–50%</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C49A45"></div>Fell 10–30%</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#B34B3B"></div>Rose or barely changed</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Mortality rate, adult, female (SP.DYN.AMRT.FE)</p>
+<script>
+const data = [{"n":"Burundi","before":419,"after":230},{"n":"Angola","before":391,"after":199},{"n":"Afghanistan","before":390,"after":221},{"n":"Ethiopia","before":387,"after":162},{"n":"Eritrea","before":351,"after":175},{"n":"Congo, Dem. Rep.","before":348,"after":237},{"n":"Central African Republic","before":345,"after":394},{"n":"Congo, Rep.","before":343,"after":237},{"n":"Chad","before":340,"after":337},{"n":"Guinea","before":328,"after":248},{"n":"Haiti","before":326,"after":183},{"n":"Guinea-Bissau","before":325,"after":233},{"n":"Gambia, The","before":318,"after":212},{"n":"Cote d'Ivoire","before":311,"after":293},{"n":"Burkina Faso","before":311,"after":220},{"n":"Bhutan","before":286,"after":107},{"n":"Bangladesh","before":277,"after":121},{"n":"India","before":217,"after":139},{"n":"Indonesia","before":186,"after":164},{"n":"Cabo Verde","before":179,"after":77},{"n":"Brazil","before":155,"after":93},{"n":"China","before":125,"after":56}];
+
+const W = 700, H = 620;
+const pad = { left: 160, right: 155, top: 55, bottom: 32 };
+const chartH = H - pad.top - pad.bottom;
+const minV = 40, maxV = 430;
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * chartH;
+}
+
+function colorForChange(d) {
+  const pct = (d.before - d.after) / d.before * 100; // decline %
+  if (pct >= 50) return "#3D7A5A";
+  if (pct >= 30) return "#8BAD72";
+  if (pct >= 10) return "#C49A45";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap, yMin, yMax) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (let i = 0; i < sorted.length; i++) {
+    sorted[i].y = Math.max(yMin, Math.min(yMax, sorted[i].y));
+  }
+  for (let pass = 0; pass < 10; pass++) {
+    let moved = false;
+    for (let i = sorted.length - 1; i >= 1; i--) {
+      if (sorted[i].y - sorted[i - 1].y < minGap) {
+        sorted[i - 1].y = sorted[i].y - minGap;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+// Grid lines
+const ticks = [50, 100, 150, 200, 250, 300, 350, 400];
+const xL = pad.left, xR = W - pad.right;
+ticks.forEach(v => {
+  const y = scale(v);
+  svg.appendChild(mkEl("line", { x1: xL, y1: y, x2: xR, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", {
+    x: xL - 6, y: y + 3, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"
+  }, v));
+});
+
+// Column headers
+["1990", "2020"].forEach((yr, i) => {
+  svg.appendChild(mkEl("text", {
+    x: i === 0 ? xL : xR, y: pad.top - 18, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F", "font-weight": "500"
+  }, yr));
+});
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 12, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 12, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+const tip = document.getElementById("tip");
+
+const leftLabels = data.map(d => ({ d, y: scale(d.before) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.after) }));
+const resolvedL = resolveCollisions(leftLabels, 13, pad.top - 2, H - pad.bottom + 2);
+const resolvedR = resolveCollisions(rightLabels, 13, pad.top - 2, H - pad.bottom + 2);
+const leftMap = {}, rightMap = {};
+resolvedL.forEach(item => { leftMap[item.d.n] = item.y; });
+resolvedR.forEach(item => { rightMap[item.d.n] = item.y; });
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.before);
+  const yb = scale(d.after);
+  const lyL = leftMap[d.n];
+  const lyR = rightMap[d.n];
+  const g = mkEl("g", { "data-name": d.n });
+
+  if (Math.abs(lyL - ya) > 2)
+    g.appendChild(mkEl("line", { x1: xL - 4, y1: lyL, x2: xL - 4, y2: ya, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  if (Math.abs(lyR - yb) > 2)
+    g.appendChild(mkEl("line", { x1: xR + 4, y1: lyR, x2: xR + 4, y2: yb, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+
+  g.appendChild(mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.8", "stroke-linecap": "round" }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "3", fill: color }));
+
+  g.appendChild(mkEl("text", {
+    x: xL - 7, y: lyL + 3.5, "text-anchor": "end", "font-size": "9", fill: "#2B2A27"
+  }, `${d.n}  ${d.before}`));
+  g.appendChild(mkEl("text", {
+    x: xR + 7, y: lyR + 3.5, "text-anchor": "start", "font-size": "9", fill: "#2B2A27"
+  }, `${d.after}  ${d.n}`));
+
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+  hit.addEventListener("mouseenter", e => {
+    document.querySelectorAll("g[data-name]").forEach(el => el.setAttribute("opacity", "0.12"));
+    g.setAttribute("opacity", "1");
+    const pct = ((d.before - d.after) / d.before * 100).toFixed(0);
+    tip.textContent = `${d.n}: ${d.before} → ${d.after} (${pct > 0 ? "-" : "+"}${Math.abs(pct)}%)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    document.querySelectorAll("g[data-name]").forEach(el => el.setAttribute("opacity", "1"));
+    tip.style.opacity = "0";
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+});
+</script>
+</body></html>
