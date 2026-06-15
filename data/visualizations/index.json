@@ -5773,7 +5773,97 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "The Aging Gap: Old-Age Dependency Ratio, 1970 vs 2023",
+      "description": "Slope chart comparing the old-age dependency ratio (people 65+ per 100 working-age adults) across 21 countries in 1970 and 2023. Japan's ratio sextupled; Sub-Saharan Africa barely changed.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-352.html",
+      "generatedCode": "",
+      "highlights": [
+        "Japan's ratio jumped from 10.1 to 50.3 \u2014 a sixfold increase",
+        "Most Eastern European countries tripled their aging burden",
+        "Chad and Central African Republic both fell below 5 (youngest demographic profile)"
+      ],
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Measles Immunization Coverage, 1990\u20132023",
+      "description": "Sparkline grid showing measles vaccine coverage trends for 23 countries over 33 years. Covers the full range from chronic underperformers to consistent 99% achievers.",
+      "datasetIds": [
+        "wb--SH-IMM-MEAS"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-353.html",
+      "generatedCode": "",
+      "highlights": [
+        "Central African Republic fell from 82% in 1990 to just 39% in 2023",
+        "Italy rose from 43% to 95% \u2014 one of the biggest gainers in the set",
+        "Hungary and Cuba maintained near-100% for the entire period"
+      ],
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "Adult Female Mortality, 1990 vs 2020",
+      "description": "Slope chart of adult female mortality rates (per 1,000 women aged 15\u201360) for 22 high-burden countries. Most made large gains; Central African Republic worsened.",
+      "datasetIds": [
+        "wb--SP-DYN-AMRT-FE"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-354.html",
+      "generatedCode": "",
+      "highlights": [
+        "Ethiopia cut female mortality by 58% over three decades",
+        "Bhutan and Bangladesh each fell by more than half",
+        "Central African Republic rose from 345 to 394 \u2014 the only country to worsen"
+      ],
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "Tuberculosis Treatment Coverage, 2023",
+      "description": "Horizontal bar chart showing the share of estimated new and relapse TB cases that received treatment in 2023 across 44 countries. Mongolia is a stark outlier at 19%.",
+      "datasetIds": [
+        "who--TB_1"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-355.html",
+      "generatedCode": "",
+      "highlights": [
+        "Mongolia reached only 19% of estimated TB cases \u2014 the lowest in the dataset",
+        "Seven countries (Malta, Grenada, Seychelles, Dominica, Tuvalu, Antigua, St. Vincent) report 100%",
+        "South Korea and Kazakhstan both exceed 94%"
+      ],
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Access to Safely Managed Drinking Water, 2000 vs 2022",
+      "description": "Slope chart comparing the population share with safely managed drinking water (on-premises, available when needed, uncontaminated) across 22 countries between 2000 and 2022.",
+      "datasetIds": [
+        "wb--SH-H2O-SMDW-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-356.html",
+      "generatedCode": "",
+      "highlights": [
+        "India gained 35 percentage points \u2014 from 38% to 73% \u2014 in just 22 years",
+        "Chad remains stuck at 6%, the same as in 2000",
+        "Jordan and Kazakhstan both surpassed 85% by 2022"
+      ],
+      "createdAt": "2026-06-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
     }
   ],
-  "lastUpdated": "2026-06-13T00:00:00.000Z"
+  "lastUpdated": "2026-06-15T00:00:00.000Z"
 }
