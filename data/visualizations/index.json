@@ -5773,7 +5773,88 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "The Patent Race, 2000\u20132021",
+      "description": "Trend lines (log scale) of resident patent applications for 10 major economies. China grew from 25,000 to 1.4 million applications, overtaking Japan and all others combined.",
+      "datasetIds": [
+        "wb--IP-PAT-RESD"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-352.html",
+      "highlights": [
+        "China grew 56x in 21 years, from 5th place to filing more patents than the rest of the top 10 combined",
+        "Japan declined 40% from its 2000 peak of 387,000 to 222,000",
+        "India grew 12x from just 2,200 applications in 2000 to 26,000 in 2021"
+      ],
+      "createdAt": "2026-06-19T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Demographic Transition: Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing dependents (young + elderly) as a share of working-age population for 7 countries. South Korea completed the fastest demographic transition on record; Japan\u2019s ratio is now rising due to elderly.",
+      "datasetIds": [
+        "wb--SP-POP-DPND"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "South Korea dropped from 84% in 1970 to 37% in 2015, the fastest demographic transition ever recorded",
+        "Japan\u2019s ratio has risen from a low of 43% in 1991 to 70% in 2024, driven by its aging population",
+        "Ethiopia peaked above 100% in 2000 and has only recently begun declining"
+      ],
+      "createdAt": "2026-06-19T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "Exclusive Breastfeeding Rates: Who Made the Biggest Gains?",
+      "description": "Slope chart comparing earliest vs latest survey breastfeeding rates for the 20 countries with largest absolute gains. Croatia rose from 24% to 98%; most started near zero in the 1980s\u201390s.",
+      "datasetIds": [
+        "wb--SH-STA-BFED-ZS"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "Croatia rose from 23% to 98% in 12 years \u2014 an extraordinary public health turnaround",
+        "Cambodia went from 11% to 65%, Ghana from 2% to 43%",
+        "Most African countries started under 30% and reached 40\u201360% through community health programs"
+      ],
+      "createdAt": "2026-06-19T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "Primary School Completion: Decades of Progress",
+      "description": "Slope chart of primary school completion rates from earliest to latest available year for 20 countries with the largest absolute gains. Cabo Verde rose from 10% to 99%; Bhutan from 6% to 87%.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "Cabo Verde improved from 10% to 99% over ~50 years",
+        "Afghanistan went from 17% to 90%, one of the biggest reversals ever recorded",
+        "Burkina Faso, Burundi, and Ethiopia remain below 55% despite doubling or tripling their rates"
+      ],
+      "createdAt": "2026-06-19T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Hospital Beds per 10,000: East Asia Invests, Post-Soviet States Cut",
+      "description": "Slope chart comparing hospital beds per 10,000 population around 2000 vs around 2020. South Korea nearly tripled capacity; China more than tripled. Finland, Russia, and Baltic states cut sharply.",
+      "datasetIds": [
+        "who--WHS6_102"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "South Korea went from 47 to 128 beds per 10,000 \u2014 nearly tripling in 21 years",
+        "Finland cut from 74 to 28 as it shifted to community-based care",
+        "Russia reduced from 107 to 68 as post-Soviet health system consolidation continued"
+      ],
+      "createdAt": "2026-06-19T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
     }
   ],
-  "lastUpdated": "2026-06-13T00:00:00.000Z"
+  "lastUpdated": "2026-06-19T00:00:00.000Z"
 }
