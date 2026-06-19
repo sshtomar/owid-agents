@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Patent Race, 2000–2021</h1>
+<p class="subtitle">Resident patent applications filed annually. China has grown from under 30,000 to 1.4 million applications, overtaking Japan and all others combined. Log scale.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Patent Applications, Residents (IP.PAT.RESD)</p>
+<script>
+const data = [{"n":"China","pts":[{"y":2000,"v":25346},{"y":2001,"v":30038},{"y":2002,"v":39806},{"y":2003,"v":56769},{"y":2004,"v":65786},{"y":2005,"v":93485},{"y":2006,"v":122318},{"y":2007,"v":153060},{"y":2008,"v":194579},{"y":2009,"v":229096},{"y":2010,"v":293066},{"y":2011,"v":415829},{"y":2012,"v":535313},{"y":2013,"v":704936},{"y":2014,"v":801135},{"y":2015,"v":968252},{"y":2016,"v":1204981},{"y":2017,"v":1245709},{"y":2018,"v":1393815},{"y":2019,"v":1243568},{"y":2020,"v":1344817},{"y":2021,"v":1426644}]},{"n":"Japan","pts":[{"y":2000,"v":387364},{"y":2001,"v":386767},{"y":2002,"v":369458},{"y":2003,"v":358184},{"y":2004,"v":368416},{"y":2005,"v":367960},{"y":2006,"v":347060},{"y":2007,"v":333498},{"y":2008,"v":330110},{"y":2009,"v":295315},{"y":2010,"v":290081},{"y":2011,"v":287580},{"y":2012,"v":287013},{"y":2013,"v":271731},{"y":2014,"v":265959},{"y":2015,"v":258839},{"y":2016,"v":260244},{"y":2017,"v":260292},{"y":2018,"v":253630},{"y":2019,"v":245372},{"y":2020,"v":227348},{"y":2021,"v":222452}]},{"n":"South Korea","pts":[{"y":2000,"v":72831},{"y":2001,"v":73714},{"y":2002,"v":76570},{"y":2003,"v":90313},{"y":2004,"v":105250},{"y":2005,"v":122188},{"y":2006,"v":125476},{"y":2007,"v":128701},{"y":2008,"v":127114},{"y":2009,"v":127316},{"y":2010,"v":131805},{"y":2011,"v":138034},{"y":2012,"v":148136},{"y":2013,"v":159978},{"y":2014,"v":164073},{"y":2015,"v":167275},{"y":2016,"v":163424},{"y":2017,"v":159084},{"y":2018,"v":162561},{"y":2019,"v":171603},{"y":2020,"v":180477},{"y":2021,"v":186245}]},{"n":"Germany","pts":[{"y":2000,"v":51736},{"y":2001,"v":49989},{"y":2002,"v":47598},{"y":2003,"v":47818},{"y":2004,"v":48448},{"y":2005,"v":48367},{"y":2006,"v":48012},{"y":2007,"v":47853},{"y":2008,"v":49240},{"y":2009,"v":47859},{"y":2010,"v":47047},{"y":2011,"v":46986},{"y":2012,"v":46620},{"y":2013,"v":47353},{"y":2014,"v":48154},{"y":2015,"v":47384},{"y":2016,"v":48480},{"y":2017,"v":47785},{"y":2018,"v":46617},{"y":2019,"v":46632},{"y":2020,"v":42260},{"y":2021,"v":39822}]},{"n":"India","pts":[{"y":2000,"v":2206},{"y":2001,"v":2379},{"y":2002,"v":2693},{"y":2003,"v":3425},{"y":2004,"v":4014},{"y":2005,"v":4721},{"y":2006,"v":5686},{"y":2007,"v":6296},{"y":2008,"v":6425},{"y":2009,"v":7262},{"y":2010,"v":8853},{"y":2011,"v":8841},{"y":2012,"v":9553},{"y":2013,"v":10669},{"y":2014,"v":12040},{"y":2015,"v":12579},{"y":2016,"v":13199},{"y":2017,"v":14961},{"y":2018,"v":16289},{"y":2019,"v":19454},{"y":2020,"v":23141},{"y":2021,"v":26267}]},{"n":"France","pts":[{"y":2000,"v":13870},{"y":2001,"v":13499},{"y":2002,"v":13519},{"y":2003,"v":13511},{"y":2004,"v":14230},{"y":2005,"v":14327},{"y":2006,"v":14529},{"y":2007,"v":14722},{"y":2008,"v":14658},{"y":2009,"v":14100},{"y":2010,"v":14748},{"y":2011,"v":14655},{"y":2012,"v":14540},{"y":2013,"v":14690},{"y":2014,"v":14500},{"y":2015,"v":14306},{"y":2016,"v":14206},{"y":2017,"v":14415},{"y":2018,"v":14303},{"y":2019,"v":14103},{"y":2020,"v":12771},{"y":2021,"v":13386}]},{"n":"Iran","pts":[{"y":2000,"v":410},{"y":2001,"v":691},{"y":2002,"v":910},{"y":2003,"v":1287},{"y":2004,"v":2426},{"y":2005,"v":4051},{"y":2006,"v":5970},{"y":2007,"v":10648},{"y":2008,"v":15403},{"y":2009,"v":12184},{"y":2010,"v":11108},{"y":2011,"v":11529},{"y":2012,"v":10622},{"y":2013,"v":11305},{"y":2014,"v":13683},{"y":2016,"v":14930},{"y":2017,"v":15264},{"y":2018,"v":11908},{"y":2019,"v":11569},{"y":2020,"v":11396},{"y":2021,"v":10210}]},{"n":"Brazil","pts":[{"y":2000,"v":3179},{"y":2001,"v":3439},{"y":2002,"v":3481},{"y":2003,"v":3866},{"y":2004,"v":4044},{"y":2005,"v":4054},{"y":2006,"v":3956},{"y":2007,"v":4194},{"y":2008,"v":4280},{"y":2009,"v":4271},{"y":2010,"v":4228},{"y":2011,"v":4695},{"y":2012,"v":4798},{"y":2013,"v":4959},{"y":2014,"v":4659},{"y":2015,"v":4641},{"y":2016,"v":5200},{"y":2017,"v":5480},{"y":2018,"v":4980},{"y":2019,"v":5464},{"y":2020,"v":5280},{"y":2021,"v":4666}]},{"n":"Italy","pts":[{"y":2000,"v":7877},{"y":2007,"v":9255},{"y":2008,"v":8588},{"y":2009,"v":8814},{"y":2010,"v":8877},{"y":2011,"v":8794},{"y":2012,"v":8439},{"y":2013,"v":8307},{"y":2014,"v":8601},{"y":2016,"v":8848},{"y":2017,"v":8643},{"y":2018,"v":8921},{"y":2019,"v":9229},{"y":2020,"v":10061},{"y":2021,"v":10281}]},{"n":"Indonesia","pts":[{"y":2000,"v":157},{"y":2001,"v":212},{"y":2002,"v":234},{"y":2003,"v":201},{"y":2004,"v":227},{"y":2005,"v":235},{"y":2006,"v":288},{"y":2007,"v":284},{"y":2008,"v":386},{"y":2009,"v":415},{"y":2010,"v":508},{"y":2011,"v":533},{"y":2013,"v":663},{"y":2014,"v":702},{"y":2015,"v":1058},{"y":2016,"v":1101},{"y":2017,"v":2271},{"y":2018,"v":1407},{"y":2019,"v":3093},{"y":2020,"v":1309},{"y":2021,"v":1397}]}];
+
+const COLORS = ["#EA5E33","#3D7A5A","#F29A44","#5B9E78","#8BAD72","#C49A45","#C4715A","#B34B3B","#7A786F","#A6C4A2"];
+
+const W = 820, H = 460;
+const margin = { top: 36, right: 130, bottom: 36, left: 68 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const yearMin = 2000, yearMax = 2021;
+const logMin = Math.log10(100), logMax = Math.log10(2000000);
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (logMax - Math.log10(v)) / (logMax - logMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+const logTicks = [100, 1000, 10000, 100000, 1000000];
+logTicks.forEach(v => {
+  if (v < 100 || v > 2000000) return;
+  const y = yScale(v);
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const label = v >= 1000000 ? (v/1000000) + "M" : v >= 1000 ? (v/1000) + "K" : v;
+  svg.appendChild(mkEl("text", { x: margin.left - 6, y: y + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#7A786F" }, label));
+});
+
+// X axis ticks
+[2000, 2005, 2010, 2015, 2020].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" }, y));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+data.forEach((series, si) => {
+  const color = COLORS[si % COLORS.length];
+  const pts = series.pts;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+
+  // invisible hit path
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+
+  const g = mkEl("g");
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+
+  const lastPt = pts[pts.length - 1];
+  groups.push({ g, line, color, series, lastY: yScale(lastPt.v), name: series.n, lastVal: lastPt.v });
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const year = yearMin + Math.round(ratio * (yearMax - yearMin));
+    const found = pts.find(p => p.y === year) || pts.reduce((a, b) => Math.abs(b.y - year) < Math.abs(a.y - year) ? b : a);
+    const fmtV = found.v >= 1000000 ? (found.v/1000000).toFixed(2)+"M" : found.v >= 1000 ? (found.v/1000).toFixed(0)+"K" : found.v;
+    tip.textContent = `${series.n} (${found.y}): ${fmtV}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach(grp => { grp.line.setAttribute("stroke-opacity", grp.series.n === series.n ? "1" : "0.1"); grp.line.setAttribute("stroke-width", grp.series.n === series.n ? "2.5" : "1"); });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(grp => { grp.line.setAttribute("stroke-opacity", "1"); grp.line.setAttribute("stroke-width", "1.5"); });
+  });
+});
+
+// Endpoint labels with collision resolution
+const labelItems = groups.map(g => ({ y: g.lastY, name: g.name, color: g.color, val: g.lastVal }));
+const resolved = resolveCollisions(labelItems, 12);
+resolved.forEach(item => {
+  const fmtV = item.val >= 1000000 ? (item.val/1000000).toFixed(1)+"M" : item.val >= 1000 ? Math.round(item.val/1000)+"K" : item.val;
+  svg.appendChild(mkEl("text", { x: W - margin.right + 8, y: item.y + 3.5, "text-anchor": "start", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: item.color }, `${fmtV} ${item.name}`));
+});
+
+// Y axis label
+const yLabel = mkEl("text", { x: 12, y: H / 2, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#7A786F", transform: `rotate(-90, 12, ${H/2})` }, "Applications (log scale)");
+svg.appendChild(yLabel);
+
+</script>
+</body></html>

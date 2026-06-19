@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Demographic Transition: Age Dependency Ratio, 1960–2024</h1>
+<p class="subtitle">Dependents (young + elderly) as a share of working-age population. East Asian countries completed the transition fastest; Japan is now aging. Sub-Saharan Africa remains high.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Age Dependency Ratio (SP.POP.DPND)</p>
+<script>
+const data = [{"n":"Japan","pts":[{"y":1960,"v":55.2},{"y":1961,"v":53.8},{"y":1962,"v":51.4},{"y":1963,"v":49.0},{"y":1964,"v":47.1},{"y":1965,"v":45.8},{"y":1966,"v":44.6},{"y":1967,"v":43.8},{"y":1968,"v":43.6},{"y":1969,"v":43.5},{"y":1970,"v":43.5},{"y":1971,"v":43.8},{"y":1972,"v":44.5},{"y":1973,"v":45.3},{"y":1974,"v":46.0},{"y":1975,"v":46.6},{"y":1976,"v":47.1},{"y":1977,"v":47.5},{"y":1978,"v":47.9},{"y":1979,"v":48.1},{"y":1980,"v":48.2},{"y":1981,"v":48.3},{"y":1982,"v":48.4},{"y":1983,"v":47.9},{"y":1984,"v":47.6},{"y":1985,"v":47.1},{"y":1986,"v":46.4},{"y":1987,"v":45.5},{"y":1988,"v":44.6},{"y":1989,"v":43.8},{"y":1990,"v":43.2},{"y":1991,"v":42.9},{"y":1992,"v":42.9},{"y":1993,"v":42.9},{"y":1994,"v":43.1},{"y":1995,"v":43.5},{"y":1996,"v":44.0},{"y":1997,"v":44.6},{"y":1998,"v":45.2},{"y":1999,"v":45.9},{"y":2000,"v":46.7},{"y":2001,"v":47.6},{"y":2002,"v":48.5},{"y":2003,"v":49.3},{"y":2004,"v":50.3},{"y":2005,"v":51.6},{"y":2006,"v":53.0},{"y":2007,"v":54.4},{"y":2008,"v":55.7},{"y":2009,"v":56.8},{"y":2010,"v":57.4},{"y":2011,"v":58.6},{"y":2012,"v":60.5},{"y":2013,"v":62.6},{"y":2014,"v":64.5},{"y":2015,"v":66.0},{"y":2016,"v":67.3},{"y":2017,"v":68.3},{"y":2018,"v":69.0},{"y":2019,"v":69.5},{"y":2020,"v":69.9},{"y":2021,"v":70.3},{"y":2022,"v":70.2},{"y":2023,"v":70.1},{"y":2024,"v":70.1}]},{"n":"Germany","pts":[{"y":1960,"v":48.7},{"y":1961,"v":50.1},{"y":1962,"v":51.4},{"y":1963,"v":52.5},{"y":1964,"v":53.6},{"y":1965,"v":54.6},{"y":1966,"v":55.5},{"y":1967,"v":56.7},{"y":1968,"v":57.6},{"y":1969,"v":58.0},{"y":1970,"v":58.3},{"y":1971,"v":58.5},{"y":1972,"v":58.4},{"y":1973,"v":58.0},{"y":1974,"v":57.6},{"y":1975,"v":57.0},{"y":1976,"v":56.2},{"y":1977,"v":55.3},{"y":1978,"v":54.3},{"y":1979,"v":53.1},{"y":1980,"v":51.6},{"y":1981,"v":49.8},{"y":1982,"v":47.8},{"y":1983,"v":46.0},{"y":1984,"v":44.6},{"y":1985,"v":44.0},{"y":1986,"v":43.8},{"y":1987,"v":43.8},{"y":1988,"v":44.1},{"y":1989,"v":44.4},{"y":1990,"v":44.8},{"y":1991,"v":45.3},{"y":1992,"v":45.5},{"y":1993,"v":45.8},{"y":1994,"v":46.1},{"y":1995,"v":46.3},{"y":1996,"v":46.4},{"y":1997,"v":46.5},{"y":1998,"v":46.6},{"y":1999,"v":46.8},{"y":2000,"v":47.3},{"y":2001,"v":47.8},{"y":2002,"v":48.2},{"y":2003,"v":48.7},{"y":2004,"v":49.3},{"y":2005,"v":50.0},{"y":2006,"v":50.8},{"y":2007,"v":51.5},{"y":2008,"v":51.8},{"y":2009,"v":52.2},{"y":2010,"v":52.1},{"y":2011,"v":51.7},{"y":2012,"v":51.6},{"y":2013,"v":51.6},{"y":2014,"v":51.8},{"y":2015,"v":52.1},{"y":2016,"v":52.6},{"y":2017,"v":53.3},{"y":2018,"v":53.9},{"y":2019,"v":54.5},{"y":2020,"v":55.3},{"y":2021,"v":56.2},{"y":2022,"v":57.2},{"y":2023,"v":58.0},{"y":2024,"v":59.0}]},{"n":"China","pts":[{"y":1960,"v":79.5},{"y":1965,"v":82.2},{"y":1970,"v":80.2},{"y":1975,"v":79.2},{"y":1980,"v":68.0},{"y":1985,"v":56.5},{"y":1990,"v":51.8},{"y":1995,"v":50.3},{"y":2000,"v":46.1},{"y":2005,"v":39.2},{"y":2010,"v":37.2},{"y":2015,"v":39.6},{"y":2020,"v":44.1},{"y":2024,"v":44.2}]},{"n":"India","pts":[{"y":1960,"v":78.2},{"y":1965,"v":82.6},{"y":1970,"v":81.9},{"y":1975,"v":80.2},{"y":1980,"v":77.8},{"y":1985,"v":76.3},{"y":1990,"v":74.2},{"y":1995,"v":71.0},{"y":2000,"v":66.6},{"y":2005,"v":61.9},{"y":2010,"v":56.9},{"y":2015,"v":52.4},{"y":2020,"v":48.7},{"y":2024,"v":46.6}]},{"n":"Brazil","pts":[{"y":1960,"v":87.7},{"y":1965,"v":88.5},{"y":1970,"v":83.9},{"y":1975,"v":77.6},{"y":1980,"v":72.2},{"y":1985,"v":69.3},{"y":1990,"v":65.6},{"y":1995,"v":59.9},{"y":2000,"v":53.9},{"y":2005,"v":49.0},{"y":2010,"v":45.7},{"y":2015,"v":43.6},{"y":2020,"v":43.6},{"y":2024,"v":44.3}]},{"n":"South Korea","pts":[{"y":1970,"v":83.5},{"y":1975,"v":72.8},{"y":1980,"v":60.9},{"y":1985,"v":52.5},{"y":1990,"v":44.3},{"y":1995,"v":40.6},{"y":2000,"v":39.0},{"y":2005,"v":39.4},{"y":2010,"v":37.7},{"y":2015,"v":36.5},{"y":2020,"v":38.8},{"y":2024,"v":42.5}]},{"n":"Ethiopia","pts":[{"y":1960,"v":82.0},{"y":1965,"v":82.7},{"y":1970,"v":88.6},{"y":1975,"v":93.7},{"y":1980,"v":96.5},{"y":1985,"v":95.2},{"y":1990,"v":95.9},{"y":1995,"v":97.6},{"y":2000,"v":101.5},{"y":2005,"v":100.3},{"y":2010,"v":94.0},{"y":2015,"v":84.5},{"y":2020,"v":77.1},{"y":2024,"v":73.3}]}];
+
+const COLORS = {"Japan":"#EA5E33","Germany":"#F29A44","South Korea":"#3D7A5A","China":"#C4715A","India":"#C49A45","Brazil":"#5B9E78","Ethiopia":"#7A786F"};
+
+const W = 820, H = 480;
+const margin = { top: 36, right: 130, bottom: 36, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const yearMin = 1960, yearMax = 2024;
+const valMin = 30, valMax = 110;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[40, 50, 60, 70, 80, 90, 100].forEach(v => {
+  const y = yScale(v);
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: margin.left - 6, y: y + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#7A786F" }, v + "%"));
+});
+
+// X axis ticks
+[1960, 1970, 1980, 1990, 2000, 2010, 2020].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" }, y));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+data.forEach(series => {
+  const color = COLORS[series.n] || "#9A9890";
+  const pts = series.pts;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+
+  const g = mkEl("g");
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+
+  const lastPt = pts[pts.length - 1];
+  groups.push({ g, line, color, series, lastY: yScale(lastPt.v), name: series.n, lastVal: lastPt.v });
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const year = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const found = pts.reduce((a, b) => Math.abs(b.y - year) < Math.abs(a.y - year) ? b : a);
+    tip.textContent = `${series.n} (${found.y}): ${found.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach(grp => {
+      grp.line.setAttribute("stroke-opacity", grp.name === series.n ? "1" : "0.1");
+      grp.line.setAttribute("stroke-width", grp.name === series.n ? "3" : "1.5");
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(grp => { grp.line.setAttribute("stroke-opacity", "1"); grp.line.setAttribute("stroke-width", "1.8"); });
+  });
+});
+
+// Endpoint labels with collision resolution
+const labelItems = groups.map(g => ({ y: g.lastY, name: g.name, color: g.color, val: g.lastVal }));
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const orig = groups.find(g => g.name === item.name);
+  // Draw faint leader line if label was moved
+  if (orig && Math.abs(orig.lastY - item.y) > 2) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 2, y1: orig.lastY, x2: W - margin.right + 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", "stroke-opacity": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", { x: W - margin.right + 8, y: item.y + 3.5, "text-anchor": "start", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: item.color }, `${item.val}% ${item.name}`));
+});
+
+</script>
+</body></html>
