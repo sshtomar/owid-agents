@@ -5773,6 +5773,96 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "Where Work Creates the Most Value",
+      "description": "Slope chart comparing GDP per person employed (constant 2021 PPP$) in 2000 vs 2024 for 14 countries. Shows the 100x gap between high and low productivity economies, and which countries are catching up fastest.",
+      "datasetIds": [
+        "wb--SL-GDP-PCAP-EM-KD"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-352.html",
+      "highlights": [
+        "China's productivity grew 6x (from $7.5k to $45.8k) in 24 years",
+        "South Korea tripled productivity, India nearly tripled; both from low bases",
+        "France, Germany, and Japan grew only 10-12% \u2014 already near a productivity ceiling",
+        "Guyana's 7x leap reflects the 2015 offshore oil discovery, not broad productivity gains"
+      ],
+      "createdAt": "2026-06-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Homicide in the Americas: Trajectories Since 1990",
+      "description": "Trend lines for intentional homicide rates per 100,000 people, 1990-2023, for six high-rate Americas countries plus Japan and Germany as low-rate baselines.",
+      "datasetIds": [
+        "wb--VC-IHR-PSRC-P5"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-353.html",
+      "highlights": [
+        "Colombia fell from a peak of 86 per 100,000 in 1991 to 25 in 2023 \u2014 one of history's sharpest sustained homicide declines",
+        "Ecuador was stable below 6 until 2019, then surged to 46 by 2023 driven by drug cartel expansion",
+        "Jamaica has remained chronically high (22-62 range) for over 30 years with no lasting improvement",
+        "Japan and Germany consistently below 1 per 100,000 \u2014 showing that sub-1 rates are achievable"
+      ],
+      "createdAt": "2026-06-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "The World's Demographic Divide",
+      "description": "Slope chart showing population ages 0-14 as % of total, 1970 vs 2024, for 20 countries spanning the full range from Sub-Saharan Africa to East Asia and Europe.",
+      "datasetIds": [
+        "wb--SP-POP-0014-TO-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-354.html",
+      "highlights": [
+        "Chad's youth share actually rose from 42.7% to 46.1% \u2014 almost half its population is under 15",
+        "South Korea fell from 42.1% in 1970 to just 10.6% in 2024, a 31 percentage-point collapse",
+        "Iran's demographic transformation: from 44.6% to 22.4% in just 54 years following the revolution's baby boom reversal",
+        "Bangladesh fell from 44.4% to 28% \u2014 a demographic transition that freed up labor for its textile boom"
+      ],
+      "createdAt": "2026-06-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "Progress on Safe Drinking Water, 2000\u20132024",
+      "description": "Slope chart showing population using safely managed drinking water services (% of population) in 2000 vs 2024. A higher bar than basic access \u2014 water must be on-premises, available when needed, and contamination-free.",
+      "datasetIds": [
+        "wb--SH-H2O-SMDW-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-355.html",
+      "highlights": [
+        "India gained 39 percentage points (37.6% to 76.4%), extending safe water to hundreds of millions",
+        "Bhutan and Honduras each gained over 37pp \u2014 showing rapid gains are possible with investment",
+        "Chad remained stuck at 5-6% across 24 years; DR Congo actually declined slightly",
+        "Germany and France were already above 97% in 2000 and now approach 100%"
+      ],
+      "createdAt": "2026-06-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Hypertension: The World's Most Undertreated Condition",
+      "description": "Horizontal bar chart of effective hypertension treatment coverage (controlled hypertension among adults 30-79, age-standardized %), most recent year 2010-2019, for 30 countries.",
+      "datasetIds": [
+        "who--NCD_HYP_CONTROL_A"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-356.html",
+      "highlights": [
+        "Canada leads at 60.7% \u2014 the only country above 60%; most of the world's hypertensive patients go uncontrolled",
+        "China has 2.6% effective treatment coverage despite having the world's largest hypertensive population",
+        "Sub-Saharan Africa clusters below 5%, with Kenya at 3.2% and Indonesia at 1.2% (lowest)",
+        "There is a steep cliff between the top-14 countries (all above 30%) and the bottom 16 (below 25%)"
+      ],
+      "createdAt": "2026-06-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
     }
   ],
   "lastUpdated": "2026-06-13T00:00:00.000Z"

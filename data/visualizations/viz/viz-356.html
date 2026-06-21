@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Hypertension: The World's Most Undertreated Condition</h1>
+<p class="subtitle">Effective treatment coverage for high blood pressure, age-standardized (%), most recent year available 2010–2019. Even Canada — the global leader — successfully controls fewer than 2 in 3 patients. In sub-Saharan Africa, fewer than 1 in 10.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory NCD_HYP_CONTROL_A</p>
+<script>
+const data = [
+  {"n":"Canada","cov":60.7},{"n":"S. Korea","cov":53.8},{"n":"United States","cov":50.3},
+  {"n":"Costa Rica","cov":49.7},{"n":"Portugal","cov":38.4},{"n":"Venezuela","cov":38.4},
+  {"n":"Honduras","cov":37.9},{"n":"Belgium","cov":36.3},{"n":"Cyprus","cov":36.2},
+  {"n":"Czechia","cov":35.5},{"n":"Singapore","cov":34.9},{"n":"Slovakia","cov":34.9},
+  {"n":"Brazil","cov":34.6},{"n":"Germany","cov":34.3},{"n":"South Africa","cov":23.6},
+  {"n":"Japan","cov":23.5},{"n":"Russia","cov":20.5},{"n":"Nigeria","cov":10.4},
+  {"n":"India","cov":8.4},{"n":"Cameroon","cov":7.1},{"n":"Senegal","cov":6.0},
+  {"n":"Tajikistan","cov":4.6},{"n":"Mozambique","cov":4.3},
+  {"n":"Uganda","cov":4.0},{"n":"Kenya","cov":3.2},{"n":"China","cov":2.6},
+  {"n":"Zambia","cov":2.3},{"n":"Ethiopia","cov":2.1},{"n":"Tanzania","cov":2.1},
+  {"n":"Indonesia","cov":1.2}
+];
+
+const W = 720, H = data.length * 20 + 60;
+const margin = { top: 28, right: 80, bottom: 28, left: 120 };
+const barH = 13;
+const rowH = 20;
+const maxV = 65;
+
+function colorForV(v) {
+  if (v >= 40) return "#3D7A5A";
+  if (v >= 25) return "#8BAD72";
+  if (v >= 15) return "#C49A45";
+  return "#B34B3B";
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const xScale = v => margin.left + v / maxV * (W - margin.left - margin.right);
+
+// Vertical grid lines
+[0, 10, 20, 30, 40, 50, 60].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top - 10, x2: x, y2: H - margin.bottom, stroke: v === 0 ? "#C2C0B5" : "#E2E0D5", "stroke-width": v === 0 ? "0.8" : "0.5" }));
+  const t = mkEl("text", { x, y: margin.top - 13, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+const rows = [];
+data.forEach((d, i) => {
+  const y = margin.top + i * rowH;
+  const col = colorForV(d.cov);
+  const g = mkEl("g", {});
+
+  // Country label
+  const lt = mkEl("text", { x: margin.left - 6, y: y + barH / 2 + 3, "text-anchor": "end", "font-size": "10", fill: "#2B2A27" });
+  lt.textContent = d.n;
+  g.appendChild(lt);
+
+  // Bar
+  const barW = xScale(d.cov) - margin.left;
+  const bar = mkEl("rect", { x: margin.left, y, width: Math.max(barW, 0), height: barH, fill: col, rx: "1.5", opacity: "0.9" });
+  g.appendChild(bar);
+
+  // Value label
+  const vt = mkEl("text", { x: xScale(d.cov) + 5, y: y + barH / 2 + 3.5, "text-anchor": "start", "font-size": "9.5", fill: col, "font-family": "'JetBrains Mono',monospace" });
+  vt.textContent = d.cov.toFixed(1) + "%";
+  g.appendChild(vt);
+
+  // Hit area (full row)
+  const hit = mkEl("rect", { x: 0, y, width: W, height: rowH, fill: "transparent" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, bar, lt, d, col });
+});
+
+// 50% reference line
+const x50 = xScale(50);
+svg.appendChild(mkEl("line", { x1: x50, y1: margin.top - 8, x2: x50, y2: H - margin.bottom, stroke: "#9A9890", "stroke-dasharray": "3,3", "stroke-width": "0.8" }));
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) { row.g.style.opacity = "1"; row.bar.setAttribute("opacity", "0.9"); }
+    else if (i === idx) { row.g.style.opacity = "1"; row.bar.setAttribute("opacity", "1"); }
+    else { row.g.style.opacity = "0.25"; }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sy = (e.clientY - rect.top) / rect.height * H;
+  const idx = Math.floor((sy - margin.top) / rowH);
+  const best = (idx >= 0 && idx < rows.length) ? idx : -1;
+  highlight(best);
+  if (best >= 0) {
+    const d = rows[best].d;
+    tip.textContent = `${d.n}: ${d.cov.toFixed(1)}% effectively treated`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else { tip.style.opacity = "0"; }
+});
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+
+// Legend
+const legend = [
+  { col: "#3D7A5A", label: "≥40% (best)" },
+  { col: "#8BAD72", label: "25–40%" },
+  { col: "#C49A45", label: "15–25%" },
+  { col: "#B34B3B", label: "<15%" },
+];
+legend.forEach((l, i) => {
+  const x = i * 140, y = H - 6;
+  svg.appendChild(mkEl("rect", { x, y: y - 7, width: 12, height: 5, fill: l.col, rx: 1 }));
+  const t = mkEl("text", { x: x + 16, y, "font-size": "9", fill: "#7A786F", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
