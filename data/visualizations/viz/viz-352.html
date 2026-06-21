@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Where Work Creates the Most Value</h1>
+<p class="subtitle">GDP per person employed (constant 2021 PPP$), 2000 vs 2024. South Korea tripled its productivity; China rose 6×. France and Germany grew barely 11%. Guyana's leap reflects the 2015 offshore oil discovery.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SL.GDP.PCAP.EM.KD</p>
+<script>
+const data = [{"n":"Guyana","lo":25117,"hi":204862},{"n":"France","lo":114080,"hi":127332},{"n":"Germany","lo":110739,"hi":123472},{"n":"Australia","lo":95966,"hi":114528},{"n":"South Korea","lo":57330,"hi":98259},{"n":"Japan","lo":76595,"hi":84354},{"n":"Chile","lo":47850,"hi":63924},{"n":"China","lo":7508,"hi":45842},{"n":"Brazil","lo":34062,"hi":41441},{"n":"Indonesia","lo":13753,"hi":29217},{"n":"India","lo":8662,"hi":24430},{"n":"Bolivia","lo":17667,"hi":21296},{"n":"Bangladesh","lo":7693,"hi":20763},{"n":"Ethiopia","lo":1958,"hi":7173}];
+
+const W = 700, H = 520;
+const pad = { left: 120, right: 140, top: 44, bottom: 28 };
+
+const logMin = Math.log10(1400), logMax = Math.log10(260000);
+const scale = v => pad.top + (logMax - Math.log10(v)) / (logMax - logMin) * (H - pad.top - pad.bottom);
+
+function fmt(v) {
+  if (v >= 100000) return '$' + Math.round(v / 1000) + 'k';
+  if (v >= 10000) return '$' + Math.round(v / 1000) + 'k';
+  return '$' + (v / 1000).toFixed(1) + 'k';
+}
+
+function colorForPct(d) {
+  const pct = (d.hi - d.lo) / d.lo * 100;
+  if (pct > 200) return "#EA5E33";
+  if (pct > 70) return "#F29A44";
+  if (pct > 25) return "#F5D38A";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topBound = pad.top, botBound = H - pad.bottom;
+  for (const item of sorted) {
+    item.y = Math.max(topBound + 4, Math.min(botBound - 4, item.y));
+  }
+  return sorted;
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+// Axis headers
+function hdr(x, txt) {
+  const t = mkEl("text", { x, y: 22, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F", "letter-spacing": "0.5" });
+  t.textContent = txt;
+  svg.appendChild(t);
+}
+hdr(pad.left, "2000");
+hdr(W - pad.right, "2024");
+
+// Grid lines at round values
+[2000, 5000, 10000, 25000, 50000, 100000].forEach(v => {
+  const y = scale(v);
+  svg.appendChild(mkEl("line", { x1: pad.left, y1: y, x2: W - pad.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: W - pad.right + 6, y: y + 3.5, "font-size": "8", fill: "#C2C0B5", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = fmt(v);
+  svg.appendChild(t);
+});
+
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.lo), v: d.lo, d }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.hi), v: d.hi, d }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const rows = [];
+
+data.forEach((d, i) => {
+  const x1 = pad.left + 4, x2 = W - pad.right - 4;
+  const y1 = scale(d.lo), y2 = scale(d.hi);
+  const col = colorForPct(d);
+  const g = mkEl("g", { "data-idx": i });
+
+  const line = mkEl("line", { x1, y1, x2, y2, stroke: col, "stroke-width": "1.5", opacity: "0.8" });
+  g.appendChild(line);
+
+  [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+    g.appendChild(mkEl("circle", { cx: p.x, cy: p.y, r: "2.5", fill: col }));
+  });
+
+  const ll = leftLabels.find(l => l.n === d.n);
+  const lt = mkEl("text", { x: x1 - 8, y: ll.y + 3.5, "text-anchor": "end", "font-size": "10", fill: "#2B2A27" });
+  lt.textContent = `${d.n}  ${fmt(d.lo)}`;
+  g.appendChild(lt);
+
+  // Leader line if label drifted from data point
+  if (Math.abs(ll.y - y1) > 5) {
+    g.appendChild(mkEl("line", { x1: x1 - 4, y1, x2: x1 - 6, y2: ll.y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const rl = rightLabels.find(l => l.n === d.n);
+  const rt = mkEl("text", { x: x2 + 8, y: rl.y + 3.5, "text-anchor": "start", "font-size": "10", fill: "#2B2A27" });
+  rt.textContent = `${fmt(d.hi)}  ${d.n}`;
+  g.appendChild(rt);
+
+  if (Math.abs(rl.y - y2) > 5) {
+    g.appendChild(mkEl("line", { x1: x2 + 4, y1: y2, x2: x2 + 6, y2: rl.y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const hit = mkEl("line", { x1, y1, x2, y2, stroke: "transparent", "stroke-width": "14" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, col, y1, y2 });
+});
+
+// Legend
+const legend = [
+  { col: "#EA5E33", label: ">200% growth" },
+  { col: "#F29A44", label: "70–200%" },
+  { col: "#F5D38A", label: "25–70%" },
+  { col: "#A6C4A2", label: "<25%" },
+];
+legend.forEach((l, i) => {
+  const x = i * 140, y = H - 6;
+  svg.appendChild(mkEl("rect", { x, y: y - 6, width: 12, height: 3, fill: l.col, rx: 1 }));
+  const t = mkEl("text", { x: x + 16, y, "font-size": "9", fill: "#7A786F", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "1.5"); }
+    else if (i === idx) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "3"); }
+    else { row.g.style.opacity = "0.12"; row.line.setAttribute("stroke-width", "1"); }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+  let best = -1, bestDist = 18;
+  rows.forEach((row, i) => {
+    const t = Math.max(0, Math.min(1, (sx - pad.left) / (W - pad.left - pad.right)));
+    const lineY = row.y1 + (row.y2 - row.y1) * t;
+    const dist = Math.abs(sy - lineY);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+  highlight(best);
+  if (best >= 0) {
+    const d = rows[best].d;
+    const pct = Math.round((d.hi - d.lo) / d.lo * 100);
+    tip.textContent = `${d.n}: ${fmt(d.lo)} → ${fmt(d.hi)} (+${pct}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else { tip.style.opacity = "0"; }
+});
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body></html>
