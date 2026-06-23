@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Age Dependency Ratio by Region, 1960–2024</h1>
+<p class="subtitle">The ratio of dependents (children and elderly) to working-age adults shapes economic growth. Sub-Saharan Africa has been locked above 80% for six decades; East Asia unlocked the "demographic dividend" by falling below 50%. Percent of working-age population.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SP.POP.DPND</p>
+<script>
+// Data from notebook viz-355.py
+const data = [{"n":"Sub-Saharan Africa","pts":[{"y":1960,"v":85.7},{"y":1965,"v":88.2},{"y":1970,"v":90.7},{"y":1975,"v":93},{"y":1980,"v":94.6},{"y":1985,"v":95},{"y":1990,"v":94.4},{"y":1995,"v":92.9},{"y":2000,"v":91.7},{"y":2005,"v":90.2},{"y":2010,"v":89},{"y":2015,"v":86.8},{"y":2024,"v":79}]},{"n":"Middle East, North Africa, Afghanistan & Pakistan","pts":[{"y":1960,"v":84.6},{"y":1965,"v":88.7},{"y":1970,"v":90.7},{"y":1975,"v":90.5},{"y":1980,"v":89.3},{"y":1985,"v":88.3},{"y":1990,"v":87.5},{"y":1995,"v":84.5},{"y":2000,"v":76.6},{"y":2005,"v":69.1},{"y":2010,"v":64},{"y":2015,"v":63.6},{"y":2024,"v":60.4}]},{"n":"South Asia","pts":[{"y":1960,"v":78.6},{"y":1965,"v":82.8},{"y":1970,"v":82.6},{"y":1975,"v":81.4},{"y":1980,"v":79.3},{"y":1985,"v":78},{"y":1990,"v":75.5},{"y":1995,"v":71.7},{"y":2000,"v":66.8},{"y":2005,"v":62.3},{"y":2010,"v":57.6},{"y":2015,"v":53},{"y":2024,"v":47.4}]},{"n":"Latin America & Caribbean","pts":[{"y":1960,"v":87.3},{"y":1965,"v":88.8},{"y":1970,"v":87.1},{"y":1975,"v":83.4},{"y":1980,"v":78.7},{"y":1985,"v":74},{"y":1990,"v":69.8},{"y":1995,"v":65.4},{"y":2000,"v":60.9},{"y":2005,"v":56.6},{"y":2010,"v":52.8},{"y":2015,"v":50.3},{"y":2024,"v":47.9}]},{"n":"East Asia & Pacific","pts":[{"y":1960,"v":77.8},{"y":1965,"v":80.1},{"y":1970,"v":78.9},{"y":1975,"v":77.4},{"y":1980,"v":68.7},{"y":1985,"v":59.9},{"y":1990,"v":55.2},{"y":1995,"v":53.2},{"y":2000,"v":49.4},{"y":2005,"v":44.4},{"y":2010,"v":42.5},{"y":2015,"v":43.9},{"y":2024,"v":46.7}]},{"n":"Europe & Central Asia","pts":[{"y":1960,"v":57.9},{"y":1965,"v":59.3},{"y":1970,"v":59},{"y":1975,"v":57.6},{"y":1980,"v":55.8},{"y":1985,"v":52.7},{"y":1990,"v":52.5},{"y":1995,"v":52.3},{"y":2000,"v":49.8},{"y":2005,"v":48.1},{"y":2010,"v":47.4},{"y":2015,"v":50},{"y":2024,"v":55.3}]},{"n":"Japan","pts":[{"y":1960,"v":55.2},{"y":1965,"v":45.8},{"y":1970,"v":43.5},{"y":1975,"v":46.6},{"y":1980,"v":48.2},{"y":1985,"v":47.1},{"y":1990,"v":43.2},{"y":1995,"v":43.5},{"y":2000,"v":46.7},{"y":2005,"v":51.6},{"y":2010,"v":57.4},{"y":2015,"v":66},{"y":2024,"v":70.1}]},{"n":"China","pts":[{"y":1960,"v":79.5},{"y":1965,"v":82.2},{"y":1970,"v":80.2},{"y":1975,"v":79.2},{"y":1980,"v":68},{"y":1985,"v":56.5},{"y":1990,"v":51.8},{"y":1995,"v":50.3},{"y":2000,"v":46.1},{"y":2005,"v":39.2},{"y":2010,"v":37.2},{"y":2015,"v":39.6},{"y":2024,"v":44.2}]}];
+
+const W = 760, H = 460;
+const margin = { top: 36, right: 130, bottom: 36, left: 46 };
+
+const yearMin = 1960, yearMax = 2024;
+const valMin = 30, valMax = 100;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const palette = {
+  "Sub-Saharan Africa": "#EA5E33",
+  "Middle East, North Africa, Afghanistan & Pakistan": "#F29A44",
+  "South Asia": "#C49A45",
+  "Latin America & Caribbean": "#8BAD72",
+  "East Asia & Pacific": "#3D7A5A",
+  "Europe & Central Asia": "#4A90A4",
+  "Japan": "#7A786F",
+  "China": "#5B9E78"
+};
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const shortLabel = {
+  "Middle East, North Africa, Afghanistan & Pakistan": "Middle East & N. Africa",
+  "Latin America & Caribbean": "Lat. Am. & Caribbean"
+};
+function label(n) { return shortLabel[n] || n; }
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+
+// Grid lines
+[40, 50, 60, 70, 80, 90, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: v === 50 ? "#C2C0B5" : "#E2E0D5",
+    "stroke-width": v === 50 ? "1" : "0.5",
+    "stroke-dasharray": v === 50 ? "5,3" : "none"
+  }));
+  const lbl = mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3,
+    "font-size": "9", fill: "#9A9890",
+    "text-anchor": "end", "font-family": "JetBrains Mono, monospace"
+  });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// 50% label
+const thr = mkEl("text", {
+  x: W - margin.right + 6, y: yScale(50) + 3,
+  "font-size": "8", fill: "#9A9890",
+  "text-anchor": "start", "font-family": "Inter, sans-serif", "font-style": "italic"
+});
+thr.textContent = "50% threshold";
+svg.appendChild(thr);
+
+// X axis
+[1960, 1970, 1980, 1990, 2000, 2010, 2020].forEach(yr => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(yr), y1: H - margin.bottom,
+    x2: xScale(yr), y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.8"
+  }));
+  const lbl = mkEl("text", {
+    x: xScale(yr), y: H - margin.bottom + 14,
+    "font-size": "9", fill: "#7A786F",
+    "text-anchor": "middle", "font-family": "JetBrains Mono, monospace"
+  });
+  lbl.textContent = yr;
+  svg.appendChild(lbl);
+});
+
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: H - margin.bottom,
+  x2: W - margin.right, y2: H - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "0.8"
+}));
+
+// Lines
+const groups = [];
+data.forEach(series => {
+  const color = palette[series.n] || "#7A786F";
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const pathD = series.pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.y).toFixed(1)} ${yScale(p.v).toFixed(1)}`
+  ).join(" ");
+
+  const isCountry = series.n === "Japan" || series.n === "China";
+  const line = mkEl("path", {
+    d: pathD, stroke: color,
+    "stroke-width": isCountry ? "1.3" : "1.8",
+    fill: "none",
+    "stroke-linejoin": "round", "stroke-linecap": "round",
+    "stroke-dasharray": isCountry ? "5,3" : "none"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+  });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const innerW = W - margin.left - margin.right;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+    const idx = Math.round(ratio * (series.pts.length - 1));
+    const pt = series.pts[idx];
+    if (pt) showTip(`${series.n}  ${pt.y}: ${pt.v}%`, e);
+    groups.forEach(gg => { if (gg !== g) gg.style.opacity = "0.1"; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    line.setAttribute("stroke-width", isCountry ? "1.3" : "1.8");
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Endpoint labels
+const labelItems = data.map(series => {
+  const last = series.pts[series.pts.length - 1];
+  return { n: series.n, val: last.v, y: yScale(last.v), color: palette[series.n] || "#7A786F" };
+});
+const resolved = resolveCollisions(labelItems, 11);
+resolved.forEach(item => {
+  item.y = Math.max(margin.top + 4, Math.min(H - margin.bottom - 4, item.y));
+});
+resolved.forEach(item => {
+  // Leader line if label moved
+  const orig = yScale(item.val);
+  if (Math.abs(orig - item.y) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: W - margin.right + 3, y1: orig,
+      x2: W - margin.right + 3, y2: item.y,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const lbl = mkEl("text", {
+    x: W - margin.right + 7, y: item.y + 3.5,
+    "font-size": "9", fill: item.color,
+    "text-anchor": "start", "font-weight": "500",
+    "font-family": "Inter, sans-serif"
+  });
+  lbl.textContent = `${item.val}%  ${label(item.n)}`;
+  svg.appendChild(lbl);
+});
+</script>
+</body></html>
