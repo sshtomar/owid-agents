@@ -5773,7 +5773,109 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "Financial Account Ownership, 2014 vs 2021",
+      "description": "Slope chart comparing the share of adults with a bank or mobile-money account across 20 countries, highlighting how far financial inclusion has expanded in the developing world.",
+      "datasetIds": [
+        "wb--FX-OWN-TOTL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-352.html",
+      "highlights": [
+        "Cameroon jumped from 12% to 52% account ownership in 7 years",
+        "Afghanistan remains the least financially included country at 10%",
+        "Several European countries now approach 100% account ownership"
+      ],
+      "createdAt": "2026-06-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Old-Age Dependency Ratio, 1960\u20132023",
+      "description": "Trend lines showing the ratio of people aged 65+ per 100 working-age adults across 8 countries, revealing Japan's exceptional aging trajectory and South Korea's accelerating shift.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-353.html",
+      "highlights": [
+        "Japan's old-age dependency ratio rose from 9 in 1960 to 50 in 2023 \u2014 the highest in the world",
+        "South Korea is aging faster than any European country did historically",
+        "India and Brazil still have relatively low ratios, providing a demographic dividend"
+      ],
+      "createdAt": "2026-06-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "Learning Poverty Rate by Country",
+      "description": "Horizontal bar chart showing the share of children who cannot read a simple text by age 10, spanning from near-100% in Central Africa to under 3% in Ireland.",
+      "datasetIds": [
+        "wb--SE-LPV-PRIM"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-354.html",
+      "highlights": [
+        "DR Congo, Burundi, and Chad have learning poverty rates above 94%",
+        "Ireland's learning poverty rate is just 2.3% \u2014 a 40x gap with the worst performers",
+        "Even middle-income countries like India (56%) and Indonesia (53%) face a serious learning crisis"
+      ],
+      "createdAt": "2026-06-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "Net Forest Depletion, 2000\u20132021",
+      "description": "Trend lines showing the value of timber harvested beyond sustainable yield as a share of GNI for the 10 most affected countries, revealing systemic forest-based wealth destruction.",
+      "datasetIds": [
+        "wb--NY-ADJ-DFOR-GN-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-355.html",
+      "highlights": [
+        "Burundi has lost more than 14% of its entire national income to forest depletion in recent years",
+        "DR Congo and Guinea-Bissau also exceed 10% of GNI lost annually to forest depletion",
+        "Most countries show slight improvement since 2017, though at very high levels"
+      ],
+      "createdAt": "2026-06-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Anaemia in Non-Pregnant Women, 2000 vs 2023",
+      "description": "Slope chart comparing anaemia prevalence among women aged 15\u201349 between 2000 and 2023, showing that many countries improved while South Asia and parts of West Africa remain stubbornly high.",
+      "datasetIds": [
+        "wb--SH-ANM-NPRG-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-356.html",
+      "highlights": [
+        "India's anaemia rate rose from 50% to 54%, bucking the global trend of improvement",
+        "Brazil and Colombia both reduced prevalence by roughly 9 percentage points",
+        "European countries have low rates but surprisingly rising slightly over the period"
+      ],
+      "createdAt": "2026-06-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Electricity from Coal, 2000 vs 2022",
+      "description": "Slope chart for countries where coal supplied more than 20% of electricity in 2000, showing which countries have decarbonized (most of Europe) and which have not (South and Southeast Asia).",
+      "datasetIds": [
+        "wb--EG-ELC-COAL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Greece cut coal's share from 64% to 11% between 2000 and 2022",
+        "Indonesia nearly doubled its coal share from 36% to 68% over the same period",
+        "India and China remain overwhelmingly coal-dependent despite rapid renewable growth"
+      ],
+      "createdAt": "2026-06-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
     }
   ],
-  "lastUpdated": "2026-06-13T00:00:00.000Z"
+  "lastUpdated": "2026-06-24T00:00:00.000Z"
 }
