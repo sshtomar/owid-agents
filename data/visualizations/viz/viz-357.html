@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0; padding: 24px;
+      background: #fff; color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; max-width: 700px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      white-space: nowrap; transition: opacity 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <h1>Share of Electricity from Coal, 2000 vs 2022</h1>
+  <p class="subtitle">Among countries where coal supplied >20% of electricity in 2000. Europe has sharply decarbonized; Asia largely has not.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank (EG.ELC.COAL.ZS)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Ireland","y":2000,"a":35.8,"b":7.7},{"n":"Hungary","y":2000,"a":27.6,"b":8.6},{"n":"Greece","y":2000,"a":63.7,"b":10.9},{"n":"Denmark","y":2000,"a":46.2,"b":12.6},{"n":"Israel","y":2000,"a":68.8,"b":22.0},{"n":"Germany","y":2000,"a":52.8,"b":32.7},{"n":"South Korea","y":2000,"a":38.2,"b":34.7},{"n":"Czechia","y":2000,"a":74.8,"b":44.1},{"n":"Australia","y":2000,"a":82.9,"b":49.2},{"n":"China","y":2000,"a":78.2,"b":61.7},{"n":"Kazakhstan","y":2000,"a":69.5,"b":62.1},{"n":"Bosnia & Herz.","y":2000,"a":50.7,"b":67.4},{"n":"Indonesia","y":2000,"a":36.4,"b":67.7},{"n":"India","y":2000,"a":68.9,"b":71.7},{"n":"Botswana","y":2000,"a":97.6,"b":98.6}];
+
+    const W = 700, H = 580;
+    const pad = { left: 130, right: 145, top: 50, bottom: 30 };
+    const minV = 0, maxV = 100;
+
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    const xL = pad.left, xR = W - pad.right;
+
+    function colorFor(d) {
+      const delta = d.b - d.a;
+      if (delta < -40) return "#0891b2";
+      if (delta < -20) return "#3b82f6";
+      if (delta < 0)   return "#6b7280";
+      if (delta < 15)  return "#ca8a04";
+      return "#b91c1c";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+
+    // Year headers
+    const hStyle = 'font-family:"JetBrains Mono",monospace;font-size:10px;fill:#7A786F';
+    [["2000", xL], ["2022", xR]].forEach(([yr, x]) => {
+      const h = mkEl("text", {x, y: 32, "text-anchor": "middle", style: hStyle});
+      h.textContent = yr;
+      svg.appendChild(h);
+    });
+
+    // Axis lines
+    svg.appendChild(mkEl("line", {x1: xL, y1: pad.top - 8, x2: xL, y2: H - pad.bottom, stroke: "#e2e8f0", "stroke-width": "1"}));
+    svg.appendChild(mkEl("line", {x1: xR, y1: pad.top - 8, x2: xR, y2: H - pad.bottom, stroke: "#e2e8f0", "stroke-width": "1"}));
+
+    const tip = document.getElementById("tip");
+    const allGroups = [];
+
+    const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+    const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+    const resolvedL = resolveCollisions(leftLabels, 13);
+    const resolvedR = resolveCollisions(rightLabels, 13);
+
+    const yMin = pad.top, yMax = H - pad.bottom;
+    resolvedL.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+    resolvedR.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+
+    const lMap = Object.fromEntries(resolvedL.map(item => [item.d.n, item.y]));
+    const rMap = Object.fromEntries(resolvedR.map(item => [item.d.n, item.y]));
+
+    data.forEach(d => {
+      const col = colorFor(d);
+      const delta = d.b - d.a;
+      const y1 = scale(d.a), y2 = scale(d.b);
+      const ly = lMap[d.n], ry = rMap[d.n];
+      const g = mkEl("g", {});
+
+      if (Math.abs(ly - y1) > 2) {
+        g.appendChild(mkEl("line", {x1: xL - 5, y1, x2: xL - 90, y2: ly, stroke: col, "stroke-width": "0.5", opacity: "0.3"}));
+      }
+      if (Math.abs(ry - y2) > 2) {
+        g.appendChild(mkEl("line", {x1: xR + 5, y1: y2, x2: xR + 100, y2: ry, stroke: col, "stroke-width": "0.5", opacity: "0.3"}));
+      }
+
+      const line = mkEl("line", {x1: xL, y1, x2: xR, y2, stroke: col, "stroke-width": "1.5"});
+      g.appendChild(line);
+
+      g.appendChild(mkEl("circle", {cx: xL, cy: y1, r: "3", fill: col}));
+      g.appendChild(mkEl("circle", {cx: xR, cy: y2, r: "3", fill: col}));
+
+      const lTxt = mkEl("text", {x: xL - 8, y: ly + 4, "text-anchor": "end", style: `font-family:"JetBrains Mono",monospace;font-size:9px;fill:#334155`});
+      lTxt.textContent = `${d.n}  ${d.a}%`;
+      g.appendChild(lTxt);
+
+      const sign = delta >= 0 ? "+" : "";
+      const rTxt = mkEl("text", {x: xR + 8, y: ry + 4, "text-anchor": "start", style: `font-family:"JetBrains Mono",monospace;font-size:9px;fill:#334155`});
+      rTxt.textContent = `${d.b}%  ${d.n}`;
+      g.appendChild(rTxt);
+
+      const hit = mkEl("line", {x1: xL, y1, x2: xR, y2, stroke: "transparent", "stroke-width": "12", cursor: "pointer"});
+      g.appendChild(hit);
+
+      hit.addEventListener("mouseenter", e => {
+        allGroups.forEach(og => og.style.opacity = og === g ? "1" : "0.1");
+        line.setAttribute("stroke-width", "3");
+        tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${sign}${delta.toFixed(1)}pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        allGroups.forEach(og => og.style.opacity = "1");
+        line.setAttribute("stroke-width", "1.5");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(g);
+      allGroups.push(g);
+    });
+
+    // Legend
+    const legendY = H - 8;
+    const legendX = pad.left;
+    const items = [
+      {col: "#0891b2", label: "Dropped >40pp"},
+      {col: "#3b82f6", label: "Dropped 20–40pp"},
+      {col: "#6b7280", label: "Small change"},
+      {col: "#ca8a04", label: "Rose <15pp"},
+      {col: "#b91c1c", label: "Rose >15pp"},
+    ];
+    items.forEach((item, i) => {
+      const x = legendX + i * 106;
+      svg.appendChild(mkEl("rect", {x, y: legendY - 8, width: 10, height: 10, fill: item.col, rx: "2"}));
+      const lt = mkEl("text", {x: x + 13, y: legendY, style: "font-size:9px;fill:#64748b"});
+      lt.textContent = item.label;
+      svg.appendChild(lt);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

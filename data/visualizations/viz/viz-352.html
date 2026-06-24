@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0; padding: 24px;
+      background: #fff; color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; max-width: 720px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      white-space: nowrap; transition: opacity 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <h1>Financial Account Ownership, 2014 vs 2021</h1>
+  <p class="subtitle">Share of adults (15+) with a bank or mobile-money account. Huge gains in many developing countries.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank Global Findex (FX.OWN.TOTL.ZS)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Afghanistan","y":2014,"a":10.0,"b":9.7},{"n":"Iraq","y":2014,"a":11.0,"b":18.6},{"n":"Egypt","y":2014,"a":14.1,"b":27.4},{"n":"Cambodia","y":2014,"a":22.2,"b":33.4},{"n":"Cameroon","y":2014,"a":12.2,"b":51.7},{"n":"Indonesia","y":2014,"a":36.1,"b":51.8},{"n":"Bangladesh","y":2014,"a":31.0,"b":52.8},{"n":"Armenia","y":2014,"a":17.7,"b":55.3},{"n":"Colombia","y":2014,"a":39.0,"b":59.7},{"n":"Ghana","y":2014,"a":40.5,"b":68.2},{"n":"Bolivia","y":2014,"a":41.8,"b":68.9},{"n":"India","y":2014,"a":53.1,"b":77.5},{"n":"Kenya","y":2014,"a":74.7,"b":79.2},{"n":"Brazil","y":2014,"a":68.1,"b":84.0},{"n":"Chile","y":2014,"a":63.3,"b":87.1},{"n":"China","y":2014,"a":79.0,"b":88.7},{"n":"Japan","y":2014,"a":96.6,"b":98.5},{"n":"France","y":2014,"a":96.6,"b":99.2},{"n":"Germany","y":2014,"a":98.8,"b":100.0},{"n":"Denmark","y":2014,"a":100.0,"b":100.0}];
+
+    const W = 700, H = 600;
+    const pad = { left: 130, right: 140, top: 50, bottom: 20 };
+    const minV = 0, maxV = 100;
+
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    const xL = pad.left, xR = W - pad.right;
+
+    function colorFor(d) {
+      const delta = d.b - d.a;
+      if (delta > 30) return "#2563eb";
+      if (delta > 15) return "#3b82f6";
+      if (delta > 5)  return "#60a5fa";
+      if (delta >= 0) return "#94a3b8";
+      return "#ef4444";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.display = "block";
+
+    // Year headers
+    const headerStyle = 'font-family:"JetBrains Mono",monospace;font-size:10px;fill:#7A786F';
+    const h1 = mkEl("text", {x: xL, y: 30, "text-anchor": "middle", style: headerStyle});
+    h1.textContent = "2014";
+    svg.appendChild(h1);
+    const h2 = mkEl("text", {x: xR, y: 30, "text-anchor": "middle", style: headerStyle});
+    h2.textContent = "2021";
+    svg.appendChild(h2);
+
+    // Axis lines
+    const axStyle = "stroke:#e2e8f0;stroke-width:1";
+    svg.appendChild(mkEl("line", {x1: xL, y1: pad.top - 5, x2: xL, y2: H - pad.bottom, style: axStyle}));
+    svg.appendChild(mkEl("line", {x1: xR, y1: pad.top - 5, x2: xR, y2: H - pad.bottom, style: axStyle}));
+
+    const tip = document.getElementById("tip");
+    const allGroups = [];
+
+    const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+    const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+    const resolvedL = resolveCollisions(leftLabels, 13);
+    const resolvedR = resolveCollisions(rightLabels, 13);
+
+    // Clamp to chart bounds
+    const yMin = pad.top, yMax = H - pad.bottom;
+    resolvedL.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+    resolvedR.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+
+    const lMap = Object.fromEntries(resolvedL.map(item => [item.d.n, item.y]));
+    const rMap = Object.fromEntries(resolvedR.map(item => [item.d.n, item.y]));
+
+    data.forEach(d => {
+      const col = colorFor(d);
+      const delta = d.b - d.a;
+      const y1 = scale(d.a), y2 = scale(d.b);
+      const ly = lMap[d.n], ry = rMap[d.n];
+      const g = mkEl("g", {});
+
+      // Leader lines (faint) if label moved from actual point
+      if (Math.abs(ly - y1) > 2) {
+        g.appendChild(mkEl("line", {x1: xL - 5, y1, x2: xL - 90, y2: ly, stroke: col, "stroke-width": "0.5", opacity: "0.3"}));
+      }
+      if (Math.abs(ry - y2) > 2) {
+        g.appendChild(mkEl("line", {x1: xR + 5, y1: y2, x2: xR + 95, y2: ry, stroke: col, "stroke-width": "0.5", opacity: "0.3"}));
+      }
+
+      // Slope line
+      const line = mkEl("line", {x1: xL, y1, x2: xR, y2, stroke: col, "stroke-width": "1.5"});
+      g.appendChild(line);
+
+      // Dots
+      g.appendChild(mkEl("circle", {cx: xL, cy: y1, r: "3", fill: col}));
+      g.appendChild(mkEl("circle", {cx: xR, cy: y2, r: "3", fill: col}));
+
+      // Left label
+      const lTxt = mkEl("text", {
+        x: xL - 8, y: ly + 4, "text-anchor": "end",
+        style: `font-family:"JetBrains Mono",monospace;font-size:9px;fill:#334155`
+      });
+      lTxt.textContent = `${d.n}  ${d.a}%`;
+      g.appendChild(lTxt);
+
+      // Right label
+      const sign = delta >= 0 ? "+" : "";
+      const rTxt = mkEl("text", {
+        x: xR + 8, y: ry + 4, "text-anchor": "start",
+        style: `font-family:"JetBrains Mono",monospace;font-size:9px;fill:#334155`
+      });
+      rTxt.textContent = `${d.b}%  ${d.n}`;
+      g.appendChild(rTxt);
+
+      // Hit area
+      const hit = mkEl("line", {x1: xL, y1, x2: xR, y2, stroke: "transparent", "stroke-width": "12", cursor: "pointer"});
+      g.appendChild(hit);
+
+      const sign2 = delta >= 0 ? "+" : "";
+      hit.addEventListener("mouseenter", e => {
+        allGroups.forEach(og => og.style.opacity = og === g ? "1" : "0.1");
+        line.setAttribute("stroke-width", "3");
+        tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${sign2}${delta.toFixed(1)}pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        allGroups.forEach(og => og.style.opacity = "1");
+        line.setAttribute("stroke-width", "1.5");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(g);
+      allGroups.push(g);
+    });
+
+    // Legend
+    const legendY = H - 10;
+    const legendX = pad.left;
+    const items = [
+      {col: "#2563eb", label: ">+30pp gain"},
+      {col: "#3b82f6", label: "+15–30pp"},
+      {col: "#60a5fa", label: "+5–15pp"},
+      {col: "#94a3b8", label: "Stable"},
+      {col: "#ef4444", label: "Declined"},
+    ];
+    items.forEach((item, i) => {
+      const x = legendX + i * 115;
+      svg.appendChild(mkEl("rect", {x, y: legendY - 8, width: 10, height: 10, fill: item.col, rx: "2"}));
+      const lt = mkEl("text", {x: x + 13, y: legendY, style: "font-size:9px;fill:#64748b"});
+      lt.textContent = item.label;
+      svg.appendChild(lt);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

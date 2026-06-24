@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0; padding: 24px;
+      background: #fff; color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; max-width: 680px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      white-space: nowrap; transition: opacity 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <h1>Learning Poverty Rate by Country</h1>
+  <p class="subtitle">Share of children who cannot read a simple text by age 10, adjusted for out-of-school rates. The gap between rich and poor countries is staggering.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank Learning Poverty (SE.LPV.PRIM) — latest available year per country (2013–2023)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"DR Congo","v":96.6},{"n":"Burundi","v":95.8},{"n":"Chad","v":94.4},{"n":"Ethiopia","v":90.4},{"n":"Cambodia","v":90.0},{"n":"Guinea","v":82.7},{"n":"Kenya","v":79.3},{"n":"Honduras","v":79.3},{"n":"Guatemala","v":78.5},{"n":"Cameroon","v":71.9},{"n":"Egypt","v":56.1},{"n":"India","v":56.1},{"n":"Indonesia","v":52.8},{"n":"Colombia","v":51.4},{"n":"Brazil","v":46.9},{"n":"Hungary","v":9.2},{"n":"Japan","v":3.6},{"n":"Ireland","v":2.3}];
+
+    const W = 680, H = data.length * 28 + 50;
+    const margin = { top: 20, right: 80, bottom: 20, left: 120 };
+    const barH = 18;
+    const maxV = 100;
+
+    const xScale = v => margin.left + v / maxV * (W - margin.left - margin.right);
+
+    function colorFor(v) {
+      if (v > 80) return "#b91c1c";
+      if (v > 60) return "#ea580c";
+      if (v > 40) return "#ca8a04";
+      if (v > 15) return "#4f7942";
+      return "#2563eb";
+    }
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+
+    // X axis gridlines
+    [0, 20, 40, 60, 80, 100].forEach(v => {
+      const x = xScale(v);
+      svg.appendChild(mkEl("line", {x1: x, y1: margin.top - 5, x2: x, y2: H - margin.bottom, stroke: "#f1f5f9", "stroke-width": "1"}));
+      const lbl = mkEl("text", {x, y: H - margin.bottom + 12, "text-anchor": "middle", style: "font-family:'JetBrains Mono',monospace;font-size:9px;fill:#94a3b8"});
+      lbl.textContent = v + "%";
+      svg.appendChild(lbl);
+    });
+
+    const tip = document.getElementById("tip");
+
+    data.forEach((d, i) => {
+      const y = margin.top + i * 28;
+      const barW = xScale(d.v) - margin.left;
+      const col = colorFor(d.v);
+
+      const g = mkEl("g", {cursor: "pointer"});
+
+      // Bar
+      const bar = mkEl("rect", {x: margin.left, y, width: barW, height: barH, fill: col, rx: "2", opacity: "0.85"});
+      g.appendChild(bar);
+
+      // Country label
+      const nameLbl = mkEl("text", {x: margin.left - 6, y: y + 13, "text-anchor": "end", style: "font-size:11px;fill:#334155"});
+      nameLbl.textContent = d.n;
+      g.appendChild(nameLbl);
+
+      // Value label
+      const valLbl = mkEl("text", {x: xScale(d.v) + 5, y: y + 13, "text-anchor": "start", style: `font-family:'JetBrains Mono',monospace;font-size:10px;fill:${col};font-weight:500`});
+      valLbl.textContent = d.v + "%";
+      g.appendChild(valLbl);
+
+      g.addEventListener("mouseenter", e => {
+        bar.setAttribute("opacity", "1");
+        tip.textContent = `${d.n}: ${d.v}% in learning poverty`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      g.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      g.addEventListener("mouseleave", () => {
+        bar.setAttribute("opacity", "0.85");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(g);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
