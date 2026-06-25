@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Who Is Insufficiently Active? Physical Inactivity Across 29 Countries</h1>
+<p class="subtitle">Prevalence of insufficient physical activity among adults 18+ (age-standardized %). Each line connects a country's earliest to most recent survey. Gulf states top the chart; Sub-Saharan Africa is most active despite rising incomes elsewhere.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — NCD_PAA (insufficient physical activity, adults)</p>
+<script>
+const data = [{"n":"UAE","y":2000,"a":54.6,"b":63.1},{"n":"Qatar","y":2007,"a":57.1,"b":62.6},{"n":"Kuwait","y":2003,"a":59.5,"b":61.5},{"n":"Saudi Arabia","y":2002,"a":68.1,"b":57.8},{"n":"South Korea","y":2001,"a":33.2,"b":50.1},{"n":"Japan","y":2006,"a":29.5,"b":46.9},{"n":"India","y":2000,"a":19.6,"b":46.4},{"n":"Portugal","y":2003,"a":47.0,"b":45.4},{"n":"Turkey","y":2001,"a":29.7,"b":44.4},{"n":"Italy","y":2001,"a":49.7,"b":43.8},{"n":"Philippines","y":2002,"a":15.7,"b":42.0},{"n":"South Africa","y":2008,"a":45.8,"b":41.2},{"n":"Canada","y":2006,"a":29.0,"b":34.6},{"n":"Brazil","y":2001,"a":31.0,"b":34.4},{"n":"Pakistan","y":2000,"a":26.4,"b":33.3},{"n":"Thailand","y":2000,"a":14.6,"b":28.2},{"n":"Colombia","y":2006,"a":32.8,"b":27.7},{"n":"United States","y":2006,"a":35.7,"b":27.3},{"n":"Australia","y":2001,"a":26.6,"b":25.9},{"n":"Spain","y":2002,"a":35.0,"b":22.6},{"n":"United Kingdom","y":2008,"a":33.5,"b":22.1},{"n":"China","y":2000,"a":19.2,"b":19.4},{"n":"Nigeria","y":2001,"a":18.7,"b":18.2},{"n":"Russia","y":2002,"a":11.5,"b":17.7},{"n":"Sweden","y":2000,"a":33.7,"b":14.5},{"n":"Ethiopia","y":2002,"a":9.6,"b":13.2},{"n":"Germany","y":2002,"a":20.5,"b":12.4},{"n":"Mozambique","y":2002,"a":7.7,"b":9.7},{"n":"Kenya","y":2003,"a":10.5,"b":8.5}];
+
+const W = 700, H = 780;
+const pad = { left: 140, right: 155, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const maxV = Math.ceil(Math.max(...allVals) / 5) * 5 + 5;
+const minV = Math.max(0, Math.floor(Math.min(...allVals) / 5) * 5 - 5);
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+function colorForChange(d) {
+  const delta = d.b - d.a;
+  if (delta > 20) return "#B34B3B";
+  if (delta > 10) return "#C4715A";
+  if (delta > 3) return "#C49A45";
+  if (delta > -3) return "#8BAD72";
+  if (delta > -10) return "#5B9E78";
+  return "#3D7A5A";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = pad.top + 4, bot = H - pad.bottom - 4;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+// Grid lines
+[10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  if (v >= minV && v <= maxV) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+      stroke: "#E2E0D5", "stroke-width": "0.5"
+    }));
+    const t = mkEl("text", { x: xLeft - 6, y: scale(v) + 3,
+      "text-anchor": "end", "font-family": "'JetBrains Mono',monospace",
+      "font-size": "8", fill: "#9A9890" });
+    t.textContent = v + "%";
+    svg.appendChild(t);
+  }
+});
+
+// Column headers
+["FIRST SURVEY", "LATEST SURVEY"].forEach((label, i) => {
+  const t = mkEl("text", {
+    x: i === 0 ? xLeft : xRight,
+    y: pad.top - 16,
+    "text-anchor": "middle",
+    "font-family": "'JetBrains Mono',monospace",
+    "font-size": "9", fill: "#7A786F",
+    "letter-spacing": "0.5"
+  });
+  t.textContent = label;
+  svg.appendChild(t);
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top - 8, x2: xLeft, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top - 8, x2: xRight, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+// Left labels (resolved)
+const leftLabels = resolveCollisions(
+  data.map(d => ({ d, y: scale(d.a) })), 13
+);
+// Right labels (resolved)
+const rightLabels = resolveCollisions(
+  data.map(d => ({ d, y: scale(d.b) })), 13
+);
+
+// Draw each country
+data.forEach(d => {
+  const color = colorForChange(d);
+  const y1 = scale(d.a), y2 = scale(d.b);
+
+  // Connecting line
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1, x2: xRight, y2,
+    stroke: color, "stroke-width": "1.2", opacity: "0.85"
+  }));
+
+  // Dots
+  svg.appendChild(mkEl("circle", { cx: xLeft, cy: y1, r: "2.5", fill: color }));
+  svg.appendChild(mkEl("circle", { cx: xRight, cy: y2, r: "2.5", fill: color }));
+
+  // Hit area
+  const hit = mkEl("line", {
+    x1: xLeft, y1, x2: xRight, y2,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  hit.style.cursor = "pointer";
+  const delta = d.b - d.a;
+  const sign = delta >= 0 ? "+" : "";
+  hit.addEventListener("mousemove", e => showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${delta.toFixed(1)} pp)`, e));
+  hit.addEventListener("mouseleave", hideTip);
+  hit.addEventListener("mouseover", () => {
+    svg.querySelectorAll("line[data-row]").forEach(el => el.setAttribute("opacity", "0.1"));
+    svg.querySelectorAll(`line[data-row="${d.n}"]`).forEach(el => { el.setAttribute("opacity", "1"); el.setAttribute("stroke-width", "2.5"); });
+  });
+  hit.addEventListener("mouseout", () => {
+    svg.querySelectorAll("line[data-row]").forEach(el => { el.setAttribute("opacity", "0.85"); el.setAttribute("stroke-width", "1.2"); });
+  });
+  hit.setAttribute("data-row", d.n);
+  // Also mark the visible line for dimming
+  svg.querySelectorAll("line:not([data-row])").forEach(() => {});
+  svg.appendChild(hit);
+});
+
+// Left labels
+leftLabels.forEach(({ d, y }) => {
+  const origY = scale(d.a);
+  const t = mkEl("text", {
+    x: xLeft - 7, y: y + 3.5,
+    "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27"
+  });
+  t.textContent = `${d.n}  ${d.a}`;
+  svg.appendChild(t);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xLeft - 4, y1: origY, x2: xLeft - 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+
+// Right labels
+rightLabels.forEach(({ d, y }) => {
+  const origY = scale(d.b);
+  const t = mkEl("text", {
+    x: xRight + 7, y: y + 3.5,
+    "text-anchor": "start", "font-size": "9.5", fill: "#2B2A27"
+  });
+  t.textContent = `${d.b}  ${d.n}`;
+  svg.appendChild(t);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xRight + 4, y1: origY, x2: xRight + 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+
+// Legend
+const legendItems = [
+  { color: "#B34B3B", label: "Rose >20 pp" },
+  { color: "#C4715A", label: "Rose 10–20 pp" },
+  { color: "#C49A45", label: "Rose 3–10 pp" },
+  { color: "#8BAD72", label: "Stable (±3 pp)" },
+  { color: "#5B9E78", label: "Fell 3–10 pp" },
+  { color: "#3D7A5A", label: "Fell >10 pp" },
+];
+legendItems.forEach((item, i) => {
+  const lx = pad.left + 20 + i * 90;
+  const ly = H - 8;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: "9", height: "9", fill: item.color, rx: "1" }));
+  const t = mkEl("text", { x: lx + 12, y: ly, "font-size": "8", fill: "#7A786F" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
