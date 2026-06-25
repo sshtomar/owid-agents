@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Researchers in R&D per Million People, 1996–2023</h1>
+<p class="subtitle">Full-time equivalent researchers in R&D per million people. South Korea quintupled its research workforce in 27 years, surpassing Japan. Denmark and Finland are among the world's most research-intensive economies. China is rising fast from a low base.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Researchers in R&D per million people (SP.POP.SCIE.RD.P6)</p>
+<script>
+const data = [
+  {"n":"South Korea","pts":[{"y":1996,"v":2186},{"y":1998,"v":2008},{"y":2000,"v":2324},{"y":2002,"v":3008},{"y":2004,"v":3281},{"y":2006,"v":4173},{"y":2008,"v":4892},{"y":2010,"v":5429},{"y":2012,"v":6393},{"y":2014,"v":6867},{"y":2016,"v":7057},{"y":2018,"v":7918},{"y":2020,"v":8620},{"y":2022,"v":9435}]},
+  {"n":"Denmark","pts":[{"y":1996,"v":3180},{"y":1998,"v":null},{"y":2000,"v":null},{"y":2002,"v":4759},{"y":2004,"v":4848},{"y":2006,"v":5315},{"y":2008,"v":6520},{"y":2010,"v":6764},{"y":2012,"v":7182},{"y":2014,"v":7358},{"y":2016,"v":7852},{"y":2018,"v":7598},{"y":2020,"v":7651},{"y":2022,"v":9037}]},
+  {"n":"Finland","pts":[{"y":2004,"v":7856},{"y":2006,"v":7689},{"y":2008,"v":7712},{"y":2010,"v":7741},{"y":2012,"v":7492},{"y":2014,"v":7022},{"y":2016,"v":6544},{"y":2018,"v":6873},{"y":2020,"v":7548},{"y":2022,"v":8073}]},
+  {"n":"Japan","pts":[{"y":1996,"v":4906},{"y":1998,"v":5165},{"y":2000,"v":5102},{"y":2002,"v":4891},{"y":2004,"v":5117},{"y":2006,"v":5353},{"y":2008,"v":5125},{"y":2010,"v":5117},{"y":2012,"v":5049},{"y":2014,"v":5352},{"y":2016,"v":5233},{"y":2018,"v":5340},{"y":2020,"v":5450},{"y":2022,"v":5630}]},
+  {"n":"Germany","pts":[{"y":1996,"v":2802},{"y":1998,"v":2884},{"y":2000,"v":3154},{"y":2002,"v":3241},{"y":2004,"v":3291},{"y":2006,"v":3412},{"y":2008,"v":3727},{"y":2010,"v":4056},{"y":2012,"v":4356},{"y":2014,"v":4336},{"y":2016,"v":4840},{"y":2018,"v":5209},{"y":2020,"v":5390},{"y":2022,"v":5802}]},
+  {"n":"Canada","pts":[{"y":1996,"v":3056},{"y":1998,"v":3153},{"y":2000,"v":3510},{"y":2002,"v":3695},{"y":2004,"v":4077},{"y":2006,"v":4315},{"y":2008,"v":4726},{"y":2010,"v":4664},{"y":2012,"v":4652},{"y":2014,"v":4564},{"y":2016,"v":4400},{"y":2018,"v":4716},{"y":2020,"v":5156},{"y":2022,"v":5624}]},
+  {"n":"France","pts":[{"y":1996,"v":2656},{"y":1998,"v":2655},{"y":2000,"v":2903},{"y":2002,"v":3101},{"y":2004,"v":3321},{"y":2006,"v":3405},{"y":2008,"v":3636},{"y":2010,"v":3850},{"y":2012,"v":4052},{"y":2014,"v":4210},{"y":2016,"v":4392},{"y":2018,"v":4671},{"y":2020,"v":4883},{"y":2022,"v":5182}]},
+  {"n":"China","pts":[{"y":1996,"v":447},{"y":1998,"v":390},{"y":2000,"v":550},{"y":2002,"v":632},{"y":2004,"v":713},{"y":2006,"v":931},{"y":2008,"v":1198},{"y":2010,"v":899},{"y":2012,"v":1029},{"y":2014,"v":1102},{"y":2016,"v":1209},{"y":2018,"v":1317},{"y":2020,"v":1600},{"y":2022,"v":1849}]}
+];
+
+const COLORS = ["#EA5E33","#3D7A5A","#5B9E78","#C49A45","#8BAD72","#F29A44","#C4715A","#7A786F"];
+
+const W = 800, H = 460;
+const margin = { top: 40, right: 150, bottom: 40, left: 65 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const yearMin = 1996, yearMax = 2022;
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yMin = 0, yMax = 10000;
+const yScale = v => margin.top + (yMax - v) / (yMax - yMin) * (H - margin.top - margin.bottom);
+
+// Grid
+[0, 2000, 4000, 6000, 8000, 10000].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-family": "'JetBrains Mono',monospace", "font-size": "8.5", fill: "#9A9890" });
+  t.textContent = v === 0 ? "0" : (v / 1000).toFixed(0) + "k";
+  svg.appendChild(t);
+});
+
+// Year labels
+[1996, 2000, 2004, 2008, 2012, 2016, 2020].forEach(y => {
+  const t = mkEl("text", { x: xScale(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "8.5", fill: "#9A9890" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+// Y-axis label
+const yl = mkEl("text", { x: 12, y: H / 2, "text-anchor": "middle", "transform": `rotate(-90, 12, ${H/2})`, "font-family": "'JetBrains Mono',monospace", "font-size": "8", fill: "#9A9890" });
+yl.textContent = "Researchers per million";
+svg.appendChild(yl);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = margin.top + 4, bot = H - margin.bottom - 4;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+const allPaths = [];
+
+data.forEach((series, si) => {
+  const color = COLORS[si];
+  const pts = series.pts.filter(p => p.v !== null);
+  if (!pts.length) return;
+
+  // Build path segments (break on null gaps)
+  const segments = [];
+  let current = [];
+  for (const p of series.pts) {
+    if (p.v !== null) {
+      current.push(p);
+    } else if (current.length) {
+      segments.push(current);
+      current = [];
+    }
+  }
+  if (current.length) segments.push(current);
+
+  segments.forEach(seg => {
+    const pathD = seg.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y).toFixed(1)} ${yScale(p.v).toFixed(1)}`).join(" ");
+    const path = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" });
+    svg.appendChild(path);
+    allPaths.push(path);
+  });
+
+  // Full hit path
+  const hitD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y).toFixed(1)} ${yScale(p.v).toFixed(1)}`).join(" ");
+  const hit = mkEl("path", { d: hitD, stroke: "transparent", "stroke-width": "14", fill: "none" });
+  hit.style.cursor = "pointer";
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const approxYear = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const closest = pts.reduce((best, p) => Math.abs(p.y - approxYear) < Math.abs(best.y - approxYear) ? p : best, pts[0]);
+    showTip(`${series.n} (${closest.y}): ${closest.v.toLocaleString()}/million`, e);
+  });
+  hit.addEventListener("mouseleave", hideTip);
+  hit.addEventListener("mouseover", () => {
+    allPaths.forEach(p => { p.setAttribute("opacity", "0.08"); p.setAttribute("stroke-width", "1.8"); });
+    allPaths.filter((_, i) => Math.floor(i / 1) === si || allPaths.indexOf(allPaths[i]) >= 0).forEach(() => {});
+    // Highlight all paths of this series
+    svg.querySelectorAll(`[data-series="${si}"]`).forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "3"); });
+  });
+  hit.addEventListener("mouseout", () => {
+    allPaths.forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "1.8"); });
+  });
+  // Tag all paths for this series
+  allPaths.slice(allPaths.length - segments.length).forEach(p => p.setAttribute("data-series", si));
+  svg.appendChild(hit);
+  hit.setAttribute("data-series", si);
+});
+
+// Re-tag paths correctly (this approach is simpler)
+// Reset and retag
+const pathsBySeries = {};
+data.forEach((series, si) => {
+  const pts = series.pts.filter(p => p.v !== null);
+  if (!pts.length) return;
+
+  // Get all paths
+  svg.querySelectorAll(`path[data-series="${si}"]`).forEach(p => {
+    if (!pathsBySeries[si]) pathsBySeries[si] = [];
+    pathsBySeries[si].push(p);
+  });
+});
+
+// Re-wire mouseover for proper highlighting
+svg.querySelectorAll("[data-series]").forEach(el => {
+  const si = el.getAttribute("data-series");
+  el.addEventListener("mouseover", () => {
+    allPaths.forEach(p => { p.setAttribute("opacity", "0.08"); p.setAttribute("stroke-width", "1.8"); });
+    svg.querySelectorAll(`path[data-series="${si}"]`).forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "3"); });
+  });
+  el.addEventListener("mouseout", () => {
+    allPaths.forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "1.8"); });
+  });
+});
+
+// Endpoint labels
+const endLabels = data.map((series, si) => {
+  const validPts = series.pts.filter(p => p.v !== null);
+  const lastPt = validPts[validPts.length - 1];
+  return { series, si, y: yScale(lastPt.v), val: lastPt.v };
+});
+const resolved = resolveCollisions(endLabels, 13);
+
+resolved.forEach(({ series, si, y, val }) => {
+  const color = COLORS[si];
+  const validPts = series.pts.filter(p => p.v !== null);
+  const lastPt = validPts[validPts.length - 1];
+  const origY = yScale(lastPt.v);
+
+  if (Math.abs(y - origY) > 2)
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 4, y1: origY, x2: W - margin.right + 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+  svg.appendChild(mkEl("rect", { x: W - margin.right + 4, y: y - 4, width: "3", height: "8", fill: color }));
+  const t = mkEl("text", { x: W - margin.right + 10, y: y + 3.5, "text-anchor": "start", "font-size": "9.5", fill: "#2B2A27" });
+  t.textContent = `${lastPt.v.toLocaleString()}  ${series.n}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>

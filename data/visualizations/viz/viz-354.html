@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Access to Safely Managed Drinking Water, 2000–2024</h1>
+<p class="subtitle">% of population using safely managed drinking water services. South Asia nearly doubled access in 24 years. Sub-Saharan Africa reached just 32% by 2024. The gap between high-income and low-income countries remains vast.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — People using safely managed drinking water services (SH.H2O.SMDW.ZS)</p>
+<script>
+const data = [
+  {"n":"High Income","pts":[{"y":2000,"v":92.7},{"y":2002,"v":93.0},{"y":2004,"v":93.4},{"y":2006,"v":94.2},{"y":2008,"v":94.5},{"y":2010,"v":94.7},{"y":2012,"v":94.9},{"y":2014,"v":95.1},{"y":2016,"v":95.3},{"y":2018,"v":95.4},{"y":2020,"v":95.6},{"y":2022,"v":95.7},{"y":2024,"v":95.8}]},
+  {"n":"Upper Middle Income","pts":[{"y":2000,"v":69.9},{"y":2002,"v":71.0},{"y":2004,"v":72.1},{"y":2006,"v":73.2},{"y":2008,"v":74.3},{"y":2010,"v":75.2},{"y":2012,"v":76.1},{"y":2014,"v":76.9},{"y":2016,"v":77.8},{"y":2018,"v":78.5},{"y":2020,"v":79.2},{"y":2022,"v":79.8}]},
+  {"n":"Latin America","pts":[{"y":2000,"v":70.2},{"y":2002,"v":70.7},{"y":2004,"v":71.3},{"y":2006,"v":72.1},{"y":2008,"v":72.7},{"y":2010,"v":73.2},{"y":2012,"v":73.8},{"y":2014,"v":74.7},{"y":2016,"v":75.7},{"y":2018,"v":76.6},{"y":2020,"v":77.5},{"y":2022,"v":78.2},{"y":2024,"v":79.0}]},
+  {"n":"East Asia & Pacific","pts":[{"y":2000,"v":68.4},{"y":2002,"v":70.0},{"y":2004,"v":71.3},{"y":2006,"v":72.5},{"y":2008,"v":73.6},{"y":2010,"v":74.6},{"y":2012,"v":75.6},{"y":2014,"v":76.5},{"y":2016,"v":65.9},{"y":2018,"v":67.3},{"y":2020,"v":68.7},{"y":2022,"v":70.0},{"y":2024,"v":75.2}]},
+  {"n":"Lower Middle Income","pts":[{"y":2000,"v":43.8},{"y":2002,"v":45.9},{"y":2004,"v":48.0},{"y":2006,"v":50.2},{"y":2008,"v":52.5},{"y":2010,"v":54.8},{"y":2012,"v":57.1},{"y":2014,"v":59.4},{"y":2016,"v":61.8},{"y":2018,"v":63.9},{"y":2020,"v":65.7},{"y":2022,"v":67.4},{"y":2024,"v":69.1}]},
+  {"n":"South Asia","pts":[{"y":2000,"v":41.0},{"y":2002,"v":43.7},{"y":2004,"v":46.4},{"y":2006,"v":49.3},{"y":2008,"v":52.3},{"y":2010,"v":55.3},{"y":2012,"v":58.4},{"y":2014,"v":61.5},{"y":2016,"v":64.7},{"y":2018,"v":67.9},{"y":2020,"v":71.1},{"y":2022,"v":74.3},{"y":2024,"v":77.6}]},
+  {"n":"Low Income","pts":[{"y":2000,"v":22.3},{"y":2002,"v":22.5},{"y":2004,"v":22.9},{"y":2006,"v":23.6},{"y":2008,"v":24.5},{"y":2010,"v":25.3},{"y":2012,"v":25.5},{"y":2014,"v":26.0},{"y":2016,"v":26.9},{"y":2018,"v":28.0},{"y":2020,"v":29.3},{"y":2022,"v":30.8},{"y":2024,"v":33.0}]},
+  {"n":"Sub-Saharan Africa","pts":[{"y":2000,"v":17.9},{"y":2002,"v":18.5},{"y":2004,"v":19.4},{"y":2006,"v":20.5},{"y":2008,"v":21.6},{"y":2010,"v":22.9},{"y":2012,"v":24.1},{"y":2014,"v":25.6},{"y":2016,"v":27.2},{"y":2018,"v":28.8},{"y":2020,"v":30.4},{"y":2022,"v":31.4},{"y":2024,"v":32.4}]}
+];
+
+const COLORS = ["#3D7A5A","#8BAD72","#C49A45","#EA5E33","#F29A44","#5B9E78","#C4715A","#B34B3B"];
+
+const W = 800, H = 460;
+const margin = { top: 40, right: 175, bottom: 40, left: 55 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const allYears = data.flatMap(d => d.pts.map(p => p.y));
+const yearMin = Math.min(...allYears), yearMax = Math.max(...allYears);
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+
+const allVals = data.flatMap(d => d.pts.map(p => p.v));
+const yMin = 0, yMax = 100;
+const yScale = v => margin.top + (yMax - v) / (yMax - yMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-family": "'JetBrains Mono',monospace", "font-size": "8.5", fill: "#9A9890" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// Year axis labels
+[2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const t = mkEl("text", { x: xScale(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "8.5", fill: "#9A9890" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = margin.top + 4, bot = H - margin.bottom - 4;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+const allPaths = [];
+
+data.forEach((series, si) => {
+  const color = COLORS[si];
+  const pts = series.pts.filter(p => p.v !== null);
+  if (!pts.length) return;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y).toFixed(1)} ${yScale(p.v).toFixed(1)}`).join(" ");
+
+  const path = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" });
+  svg.appendChild(path);
+  allPaths.push(path);
+
+  // Wide hit path
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none" });
+  hit.style.cursor = "pointer";
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const approxYear = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const closest = pts.reduce((best, p) => Math.abs(p.y - approxYear) < Math.abs(best.y - approxYear) ? p : best, pts[0]);
+    showTip(`${series.n} (${closest.y}): ${closest.v}%`, e);
+  });
+  hit.addEventListener("mouseleave", hideTip);
+  hit.addEventListener("mouseover", () => {
+    allPaths.forEach(p => p.setAttribute("opacity", "0.08"));
+    path.setAttribute("opacity", "1");
+    path.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mouseout", () => {
+    allPaths.forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "1.8"); });
+  });
+  svg.appendChild(hit);
+});
+
+// Endpoint labels (right side)
+const endLabels = data.map((series, si) => {
+  const lastPt = series.pts[series.pts.length - 1];
+  return { d: series, si, y: yScale(lastPt.v), val: lastPt.v };
+});
+const resolved = resolveCollisions(endLabels, 13);
+
+resolved.forEach(({ d, si, y, val }) => {
+  const color = COLORS[si];
+  const lastPt = d.pts[d.pts.length - 1];
+  const origY = yScale(lastPt.v);
+
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 4, y1: origY, x2: W - margin.right + 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const t = mkEl("text", { x: W - margin.right + 8, y: y + 3.5, "text-anchor": "start", "font-size": "9.5", fill: "#2B2A27" });
+  t.textContent = `${lastPt.v}%  ${d.n}`;
+  svg.appendChild(t);
+
+  // Color swatch
+  svg.appendChild(mkEl("rect", { x: W - margin.right + 4, y: y - 4, width: "3", height: "8", fill: color }));
+});
+</script>
+</body></html>
