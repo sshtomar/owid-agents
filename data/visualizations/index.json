@@ -5773,7 +5773,88 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "Solar Electricity Generation, 2000\u20132025",
+      "description": "Trend lines showing the explosive rise of solar PV generation for the top 8 producing countries. China grew from near-zero in 2010 to over 1,100 TWh by 2025.",
+      "datasetIds": [
+        "ember--GEN-SOLAR"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-352.html",
+      "highlights": [
+        "China's solar generation grew 1,500-fold in 15 years, from 0.7 TWh (2010) to 1,175 TWh (2025)",
+        "India surpassed Japan in 2021 and nearly matched Germany by 2025",
+        "Brazil added 88 TWh of solar in 25 years, mostly after 2016"
+      ],
+      "createdAt": "2026-06-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Wind Electricity Generation, 2000\u20132025",
+      "description": "Trend lines showing the growth of wind electricity generation for the top 8 producing countries. China now generates more wind power than the next seven countries combined.",
+      "datasetIds": [
+        "ember--GEN-WIND"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China surpassed the United States in wind generation in 2012 and reached 1,135 TWh by 2025",
+        "Brazil grew from near-zero in 2005 to 118 TWh in 2025, surpassing Germany and UK",
+        "Germany's wind generation has plateaued around 130\u2013140 TWh since 2020"
+      ],
+      "createdAt": "2026-06-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "Consumer Price Inflation, 2000\u20132024",
+      "description": "Trend lines showing annual consumer price inflation rates for 7 major economies. The 2021\u20132022 global inflation surge was the largest synchronised price shock in decades.",
+      "datasetIds": [
+        "wb--FP-CPI-TOTL-ZG"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan broke out of a decade-long deflation in 2022, reaching 2.5% for the first time since 2014",
+        "Chile hit 11.6% in 2022 \u2014 its highest inflation in over 30 years",
+        "All 7 countries saw inflation spike in 2022, then fall back sharply by 2024"
+      ],
+      "createdAt": "2026-06-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "International Tourism: The COVID-19 Collapse",
+      "description": "Slope chart comparing international tourist arrivals (millions) for top destinations in 2019 vs 2020. Hong Kong fell 94%, Japan 87%, and China 81% \u2014 the world lost over 1 billion arrivals in a single year.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "Hong Kong fell 94% \u2014 from 55.9 million arrivals to just 3.6 million",
+        "France lost 100 million visitors but remained the world's most visited country",
+        "Every country in the top 12 lost at least 46% of its international arrivals"
+      ],
+      "createdAt": "2026-06-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Population Growth Rate by World Region, 1961\u20132024",
+      "description": "Trend lines showing annual population growth rates by world region over 63 years. Sub-Saharan Africa remains at ~2.4% while East Asia & Pacific has fallen from 2.6% to 0.16% \u2014 one of the sharpest demographic transitions on record.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "East Asia & Pacific fell from 2.6% (1969) to 0.16% (2024), driven by China's demographic transition",
+        "Sub-Saharan Africa's rate has barely moved in 60 years, still above 2.4%",
+        "Europe & Central Asia briefly recorded negative growth in 2022"
+      ],
+      "createdAt": "2026-06-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
     }
   ],
-  "lastUpdated": "2026-06-13T00:00:00.000Z"
+  "lastUpdated": "2026-06-26T00:00:00.000Z"
 }

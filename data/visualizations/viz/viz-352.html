@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Solar Electricity Generation, 2000–2025</h1>
+<p class="subtitle">Annual electricity generated from solar photovoltaic sources, in terawatt-hours (TWh), for the top 8 producing countries. China's near-zero generation in 2010 grew to over 1,100 TWh by 2025 — a 1,500-fold increase in 15 years.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Ember Global Electricity Review · ember-climate.org</p>
+<script>
+const data = [{"n":"China","s":[0.02,0.03,0.05,0.06,0.08,0.08,0.09,0.11,0.15,0.28,0.7,2.61,3.59,8.37,23.51,39.48,66.53,117.8,176.9,224,261.1,327,427.27,584.15,839.04,1174.94],"y0":2000,"step":1},{"n":"United States","s":[0.49,0.54,0.55,0.53,0.58,0.55,0.51,0.61,0.86,0.89,1.21,1.82,4.33,9.04,28.92,39.03,54.87,77.28,93.36,106.89,130.72,164.42,205.07,238.94,303.75,388.82],"y0":2000,"step":1},{"n":"India","s":[0.01,0.01,0.01,0.02,0.02,0.02,0.01,0.06,0.06,0.08,0.11,0.83,2.1,3.43,4.91,7.09,12.2,22.36,37.45,37.45,52.91,65.59,95.92,115.42,143.07,195.99],"y0":2000,"step":1},{"n":"Japan","s":[0.34,0.5,0.69,0.95,1.27,1.63,2,2.31,2.59,3.05,3.98,5.44,7.37,12.91,23.55,34.54,43.33,54.04,61.22,67.43,75.92,84.18,91.07,96.36,96.7,101.06],"y0":2000,"step":1},{"n":"Germany","s":[0,0.1,0.2,0.31,0.56,1.31,2.27,3.14,4.51,6.72,11.96,19.99,26.74,30.62,35.45,38.08,37.56,38.76,44.32,45.22,49.5,49.34,60.3,63.87,74.13,89.62],"y0":2000,"step":1},{"n":"Brazil","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.02,0.06,0.09,0.83,3.46,6.65,10.75,16.75,30.13,50.63,71.32,88.64],"y0":2000,"step":1},{"n":"Spain","s":[0.01,0.02,0.02,0.02,0.02,0.05,0.12,0.52,2.58,6.06,7.19,9.4,11.97,13.1,13.67,13.86,13.64,14.4,12.74,15.1,20.67,27.1,35.72,48.59,58.29,62.92],"y0":2000,"step":1},{"n":"Australia","s":[0.05,0.05,0.06,0.06,0.07,0.08,0.1,0.11,0.14,0.29,0.98,2.04,2.41,3.85,4.95,6.2,7.44,8.92,12.33,18.3,23.84,31.19,37.54,44.99,50.21,56.42],"y0":2000,"step":1}];
+
+const COLORS = ["#EA5E33","#F29A44","#5B9E78","#3D7A5A","#A6C4A2","#C49A45","#B34B3B","#7A786F"];
+
+const W = 760, H = 460;
+const margin = { top: 30, right: 130, bottom: 40, left: 55 };
+
+const allVals = data.flatMap(d => d.s);
+const valMin = 0, valMax = Math.max(...allVals);
+const yearMin = 2000, yearMax = 2025;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[0, 200, 400, 600, 800, 1000, 1200].forEach(v => {
+  if (v <= valMax) {
+    svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+    const lbl = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3, "text-anchor": "end", "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+    lbl.textContent = v === 0 ? "0" : v + " TWh";
+    svg.appendChild(lbl);
+  }
+});
+
+// X axis ticks
+[2000, 2005, 2010, 2015, 2020, 2025].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Draw lines
+const lineGroups = [];
+data.forEach((d, idx) => {
+  const color = COLORS[idx];
+  const points = d.s.map((v, i) => ({ year: d.y0 + i * d.step, value: v }));
+  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+
+  const g = mkEl("g", {});
+
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  lineGroups.push({ g, line, hit, d, color, points });
+});
+
+// Endpoint labels with collision resolution
+const labelItems = lineGroups.map(({ d, points, color }) => {
+  const last = points[points.length - 1];
+  return { y: yScale(last.value), n: d.n, v: last.value, color };
+});
+
+const resolved = resolveCollisions(labelItems.map((l, i) => ({ ...l, origY: l.y, idx: i })), 12);
+const clampedTop = margin.top;
+const clampedBot = H - margin.bottom;
+resolved.forEach(item => {
+  item.y = Math.max(clampedTop + 6, Math.min(clampedBot - 4, item.y));
+});
+
+resolved.forEach(item => {
+  const orig = labelItems[item.idx];
+  const finalY = item.y;
+  const anchorY = yScale(orig.v);
+  const labelX = W - margin.right + 8;
+
+  if (Math.abs(finalY - anchorY) > 3) {
+    const line = mkEl("line", { x1: W - margin.right + 2, y1: anchorY, x2: W - margin.right + 6, y2: finalY, stroke: orig.color, "stroke-width": "0.6", opacity: "0.5" });
+    svg.appendChild(line);
+  }
+
+  const t = mkEl("text", { x: labelX, y: finalY + 3, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: orig.color, "font-weight": "500" });
+  t.textContent = `${orig.n}`;
+  svg.appendChild(t);
+});
+
+// Hover interactions
+const tip = document.getElementById("tip");
+lineGroups.forEach(({ g, line, hit, d, color, points }) => {
+  hit.addEventListener("mousemove", e => {
+    lineGroups.forEach(lg => { lg.line.setAttribute("opacity", "0.12"); lg.line.setAttribute("stroke-width", "1.5"); });
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "3");
+
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yearIdx = Math.round(ratio * (d.s.length - 1));
+    const year = d.y0 + yearIdx * d.step;
+    const val = d.s[yearIdx];
+
+    tip.textContent = `${d.n} · ${year}: ${val >= 10 ? val.toFixed(0) : val.toFixed(1)} TWh`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lineGroups.forEach(lg => { lg.line.setAttribute("opacity", "1"); lg.line.setAttribute("stroke-width", "1.8"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
