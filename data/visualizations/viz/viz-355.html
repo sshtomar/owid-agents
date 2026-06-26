@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>International Tourism Arrivals: The COVID-19 Collapse</h1>
+<p class="subtitle">International tourist arrivals for top destinations in 2019 vs 2020. Every country saw dramatic drops — Hong Kong fell 94%, Japan 87%, and China 81%. Global tourism lost over 1 billion arrivals in a single year.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — International tourism, number of arrivals · data.worldbank.org</p>
+<script>
+// Raw arrivals from source (exact source values; y=before year for validation)
+const raw = [{"n":"France","y":2019,"a":217877000,"b":117109000},{"n":"China","y":2019,"a":162538000,"b":30402000},{"n":"Italy","y":2019,"a":95399000,"b":38419000},{"n":"Hungary","y":2019,"a":61397000,"b":31641000},{"n":"Croatia","y":2019,"a":60021000,"b":21608000},{"n":"Hong Kong SAR, China","y":2019,"a":55913000,"b":3569000},{"n":"Germany","y":2019,"a":39563000,"b":12449000},{"n":"Greece","y":2019,"a":34005000,"b":7406000},{"n":"Denmark","y":2019,"a":33093000,"b":15595000},{"n":"Austria","y":2019,"a":31884000,"b":15091000},{"n":"Japan","y":2019,"a":31881000,"b":4115799.8046875},{"n":"Korea, Rep.","y":2019,"a":17503000,"b":2519000}];
+
+// Display labels
+const labels = {"Hong Kong SAR, China": "Hong Kong", "Korea, Rep.": "South Korea"};
+const data = raw.map(d => ({
+  n: labels[d.n] || d.n,
+  a: d.a / 1e6,
+  b: d.b / 1e6,
+  pct: Math.round((d.a - d.b) / d.a * 100)
+}));
+
+const W = 680, H = 560;
+const pad = { left: 118, right: 128, top: 50, bottom: 28 };
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = Math.max(...allVals) * 1.05;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Column header labels
+const hdr19 = mkEl("text", { x: pad.left, y: 30, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+hdr19.textContent = "2019";
+svg.appendChild(hdr19);
+const hdr20 = mkEl("text", { x: W - pad.right, y: 30, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+hdr20.textContent = "2020";
+svg.appendChild(hdr20);
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: pad.left, y1: pad.top, x2: pad.left, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: W - pad.right, y1: pad.top, x2: W - pad.right, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+function colorForDrop(pct) {
+  if (pct > 85) return "#B34B3B";
+  if (pct > 70) return "#C4715A";
+  if (pct > 55) return "#C49A45";
+  if (pct > 45) return "#F29A44";
+  return "#5B9E78";
+}
+
+const rows = [];
+data.forEach((d, idx) => {
+  const color = colorForDrop(d.pct);
+  const ya = scale(d.a), yb = scale(d.b);
+
+  const g = mkEl("g", {});
+  const line = mkEl("line", { x1: pad.left, y1: ya, x2: W - pad.right, y2: yb, stroke: color, "stroke-width": "1.5", opacity: "0.85" });
+  g.appendChild(line);
+  const hit = mkEl("line", { x1: pad.left, y1: ya, x2: W - pad.right, y2: yb, stroke: "transparent", "stroke-width": "12", cursor: "pointer" });
+  g.appendChild(hit);
+  g.appendChild(mkEl("circle", { cx: pad.left, cy: ya, r: "3.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: W - pad.right, cy: yb, r: "3.5", fill: color }));
+  svg.appendChild(g);
+  rows.push({ g, line, hit, d, color, ya, yb });
+});
+
+// Left labels
+const leftItems = rows.map((r, i) => ({ y: r.ya, n: r.d.n, v: r.d.a, pct: r.d.pct, color: r.color, idx: i }));
+const resolvedLeft = resolveCollisions(leftItems.map(l => ({ ...l })), 14);
+resolvedLeft.forEach(item => { item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, item.y)); });
+resolvedLeft.forEach(item => {
+  const orig = leftItems.find(l => l.idx === item.idx);
+  if (Math.abs(item.y - orig.y) > 2) {
+    svg.appendChild(mkEl("line", { x1: pad.left - 4, y1: orig.y, x2: pad.left - 8, y2: item.y, stroke: orig.color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const t = mkEl("text", { x: pad.left - 10, y: item.y + 3.5, "text-anchor": "end", "font-size": "9.5", "font-family": "Inter, sans-serif", fill: orig.color, "font-weight": "500" });
+  t.textContent = `${orig.n}  ${orig.v.toFixed(0)}M`;
+  svg.appendChild(t);
+});
+
+// Right labels
+const rightItems = rows.map((r, i) => ({ y: r.yb, n: r.d.n, v: r.d.b, pct: r.d.pct, color: r.color, idx: i }));
+const resolvedRight = resolveCollisions(rightItems.map(l => ({ ...l })), 14);
+resolvedRight.forEach(item => { item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, item.y)); });
+resolvedRight.forEach(item => {
+  const orig = rightItems.find(l => l.idx === item.idx);
+  if (Math.abs(item.y - orig.y) > 2) {
+    svg.appendChild(mkEl("line", { x1: W - pad.right + 4, y1: orig.y, x2: W - pad.right + 8, y2: item.y, stroke: orig.color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const t = mkEl("text", { x: W - pad.right + 10, y: item.y + 3.5, "text-anchor": "start", "font-size": "9.5", "font-family": "Inter, sans-serif", fill: orig.color, "font-weight": "500" });
+  t.textContent = `${orig.v.toFixed(0)}M  −${orig.pct}%`;
+  svg.appendChild(t);
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+rows.forEach(({ g, line, hit, d, color }) => {
+  hit.addEventListener("mouseover", () => {
+    rows.forEach(r => { r.line.setAttribute("opacity", "0.08"); });
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "3");
+    tip.textContent = `${d.n}: ${d.a.toFixed(0)}M → ${d.b.toFixed(0)}M (−${d.pct}%)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    rows.forEach(r => { r.line.setAttribute("opacity", "0.85"); r.line.setAttribute("stroke-width", "1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+
+// Legend
+const legend = [
+  { label: ">85% drop", color: "#B34B3B" },
+  { label: "70–85%", color: "#C4715A" },
+  { label: "55–70%", color: "#C49A45" },
+  { label: "45–55%", color: "#F29A44" },
+  { label: "<45%", color: "#5B9E78" }
+];
+let lx = pad.left;
+legend.forEach(({ label, color }) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: H - 14, width: 10, height: 6, fill: color, rx: "1" }));
+  const lt = mkEl("text", { x: lx + 13, y: H - 9, "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+  lt.textContent = label;
+  svg.appendChild(lt);
+  lx += 80;
+});
+</script>
+</body></html>
