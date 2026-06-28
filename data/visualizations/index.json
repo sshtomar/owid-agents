@@ -5773,7 +5773,92 @@
       ],
       "createdAt": "2026-06-13T00:00:00.000Z",
       "notebookPath": "notebooks/viz-351.py"
+    },
+    {
+      "id": "viz-352",
+      "title": "Youth NEET Rate, 2000-2024",
+      "description": "Share of young people (ages 15-24) not in education, employment or training (%) across 11 countries. Shows declining trends in India, Iran, Albania, and Bosnia alongside persistent challenges in Honduras.",
+      "datasetIds": [
+        "wb--SL-UEM-NEET-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-352.html",
+      "highlights": [
+        "Iran declined from 36% to 24% over 2005-2024",
+        "Bosnia halved its NEET rate from 32% to 14%",
+        "Honduras remains stuck above 30% \u2014 rising since 2019"
+      ],
+      "createdAt": "2026-06-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-352.py"
+    },
+    {
+      "id": "viz-353",
+      "title": "Coal's Share of Electricity: 1990 vs. 2023",
+      "description": "Slope chart comparing electricity production from coal sources (% of total) in 1990 versus 2023. Shows Europe's dramatic coal exit against Asia's coal expansion.",
+      "datasetIds": [
+        "wb--EG-ELC-COAL-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-353.html",
+      "highlights": [
+        "Denmark cut coal from 91% to just 8%; Greece from 72% to 9%",
+        "Indonesia surged from 30% to 69%; India from 65% to 74%",
+        "Hong Kong fell from 98% to 33% \u2014 pivoting to natural gas"
+      ],
+      "createdAt": "2026-06-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-353.py"
+    },
+    {
+      "id": "viz-354",
+      "title": "Financial Inclusion: Account Ownership, 2011 vs. 2021",
+      "description": "Slope chart showing adults (15+) with a financial account or mobile money, comparing 2011 and 2021. A decade of rapid inclusion driven by mobile money in Africa and South Asia.",
+      "datasetIds": [
+        "wb--FX-OWN-TOTL-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-354.html",
+      "highlights": [
+        "India jumped from 35% to 78% in a decade (Jan Dhan Yojana scheme)",
+        "Kenya rose from 42% to 79% \u2014 mobile money revolution",
+        "Afghanistan barely moved: 9% to 10%"
+      ],
+      "createdAt": "2026-06-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-354.py"
+    },
+    {
+      "id": "viz-355",
+      "title": "Physical Inactivity Among Adults, ~2021",
+      "description": "Horizontal bar chart ranking 43 countries by prevalence of insufficient physical activity in adults 18+ (age-standardized %). Mediterranean and Central Asian countries lead; sub-Saharan Africa and Pacific islands show lowest rates.",
+      "datasetIds": [
+        "who--NCD_PAA"
+      ],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-355.html",
+      "highlights": [
+        "Serbia (41%), Cyprus (41%), Malta (38%) are most physically inactive",
+        "Nepal (7%), Finland (9%), Netherlands (11%) are most active",
+        "Lower rates in poorer countries partly reflect occupational physical labour"
+      ],
+      "createdAt": "2026-06-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-355.py"
+    },
+    {
+      "id": "viz-356",
+      "title": "Access to Safely Managed Drinking Water: 2000 vs. 2022",
+      "description": "Slope chart showing progress in safely managed drinking water access across 16 countries. Dramatic gains in India and Bhutan contrast with near-stagnation in Chad and actual decline in the Central African Republic.",
+      "datasetIds": [
+        "wb--SH-H2O-SMDW-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-356.html",
+      "highlights": [
+        "India jumped from 38% to 73% \u2014 largest absolute gain in the set",
+        "Kazakhstan rose from 63% to 91%; Jordan from 56% to 85%",
+        "Central African Republic declined from 8.5% to 6.1%"
+      ],
+      "createdAt": "2026-06-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-356.py"
     }
   ],
-  "lastUpdated": "2026-06-13T00:00:00.000Z"
+  "lastUpdated": "2026-06-28T00:00:00.000Z"
 }

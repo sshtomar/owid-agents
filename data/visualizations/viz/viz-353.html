@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Coal's Share of Electricity: 1990 vs. 2023</h1>
+  <p class="subtitle">Electricity production from coal sources (% of total). Europe exited coal; Asia expanded it.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — EG.ELC.COAL.ZS</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Hong Kong","a":98.2,"b":33.1},{"n":"Estonia","a":90.9,"b":48.9},{"n":"Denmark","a":90.7,"b":7.5},{"n":"Botswana","a":88.1,"b":98.9},{"n":"Australia","a":78.4,"b":46.5},{"n":"Czechia","a":76.1,"b":39.5},{"n":"Greece","a":71.9,"b":9.2},{"n":"Bosnia","a":71.8,"b":56.4},{"n":"Kazakhstan","a":71.1,"b":58.4},{"n":"China","a":71.0,"b":61.3},{"n":"India","a":65.3,"b":74.4},{"n":"Germany","a":58.5,"b":26.4},{"n":"Ireland","a":56.2,"b":4.3},{"n":"Bulgaria","a":50.3,"b":29.1},{"n":"Israel","a":50.1,"b":17.2},{"n":"Eswatini","a":36.1,"b":2.7},{"n":"Chile","a":35.5,"b":16.1},{"n":"Indonesia","a":29.9,"b":69.1},{"n":"S. Korea","a":19.6,"b":33.6},{"n":"Japan","a":14.3,"b":28.3}];
+
+    const W = 720, H = 580;
+    const pad = { left: 130, right: 140, top: 50, bottom: 30 };
+
+    const minV = 0, maxV = 100;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    const xL = pad.left, xR = W - pad.right;
+
+    function colorFor(d) {
+      const change = d.b - d.a;
+      if (change >= 15) return "#EA5E33";
+      if (change >= 5) return "#F29A44";
+      if (change <= -40) return "#3D7A5A";
+      if (change <= -20) return "#5B9E78";
+      if (change <= -10) return "#8BAD72";
+      return "#94A3B8";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      const topBound = pad.top + 6;
+      const botBound = H - pad.bottom - 6;
+      sorted.forEach(item => { item.y = Math.max(topBound, Math.min(botBound, item.y)); });
+      return sorted;
+    }
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:720px" });
+    const tip = document.getElementById("tip");
+
+    // Axis columns
+    [0, 25, 50, 75, 100].forEach(v => {
+      svg.appendChild(mkEl("line", {
+        x1: xL, y1: scale(v), x2: xR, y2: scale(v),
+        stroke: "#EEF0F2", "stroke-width": "0.7"
+      }));
+    });
+    svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: H - pad.bottom, stroke: "#CBD5E1", "stroke-width": "1" }));
+    svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: H - pad.bottom, stroke: "#CBD5E1", "stroke-width": "1" }));
+
+    // Column headers
+    ["1990", "2023"].forEach((yr, i) => {
+      svg.appendChild(mkEl("text", {
+        x: i === 0 ? xL : xR,
+        y: pad.top - 14,
+        "text-anchor": "middle", "font-size": "12", fill: "#7A786F",
+        "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+      }, yr));
+    });
+
+    // Prepare label items
+    const leftLabels = [], rightLabels = [];
+    data.forEach(d => {
+      leftLabels.push({ n: d.n, v: d.a, y: scale(d.a), color: colorFor(d), d });
+      rightLabels.push({ n: d.n, v: d.b, y: scale(d.b), color: colorFor(d), d });
+    });
+
+    const leftRes = resolveCollisions(leftLabels.map(l => ({...l})), 13);
+    const rightRes = resolveCollisions(rightLabels.map(l => ({...l})), 13);
+
+    // Draw lines and hit areas
+    data.forEach((d, i) => {
+      const color = colorFor(d);
+      const ya = scale(d.a), yb = scale(d.b);
+
+      // Line
+      const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5", opacity: "1" });
+
+      // Dots
+      const dotA = mkEl("circle", { cx: xL, cy: ya, r: "3.5", fill: color });
+      const dotB = mkEl("circle", { cx: xR, cy: yb, r: "3.5", fill: color });
+
+      // Hit area
+      const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+
+      const allLines = svg.querySelectorAll(".vis-line");
+      hit.addEventListener("mouseover", e => {
+        svg.querySelectorAll(".vis-line").forEach((el, j) => {
+          el.style.opacity = j === i ? "1" : "0.1";
+        });
+        svg.querySelectorAll(".vis-dot").forEach((el, j) => {
+          el.style.opacity = Math.floor(j / 2) === i ? "1" : "0.1";
+        });
+        const change = d.b - d.a;
+        tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${change >= 0 ? "+" : ""}${(change).toFixed(1)}pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mouseout", () => {
+        svg.querySelectorAll(".vis-line").forEach(el => el.style.opacity = "1");
+        svg.querySelectorAll(".vis-dot").forEach(el => el.style.opacity = "1");
+        tip.style.opacity = "0";
+      });
+
+      line.classList.add("vis-line");
+      dotA.classList.add("vis-dot");
+      dotB.classList.add("vis-dot");
+
+      svg.appendChild(line);
+      svg.appendChild(dotA);
+      svg.appendChild(dotB);
+      svg.appendChild(hit);
+    });
+
+    // Left labels
+    leftRes.forEach(item => {
+      const origY = scale(item.v);
+      if (Math.abs(item.y - origY) > 2) {
+        svg.appendChild(mkEl("line", {
+          x1: xL - 4, y1: origY, x2: xL - 10, y2: item.y,
+          stroke: item.color, "stroke-width": "0.7", opacity: "0.6"
+        }));
+      }
+      svg.appendChild(mkEl("text", {
+        x: xL - 12, y: item.y + 4,
+        "text-anchor": "end", "font-size": "10", fill: item.color,
+        "font-family": "JetBrains Mono, monospace"
+      }, `${item.n}  ${item.v}%`));
+    });
+
+    // Right labels
+    rightRes.forEach(item => {
+      const origY = scale(item.v);
+      if (Math.abs(item.y - origY) > 2) {
+        svg.appendChild(mkEl("line", {
+          x1: xR + 4, y1: origY, x2: xR + 10, y2: item.y,
+          stroke: item.color, "stroke-width": "0.7", opacity: "0.6"
+        }));
+      }
+      svg.appendChild(mkEl("text", {
+        x: xR + 12, y: item.y + 4,
+        "text-anchor": "start", "font-size": "10", fill: item.color,
+        "font-family": "JetBrains Mono, monospace"
+      }, `${item.v}%  ${item.n}`));
+    });
+
+    // Legend
+    const legend = [
+      { color: "#EA5E33", label: "Large coal increase (>+15pp)" },
+      { color: "#3D7A5A", label: "Large coal decline (>-40pp)" },
+      { color: "#5B9E78", label: "Moderate decline (-20 to -40pp)" },
+      { color: "#94A3B8", label: "Relatively stable" },
+    ];
+    const lx = pad.left, ly = H - 14;
+    legend.forEach((item, i) => {
+      const ix = lx + i * 160;
+      svg.appendChild(mkEl("rect", { x: ix, y: ly - 8, width: 10, height: 10, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: ix + 14, y: ly + 1, "font-size": "9", fill: "#64748B", "font-family": "Inter, sans-serif" }, item.label));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

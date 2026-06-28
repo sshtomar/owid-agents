@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Physical Inactivity Among Adults, ~2021</h1>
+  <p class="subtitle">Prevalence of insufficient physical activity in adults 18+ (age-standardized, %). WHO Global Health Observatory.</p>
+  <div id="chart"></div>
+  <p class="source">Source: WHO GHO — NCD_PAA. Values ~2021 (latest available per country).</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Serbia","v":41.4,"y":2020},{"n":"Cyprus","v":40.9,"y":2021},{"n":"Malta","v":38.3,"y":2021},{"n":"Malaysia","v":37.4,"y":2021},{"n":"Greece","v":37.1,"y":2021},{"n":"Grenada","v":35.4,"y":2021},{"n":"Paraguay","v":35.3,"y":2021},{"n":"Uzbekistan","v":35.3,"y":2021},{"n":"Oman","v":34.7,"y":2021},{"n":"Uruguay","v":33.6,"y":2021},{"n":"Egypt","v":33.6,"y":2021},{"n":"Pakistan","v":33.3,"y":2021},{"n":"Bulgaria","v":31.2,"y":2020},{"n":"Honduras","v":30.3,"y":2021},{"n":"Hungary","v":30.1,"y":2021},{"n":"Dominica","v":29.9,"y":2021},{"n":"Belgium","v":29.4,"y":2021},{"n":"Kazakhstan","v":26.5,"y":2020},{"n":"Croatia","v":25.7,"y":2019},{"n":"Czechia","v":24.1,"y":2021},{"n":"Bosnia","v":23.4,"y":2021},{"n":"Austria","v":20.3,"y":2021},{"n":"N. Macedonia","v":20.2,"y":2021},{"n":"Slovenia","v":18.9,"y":2021},{"n":"C. Afr. Rep.","v":16.5,"y":2021},{"n":"Eritrea","v":16.1,"y":2021},{"n":"Fiji","v":15.7,"y":2021},{"n":"Estonia","v":15.2,"y":2021},{"n":"Burkina Faso","v":14.3,"y":2021},{"n":"Zambia","v":14.2,"y":2021},{"n":"Solomon Is.","v":13.3,"y":2021},{"n":"Germany","v":13.2,"y":2019},{"n":"Cambodia","v":13.2,"y":2021},{"n":"Denmark","v":12.6,"y":2021},{"n":"Congo","v":12.4,"y":2021},{"n":"Netherlands","v":11.1,"y":2021},{"n":"Moldova","v":10.1,"y":2020},{"n":"Kenya","v":9.5,"y":2021},{"n":"Mozambique","v":9.3,"y":2020},{"n":"Bhutan","v":8.8,"y":2021},{"n":"Finland","v":8.6,"y":2021},{"n":"Nepal","v":6.6,"y":2021},{"n":"Vanuatu","v":6.4,"y":2019}];
+
+    const barH = 14, gap = 5, labelW = 110, valueW = 38;
+    const maxV = 45;
+    const chartW = 580, barMaxW = chartW - labelW - valueW - 10;
+    const totalH = data.length * (barH + gap) + 30;
+    const W = chartW, H = totalH + 20;
+
+    function colorFor(v) {
+      const t = v / maxV;
+      // Red at high values, green at low
+      const r = Math.round(80 + t * 154);
+      const g = Math.round(154 - t * 100);
+      const b = Math.round(58);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:620px" });
+    const tip = document.getElementById("tip");
+
+    // Header labels
+    svg.appendChild(mkEl("text", { x: labelW, y: 13, "font-size": "9", fill: "#94A3B8", "font-family": "Inter, sans-serif" }, "MOST INACTIVE"));
+    svg.appendChild(mkEl("text", { x: labelW, y: H - 8, "font-size": "9", fill: "#94A3B8", "font-family": "Inter, sans-serif" }, "LEAST INACTIVE"));
+
+    data.forEach((d, i) => {
+      const y = 20 + i * (barH + gap);
+      const bw = (d.v / maxV) * barMaxW;
+      const color = colorFor(d.v);
+
+      const g = mkEl("g", { cursor: "pointer" });
+
+      // Country label
+      g.appendChild(mkEl("text", {
+        x: labelW - 6, y: y + barH - 3,
+        "text-anchor": "end", "font-size": "11", fill: "#334155", "font-family": "Inter, sans-serif"
+      }, d.n));
+
+      // Bar
+      const bar = mkEl("rect", { x: labelW, y, width: bw, height: barH, fill: color, rx: "2" });
+      g.appendChild(bar);
+
+      // Value label
+      g.appendChild(mkEl("text", {
+        x: labelW + bw + 5, y: y + barH - 3,
+        "font-size": "10", fill: color, "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+      }, d.v + "%"));
+
+      g.addEventListener("mouseover", e => {
+        svg.querySelectorAll("rect").forEach((r, j) => r.style.opacity = j === i ? "1" : "0.3");
+        tip.textContent = `${d.n} (${d.y}): ${d.v}% physically inactive`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      g.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      g.addEventListener("mouseout", () => {
+        svg.querySelectorAll("rect").forEach(r => r.style.opacity = "1");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(g);
+    });
+
+    // Reference line at 20%
+    const refX = labelW + (20 / maxV) * barMaxW;
+    svg.appendChild(mkEl("line", { x1: refX, y1: 20, x2: refX, y2: H - 20, stroke: "#CBD5E1", "stroke-dasharray": "3,3", "stroke-width": "0.8" }));
+    svg.appendChild(mkEl("text", { x: refX + 2, y: 14, "font-size": "8", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace" }, "20%"));
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
