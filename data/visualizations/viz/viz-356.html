@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Access to Safely Managed Drinking Water: 2000 vs. 2022</h1>
+  <p class="subtitle">Share of population using safely managed drinking water services (%). Who made progress — and who didn't.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — SH.H2O.SMDW.ZS (WHO/UNICEF JMP)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Ethiopia","a":5.4,"b":12.9},{"n":"Chad","a":5.5,"b":6.2},{"n":"C. Afr. Rep.","a":8.5,"b":6.1},{"n":"DR Congo","a":12.2,"b":11.6},{"n":"Ghana","a":14.4,"b":40.2},{"n":"Cambodia","a":17.1,"b":28.9},{"n":"Gambia","a":23.3,"b":47.3},{"n":"Bhutan","a":28.4,"b":67.8},{"n":"Congo","a":27.9,"b":45.9},{"n":"Albania","a":49.1,"b":70.7},{"n":"India","a":37.6,"b":73.0},{"n":"Bangladesh","a":55.3,"b":59.2},{"n":"Honduras","a":41.8,"b":64.8},{"n":"Afghanistan","a":11.5,"b":29.2},{"n":"Jordan","a":55.5,"b":85.3},{"n":"Kazakhstan","a":63.2,"b":91.3}];
+
+    const W = 700, H = 580;
+    const pad = { left: 130, right: 150, top: 50, bottom: 40 };
+
+    const minV = 0, maxV = 100;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    const xL = pad.left, xR = W - pad.right;
+
+    function colorFor(d) {
+      const gain = d.b - d.a;
+      if (gain < 0) return "#EA5E33";
+      if (gain < 5) return "#F59E0B";
+      if (gain < 15) return "#A3C77A";
+      if (gain < 30) return "#5B9E78";
+      return "#3D7A5A";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      const topB = pad.top + 4, botB = H - pad.bottom - 4;
+      sorted.forEach(item => { item.y = Math.max(topB, Math.min(botB, item.y)); });
+      return sorted;
+    }
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:700px" });
+    const tip = document.getElementById("tip");
+
+    // Grid lines
+    [0, 25, 50, 75, 100].forEach(v => {
+      svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#EEF0F2", "stroke-width": "0.7" }));
+      svg.appendChild(mkEl("text", {
+        x: (xL + xR) / 2, y: scale(v) - 3,
+        "text-anchor": "middle", "font-size": "9", fill: "#CBD5E1", "font-family": "JetBrains Mono, monospace"
+      }, v + "%"));
+    });
+
+    // Axes
+    svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: H - pad.bottom, stroke: "#CBD5E1", "stroke-width": "1" }));
+    svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: H - pad.bottom, stroke: "#CBD5E1", "stroke-width": "1" }));
+
+    // Column headers
+    ["2000", "2022"].forEach((yr, i) => {
+      svg.appendChild(mkEl("text", {
+        x: i === 0 ? xL : xR, y: pad.top - 16,
+        "text-anchor": "middle", "font-size": "13", fill: "#475569",
+        "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+      }, yr));
+    });
+
+    // Sort data by 2000 value descending for rendering
+    const sortedData = [...data].sort((a, b) => b.a - a.a);
+
+    // Prepare labels
+    const leftLabels = sortedData.map(d => ({ ...d, y: scale(d.a) }));
+    const rightLabels = sortedData.map(d => ({ ...d, y: scale(d.b) }));
+    const leftRes = resolveCollisions(leftLabels, 13);
+    const rightRes = resolveCollisions(rightLabels, 13);
+
+    // Draw elements
+    sortedData.forEach((d, i) => {
+      const color = colorFor(d);
+      const ya = scale(d.a), yb = scale(d.b);
+
+      const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.7", class: "vis-line" });
+      const dA = mkEl("circle", { cx: xL, cy: ya, r: "3.5", fill: color, class: "vis-dot" });
+      const dB = mkEl("circle", { cx: xR, cy: yb, r: "3.5", fill: color, class: "vis-dot" });
+      const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+
+      hit.addEventListener("mouseover", e => {
+        svg.querySelectorAll(".vis-line").forEach((el, j) => el.style.opacity = j === i ? "1" : "0.08");
+        svg.querySelectorAll(".vis-dot").forEach((el, j) => el.style.opacity = Math.floor(j / 2) === i ? "1" : "0.08");
+        const gain = d.b - d.a;
+        tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${gain >= 0 ? "+" : ""}${gain.toFixed(1)}pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mouseout", () => {
+        svg.querySelectorAll(".vis-line, .vis-dot").forEach(el => el.style.opacity = "1");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(line);
+      svg.appendChild(dA);
+      svg.appendChild(dB);
+      svg.appendChild(hit);
+    });
+
+    // Left labels
+    leftRes.forEach(item => {
+      const color = colorFor(item);
+      const origY = scale(item.a);
+      if (Math.abs(item.y - origY) > 2) {
+        svg.appendChild(mkEl("line", { x1: xL - 4, y1: origY, x2: xL - 10, y2: item.y, stroke: color, "stroke-width": "0.7", opacity: "0.5" }));
+      }
+      svg.appendChild(mkEl("text", {
+        x: xL - 12, y: item.y + 4,
+        "text-anchor": "end", "font-size": "10", fill: color, "font-family": "JetBrains Mono, monospace"
+      }, `${item.n}  ${item.a}%`));
+    });
+
+    // Right labels
+    rightRes.forEach(item => {
+      const color = colorFor(item);
+      const origY = scale(item.b);
+      if (Math.abs(item.y - origY) > 2) {
+        svg.appendChild(mkEl("line", { x1: xR + 4, y1: origY, x2: xR + 10, y2: item.y, stroke: color, "stroke-width": "0.7", opacity: "0.5" }));
+      }
+      svg.appendChild(mkEl("text", {
+        x: xR + 12, y: item.y + 4,
+        "text-anchor": "start", "font-size": "10", fill: color, "font-family": "JetBrains Mono, monospace"
+      }, `${item.b}%  ${item.n}`));
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#EA5E33", label: "Declined" },
+      { color: "#F59E0B", label: "< 5pp gain" },
+      { color: "#5B9E78", label: "15-30pp gain" },
+      { color: "#3D7A5A", label: "> 30pp gain" },
+    ];
+    legendItems.forEach((item, i) => {
+      const ix = pad.left + i * 148;
+      const ly = H - 8;
+      svg.appendChild(mkEl("rect", { x: ix, y: ly - 8, width: 10, height: 10, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: ix + 14, y: ly + 1, "font-size": "9", fill: "#64748B", "font-family": "Inter, sans-serif" }, item.label));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Youth NEET Rate, 2000-2024</h1>
+  <p class="subtitle">Share of young people (ages 15-24) not in education, employment or training (%). Selected countries.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — SL.UEM.NEET.ZS</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Honduras","pts":[{"y":2005,"v":27.02},{"y":2006,"v":26.84},{"y":2007,"v":27.58},{"y":2008,"v":25.89},{"y":2009,"v":26.62},{"y":2010,"v":26.21},{"y":2011,"v":27.55},{"y":2012,"v":28.67},{"y":2013,"v":26.81},{"y":2014,"v":28.67},{"y":2015,"v":26.96},{"y":2016,"v":27.82},{"y":2017,"v":27.72},{"y":2018,"v":26.68},{"y":2019,"v":28.11},{"y":2021,"v":31.92},{"y":2022,"v":31.23},{"y":2023,"v":30.39},{"y":2024,"v":30.75}]},{"n":"Iran","pts":[{"y":2005,"v":36.01},{"y":2006,"v":35.81},{"y":2007,"v":34.46},{"y":2008,"v":34.19},{"y":2009,"v":34.83},{"y":2010,"v":34.43},{"y":2011,"v":32.9},{"y":2012,"v":32.1},{"y":2013,"v":33.45},{"y":2014,"v":33.33},{"y":2015,"v":32.75},{"y":2016,"v":32.38},{"y":2017,"v":32.26},{"y":2018,"v":32.09},{"y":2019,"v":30.4},{"y":2020,"v":29.4},{"y":2021,"v":27.47},{"y":2022,"v":26.94},{"y":2023,"v":25.65},{"y":2024,"v":24.32}]},{"n":"India","pts":[{"y":2000,"v":32.71},{"y":2004,"v":26.13},{"y":2005,"v":29.86},{"y":2010,"v":28.94},{"y":2012,"v":26.86},{"y":2018,"v":30.8},{"y":2019,"v":31.2},{"y":2020,"v":30.7},{"y":2021,"v":28.01},{"y":2022,"v":25.76},{"y":2023,"v":23.49},{"y":2024,"v":24.19}]},{"n":"Albania","pts":[{"y":2002,"v":41.8},{"y":2005,"v":35.19},{"y":2007,"v":33.77},{"y":2008,"v":28.17},{"y":2009,"v":30.73},{"y":2010,"v":29.72},{"y":2011,"v":30.01},{"y":2012,"v":27.65},{"y":2013,"v":30.98},{"y":2014,"v":31.39},{"y":2015,"v":29.82},{"y":2016,"v":27.39},{"y":2017,"v":26.23},{"y":2018,"v":26.61},{"y":2019,"v":25.82},{"y":2020,"v":26.94},{"y":2021,"v":24.08},{"y":2022,"v":23.71},{"y":2023,"v":23.16},{"y":2024,"v":21.03}]},{"n":"Colombia","pts":[{"y":2002,"v":29.94},{"y":2003,"v":28.09},{"y":2004,"v":28.74},{"y":2005,"v":27.72},{"y":2007,"v":26.7},{"y":2008,"v":25.54},{"y":2009,"v":24.96},{"y":2010,"v":23.44},{"y":2011,"v":23.03},{"y":2012,"v":22.53},{"y":2013,"v":22.08},{"y":2014,"v":21.4},{"y":2015,"v":21.14},{"y":2016,"v":21.13},{"y":2017,"v":21.84},{"y":2018,"v":22.84},{"y":2019,"v":23.92},{"y":2021,"v":27.26},{"y":2022,"v":24.42},{"y":2023,"v":23.25},{"y":2024,"v":23.15}]},{"n":"Indonesia","pts":[{"y":2000,"v":29.38},{"y":2001,"v":29.85},{"y":2002,"v":31.06},{"y":2003,"v":31.52},{"y":2004,"v":31.42},{"y":2005,"v":31.86},{"y":2006,"v":30.42},{"y":2007,"v":30.03},{"y":2008,"v":28.15},{"y":2009,"v":27.67},{"y":2010,"v":26.65},{"y":2011,"v":25.9},{"y":2012,"v":22.95},{"y":2013,"v":22.89},{"y":2014,"v":22.35},{"y":2015,"v":22.92},{"y":2016,"v":22.48},{"y":2017,"v":21.45},{"y":2018,"v":21.74},{"y":2019,"v":20.55},{"y":2020,"v":21.8},{"y":2021,"v":22.45},{"y":2022,"v":22.34},{"y":2023,"v":21.36}]},{"n":"Ecuador","pts":[{"y":2000,"v":20.96},{"y":2001,"v":18.03},{"y":2003,"v":21.03},{"y":2004,"v":18.43},{"y":2005,"v":17.46},{"y":2006,"v":17.05},{"y":2007,"v":16.37},{"y":2008,"v":16.14},{"y":2009,"v":16.5},{"y":2010,"v":15.66},{"y":2011,"v":16.43},{"y":2012,"v":16.55},{"y":2013,"v":17.36},{"y":2014,"v":20.23},{"y":2015,"v":19.81},{"y":2016,"v":18.44},{"y":2017,"v":17.56},{"y":2018,"v":17.67},{"y":2019,"v":17.52},{"y":2021,"v":18.5},{"y":2022,"v":17.99},{"y":2023,"v":18.63},{"y":2024,"v":18.95}]},{"n":"Bosnia","pts":[{"y":2001,"v":32.45},{"y":2006,"v":35.49},{"y":2007,"v":32.36},{"y":2008,"v":27.38},{"y":2009,"v":26.63},{"y":2010,"v":28.73},{"y":2011,"v":28.3},{"y":2012,"v":28.92},{"y":2013,"v":26.63},{"y":2014,"v":27.1},{"y":2015,"v":28.35},{"y":2016,"v":27.09},{"y":2017,"v":25.51},{"y":2018,"v":22.61},{"y":2019,"v":22.6},{"y":2020,"v":21.8},{"y":2021,"v":19.3},{"y":2022,"v":17.62},{"y":2023,"v":15.98},{"y":2024,"v":14.31}]},{"n":"Chile","pts":[{"y":2000,"v":24.03},{"y":2003,"v":20.54},{"y":2006,"v":19.89},{"y":2009,"v":23.2},{"y":2010,"v":19.54},{"y":2011,"v":19.18},{"y":2012,"v":18.05},{"y":2013,"v":18.41},{"y":2014,"v":18.96},{"y":2015,"v":19.2},{"y":2016,"v":17.5},{"y":2017,"v":18.28},{"y":2020,"v":19.22},{"y":2021,"v":15.34},{"y":2022,"v":14.42},{"y":2023,"v":15.32},{"y":2024,"v":13.76}]},{"n":"France","pts":[{"y":2000,"v":10.16},{"y":2001,"v":9.86},{"y":2002,"v":10.35},{"y":2003,"v":9.52},{"y":2004,"v":10.69},{"y":2005,"v":11.35},{"y":2006,"v":11.78},{"y":2007,"v":11.0},{"y":2008,"v":10.87},{"y":2009,"v":14.34},{"y":2010,"v":12.88},{"y":2011,"v":12.41},{"y":2012,"v":12.84},{"y":2013,"v":13.43},{"y":2014,"v":13.5},{"y":2015,"v":13.97},{"y":2016,"v":13.94},{"y":2017,"v":13.43},{"y":2018,"v":13.08},{"y":2019,"v":12.62},{"y":2020,"v":12.7},{"y":2021,"v":11.48},{"y":2022,"v":11.56},{"y":2023,"v":11.8},{"y":2024,"v":12.57}]},{"n":"Canada","pts":[{"y":2000,"v":13.9},{"y":2001,"v":13.34},{"y":2002,"v":13.22},{"y":2003,"v":13.19},{"y":2004,"v":13.09},{"y":2005,"v":12.78},{"y":2006,"v":12.21},{"y":2007,"v":11.94},{"y":2008,"v":12.42},{"y":2009,"v":13.93},{"y":2010,"v":13.7},{"y":2011,"v":13.19},{"y":2012,"v":13.25},{"y":2013,"v":12.91},{"y":2014,"v":13.55},{"y":2015,"v":13.27},{"y":2016,"v":12.89},{"y":2017,"v":12.07},{"y":2018,"v":12.21},{"y":2019,"v":12.04},{"y":2020,"v":17.86},{"y":2021,"v":12.81},{"y":2022,"v":11.6},{"y":2023,"v":11.73},{"y":2024,"v":12.99}]}];
+
+    const W = 820, H = 440;
+    const margin = { top: 36, right: 110, bottom: 36, left: 48 };
+
+    const allYears = [...new Set(data.flatMap(s => s.pts.map(p => p.y)))].sort();
+    const yearMin = 2000, yearMax = 2024;
+    const valMin = 0, valMax = 42;
+
+    const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+    const PALETTE = ["#EA5E33","#F29A44","#5B9E78","#3B82F6","#8B5CF6","#EC4899","#14B8A6","#F59E0B","#6366F1","#22C55E","#EF4444"];
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      // Clamp within bounds
+      const topBound = margin.top + 6;
+      const botBound = H - margin.bottom - 6;
+      for (const item of sorted) {
+        item.y = Math.max(topBound, Math.min(botBound, item.y));
+      }
+      return sorted;
+    }
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:820px" });
+
+    // Grid lines
+    [0, 10, 20, 30, 40].forEach(v => {
+      svg.appendChild(mkEl("line", {
+        x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+        stroke: v === 0 ? "#CBD5E1" : "#EEF0F2", "stroke-width": v === 0 ? "1" : "0.8"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: margin.left - 6, y: yScale(v) + 4,
+        "text-anchor": "end", "font-size": "10", fill: "#94A3B8",
+        "font-family": "JetBrains Mono, monospace"
+      }, v + "%"));
+    });
+
+    // X axis ticks
+    [2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+      svg.appendChild(mkEl("text", {
+        x: xScale(yr), y: H - margin.bottom + 14,
+        "text-anchor": "middle", "font-size": "10", fill: "#94A3B8",
+        "font-family": "JetBrains Mono, monospace"
+      }, String(yr)));
+    });
+
+    // Build endpoint label items for collision resolution
+    const labelItems = [];
+
+    const groups = [];
+    data.forEach((series, i) => {
+      const color = PALETTE[i % PALETTE.length];
+      const pts = series.pts;
+      if (!pts.length) return;
+
+      const d = pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+      const g = mkEl("g", { class: "series", "data-i": i });
+
+      // Visible line
+      g.appendChild(mkEl("path", { d, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+      // Hit area
+      const hit = mkEl("path", { d, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+      hit.addEventListener("mouseover", e => {
+        groups.forEach((gg, j) => gg.querySelector("path").style.opacity = j === i ? "1" : "0.1");
+        groups[i].querySelector("path").setAttribute("stroke-width", "3");
+        const mx = e.clientX - svg.getBoundingClientRect().left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+        const nearest = pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best, pts[0]);
+        tip.textContent = `${series.n}  ${nearest.y}: ${nearest.v}%`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        const mx = e.clientX - svg.getBoundingClientRect().left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+        const nearest = pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best, pts[0]);
+        tip.textContent = `${series.n}  ${nearest.y}: ${nearest.v}%`;
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mouseout", () => {
+        groups.forEach(gg => {
+          gg.querySelector("path").style.opacity = "1";
+          gg.querySelector("path").setAttribute("stroke-width", "1.8");
+        });
+        tip.style.opacity = "0";
+      });
+      g.appendChild(hit);
+
+      // Store endpoint for labels
+      const last = pts[pts.length - 1];
+      labelItems.push({ n: series.n, v: last.v, y: yScale(last.v), x: xScale(last.y), color });
+
+      groups.push(g);
+    });
+
+    // Add groups to SVG before labels
+    groups.forEach(g => svg.appendChild(g));
+
+    // Resolve label collisions
+    const resolved = resolveCollisions(labelItems.map(l => ({...l})), 13);
+    resolved.forEach(item => {
+      // Leader line
+      svg.appendChild(mkEl("line", {
+        x1: item.x + 4, y1: yScale(item.v),
+        x2: W - margin.right + 6, y2: item.y,
+        stroke: item.color, "stroke-width": "0.8", opacity: "0.5"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: W - margin.right + 8, y: item.y + 4,
+        "font-size": "10", fill: item.color, "font-family": "JetBrains Mono, monospace",
+        "font-weight": "600"
+      }, item.n));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
