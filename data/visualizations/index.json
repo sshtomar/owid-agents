@@ -5858,7 +5858,97 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "PM2.5 Air Pollution Exposure by Country, 1990\u20132020",
+      "description": "Trend lines showing mean annual PM2.5 exposure in \u03bcg/m\u00b3 for 13 countries. European countries halved exposure since 1990; China improved sharply post-2015; South Asian and West African countries remain far above WHO targets.",
+      "datasetIds": [
+        "wb--EN-ATM-PM25-MC-M3"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China's PM2.5 dropped from ~51 to 35 \u03bcg/m\u00b3 after its 2015 clean air policy",
+        "Germany and France roughly halved PM2.5 exposure since 1990",
+        "India and Bangladesh remain at 42\u201348 \u03bcg/m\u00b3, well above WHO interim targets",
+        "Finland at 4.9 \u03bcg/m\u00b3 is close to the WHO 2021 annual guideline of 5 \u03bcg/m\u00b3"
+      ],
+      "createdAt": "2026-06-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "COVID-19 and International Tourism: The 2020 Collapse",
+      "description": "Slope chart comparing 2019 vs 2020 tourist arrivals (millions) for top destinations. The pandemic caused unprecedented drops, with Asia-Pacific seeing the steepest declines.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Hong Kong lost 94% of visitors in 2020 (55.9M \u2192 3.6M)",
+        "Japan dropped 87% (31.9M \u2192 4.1M) due to strict border closures",
+        "South Korea fell 86% (17.5M \u2192 2.5M)",
+        "France had the smallest relative drop at 46% (217.9M \u2192 117.1M)"
+      ],
+      "createdAt": "2026-06-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Terrestrial Protected Areas: Conservation Gains, 2013\u20132024",
+      "description": "Slope chart showing share of land under terrestrial protection (%) comparing 2013 and 2024. Croatia, Cyprus, Armenia, and Cambodia more than doubled their protected area.",
+      "datasetIds": [
+        "wb--ER-LND-PTLD-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Bhutan leads at 51.6% protected land, up from 28.8% in 2013",
+        "Croatia expanded from 13.8% to 38.4% \u2014 driven by EU accession requirements",
+        "Cambodia grew from 26.3% to 39.8%, surpassing the CBD 30x30 target",
+        "India and China remain below 10-16% despite their vast land areas"
+      ],
+      "createdAt": "2026-06-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "The Surgery Gap: Financial Risk of Surgical Care by Country",
+      "description": "Horizontal bar chart showing % of population at catastrophic financial risk if they need surgery (most recent year 2019\u20132022). The gap between high- and low-income countries is stark.",
+      "datasetIds": [
+        "wb--SH-SGR-CRSK-ZS"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "In C\u00f4te d'Ivoire and Burundi, virtually 100% of the population faces catastrophic surgical costs",
+        "Germany, Finland, France: essentially 0% thanks to universal health coverage",
+        "China at 3.7% reflects rapid expansion of its national health insurance system",
+        "India at 20.4% still leaves hundreds of millions without affordable surgical care"
+      ],
+      "createdAt": "2026-06-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Armed Forces as a Share of the Labor Force: 1990 vs. 2020",
+      "description": "Slope chart comparing military personnel as % of labor force in 1990 vs 2020. Cold War demobilization, the Gulf War aftermath, and NATO burden-sharing explain most of the largest drops.",
+      "datasetIds": [
+        "wb--MS-MIL-TOTL-TF-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Iraq dropped from 33.98% in 1990 to 4.4% in 2020 after Gulf War and post-2003 restructuring",
+        "North Korea remains the global outlier at ~8.6% of labor force under arms",
+        "Belgium and Germany cut military share by ~80% since 1990 (post-Cold War dividend)",
+        "Algeria increased slightly, reflecting expanded Sahel security operations"
+      ],
+      "createdAt": "2026-06-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-06-29T00:00:00.000Z"
 }

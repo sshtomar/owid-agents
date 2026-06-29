@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Urban Air Quality: PM2.5 Exposure by Country, 1990–2020</h1>
+<p class="subtitle">Mean annual PM2.5 exposure in micrograms per cubic meter (μg/m³). European countries have roughly halved exposure since 1990 while South Asian and West African countries remain far above WHO interim targets. Dashed line = WHO interim target 3 (15 μg/m³).</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank / Global Burden of Disease Study — Indicator EN.ATM.PM25.MC.M3</p>
+
+<script>
+const data = [{"n":"India","s":[62.0,59.7,61.5,62.8,50.1,73.8,48.4],"y0":1990,"step":5},{"n":"China","s":[49.3,48.9,50.3,51.5,47.5,50.8,34.8],"y0":1990,"step":5},{"n":"Bangladesh","s":[53.2,52.6,53.2,54.7,42.2,64.1,42.4],"y0":1990,"step":5},{"n":"Egypt","s":[57.4,65.3,60.0,61.8,76.5,67.6,54.9],"y0":1990,"step":5},{"n":"Ghana","s":[60.8,50.2,63.1,49.3,47.8,68.0,54.2],"y0":1990,"step":5},{"n":"Iran","s":[33.8,34.4,36.5,34.8,38.3,38.7,32.3],"y0":1990,"step":5},{"n":"Indonesia","s":[29.8,28.2,26.2,24.4,20.6,18.7,17.9],"y0":1990,"step":5},{"n":"Brazil","s":[15.4,15.5,15.6,15.4,14.9,12.4,12.2],"y0":1990,"step":5},{"n":"Germany","s":[22.5,20.7,18.1,16.6,16.2,12.8,10.3],"y0":1990,"step":5},{"n":"France","s":[18.3,17.3,16.1,14.9,13.8,11.3,9.6],"y0":1990,"step":5},{"n":"Japan","s":[13.4,13.1,13.2,12.3,10.9,12.9,12.8],"y0":1990,"step":5},{"n":"Australia","s":[7.8,7.4,7.5,7.0,7.4,7.2,8.3],"y0":1990,"step":5},{"n":"Finland","s":[9.3,8.7,8.0,7.5,7.0,5.6,4.9],"y0":1990,"step":5}];
+
+const W = 780, H = 460;
+const margin = { top: 40, right: 140, bottom: 36, left: 54 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 1990, yearMax = 2020;
+const valMin = 0, valMax = 85;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+function colorForPM25(val) {
+  if (val > 45) return "#B34B3B";
+  if (val > 35) return "#EA5E33";
+  if (val > 25) return "#C49A45";
+  if (val > 15) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+// Grid lines
+[0, 10, 20, 30, 40, 50, 60, 70, 80].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end", fill: "#7A786F",
+    "font-family": "JetBrains Mono,monospace", "font-size": "9"
+  });
+  lbl.textContent = v;
+  svg.appendChild(lbl);
+});
+
+// WHO guideline reference line at 15
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: yScale(15),
+  x2: W - margin.right, y2: yScale(15),
+  stroke: "#7A786F", "stroke-dasharray": "4,3", "stroke-width": "0.8"
+}));
+const whoLbl = mkEl("text", {
+  x: W - margin.right + 4, y: yScale(15) + 3,
+  fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "8"
+});
+whoLbl.textContent = "WHO IT-3";
+svg.appendChild(whoLbl);
+
+// X axis ticks
+const years = [1990, 1995, 2000, 2005, 2010, 2015, 2020];
+years.forEach(y => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: H - margin.bottom,
+    x2: xScale(y), y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 14,
+    "text-anchor": "middle", fill: "#7A786F",
+    "font-family": "JetBrains Mono,monospace", "font-size": "9"
+  });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+// Y axis label
+const yAxisLabel = mkEl("text", {
+  x: 12, y: margin.top + (H - margin.top - margin.bottom) / 2,
+  "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "Inter,sans-serif", "font-size": "9",
+  transform: `rotate(-90, 12, ${margin.top + (H - margin.top - margin.bottom) / 2})`
+});
+yAxisLabel.textContent = "μg/m³";
+svg.appendChild(yAxisLabel);
+
+// Resolve endpoint label collisions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to chart bounds
+  sorted.forEach(item => {
+    item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 6, item.y));
+  });
+  return sorted;
+}
+
+// Build label positions from endpoint values
+const labelItems = data.map(d => {
+  const lastVal = d.s[d.s.length - 1];
+  return { n: d.n, val: lastVal, y: yScale(lastVal), origY: yScale(lastVal), color: colorForPM25(lastVal) };
+});
+const resolvedLabels = resolveCollisions(labelItems, 11);
+const labelMap = {};
+resolvedLabels.forEach(item => { labelMap[item.n] = item; });
+
+// Draw lines
+const groups = [];
+data.forEach(d => {
+  const lastVal = d.s[d.s.length - 1];
+  const color = colorForPM25(lastVal);
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i * d.step, value: v }));
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Line path
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+  const line = mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  // Endpoint dot
+  const endX = xScale(pts[pts.length - 1].year);
+  const endY = yScale(pts[pts.length - 1].value);
+  const dot = mkEl("circle", { cx: endX, cy: endY, r: "2.5", fill: color });
+  g.appendChild(dot);
+
+  // Leader line from endpoint to label
+  const lbl = labelMap[d.n];
+  if (Math.abs(lbl.y - endY) > 2) {
+    const leader = mkEl("line", {
+      x1: endX + 3, y1: endY,
+      x2: W - margin.right + 6, y2: lbl.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    });
+    g.appendChild(leader);
+  }
+
+  // Endpoint label
+  const text = mkEl("text", {
+    x: W - margin.right + 8, y: lbl.y + 3.5,
+    fill: color, "font-family": "JetBrains Mono,monospace",
+    "font-size": "9", "font-weight": "500"
+  });
+  text.textContent = `${lastVal.toFixed(1)}  ${d.n}`;
+  g.appendChild(text);
+
+  // Wide invisible hit area
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+  });
+  g.appendChild(hit);
+
+  groups.push({ g, d, color, pts, line });
+  svg.appendChild(g);
+});
+
+// Tooltip and hover
+const tip = document.getElementById("tip");
+
+groups.forEach(({ g, d, color, pts, line }) => {
+  g.addEventListener("mousemove", e => {
+    // Isolate this line
+    groups.forEach(other => {
+      other.g.style.opacity = other.d.n === d.n ? "1" : "0.08";
+    });
+    line.setAttribute("stroke-width", "2.5");
+
+    // Find nearest year
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const idx = Math.round(ratio * (pts.length - 1));
+    const pt = pts[idx];
+
+    tip.textContent = `${d.n} (${pt.year}): ${pt.value.toFixed(1)} μg/m³`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+
+  g.addEventListener("mouseleave", () => {
+    groups.forEach(other => { other.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+// Chart frame
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: margin.top,
+  x2: margin.left, y2: H - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "0.5"
+}));
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: H - margin.bottom,
+  x2: W - margin.right, y2: H - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "0.5"
+}));
+
+// Legend
+const legend = [
+  { color: "#B34B3B", label: "> 45 μg/m³ (very high)" },
+  { color: "#EA5E33", label: "35–45 μg/m³ (high)" },
+  { color: "#C49A45", label: "25–35 μg/m³ (moderate)" },
+  { color: "#8BAD72", label: "15–25 μg/m³ (approaching IT-3)" },
+  { color: "#3D7A5A", label: "< 15 μg/m³ (at or below IT-3)" },
+];
+legend.forEach((l, i) => {
+  const lx = margin.left + i * 150;
+  const ly = 14;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 10, height: 7, fill: l.color }));
+  const lt = mkEl("text", { x: lx + 13, y: ly, fill: "#7A786F", "font-family": "Inter,sans-serif", "font-size": "8" });
+  lt.textContent = l.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>
