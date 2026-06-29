@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>COVID-19 and International Tourism: The 2020 Collapse</h1>
+<p class="subtitle">International tourist arrivals in 2019 vs 2020. The pandemic caused an unprecedented drop across all major destinations — Asia-Pacific saw the steepest declines as border closures took effect earliest and longest.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank / UN World Tourism Organization — Indicator ST.INT.ARVL</p>
+
+<script>
+// n=source country name, d=display name, y=year of 'a', a=2019 arrivals (raw), b=2020 arrivals (raw)
+const data = [{"n":"France","d":"France","y":2019,"a":217877000,"b":117109000},{"n":"China","d":"China","y":2019,"a":162538000,"b":30402000},{"n":"Italy","d":"Italy","y":2019,"a":95399000,"b":38419000},{"n":"Hungary","d":"Hungary","y":2019,"a":61397000,"b":31641000},{"n":"Croatia","d":"Croatia","y":2019,"a":60021000,"b":21608000},{"n":"Hong Kong SAR, China","d":"Hong Kong","y":2019,"a":55913000,"b":3569000},{"n":"Germany","d":"Germany","y":2019,"a":39563000,"b":12449000},{"n":"Greece","d":"Greece","y":2019,"a":34005000,"b":7406000},{"n":"Austria","d":"Austria","y":2019,"a":31884000,"b":15091000},{"n":"Japan","d":"Japan","y":2019,"a":31881000,"b":4115800},{"n":"Korea, Rep.","d":"South Korea","y":2019,"a":17503000,"b":2519000},{"n":"Indonesia","d":"Indonesia","y":2019,"a":16107000,"b":4053000}];
+
+function fmt(v) { return (v / 1e6).toFixed(1) + "M"; }
+
+const W = 700, H = 560;
+const pad = { left: 130, right: 150, top: 48, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = Math.max(...data.map(d => d.a)) * 1.08;
+const minV = 0;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+function colorForDrop(pctDrop) {
+  if (pctDrop >= 85) return "#B34B3B";
+  if (pctDrop >= 70) return "#EA5E33";
+  if (pctDrop >= 55) return "#F29A44";
+  if (pctDrop >= 40) return "#C49A45";
+  return "#8BAD72";
+}
+
+// Column headers
+[{x: leftX, label: "2019"}, {x: rightX, label: "2020"}].forEach(col => {
+  const t = mkEl("text", {
+    x: col.x, y: pad.top - 20,
+    "text-anchor": "middle", fill: "#7A786F",
+    "font-family": "JetBrains Mono,monospace", "font-size": "11", "font-weight": "500"
+  });
+  t.textContent = col.label;
+  svg.appendChild(t);
+  svg.appendChild(mkEl("line", {
+    x1: col.x, y1: pad.top - 12,
+    x2: col.x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 60; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(item => {
+    item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, item.y));
+  });
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b) }));
+const resolvedLeft = resolveCollisions(leftLabels, 13);
+const resolvedRight = resolveCollisions(rightLabels, 13);
+const leftMap = {}, rightMap = {};
+resolvedLeft.forEach(l => { leftMap[l.n] = l; });
+resolvedRight.forEach(l => { rightMap[l.n] = l; });
+
+const rows = [];
+data.forEach(d => {
+  const pctDrop = ((d.a - d.b) / d.a) * 100;
+  const color = colorForDrop(pctDrop);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const y1 = scale(d.a);
+  const y2 = scale(d.b);
+  const line = mkEl("line", {
+    x1: leftX, y1, x2: rightX, y2,
+    stroke: color, "stroke-width": "1.5", opacity: "0.85"
+  });
+  g.appendChild(line);
+
+  g.appendChild(mkEl("circle", { cx: leftX, cy: y1, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: rightX, cy: y2, r: "3", fill: color }));
+
+  const ll = leftMap[d.n];
+  const rl = rightMap[d.n];
+
+  if (Math.abs(ll.y - y1) > 1) {
+    g.appendChild(mkEl("line", { x1: leftX - 3, y1, x2: leftX - 8, y2: ll.y, stroke: color, "stroke-width": "0.4", opacity: "0.5" }));
+  }
+  if (Math.abs(rl.y - y2) > 1) {
+    g.appendChild(mkEl("line", { x1: rightX + 3, y1: y2, x2: rightX + 8, y2: rl.y, stroke: color, "stroke-width": "0.4", opacity: "0.5" }));
+  }
+
+  const leftTxt = mkEl("text", {
+    x: leftX - 12, y: ll.y + 3.5,
+    "text-anchor": "end", fill: color,
+    "font-family": "JetBrains Mono,monospace", "font-size": "9"
+  });
+  leftTxt.textContent = `${d.d}  ${fmt(d.a)}`;
+  g.appendChild(leftTxt);
+
+  const rightTxt = mkEl("text", {
+    x: rightX + 12, y: rl.y + 3.5,
+    "text-anchor": "start", fill: color,
+    "font-family": "JetBrains Mono,monospace", "font-size": "9"
+  });
+  rightTxt.textContent = `${fmt(d.b)}  −${pctDrop.toFixed(0)}%`;
+  g.appendChild(rightTxt);
+
+  const hit = mkEl("line", {
+    x1: leftX, y1, x2: rightX, y2,
+    stroke: "transparent", "stroke-width": "14"
+  });
+  g.appendChild(hit);
+
+  rows.push({ g, d, color, line });
+  svg.appendChild(g);
+});
+
+const tip = document.getElementById("tip");
+rows.forEach(({ g, d, color, line }) => {
+  g.addEventListener("mousemove", e => {
+    rows.forEach(r => { r.g.style.opacity = r.d.n === d.n ? "1" : "0.1"; });
+    line.setAttribute("stroke-width", "3");
+    const pctDrop = ((d.a - d.b) / d.a * 100).toFixed(0);
+    tip.textContent = `${d.d}: ${fmt(d.a)} (2019) → ${fmt(d.b)} (2020) — ↓${pctDrop}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    rows.forEach(r => { r.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+// Legend
+const legendItems = [
+  { color: "#B34B3B", label: "≥ 85% drop" },
+  { color: "#EA5E33", label: "70–85% drop" },
+  { color: "#F29A44", label: "55–70% drop" },
+  { color: "#C49A45", label: "40–55% drop" },
+  { color: "#8BAD72", label: "< 40% drop" },
+];
+legendItems.forEach((l, i) => {
+  const lx = pad.left + i * 106;
+  const ly = 16;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 10, height: 7, fill: l.color }));
+  const lt = mkEl("text", { x: lx + 13, y: ly, fill: "#7A786F", "font-family": "Inter,sans-serif", "font-size": "8" });
+  lt.textContent = l.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>
