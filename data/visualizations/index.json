@@ -5858,7 +5858,75 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Universal Health Coverage: Progress Since 2000",
+      "description": "Slope chart comparing each country's earliest UHC Service Coverage Index value (~2000\u20132005) with its most recent (~2019\u20132023). Rwanda rose 37 points; India gained 33. Persistent gaps remain between sub-Saharan Africa and high-income countries.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Rwanda gained 37 index points \u2014 the largest absolute improvement in the set",
+        "India rose from 36 to 69, driven by expanded primary care and immunization programs",
+        "Canada leads at 92; Ethiopia remains at 33, the lowest in this selection"
+      ],
+      "createdAt": "2026-06-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "The Aging Wave: Old-Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines for 12 countries showing the elderly population (65+) as a share of the working-age population. Japan leads at 51%, having nearly doubled in 30 years. China and South Korea are accelerating; sub-Saharan Africa remains below 6%.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Japan's old-age dependency ratio hit 50.7% in 2024, more than 5\u00d7 its 1960 value",
+        "South Korea rose from 6% in 1970 to 27.5% in 2024, accelerating sharply",
+        "Kenya and Ethiopia have stayed below 6% throughout, reflecting younger demographics"
+      ],
+      "createdAt": "2026-06-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Investment Divergence: Gross Fixed Capital Formation, 1990 vs. 2022",
+      "description": "Slope chart showing capital investment as a share of GDP for 14 countries. China's rate rose from 24% to 41%; Bangladesh jumped from 17% to 32%. Japan and Korea both declined as their economies matured.",
+      "datasetIds": [
+        "wb--NE-GDI-FTOT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "China raised its investment rate +17 percentage points to 41% \u2014 highest in this set",
+        "Bangladesh surged from 17% to 32%, reflecting its infrastructure and manufacturing boom",
+        "Japan fell from 35% to 26%, and Korea from 37% to 32%, as both economies matured"
+      ],
+      "createdAt": "2026-06-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Economic Convergence? GNI per Capita, PPP \u2014 1990 vs. 2024",
+      "description": "Slope chart of purchasing-power-parity income for 18 countries. China rose 27\u00d7 from  to ,900; Bangladesh and India roughly 10\u00d7. Burundi and Chad remain below ,000, barely changed in real purchasing power.",
+      "datasetIds": [
+        "wb--NY-GNP-PCAP-PP-CD"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "China grew 27\u00d7 in PPP terms \u2014 from  to ,900 \u2014 the most dramatic rise in the set",
+        "South Korea climbed from ,600 to ,900, overtaking several European economies",
+        "Burundi rose only from  to ,200 in 34 years, illustrating persistent divergence"
+      ],
+      "createdAt": "2026-06-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-06-30T00:00:00.000Z"
 }
