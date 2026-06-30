@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; font-family: 'JetBrains Mono', monospace; }
+  .leg-swatch { width: 12px; height: 3px; border-radius: 1px; }
+</style></head>
+<body>
+<h1>Universal Health Coverage: Progress Since 2000</h1>
+<p class="subtitle">UHC Service Coverage Index (0–100) comparing each country's earliest available value (~2000–2005) with its most recent (~2019–2023). The index tracks essential health services from reproductive care to infectious disease treatment.</p>
+<div class="legend">
+  <div class="leg-item"><div class="leg-swatch" style="background:#EA5E33"></div> +30 or more</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#F29A44"></div> +20 to 29</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#C49A45"></div> +10 to 19</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#A6C4A2"></div> under +10</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — UHC Service Coverage Index (SDG 3.8.1)</p>
+<script>
+const data = [
+  {"n":"Ethiopia","a":14,"b":33},{"n":"Guinea","a":19,"b":43},{"n":"Niger","a":19,"b":37},
+  {"n":"Rwanda","a":21,"b":58},{"n":"Malawi","a":24,"b":53},{"n":"Equatorial Guinea","a":24,"b":49},
+  {"n":"Uganda","a":25,"b":52},{"n":"Liberia","a":25,"b":49},{"n":"Nepal","a":28,"b":58},
+  {"n":"India","a":36,"b":69},{"n":"Pakistan","a":37,"b":56},{"n":"Bhutan","a":50,"b":69},
+  {"n":"China","a":65,"b":85},{"n":"Cuba","a":74,"b":86},{"n":"Norway","a":76,"b":89},
+  {"n":"Japan","a":78,"b":85},{"n":"UK","a":80,"b":88},{"n":"Belgium","a":82,"b":86},
+  {"n":"New Zealand","a":84,"b":89},{"n":"Canada","a":85,"b":92}
+];
+
+const W = 700, H = 620;
+const pad = { left: 150, right: 155, top: 55, bottom: 25 };
+const minV = 8, maxV = 97;
+
+function colorForChange(d) {
+  const ch = d.b - d.a;
+  if (ch >= 30) return "#EA5E33";
+  if (ch >= 20) return "#F29A44";
+  if (ch >= 10) return "#C49A45";
+  return "#A6C4A2";
+}
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to bounds
+  const topBound = pad.top;
+  const botBound = H - pad.bottom;
+  for (let i = 0; i < sorted.length; i++) sorted[i].y = Math.max(topBound, Math.min(botBound, sorted[i].y));
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xL = pad.left, xR = W - pad.right;
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 10, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 10, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+// Year headers
+function mono(text, x, y, anchor) {
+  const t = mkEl("text", { x, y, "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F", "text-anchor": anchor });
+  t.textContent = text;
+  return t;
+}
+svg.appendChild(mono("~2002", xL, pad.top - 16, "middle"));
+svg.appendChild(mono("~2022", xR, pad.top - 16, "middle"));
+
+// Grid lines
+[20, 40, 60, 80].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mono(String(v), xL - 8, scale(v) + 3, "end");
+  t.setAttribute("font-size", "9");
+  svg.appendChild(t);
+});
+
+// Compute label positions
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+const leftResolved = resolveCollisions(leftLabels, 12);
+const rightResolved = resolveCollisions(rightLabels, 12);
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Connecting line
+  const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5", opacity: "1" });
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "3", fill: color }));
+
+  // Invisible hit area
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  groups.push({ g, line, color });
+
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach((gr, j) => {
+      gr.g.style.opacity = j === i ? "1" : "0.12";
+    });
+    const ch = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a} → ${d.b} (+${ch})`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gr => gr.g.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+});
+
+// Labels
+function addLabel(item, x, anchor) {
+  const origY = scale(item.d.a);
+  const labelY = item.y;
+  const color = colorForChange(item.d);
+  const val = anchor === "end" ? item.d.a : item.d.b;
+  const name = item.d.n;
+  const text = anchor === "end" ? `${name}  ${val}` : `${val}  ${name}`;
+
+  // Leader line if displaced
+  const dotY = anchor === "end" ? scale(item.d.a) : scale(item.d.b);
+  if (Math.abs(labelY - dotY) > 4) {
+    const lx = anchor === "end" ? x + 5 : x - 5;
+    svg.appendChild(mkEl("line", { x1: lx, y1: dotY, x2: x + (anchor === "end" ? 3 : -3), y2: labelY, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x);
+  t.setAttribute("y", labelY + 3);
+  t.setAttribute("text-anchor", anchor);
+  t.setAttribute("font-size", "9");
+  t.setAttribute("font-family", "'Inter',sans-serif");
+  t.setAttribute("fill", "#2B2A27");
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+leftResolved.forEach(item => addLabel(item, xL - 6, "end"));
+rightResolved.forEach(item => addLabel(item, xR + 6, "start"));
+</script>
+</body></html>

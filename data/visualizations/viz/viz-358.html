@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head>
+<body>
+<h1>The Aging Wave: Old-Age Dependency Ratio, 1960–2024</h1>
+<p class="subtitle">Elderly population (65+) as a share of the working-age population (15–64). A rising ratio means fewer workers supporting each retiree. Japan leads a global wave that is now reaching China and South Korea.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Age Dependency Ratio, Old (SP.POP.DPND.OL)</p>
+<script>
+const data = [
+  {"n":"Japan","pts":[{"y":1960,"v":8.9},{"y":1965,"v":9.2},{"y":1970,"v":10.1},{"y":1975,"v":11.6},{"y":1980,"v":13.4},{"y":1985,"v":15.2},{"y":1990,"v":17.4},{"y":1995,"v":21.0},{"y":2000,"v":25.6},{"y":2005,"v":30.7},{"y":2010,"v":36.4},{"y":2015,"v":44.7},{"y":2020,"v":49.1},{"y":2024,"v":50.7}]},
+  {"n":"Italy","pts":[{"y":1960,"v":14.5},{"y":1965,"v":15.5},{"y":1970,"v":17.2},{"y":1975,"v":19.1},{"y":1980,"v":20.5},{"y":1985,"v":19.5},{"y":1990,"v":21.8},{"y":1995,"v":24.9},{"y":2000,"v":27.0},{"y":2005,"v":29.6},{"y":2010,"v":31.2},{"y":2015,"v":34.3},{"y":2020,"v":36.6},{"y":2024,"v":38.8}]},
+  {"n":"Germany","pts":[{"y":1960,"v":17.1},{"y":1965,"v":19.3},{"y":1970,"v":21.6},{"y":1975,"v":23.3},{"y":1980,"v":23.7},{"y":1985,"v":20.9},{"y":1990,"v":21.5},{"y":1995,"v":22.5},{"y":2000,"v":24.2},{"y":2005,"v":28.3},{"y":2010,"v":31.3},{"y":2015,"v":32.0},{"y":2020,"v":33.9},{"y":2024,"v":36.9}]},
+  {"n":"France","pts":[{"y":1960,"v":18.6},{"y":1965,"v":19.4},{"y":1970,"v":20.6},{"y":1975,"v":21.5},{"y":1980,"v":21.9},{"y":1985,"v":19.6},{"y":1990,"v":21.2},{"y":1995,"v":23.1},{"y":2000,"v":24.6},{"y":2005,"v":25.3},{"y":2010,"v":25.9},{"y":2015,"v":30.0},{"y":2020,"v":33.6},{"y":2024,"v":36.1}]},
+  {"n":"South Korea","pts":[{"y":1970,"v":6.2},{"y":1975,"v":6.2},{"y":1980,"v":6.2},{"y":1985,"v":6.5},{"y":1990,"v":7.1},{"y":1995,"v":8.1},{"y":2000,"v":9.9},{"y":2005,"v":12.5},{"y":2010,"v":15.1},{"y":2015,"v":17.7},{"y":2020,"v":22.0},{"y":2024,"v":27.5}]},
+  {"n":"China","pts":[{"y":1960,"v":7.1},{"y":1965,"v":6.6},{"y":1970,"v":6.7},{"y":1975,"v":7.1},{"y":1980,"v":7.4},{"y":1985,"v":7.6},{"y":1990,"v":8.1},{"y":1995,"v":9.1},{"y":2000,"v":10.3},{"y":2005,"v":11.0},{"y":2010,"v":11.9},{"y":2015,"v":14.0},{"y":2020,"v":18.2},{"y":2024,"v":21.2}]},
+  {"n":"Argentina","pts":[{"y":1960,"v":8.3},{"y":1965,"v":9.4},{"y":1970,"v":10.4},{"y":1975,"v":11.4},{"y":1980,"v":12.5},{"y":1985,"v":13.2},{"y":1990,"v":14.1},{"y":1995,"v":15.0},{"y":2000,"v":15.5},{"y":2005,"v":15.8},{"y":2010,"v":16.3},{"y":2015,"v":17.2},{"y":2020,"v":18.3},{"y":2024,"v":18.8}]},
+  {"n":"Brazil","pts":[{"y":1960,"v":4.7},{"y":1965,"v":5.1},{"y":1970,"v":5.4},{"y":1975,"v":5.8},{"y":1980,"v":6.1},{"y":1985,"v":6.3},{"y":1990,"v":6.8},{"y":1995,"v":7.4},{"y":2000,"v":7.9},{"y":2005,"v":8.6},{"y":2010,"v":9.7},{"y":2015,"v":11.4},{"y":2020,"v":13.8},{"y":2024,"v":15.9}]},
+  {"n":"India","pts":[{"y":1960,"v":5.9},{"y":1965,"v":6.5},{"y":1970,"v":6.7},{"y":1975,"v":6.9},{"y":1980,"v":7.0},{"y":1985,"v":7.0},{"y":1990,"v":7.0},{"y":1995,"v":7.2},{"y":2000,"v":7.3},{"y":2005,"v":7.6},{"y":2010,"v":7.8},{"y":2015,"v":8.3},{"y":2020,"v":9.5},{"y":2024,"v":10.5}]},
+  {"n":"Bangladesh","pts":[{"y":1960,"v":5.3},{"y":1965,"v":5.4},{"y":1970,"v":5.8},{"y":1975,"v":6.0},{"y":1980,"v":6.6},{"y":1985,"v":6.7},{"y":1990,"v":6.5},{"y":1995,"v":6.1},{"y":2000,"v":5.8},{"y":2005,"v":6.2},{"y":2010,"v":6.8},{"y":2015,"v":7.7},{"y":2020,"v":9.0},{"y":2024,"v":9.9}]},
+  {"n":"Ethiopia","pts":[{"y":1960,"v":5.1},{"y":1965,"v":5.0},{"y":1970,"v":5.3},{"y":1975,"v":5.4},{"y":1980,"v":5.5},{"y":1985,"v":5.3},{"y":1990,"v":5.4},{"y":1995,"v":5.3},{"y":2000,"v":5.3},{"y":2005,"v":5.3},{"y":2010,"v":5.3},{"y":2015,"v":5.4},{"y":2020,"v":5.4},{"y":2024,"v":5.6}]},
+  {"n":"Kenya","pts":[{"y":1960,"v":6.7},{"y":1965,"v":5.5},{"y":1970,"v":4.9},{"y":1975,"v":4.5},{"y":1980,"v":4.5},{"y":1985,"v":4.4},{"y":1990,"v":4.4},{"y":1995,"v":4.4},{"y":2000,"v":4.3},{"y":2005,"v":4.1},{"y":2010,"v":3.9},{"y":2015,"v":4.4},{"y":2020,"v":4.8},{"y":2024,"v":4.9}]}
+];
+
+const colors = [
+  "#EA5E33","#F29A44","#C49A45","#8BAD72","#A6C4A2",
+  "#5B9E78","#3D7A5A","#6B8FB5","#9A7EC4","#C47EA2",
+  "#B34B3B","#7A786F"
+];
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 130, bottom: 30, left: 52 };
+
+const allYears = [...new Set(data.flatMap(d => d.pts.map(p => p.y)))].sort((a, b) => a - b);
+const yearMin = Math.min(...allYears), yearMax = Math.max(...allYears);
+const allVals = data.flatMap(d => d.pts.map(p => p.v));
+const valMin = 0, valMax = 55;
+
+function xScale(year) {
+  return margin.left + (year - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+}
+function yScale(val) {
+  return margin.top + (valMax - val) / (valMax - valMin) * (H - margin.top - margin.bottom);
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid lines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3, "text-anchor": "end", "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X axis ticks
+[1960, 1980, 2000, 2020].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x, y: H - margin.bottom + 13, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+// Annotation band for "high aging" threshold
+svg.appendChild(mkEl("rect", {
+  x: margin.left, y: yScale(30),
+  width: W - margin.left - margin.right,
+  height: yScale(20) - yScale(30),
+  fill: "#EA5E33", opacity: "0.05"
+}));
+
+const tip = document.getElementById("tip");
+const allGroups = [];
+
+data.forEach((series, si) => {
+  const color = colors[si];
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const pts = series.pts;
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.6", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  // Invisible wide hit path
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none" });
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  allGroups.push({ g, line });
+
+  hit.addEventListener("mouseenter", e => {
+    allGroups.forEach((gr, j) => {
+      gr.g.style.opacity = j === si ? "1" : "0.08";
+      if (j === si) gr.line.setAttribute("stroke-width", "2.5");
+    });
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    const closest = pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best, pts[0]);
+    tip.textContent = `${series.n} ${closest.y}: ${closest.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    allGroups.forEach(gr => {
+      gr.g.style.opacity = "1";
+      gr.line.setAttribute("stroke-width", "1.6");
+    });
+    tip.style.opacity = "0";
+  });
+});
+
+// Endpoint labels with collision resolution
+const endpoints = data.map((series, si) => ({
+  si,
+  y: yScale(series.pts[series.pts.length - 1].v),
+  n: series.n,
+  v: series.pts[series.pts.length - 1].v,
+  color: colors[si]
+}));
+const resolved = resolveCollisions(endpoints, 12);
+const xEnd = W - margin.right + 6;
+resolved.forEach(item => {
+  const dotY = yScale(data[item.si].pts[data[item.si].pts.length - 1].v);
+  if (Math.abs(item.y - dotY) > 4) {
+    svg.appendChild(mkEl("line", { x1: xEnd - 2, y1: dotY, x2: xEnd - 2, y2: item.y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  const t = mkEl("text", { x: xEnd, y: item.y + 3, "text-anchor": "start", "font-size": "9", "font-family": "'JetBrains Mono',monospace", fill: item.color });
+  t.textContent = `${item.v}  ${item.n}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>

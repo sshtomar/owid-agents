@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; font-family: 'JetBrains Mono', monospace; }
+  .leg-swatch { width: 12px; height: 3px; border-radius: 1px; }
+</style></head>
+<body>
+<h1>Economic Convergence? GNI per Capita, PPP — 1990 vs. 2024</h1>
+<p class="subtitle">GNI per capita in purchasing-power-parity dollars (international $, current prices). PPP adjusts for local price levels, making incomes more comparable across countries. China and South Korea show the most dramatic rises; several African countries remain nearly flat.</p>
+<div class="legend">
+  <div class="leg-item"><div class="leg-swatch" style="background:#EA5E33"></div> 8× increase or more</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#F29A44"></div> 4× to 8×</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#C49A45"></div> 2× to 4×</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#A6C4A2"></div> under 2×</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — GNI per Capita, PPP (NY.GNP.PCAP.PP.CD)</p>
+<script>
+// Values in thousands of int'l $
+const data = [
+  {"n":"Burundi","from":0.6,"to":1.2},
+  {"n":"Ethiopia","from":0.4,"to":3.3},
+  {"n":"Chad","from":1.0,"to":2.7},
+  {"n":"Haiti","from":2.2,"to":3.2},
+  {"n":"Kenya","from":1.7,"to":6.5},
+  {"n":"Bolivia","from":2.7,"to":12.6},
+  {"n":"Egypt","from":3.5,"to":18.2},
+  {"n":"Bangladesh","from":0.95,"to":10.1},
+  {"n":"India","from":1.2,"to":11.0},
+  {"n":"Albania","from":2.7,"to":26.5},
+  {"n":"Brazil","from":6.5,"to":21.6},
+  {"n":"Argentina","from":6.8,"to":29.8},
+  {"n":"China","from":1.0,"to":26.9},
+  {"n":"Japan","from":20.1,"to":55.5},
+  {"n":"South Korea","from":8.6,"to":61.9},
+  {"n":"Australia","from":16.8,"to":69.6},
+  {"n":"Germany","from":19.7,"to":76.2},
+  {"n":"Belgium","from":18.8,"to":74.8}
+];
+
+const W = 720, H = 580;
+const pad = { left: 115, right: 130, top: 55, bottom: 25 };
+const minV = 0, maxV = 80;
+
+function colorForChange(d) {
+  const ratio = d.to / (d.from || 0.01);
+  if (ratio >= 8) return "#EA5E33";
+  if (ratio >= 4) return "#F29A44";
+  if (ratio >= 2) return "#C49A45";
+  return "#A6C4A2";
+}
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 50; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topB = pad.top, botB = H - pad.bottom;
+  for (const item of sorted) item.y = Math.max(topB, Math.min(botB, item.y));
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xL = pad.left, xR = W - pad.right;
+
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 12, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 12, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+function mono(text, x, y, anchor) {
+  const t = mkEl("text", { x, y, "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F", "text-anchor": anchor });
+  t.textContent = text;
+  return t;
+}
+svg.appendChild(mono("1990", xL, pad.top - 18, "middle"));
+svg.appendChild(mono("2024", xR, pad.top - 18, "middle"));
+
+// Grid + labels
+[0, 10, 20, 30, 40, 50, 60, 70, 80].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mono("$" + v + "k", xL - 8, scale(v) + 3, "end");
+  t.setAttribute("font-size", "9");
+  svg.appendChild(t);
+});
+
+const leftLabels = data.map(d => ({ d, y: scale(d.from) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.to) }));
+const leftResolved = resolveCollisions(leftLabels, 12);
+const rightResolved = resolveCollisions(rightLabels, 12);
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const ya = scale(d.from), yb = scale(d.to);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  g.appendChild(mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5" }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "3", fill: color }));
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  groups.push({ g });
+
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach((gr, j) => { gr.g.style.opacity = j === i ? "1" : "0.1"; });
+    const ratio = (d.to / d.from).toFixed(1);
+    tip.textContent = `${d.n}: $${d.from}k → $${d.to}k (×${ratio})`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gr => { gr.g.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+});
+
+function addLabel(item, x, anchor) {
+  const dotY = anchor === "end" ? scale(item.d.from) : scale(item.d.to);
+  const labelY = item.y;
+  const color = colorForChange(item.d);
+  const val = anchor === "end" ? item.d.from : item.d.to;
+  const name = item.d.n;
+  const text = anchor === "end" ? `${name}  $${val}k` : `$${val}k  ${name}`;
+
+  if (Math.abs(labelY - dotY) > 5) {
+    const lx = anchor === "end" ? x + 4 : x - 4;
+    svg.appendChild(mkEl("line", { x1: lx, y1: dotY, x2: anchor === "end" ? x + 3 : x - 3, y2: labelY, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const t = mkEl("text", { x, y: labelY + 3, "text-anchor": anchor, "font-size": "9", "font-family": "'Inter',sans-serif", fill: "#2B2A27" });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+leftResolved.forEach(item => addLabel(item, xL - 6, "end"));
+rightResolved.forEach(item => addLabel(item, xR + 6, "start"));
+</script>
+</body></html>
