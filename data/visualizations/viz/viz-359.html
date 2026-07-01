@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; max-width: 800px; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; }
+  .cell:nth-child(5n) { border-right: none; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 3px; }
+  .cell-val { font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #7A786F; }
+  canvas { display: block; width: 100%; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Population Density Trends, 1990–2022 (people per sq. km)</h1>
+<p class="subtitle">Each sparkline shows how densely packed a country's land area has become over three decades. Bangladesh approaches 1,300 people per square kilometre — nearly nine times India's density. Japan and Germany are starting to thin as populations shrink.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Population Density</p>
+<script>
+const data = [
+  {"n":"Bangladesh","s":[857.6,874.1,890.8,907.5,924.5,941.8,959.2,977.2,995.8,1014.9,1033.6,1051,1067.3,1083,1097.8,1111.7,1124.7,1136.9,1148.3,1159.1,1169.3,1179.9,1191.3,1202.5,1213.5,1224.4,1235.4,1246,1256.2,1266.9,1277.5,1288,1300.4],"y0":1990},
+  {"n":"South Korea","s":[444.4,448.8,453.5,458.2,462.8,467.5,472,476.4,479.9,483.3,487.3,489.7,492.2,494.8,496.6,497.5,500,502.3,505.8,508,509.8,513.8,515.9,517.6,520.9,523.5,525.4,526.7,529,530.4,531.1,530.4,529.4],"y0":1990},
+  {"n":"India","s":[290.9,297.3,303.7,310.1,316.6,323,329.5,336,342.6,349.2,355.8,362.5,369.2,375.6,382.1,388.4,394.5,400.5,406.3,412.2,418.2,424.2,430.1,435.8,441.4,446.7,452,457.3,462.4,467.2,471.8,475.7,479.4],"y0":1990},
+  {"n":"Japan","s":[338.7,340,341.3,342.4,343.3,344.1,345,345.8,346.8,347.4,348,348.8,349.6,350.4,350.5,350.5,350.8,351.2,351.3,351.3,351.4,350.7,350.1,349.6,349.2,348.8,348.6,348.3,347.9,347.4,346.4,344.8,343.3],"y0":1990},
+  {"n":"Germany","s":[227.5,229.2,230.9,232.5,233.3,234,234.7,235,235.1,235.3,235.6,236,236.5,236.6,236.6,236.5,236.2,235.9,235.5,234.9,234.6,230.3,230.8,231.2,232.1,234.2,235.7,236.6,237.3,237.8,238,238.1,238.1],"y0":1990},
+  {"n":"Italy","s":[192.9,193,193.1,193.2,193.3,193.3,193.3,193.4,193.5,193.5,192.6,192.7,193.1,194.1,195.6,196.7,197.5,198.7,200.2,201.4,202.3,203,203.5,203.9,204,203.7,203.3,202.9,202.5,202,201,200,199.6],"y0":1990},
+  {"n":"China","s":[120.9,122.6,124.1,125.5,126.9,128.3,129.7,131,132.3,133.4,134.5,135.5,136.4,137.2,138.1,138.9,139.6,140.4,141.1,141.8,142.5,143.3,144.2,145.2,146.1,147,147.8,148.7,149.4,149.9,150.3,150.4,150.4],"y0":1990},
+  {"n":"Indonesia","s":[101.3,103.1,104.9,106.7,108.5,110.3,112.2,114,115.8,117.6,115.1,116.7,118.3,119.9,121.4,123,124.6,126.3,127.9,129.5,131.2,132.9,134.6,136.3,137.9,139.4,140.9,142.4,143.8,145.1,146.4,146.2,147.3],"y0":1990},
+  {"n":"France","s":[108.1,108.6,109.2,109.7,110.1,110.5,110.9,111.3,111.7,112.3,113,113.9,114.7,115.5,116.4,117.2,118,118.8,119.4,120.1,120.7,121.2,121.8,122.5,123,123.5,123.8,124.2,124.6,125,125.4,125.9,126.5],"y0":1990},
+  {"n":"Egypt","s":[58.7,60.3,61.8,63.2,64.6,66,67.3,68.7,70.3,71.8,73.4,75,76.6,78.2,79.8,81.5,83.1,84.7,86.3,87.9,89.6,91.5,93.6,95.8,98,100.1,102.1,104.2,106.2,108,109.8,111.5,113.1],"y0":1990},
+  {"n":"Kenya","s":[40.2,41.5,42.8,44.1,45.4,46.7,48,49.4,50.8,52.2,53.8,55.6,57.3,59.1,61,62.9,64.8,66.8,68.9,71,73.1,75.1,77.1,79,80.9,82.5,84,85.6,87,88.4,89.9,91.6,93.4],"y0":1990},
+  {"n":"Colombia","s":[29.2,29.8,30.4,31,31.7,32.3,32.9,33.5,34.1,34.7,35.2,35.8,36.3,36.9,37.4,38,38.5,39,39.4,39.9,40.4,40.8,41.2,41.6,42,42.3,42.8,43.4,44.2,45,45.6,46.1,46.6],"y0":1990},
+  {"n":"D.R. Congo","s":[16.2,16.7,17.3,17.9,18.8,19.6,20,20.3,20.9,21.6,22.3,23,23.7,24.4,25.1,25.9,26.7,27.6,28.4,29.3,30.2,31.3,32.3,33.4,34.6,35.7,37,38.4,39.7,41,42.3,43.7,45.2],"y0":1990},
+  {"n":"Brazil","s":[17.8,18.2,18.5,18.8,19.1,19.4,19.6,19.9,20.2,20.5,20.8,21.1,21.4,21.6,21.9,22.1,22.3,22.6,22.8,23,23.2,23.4,23.6,23.7,23.9,24.1,24.3,24.5,24.7,24.8,25,25.1,25.2],"y0":1990},
+  {"n":"Argentina","s":[12,12.1,12.3,12.5,12.6,12.8,13,13.1,13.3,13.4,13.6,13.7,13.9,14,14.2,14.3,14.5,14.6,14.8,14.9,15.1,15.2,15.4,15.6,15.7,15.9,16,16.2,16.3,16.4,16.5,16.6,16.6],"y0":1990}
+];
+
+const CELL_W = 140, CELL_H = 64;
+const LINE_H = 34;
+const dpr = window.devicePixelRatio || 1;
+const tip = document.getElementById("tip");
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "cell-name";
+  nameEl.textContent = d.n;
+  cell.appendChild(nameEl);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = CELL_W * dpr;
+  canvas.height = LINE_H * dpr;
+  canvas.style.width = "100%";
+  canvas.style.height = LINE_H + "px";
+  cell.appendChild(canvas);
+
+  const valsEl = document.createElement("div");
+  valsEl.className = "cell-vals";
+  const startEl = document.createElement("span");
+  startEl.className = "cell-val";
+  startEl.textContent = d.s[0].toFixed(0);
+  const endEl = document.createElement("span");
+  endEl.className = "cell-val";
+  endEl.textContent = d.s[d.s.length-1].toFixed(0);
+  valsEl.appendChild(startEl);
+  valsEl.appendChild(endEl);
+  cell.appendChild(valsEl);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const cw = CELL_W, ch = LINE_H;
+
+  const minV = Math.min(...d.s), maxV = Math.max(...d.s);
+  const range = maxV - minV || 1;
+  const norm = v => ch - ((v - minV) / range) * (ch - 4) - 2;
+
+  function draw(hoverIdx) {
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.3;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    d.s.forEach((v, i) => {
+      const x = (i / (d.s.length - 1)) * cw;
+      const y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    if (hoverIdx !== undefined) {
+      const x = (hoverIdx / (d.s.length - 1)) * cw;
+      ctx.strokeStyle = "#C2C0B5";
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, ch);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#EA5E33";
+      ctx.beginPath();
+      ctx.arc(x, norm(d.s[hoverIdx]), 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  draw();
+
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const idx = Math.max(0, Math.min(d.s.length - 1, Math.round((mx / rect.width) * (d.s.length - 1))));
+    const yr = d.y0 + idx;
+    draw(idx);
+    tip.textContent = `${d.n} ${yr}: ${d.s[idx].toFixed(1)} /km²`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  canvas.addEventListener("mouseout", () => { draw(); tip.style.opacity = "0"; });
+
+  document.getElementById("grid").appendChild(cell);
+});
+</script>
+</body></html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Decarbonizing the Grid: Electricity Carbon Intensity, 2000 vs. 2024</h1>
+<p class="subtitle">Grams of CO₂ emitted per kilowatt-hour of electricity generated. Countries above 400 gCO₂/kWh in 2000 have cut emissions dramatically — the UK, Spain, and Germany each slashed intensity by over 200 points. A few countries moved in the wrong direction.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Ember — Yearly Electricity Data</p>
+<script>
+const data = [{"n":"Poland","a":955,"b":608},{"n":"Australia","a":806,"b":554},{"n":"South Africa","a":799,"b":718},{"n":"China","a":784,"b":556},{"n":"India","a":740,"b":707},{"n":"Indonesia","a":631,"b":681},{"n":"USA","a":608,"b":384},{"n":"Turkey","a":574,"b":471},{"n":"Germany","a":573,"b":337},{"n":"Mexico","a":525,"b":483},{"n":"UK","a":522,"b":216},{"n":"Italy","a":502,"b":281},{"n":"Spain","a":471,"b":146},{"n":"South Korea","a":462,"b":416},{"n":"Japan","a":424,"b":484},{"n":"Canada","a":246,"b":185},{"n":"Brazil","a":89,"b":106},{"n":"France","a":80,"b":40},{"n":"Sweden","a":45,"b":35},{"n":"Norway","a":26,"b":30}];
+
+const W = 720, H = 580;
+const pad = { left: 145, right: 150, top: 50, bottom: 20 };
+const minV = 0, maxV = 980;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+}
+
+const xL = pad.left, xR = W - pad.right;
+
+function colorForChange(d) {
+  const ch = d.b - d.a;
+  if (ch < -250) return "#3D7A5A";
+  if (ch < -100) return "#8BAD72";
+  if (ch < 0)    return "#C49A45";
+  return "#C4715A";
+}
+
+// Grid lines
+[0, 200, 400, 600, 800].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: xL - 6, y: scale(v) + 3, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890" }, v.toString()));
+});
+
+// Column headers
+svg.appendChild(mkEl("text", { x: xL, y: pad.top - 12, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" }, "2000"));
+svg.appendChild(mkEl("text", { x: xR, y: pad.top - 12, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" }, "2024"));
+svg.appendChild(mkEl("text", { x: xL, y: pad.top - 24, "text-anchor": "middle", "font-size": "8", fill: "#C2C0B5" }, "gCO₂/kWh"));
+
+// Collision resolution
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Build label positions
+const leftLabels = data.map(d => ({ d, y: scale(d.a), orig: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b), orig: scale(d.b) }));
+
+const resolvedL = resolveCollisions(leftLabels, 13);
+const resolvedR = resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+
+// Draw lines and hit areas
+data.forEach(d => {
+  const color = colorForChange(d);
+  const y1 = scale(d.a), y2 = scale(d.b);
+
+  const line = mkEl("line", { x1: xL, y1, x2: xR, y2, stroke: color, "stroke-width": "1.5", opacity: "1" });
+  svg.appendChild(line);
+
+  const hit = mkEl("line", { x1: xL, y1, x2: xR, y2, stroke: "transparent", "stroke-width": "10", cursor: "pointer" });
+  hit.addEventListener("mouseover", e => {
+    svg.querySelectorAll("line[stroke-width='1.5']").forEach(l => l.setAttribute("opacity", "0.12"));
+    line.setAttribute("stroke-width", "2.5");
+    line.setAttribute("opacity", "1");
+    const ch = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a} → ${d.b} gCO₂/kWh (${ch > 0 ? '+' : ''}${ch})`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    svg.querySelectorAll("line[stroke-width='2.5']").forEach(l => { l.setAttribute("stroke-width", "1.5"); l.setAttribute("opacity", "1"); });
+    svg.querySelectorAll("line[stroke-width='1.5']").forEach(l => l.setAttribute("opacity", "1"));
+    tip.style.opacity = "0";
+  });
+  svg.appendChild(hit);
+});
+
+// Left labels (clamped to chart)
+resolvedL.forEach(({ d, y }) => {
+  const yC = Math.max(pad.top, Math.min(H - pad.bottom, y));
+  const color = colorForChange(d);
+  svg.appendChild(mkEl("text", { x: xL - 8, y: yC + 3.5, "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27", "font-weight": "500" }, `${d.n}`));
+  svg.appendChild(mkEl("text", { x: xL - 60, y: yC + 3.5, "text-anchor": "end", "font-size": "8.5", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, `${d.a}`));
+});
+
+// Right labels
+resolvedR.forEach(({ d, y }) => {
+  const yC = Math.max(pad.top, Math.min(H - pad.bottom, y));
+  const color = colorForChange(d);
+  const ch = d.b - d.a;
+  const chStr = (ch > 0 ? "+" : "") + ch;
+  svg.appendChild(mkEl("text", { x: xR + 8, y: yC + 3.5, "text-anchor": "start", "font-size": "8.5", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, `${d.b}`));
+  svg.appendChild(mkEl("text", { x: xR + 36, y: yC + 3.5, "text-anchor": "start", "font-size": "9.5", fill: "#2B2A27", "font-weight": "500" }, d.n));
+});
+
+// Axis ticks
+svg.appendChild(mkEl("circle", { cx: xL, cy: pad.top - 2, r: "2", fill: "#C2C0B5" }));
+svg.appendChild(mkEl("circle", { cx: xR, cy: pad.top - 2, r: "2", fill: "#C2C0B5" }));
+
+// Legend
+const legend = [
+  { color: "#3D7A5A", label: "Reduced >250 gCO₂/kWh" },
+  { color: "#8BAD72", label: "Reduced 100–250" },
+  { color: "#C49A45", label: "Reduced <100" },
+  { color: "#C4715A", label: "Increased" },
+];
+legend.forEach((l, i) => {
+  const lx = pad.left + i * 150, ly = H - 6;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: "10", height: "10", fill: l.color, rx: "1" }));
+  svg.appendChild(mkEl("text", { x: lx + 13, y: ly + 1, "font-size": "8", fill: "#7A786F" }, l.label));
+});
+</script>
+</body></html>
