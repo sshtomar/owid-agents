@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Decarbonizing the Grid: Electricity Carbon Intensity, 2000 vs. 2024",
+      "description": "Slope chart comparing carbon intensity of electricity generation (gCO2/kWh) for 20 major economies between 2000 and 2024. The UK, Spain, and Germany cut emissions intensity by over 200 points each; Indonesia and Japan moved in the wrong direction.",
+      "datasetIds": [
+        "ember--EMISSIONS-INTENSITY"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Spain cut carbon intensity from 471 to 146 gCO2/kWh \u2014 a 69% reduction",
+        "UK dropped from 522 to 216 gCO2/kWh as coal exits the power mix",
+        "Poland remains the most carbon-intensive grid among the selected countries at 608 gCO2/kWh"
+      ],
+      "createdAt": "2026-07-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "The Solar Surge: Electricity Generation from Solar, 2010\u20132024",
+      "description": "Trend lines showing solar electricity generation (TWh) for the top 10 generating countries from 2010 to 2024. China's growth from under 1 TWh to 839 TWh in 14 years defines the chart; Brazil and Australia accelerated sharply after 2020.",
+      "datasetIds": [
+        "ember--GEN-SOLAR"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China generated 839 TWh of solar in 2024 \u2014 more than the next four countries combined",
+        "Brazil went from near-zero to 71 TWh in just four years (2020\u20132024)",
+        "Germany and Italy reached early maturity and plateaued while newer adopters surged"
+      ],
+      "createdAt": "2026-07-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Population Density Trends, 1990\u20132022",
+      "description": "Sparkline grid showing population density (people per sq. km) for 15 major countries from 1990 to 2022. Bangladesh approaches 1,300 people per square kilometre; Japan and Germany show declining density as their populations shrink.",
+      "datasetIds": [
+        "wb--EN-POP-DNST"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "Bangladesh grew from 858 to 1,300 people/km\u00b2 \u2014 nearly nine times India's density",
+        "Japan and Germany are now on declining trajectories as populations age and shrink",
+        "D.R. Congo nearly tripled in density over three decades, driven by rapid population growth"
+      ],
+      "createdAt": "2026-07-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Cholera Deaths Reported Worldwide, 1950\u20132016",
+      "description": "Area chart showing total reported cholera deaths globally each year. The catastrophic 1953 spike (124,000+ deaths in India alone) towers over later outbreaks. The 7th pandemic drove persistent mortality from 1961 through the 1990s.",
+      "datasetIds": [
+        "who--CHOLERA_0000000002"
+      ],
+      "chartType": "area-chart",
+      "highlights": [
+        "1953 saw 124,242 reported deaths \u2014 the last major wave of the 6th pandemic, concentrated in India",
+        "The 7th pandemic (El Tor strain) began in 1961 and caused sustained deaths for three decades",
+        "A 1991 resurgence reached Latin America for the first time in a century, causing over 7,000 deaths"
+      ],
+      "createdAt": "2026-07-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Breast Cancer 5-Year Survival Rates by Country and Income Group, 2021",
+      "description": "Horizontal bar chart showing 5-year net survival rates for breast cancer. High-income countries achieve 87%+ survival; low-income countries just 42%. Nigeria reports 27.7%, reflecting late-stage diagnosis and limited treatment access.",
+      "datasetIds": [
+        "who--CANCERSURVIVAL_BREASTCANCER"
+      ],
+      "chartType": "bar-chart",
+      "highlights": [
+        "Japan, USA, and Australia all exceed 90% \u2014 breast cancer is increasingly survivable with early detection",
+        "High-income vs. low-income gap: 87.3% vs. 41.9% \u2014 more than double",
+        "Nigeria reports 27.7% survival, the lowest in the dataset"
+      ],
+      "createdAt": "2026-07-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-01T00:00:00.000Z"
 }
