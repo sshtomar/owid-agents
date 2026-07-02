@@ -1,0 +1,6247 @@
+{
+  "meta": {
+    "id": "who--UHC_INDEX_REPORTED",
+    "title": "Universal Health Coverage Service Index (SDG 3.8.1)",
+    "description": "UHC Service Coverage Index (SDG 3.8.1) from who-gho",
+    "source": {
+      "provider": "who-gho",
+      "indicatorId": "UHC_INDEX_REPORTED",
+      "indicatorName": "UHC Service Coverage Index (SDG 3.8.1)",
+      "sourceUrl": "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/UHC_INDEX_REPORTED",
+      "lastFetched": "2026-07-02T00:39:48.451Z"
+    },
+    "topics": [
+      "universal health coverage",
+      "health access",
+      "UHC",
+      "healthcare",
+      "sdg-3",
+      "development"
+    ],
+    "countries": [
+      "GMB",
+      "MNG",
+      "MRT",
+      "SLE",
+      "VUT",
+      "VEN",
+      "WB_LMI",
+      "CRI",
+      "JOR",
+      "UZB",
+      "FSM",
+      "ZMB",
+      "SLB",
+      "LKA",
+      "ETH",
+      "PRK",
+      "AZE",
+      "JAM",
+      "MDG",
+      "CPV",
+      "MEX",
+      "KWT",
+      "DZA",
+      "SWZ",
+      "QAT",
+      "ARG",
+      "EUR",
+      "COM",
+      "SOM",
+      "ROU",
+      "LAO",
+      "BIH",
+      "PRY",
+      "PAK",
+      "DJI",
+      "BHS",
+      "PRT",
+      "BTN",
+      "GUY",
+      "BEN",
+      "CUB",
+      "NPL",
+      "USA",
+      "BRB",
+      "LSO",
+      "NRU",
+      "MCO",
+      "MHL",
+      "SMR",
+      "MDA",
+      "WSM",
+      "GNB",
+      "ISR",
+      "IRL",
+      "BLR",
+      "BRA",
+      "LBR",
+      "ITA",
+      "BGR",
+      "WPR",
+      "MOZ",
+      "OMN",
+      "LTU",
+      "MLT",
+      "UKR",
+      "COK",
+      "BLZ",
+      "GIN",
+      "BDI",
+      "TUN",
+      "NGA",
+      "SVK",
+      "NIU",
+      "KHM",
+      "NER",
+      "TGO",
+      "NOR",
+      "BHR",
+      "WB_SSA",
+      "ECU",
+      "NAM",
+      "BRN",
+      "WB_LI",
+      "BGD",
+      "CAF",
+      "TJK",
+      "ZWE",
+      "NLD",
+      "MDV",
+      "AGO",
+      "MLI",
+      "CHN",
+      "IND",
+      "ERI",
+      "PHL",
+      "GRD",
+      "SEAR",
+      "FIN",
+      "PER",
+      "HRV",
+      "HTI",
+      "TUR",
+      "TCD",
+      "URY",
+      "UGA",
+      "GTM",
+      "LVA",
+      "BEL",
+      "SVN",
+      "PLW",
+      "SYC",
+      "HND",
+      "JPN",
+      "KAZ",
+      "MYS",
+      "CHL",
+      "ALB",
+      "FRA",
+      "EGY",
+      "ISL",
+      "CMR",
+      "SDN",
+      "TKM",
+      "LCA",
+      "RWA",
+      "IRN",
+      "MKD",
+      "WB_UMI",
+      "KNA",
+      "ZAF",
+      "COL",
+      "AND",
+      "MNE",
+      "POL",
+      "LBN",
+      "HUN",
+      "THA",
+      "GBR",
+      "EST",
+      "DNK",
+      "GNQ",
+      "VNM",
+      "SSD",
+      "KGZ",
+      "AMR",
+      "MAR",
+      "VCT",
+      "SLV",
+      "TZA",
+      "MWI",
+      "WB_EAP",
+      "BWA",
+      "NZL",
+      "TLS",
+      "CAN",
+      "ARE",
+      "DOM",
+      "ARM",
+      "KOR",
+      "CIV",
+      "GHA",
+      "KIR",
+      "STP",
+      "IDN",
+      "SGP",
+      "AFR",
+      "NIC",
+      "AUS",
+      "CHE",
+      "GLOBAL",
+      "PAN",
+      "TUV",
+      "KEN",
+      "WB_SAR",
+      "GEO",
+      "SWE",
+      "FJI",
+      "MMR",
+      "ATG",
+      "SEN",
+      "WB_LAC",
+      "WPR_WO_IDN",
+      "TTO",
+      "IRQ",
+      "SYR",
+      "WB_NAR",
+      "WB_MNA",
+      "COG",
+      "GAB",
+      "DEU",
+      "SEAR_W_IDN",
+      "SRB",
+      "YEM",
+      "RUS",
+      "COD",
+      "AFG",
+      "WB_HI",
+      "EMR",
+      "MUS",
+      "SUR",
+      "BFA",
+      "GRC",
+      "CYP",
+      "TON",
+      "CZE",
+      "DMA",
+      "PSE",
+      "BOL",
+      "SAU",
+      "LBY",
+      "PNG",
+      "AUT",
+      "WB_ECA",
+      "LUX",
+      "ESP"
+    ],
+    "dateRange": {
+      "start": "2000",
+      "end": "2023"
+    },
+    "dataPointCount": 1000,
+    "dataFilePath": "datasets/who--UHC_INDEX_REPORTED.json"
+  },
+  "data": [
+    {
+      "country": "GMB",
+      "countryName": "GMB",
+      "year": 2000,
+      "value": 38
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2000,
+      "value": 62
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2000,
+      "value": 23
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2000,
+      "value": 18
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2000,
+      "value": 46
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2000,
+      "value": 63
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2000,
+      "value": 65
+    },
+    {
+      "country": "CRI",
+      "countryName": "CRI",
+      "year": 2000,
+      "value": 76
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2000,
+      "value": 75
+    },
+    {
+      "country": "UZB",
+      "countryName": "UZB",
+      "year": 2000,
+      "value": 78
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2000,
+      "value": 42
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2000,
+      "value": 32
+    },
+    {
+      "country": "SLB",
+      "countryName": "SLB",
+      "year": 2000,
+      "value": 38
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2000,
+      "value": 61
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2000,
+      "value": 13
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2000,
+      "value": 70
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2000,
+      "value": 54
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2000,
+      "value": 61
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2000,
+      "value": 15
+    },
+    {
+      "country": "CPV",
+      "countryName": "CPV",
+      "year": 2000,
+      "value": 49
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2000,
+      "value": 68
+    },
+    {
+      "country": "KWT",
+      "countryName": "KWT",
+      "year": 2000,
+      "value": 79
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2000,
+      "value": 68
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2000,
+      "value": 51
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2000,
+      "value": 81
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2000,
+      "value": 74
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2000,
+      "value": 72
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2000,
+      "value": 25
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2000,
+      "value": 14
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2000,
+      "value": 63
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2000,
+      "value": 33
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2000,
+      "value": 54
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2000,
+      "value": 62
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2000,
+      "value": 36
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2000,
+      "value": 31
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2000,
+      "value": 79
+    },
+    {
+      "country": "PRT",
+      "countryName": "PRT",
+      "year": 2000,
+      "value": 81
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2000,
+      "value": 46
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2000,
+      "value": 61
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2000,
+      "value": 25
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2000,
+      "value": 74
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2000,
+      "value": 18
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2000,
+      "value": 79
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2000,
+      "value": 77
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2000,
+      "value": 31
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2001,
+      "value": 42
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2001,
+      "value": 62
+    },
+    {
+      "country": "MCO",
+      "countryName": "MCO",
+      "year": 2001,
+      "value": 77
+    },
+    {
+      "country": "MHL",
+      "countryName": "MHL",
+      "year": 2001,
+      "value": 66
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2001,
+      "value": 71
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2001,
+      "value": 64
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2001,
+      "value": 46
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2001,
+      "value": 67
+    },
+    {
+      "country": "WSM",
+      "countryName": "WSM",
+      "year": 2001,
+      "value": 58
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2001,
+      "value": 67
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2001,
+      "value": 25
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2001,
+      "value": 77
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2001,
+      "value": 73
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2001,
+      "value": 69
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2001,
+      "value": 70
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2001,
+      "value": 14
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2001,
+      "value": 25
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2001,
+      "value": 33
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2001,
+      "value": 79
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2001,
+      "value": 75
+    },
+    {
+      "country": "BGR",
+      "countryName": "BGR",
+      "year": 2001,
+      "value": 62
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2001,
+      "value": 64
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2001,
+      "value": 79
+    },
+    {
+      "country": "KWT",
+      "countryName": "KWT",
+      "year": 2001,
+      "value": 79
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2001,
+      "value": 23
+    },
+    {
+      "country": "OMN",
+      "countryName": "OMN",
+      "year": 2001,
+      "value": 73
+    },
+    {
+      "country": "LTU",
+      "countryName": "LTU",
+      "year": 2001,
+      "value": 65
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2001,
+      "value": 75
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2001,
+      "value": 73
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2001,
+      "value": 71
+    },
+    {
+      "country": "COK",
+      "countryName": "COK",
+      "year": 2001,
+      "value": 70
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2001,
+      "value": 65
+    },
+    {
+      "country": "GIN",
+      "countryName": "GIN",
+      "year": 2001,
+      "value": 19
+    },
+    {
+      "country": "BDI",
+      "countryName": "BDI",
+      "year": 2001,
+      "value": 25
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2002,
+      "value": 73
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2002,
+      "value": 32
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2002,
+      "value": 62
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2002,
+      "value": 14
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2002,
+      "value": 25
+    },
+    {
+      "country": "SVK",
+      "countryName": "SVK",
+      "year": 2002,
+      "value": 76
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2002,
+      "value": 37
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2002,
+      "value": 60
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2002,
+      "value": 29
+    },
+    {
+      "country": "LTU",
+      "countryName": "LTU",
+      "year": 2002,
+      "value": 66
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2002,
+      "value": 18
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2002,
+      "value": 64
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2002,
+      "value": 31
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2002,
+      "value": 14
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2002,
+      "value": 18
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2002,
+      "value": 76
+    },
+    {
+      "country": "CPV",
+      "countryName": "CPV",
+      "year": 2002,
+      "value": 51
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2002,
+      "value": 75
+    },
+    {
+      "country": "WB_SSA",
+      "countryName": "WB_SSA",
+      "year": 2002,
+      "value": 27
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2002,
+      "value": 71
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2002,
+      "value": 80
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2002,
+      "value": 66
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2002,
+      "value": 50
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2002,
+      "value": 74
+    },
+    {
+      "country": "KWT",
+      "countryName": "KWT",
+      "year": 2002,
+      "value": 79
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2002,
+      "value": 35
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2002,
+      "value": 26
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2002,
+      "value": 23
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2002,
+      "value": 67
+    },
+    {
+      "country": "ZWE",
+      "countryName": "ZWE",
+      "year": 2002,
+      "value": 33
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2002,
+      "value": 77
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2002,
+      "value": 81
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2002,
+      "value": 22
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2002,
+      "value": 70
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2002,
+      "value": 67
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2002,
+      "value": 32
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2002,
+      "value": 56
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2002,
+      "value": 30
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2002,
+      "value": 65
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2002,
+      "value": 23
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2002,
+      "value": 23
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2002,
+      "value": 65
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2002,
+      "value": 36
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2002,
+      "value": 27
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2002,
+      "value": 57
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2002,
+      "value": 73
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2003,
+      "value": 40
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2003,
+      "value": 31
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2003,
+      "value": 79
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2003,
+      "value": 49
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2003,
+      "value": 65
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2003,
+      "value": 23
+    },
+    {
+      "country": "HRV",
+      "countryName": "HRV",
+      "year": 2003,
+      "value": 70
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2003,
+      "value": 76
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2003,
+      "value": 34
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2003,
+      "value": 66
+    },
+    {
+      "country": "MHL",
+      "countryName": "MHL",
+      "year": 2003,
+      "value": 66
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2003,
+      "value": 48
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2003,
+      "value": 17
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2003,
+      "value": 75
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2003,
+      "value": 24
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2003,
+      "value": 78
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2003,
+      "value": 25
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2003,
+      "value": 57
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2003,
+      "value": 69
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2003,
+      "value": 82
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2003,
+      "value": 66
+    },
+    {
+      "country": "SVN",
+      "countryName": "SVN",
+      "year": 2003,
+      "value": 78
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2003,
+      "value": 70
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2003,
+      "value": 18
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2003,
+      "value": 63
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2003,
+      "value": 57
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2003,
+      "value": 65
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2003,
+      "value": 78
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2003,
+      "value": 65
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2003,
+      "value": 77
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2003,
+      "value": 72
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2003,
+      "value": 67
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2003,
+      "value": 55
+    },
+    {
+      "country": "OMN",
+      "countryName": "OMN",
+      "year": 2003,
+      "value": 73
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2003,
+      "value": 79
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2003,
+      "value": 74
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2003,
+      "value": 74
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2003,
+      "value": 48
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2003,
+      "value": 82
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2003,
+      "value": 71
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2003,
+      "value": 29
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2003,
+      "value": 27
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2003,
+      "value": 67
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2003,
+      "value": 77
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2003,
+      "value": 69
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2003,
+      "value": 75
+    },
+    {
+      "country": "RWA",
+      "countryName": "RWA",
+      "year": 2003,
+      "value": 21
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2004,
+      "value": 70
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2004,
+      "value": 79
+    },
+    {
+      "country": "MKD",
+      "countryName": "MKD",
+      "year": 2004,
+      "value": 58
+    },
+    {
+      "country": "WB_UMI",
+      "countryName": "WB_UMI",
+      "year": 2004,
+      "value": 70
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2004,
+      "value": 76
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2004,
+      "value": 66
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2004,
+      "value": 57
+    },
+    {
+      "country": "COL",
+      "countryName": "COL",
+      "year": 2004,
+      "value": 70
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2004,
+      "value": 81
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2004,
+      "value": 55
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2004,
+      "value": 71
+    },
+    {
+      "country": "MNE",
+      "countryName": "MNE",
+      "year": 2004,
+      "value": 66
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2004,
+      "value": 75
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2004,
+      "value": 70
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2004,
+      "value": 66
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2004,
+      "value": 19
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2004,
+      "value": 64
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2004,
+      "value": 62
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2004,
+      "value": 66
+    },
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2004,
+      "value": 75
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2004,
+      "value": 47
+    },
+    {
+      "country": "GMB",
+      "countryName": "GMB",
+      "year": 2004,
+      "value": 31
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2004,
+      "value": 34
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2004,
+      "value": 39
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2004,
+      "value": 68
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2004,
+      "value": 67
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2004,
+      "value": 75
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2004,
+      "value": 71
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2004,
+      "value": 71
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2004,
+      "value": 76
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2004,
+      "value": 80
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2004,
+      "value": 70
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2004,
+      "value": 57
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2004,
+      "value": 60
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2004,
+      "value": 80
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2004,
+      "value": 75
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2004,
+      "value": 76
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2004,
+      "value": 76
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2004,
+      "value": 24
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2004,
+      "value": 63
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2004,
+      "value": 57
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2004,
+      "value": 49
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2005,
+      "value": 23
+    },
+    {
+      "country": "KGZ",
+      "countryName": "KGZ",
+      "year": 2005,
+      "value": 71
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2005,
+      "value": 78
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2005,
+      "value": 76
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2005,
+      "value": 58
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2005,
+      "value": 49
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2005,
+      "value": 50
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2005,
+      "value": 78
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2005,
+      "value": 29
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2005,
+      "value": 58
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2005,
+      "value": 77
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2005,
+      "value": 71
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2005,
+      "value": 72
+    },
+    {
+      "country": "TZA",
+      "countryName": "TZA",
+      "year": 2005,
+      "value": 27
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2005,
+      "value": 24
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2005,
+      "value": 83
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2005,
+      "value": 55
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2005,
+      "value": 78
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2005,
+      "value": 66
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2005,
+      "value": 20
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2005,
+      "value": 67
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2005,
+      "value": 79
+    },
+    {
+      "country": "WB_EAP",
+      "countryName": "WB_EAP",
+      "year": 2005,
+      "value": 67
+    },
+    {
+      "country": "BWA",
+      "countryName": "BWA",
+      "year": 2005,
+      "value": 50
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2005,
+      "value": 50
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2005,
+      "value": 57
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2005,
+      "value": 75
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2005,
+      "value": 84
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2005,
+      "value": 74
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2005,
+      "value": 34
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2005,
+      "value": 28
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2005,
+      "value": 67
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2005,
+      "value": 77
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2005,
+      "value": 85
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2006,
+      "value": 75
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2006,
+      "value": 71
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2006,
+      "value": 65
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2006,
+      "value": 69
+    },
+    {
+      "country": "ARM",
+      "countryName": "ARM",
+      "year": 2006,
+      "value": 61
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2006,
+      "value": 60
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2006,
+      "value": 83
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2006,
+      "value": 71
+    },
+    {
+      "country": "WSM",
+      "countryName": "WSM",
+      "year": 2006,
+      "value": 56
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2006,
+      "value": 67
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2006,
+      "value": 80
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2006,
+      "value": 72
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2006,
+      "value": 67
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2006,
+      "value": 26
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2006,
+      "value": 66
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2006,
+      "value": 31
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2006,
+      "value": 62
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2006,
+      "value": 69
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2006,
+      "value": 25
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2006,
+      "value": 56
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2006,
+      "value": 39
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2006,
+      "value": 78
+    },
+    {
+      "country": "STP",
+      "countryName": "STP",
+      "year": 2006,
+      "value": 48
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2006,
+      "value": 49
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2006,
+      "value": 78
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2006,
+      "value": 86
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2006,
+      "value": 34
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2006,
+      "value": 77
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2006,
+      "value": 63
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2006,
+      "value": 18
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2006,
+      "value": 86
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2006,
+      "value": 74
+    },
+    {
+      "country": "MKD",
+      "countryName": "MKD",
+      "year": 2006,
+      "value": 59
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2006,
+      "value": 22
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2006,
+      "value": 79
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2006,
+      "value": 72
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2006,
+      "value": 68
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2006,
+      "value": 30
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2006,
+      "value": 83
+    },
+    {
+      "country": "GIN",
+      "countryName": "GIN",
+      "year": 2006,
+      "value": 21
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2006,
+      "value": 28
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2006,
+      "value": 59
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2007,
+      "value": 75
+    },
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2007,
+      "value": 76
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2007,
+      "value": 73
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2007,
+      "value": 73
+    },
+    {
+      "country": "TUV",
+      "countryName": "TUV",
+      "year": 2007,
+      "value": 62
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2007,
+      "value": 79
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2007,
+      "value": 43
+    },
+    {
+      "country": "WB_SAR",
+      "countryName": "WB_SAR",
+      "year": 2007,
+      "value": 46
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2007,
+      "value": 77
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2007,
+      "value": 67
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2007,
+      "value": 79
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2007,
+      "value": 73
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2007,
+      "value": 35
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2007,
+      "value": 57
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2007,
+      "value": 64
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2007,
+      "value": 43
+    },
+    {
+      "country": "SWE",
+      "countryName": "SWE",
+      "year": 2007,
+      "value": 77
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2007,
+      "value": 30
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2007,
+      "value": 78
+    },
+    {
+      "country": "FJI",
+      "countryName": "FJI",
+      "year": 2007,
+      "value": 61
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2007,
+      "value": 43
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2007,
+      "value": 65
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2007,
+      "value": 40
+    },
+    {
+      "country": "ATG",
+      "countryName": "ATG",
+      "year": 2007,
+      "value": 78
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2007,
+      "value": 34
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2007,
+      "value": 69
+    },
+    {
+      "country": "SEN",
+      "countryName": "SEN",
+      "year": 2007,
+      "value": 34
+    },
+    {
+      "country": "WB_LAC",
+      "countryName": "WB_LAC",
+      "year": 2007,
+      "value": 72
+    },
+    {
+      "country": "WPR_WO_IDN",
+      "countryName": "WPR_WO_IDN",
+      "year": 2007,
+      "value": 71
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2007,
+      "value": 82
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2007,
+      "value": 34
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2007,
+      "value": 81
+    },
+    {
+      "country": "STP",
+      "countryName": "STP",
+      "year": 2007,
+      "value": 48
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2007,
+      "value": 33
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2007,
+      "value": 71
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2007,
+      "value": 73
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2007,
+      "value": 83
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2007,
+      "value": 24
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2007,
+      "value": 73
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2007,
+      "value": 77
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2007,
+      "value": 69
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2008,
+      "value": 34
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2008,
+      "value": 57
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2008,
+      "value": 80
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2008,
+      "value": 84
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2008,
+      "value": 34
+    },
+    {
+      "country": "SEN",
+      "countryName": "SEN",
+      "year": 2008,
+      "value": 36
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2008,
+      "value": 78
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2008,
+      "value": 45
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2008,
+      "value": 65
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2008,
+      "value": 40
+    },
+    {
+      "country": "ATG",
+      "countryName": "ATG",
+      "year": 2008,
+      "value": 77
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2008,
+      "value": 45
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2008,
+      "value": 68
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2008,
+      "value": 68
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2008,
+      "value": 62
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2008,
+      "value": 78
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2008,
+      "value": 82
+    },
+    {
+      "country": "SWE",
+      "countryName": "SWE",
+      "year": 2008,
+      "value": 78
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2008,
+      "value": 77
+    },
+    {
+      "country": "WB_SAR",
+      "countryName": "WB_SAR",
+      "year": 2008,
+      "value": 48
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2008,
+      "value": 74
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2008,
+      "value": 36
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2008,
+      "value": 64
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2008,
+      "value": 69
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2008,
+      "value": 69
+    },
+    {
+      "country": "WB_NAR",
+      "countryName": "WB_NAR",
+      "year": 2008,
+      "value": 84
+    },
+    {
+      "country": "WB_MNA",
+      "countryName": "WB_MNA",
+      "year": 2008,
+      "value": 60
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2008,
+      "value": 58
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2008,
+      "value": 71
+    },
+    {
+      "country": "MHL",
+      "countryName": "MHL",
+      "year": 2008,
+      "value": 67
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2008,
+      "value": 67
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2008,
+      "value": 77
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2008,
+      "value": 72
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2008,
+      "value": 42
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2008,
+      "value": 70
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2008,
+      "value": 73
+    },
+    {
+      "country": "GMB",
+      "countryName": "GMB",
+      "year": 2008,
+      "value": 50
+    },
+    {
+      "country": "ZWE",
+      "countryName": "ZWE",
+      "year": 2008,
+      "value": 39
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2008,
+      "value": 35
+    },
+    {
+      "country": "WPR_WO_IDN",
+      "countryName": "WPR_WO_IDN",
+      "year": 2008,
+      "value": 72
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2008,
+      "value": 31
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2008,
+      "value": 63
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2008,
+      "value": 32
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2008,
+      "value": 66
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2008,
+      "value": 66
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2008,
+      "value": 77
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2008,
+      "value": 61
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2009,
+      "value": 52
+    },
+    {
+      "country": "DEU",
+      "countryName": "DEU",
+      "year": 2009,
+      "value": 83
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2009,
+      "value": 83
+    },
+    {
+      "country": "SEAR_W_IDN",
+      "countryName": "SEAR_W_IDN",
+      "year": 2009,
+      "value": 52
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2009,
+      "value": 59
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2009,
+      "value": 76
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2009,
+      "value": 28
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2009,
+      "value": 69
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2009,
+      "value": 36
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2009,
+      "value": 64
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2009,
+      "value": 74
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2009,
+      "value": 26
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2009,
+      "value": 75
+    },
+    {
+      "country": "SVK",
+      "countryName": "SVK",
+      "year": 2009,
+      "value": 78
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2009,
+      "value": 51
+    },
+    {
+      "country": "YEM",
+      "countryName": "YEM",
+      "year": 2009,
+      "value": 44
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2009,
+      "value": 74
+    },
+    {
+      "country": "WB_EAP",
+      "countryName": "WB_EAP",
+      "year": 2009,
+      "value": 70
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2009,
+      "value": 75
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2009,
+      "value": 43
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2009,
+      "value": 80
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2009,
+      "value": 66
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2009,
+      "value": 72
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2009,
+      "value": 73
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2009,
+      "value": 46
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2009,
+      "value": 76
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2009,
+      "value": 78
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2009,
+      "value": 67
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2009,
+      "value": 80
+    },
+    {
+      "country": "COD",
+      "countryName": "COD",
+      "year": 2009,
+      "value": 33
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2009,
+      "value": 76
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2009,
+      "value": 84
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2009,
+      "value": 41
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2009,
+      "value": 71
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2009,
+      "value": 81
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2009,
+      "value": 68
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2010,
+      "value": 38
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2010,
+      "value": 45
+    },
+    {
+      "country": "MNE",
+      "countryName": "MNE",
+      "year": 2010,
+      "value": 67
+    },
+    {
+      "country": "SVK",
+      "countryName": "SVK",
+      "year": 2010,
+      "value": 78
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2010,
+      "value": 75
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2010,
+      "value": 73
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2010,
+      "value": 70
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2010,
+      "value": 73
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2010,
+      "value": 70
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2010,
+      "value": 37
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2010,
+      "value": 75
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2010,
+      "value": 73
+    },
+    {
+      "country": "WB_UMI",
+      "countryName": "WB_UMI",
+      "year": 2010,
+      "value": 74
+    },
+    {
+      "country": "KGZ",
+      "countryName": "KGZ",
+      "year": 2010,
+      "value": 70
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2010,
+      "value": 69
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2010,
+      "value": 58
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2010,
+      "value": 79
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2010,
+      "value": 82
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2010,
+      "value": 57
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2010,
+      "value": 41
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2010,
+      "value": 87
+    },
+    {
+      "country": "WPR_WO_IDN",
+      "countryName": "WPR_WO_IDN",
+      "year": 2010,
+      "value": 73
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2010,
+      "value": 78
+    },
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2010,
+      "value": 77
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2010,
+      "value": 70
+    },
+    {
+      "country": "WB_SSA",
+      "countryName": "WB_SSA",
+      "year": 2010,
+      "value": 39
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2010,
+      "value": 44
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2010,
+      "value": 77
+    },
+    {
+      "country": "COD",
+      "countryName": "COD",
+      "year": 2010,
+      "value": 33
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2010,
+      "value": 53
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2010,
+      "value": 31
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2010,
+      "value": 67
+    },
+    {
+      "country": "SUR",
+      "countryName": "SUR",
+      "year": 2010,
+      "value": 70
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2010,
+      "value": 65
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2010,
+      "value": 44
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2010,
+      "value": 74
+    },
+    {
+      "country": "YEM",
+      "countryName": "YEM",
+      "year": 2010,
+      "value": 44
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2010,
+      "value": 39
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2010,
+      "value": 32
+    },
+    {
+      "country": "GRC",
+      "countryName": "GRC",
+      "year": 2010,
+      "value": 72
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2010,
+      "value": 71
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2010,
+      "value": 37
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2010,
+      "value": 81
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2010,
+      "value": 72
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2010,
+      "value": 80
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2011,
+      "value": 80
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2011,
+      "value": 81
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2011,
+      "value": 79
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2011,
+      "value": 75
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2011,
+      "value": 86
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2011,
+      "value": 44
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2011,
+      "value": 74
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2011,
+      "value": 74
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2011,
+      "value": 54
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2011,
+      "value": 73
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2011,
+      "value": 32
+    },
+    {
+      "country": "CRI",
+      "countryName": "CRI",
+      "year": 2011,
+      "value": 81
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2011,
+      "value": 70
+    },
+    {
+      "country": "WSM",
+      "countryName": "WSM",
+      "year": 2011,
+      "value": 59
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2011,
+      "value": 34
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2011,
+      "value": 76
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2011,
+      "value": 72
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2011,
+      "value": 76
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2011,
+      "value": 79
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2011,
+      "value": 24
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2011,
+      "value": 81
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2011,
+      "value": 26
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2011,
+      "value": 39
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2011,
+      "value": 67
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2011,
+      "value": 36
+    },
+    {
+      "country": "SEAR_W_IDN",
+      "countryName": "SEAR_W_IDN",
+      "year": 2011,
+      "value": 55
+    },
+    {
+      "country": "WB_SSA",
+      "countryName": "WB_SSA",
+      "year": 2011,
+      "value": 42
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2011,
+      "value": 38
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2011,
+      "value": 72
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2011,
+      "value": 77
+    },
+    {
+      "country": "SUR",
+      "countryName": "SUR",
+      "year": 2011,
+      "value": 70
+    },
+    {
+      "country": "TUV",
+      "countryName": "TUV",
+      "year": 2011,
+      "value": 64
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2011,
+      "value": 59
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2011,
+      "value": 78
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2011,
+      "value": 74
+    },
+    {
+      "country": "SVN",
+      "countryName": "SVN",
+      "year": 2011,
+      "value": 80
+    },
+    {
+      "country": "FJI",
+      "countryName": "FJI",
+      "year": 2011,
+      "value": 64
+    },
+    {
+      "country": "KGZ",
+      "countryName": "KGZ",
+      "year": 2011,
+      "value": 69
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2011,
+      "value": 43
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2011,
+      "value": 81
+    },
+    {
+      "country": "DEU",
+      "countryName": "DEU",
+      "year": 2011,
+      "value": 85
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2011,
+      "value": 40
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2011,
+      "value": 78
+    },
+    {
+      "country": "PRT",
+      "countryName": "PRT",
+      "year": 2011,
+      "value": 83
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2011,
+      "value": 70
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2012,
+      "value": 81
+    },
+    {
+      "country": "SLB",
+      "countryName": "SLB",
+      "year": 2012,
+      "value": 42
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2012,
+      "value": 82
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2012,
+      "value": 83
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2012,
+      "value": 49
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2012,
+      "value": 67
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2012,
+      "value": 56
+    },
+    {
+      "country": "CZE",
+      "countryName": "CZE",
+      "year": 2012,
+      "value": 82
+    },
+    {
+      "country": "WB_LAC",
+      "countryName": "WB_LAC",
+      "year": 2012,
+      "value": 76
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2012,
+      "value": 82
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2012,
+      "value": 54
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2012,
+      "value": 85
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2012,
+      "value": 85
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2012,
+      "value": 74
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2012,
+      "value": 45
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2012,
+      "value": 75
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2012,
+      "value": 49
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2012,
+      "value": 61
+    },
+    {
+      "country": "GIN",
+      "countryName": "GIN",
+      "year": 2012,
+      "value": 30
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2012,
+      "value": 44
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2012,
+      "value": 63
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2012,
+      "value": 69
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2012,
+      "value": 85
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2012,
+      "value": 31
+    },
+    {
+      "country": "PSE",
+      "countryName": "PSE",
+      "year": 2012,
+      "value": 69
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2012,
+      "value": 47
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2012,
+      "value": 69
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2012,
+      "value": 60
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2012,
+      "value": 79
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2012,
+      "value": 41
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2012,
+      "value": 40
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2012,
+      "value": 36
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2012,
+      "value": 39
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2012,
+      "value": 36
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2012,
+      "value": 78
+    },
+    {
+      "country": "GRC",
+      "countryName": "GRC",
+      "year": 2012,
+      "value": 73
+    },
+    {
+      "country": "DEU",
+      "countryName": "DEU",
+      "year": 2012,
+      "value": 85
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2012,
+      "value": 56
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2012,
+      "value": 44
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2012,
+      "value": 46
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2012,
+      "value": 56
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2012,
+      "value": 81
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2012,
+      "value": 67
+    },
+    {
+      "country": "WB_SAR",
+      "countryName": "WB_SAR",
+      "year": 2012,
+      "value": 55
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2012,
+      "value": 74
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2012,
+      "value": 80
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2012,
+      "value": 68
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2012,
+      "value": 47
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2012,
+      "value": 81
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2012,
+      "value": 81
+    },
+    {
+      "country": "CZE",
+      "countryName": "CZE",
+      "year": 2013,
+      "value": 82
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2013,
+      "value": 84
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2013,
+      "value": 81
+    },
+    {
+      "country": "GRC",
+      "countryName": "GRC",
+      "year": 2013,
+      "value": 74
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2013,
+      "value": 88
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2013,
+      "value": 74
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2013,
+      "value": 47
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2013,
+      "value": 80
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2013,
+      "value": 74
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2013,
+      "value": 43
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2013,
+      "value": 84
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2013,
+      "value": 53
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2013,
+      "value": 36
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2013,
+      "value": 79
+    },
+    {
+      "country": "GMB",
+      "countryName": "GMB",
+      "year": 2013,
+      "value": 54
+    },
+    {
+      "country": "WPR_WO_IDN",
+      "countryName": "WPR_WO_IDN",
+      "year": 2013,
+      "value": 76
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2013,
+      "value": 60
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2013,
+      "value": 68
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2013,
+      "value": 54
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2013,
+      "value": 24
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2013,
+      "value": 85
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2013,
+      "value": 49
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2013,
+      "value": 29
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2013,
+      "value": 33
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2013,
+      "value": 30
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2013,
+      "value": 70
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2013,
+      "value": 47
+    },
+    {
+      "country": "BDI",
+      "countryName": "BDI",
+      "year": 2013,
+      "value": 45
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2013,
+      "value": 59
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2013,
+      "value": 69
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2013,
+      "value": 72
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2013,
+      "value": 70
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2013,
+      "value": 69
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2013,
+      "value": 76
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2014,
+      "value": 29
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2014,
+      "value": 82
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2014,
+      "value": 71
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2014,
+      "value": 47
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2014,
+      "value": 36
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2014,
+      "value": 43
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2014,
+      "value": 82
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2014,
+      "value": 68
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2014,
+      "value": 81
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2014,
+      "value": 41
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2014,
+      "value": 53
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2014,
+      "value": 82
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2014,
+      "value": 22
+    },
+    {
+      "country": "SLB",
+      "countryName": "SLB",
+      "year": 2014,
+      "value": 45
+    },
+    {
+      "country": "MCO",
+      "countryName": "MCO",
+      "year": 2014,
+      "value": 84
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2014,
+      "value": 47
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2014,
+      "value": 83
+    },
+    {
+      "country": "TUV",
+      "countryName": "TUV",
+      "year": 2014,
+      "value": 64
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2014,
+      "value": 80
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2014,
+      "value": 77
+    },
+    {
+      "country": "ARM",
+      "countryName": "ARM",
+      "year": 2014,
+      "value": 70
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2014,
+      "value": 66
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2014,
+      "value": 70
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2014,
+      "value": 58
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2014,
+      "value": 59
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2014,
+      "value": 67
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2014,
+      "value": 75
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2014,
+      "value": 82
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2014,
+      "value": 73
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2014,
+      "value": 53
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2014,
+      "value": 89
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2014,
+      "value": 84
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2014,
+      "value": 43
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2014,
+      "value": 80
+    },
+    {
+      "country": "WB_SAR",
+      "countryName": "WB_SAR",
+      "year": 2014,
+      "value": 58
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2014,
+      "value": 68
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2014,
+      "value": 77
+    },
+    {
+      "country": "BGR",
+      "countryName": "BGR",
+      "year": 2014,
+      "value": 70
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2014,
+      "value": 72
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2014,
+      "value": 78
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2015,
+      "value": 77
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2015,
+      "value": 85
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2015,
+      "value": 62
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2015,
+      "value": 79
+    },
+    {
+      "country": "WB_UMI",
+      "countryName": "WB_UMI",
+      "year": 2015,
+      "value": 78
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2015,
+      "value": 76
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2015,
+      "value": 76
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2015,
+      "value": 62
+    },
+    {
+      "country": "SVK",
+      "countryName": "SVK",
+      "year": 2015,
+      "value": 82
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2015,
+      "value": 59
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2015,
+      "value": 64
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2015,
+      "value": 88
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2015,
+      "value": 84
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2015,
+      "value": 66
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2015,
+      "value": 69
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2015,
+      "value": 32
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2015,
+      "value": 82
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2015,
+      "value": 45
+    },
+    {
+      "country": "CPV",
+      "countryName": "CPV",
+      "year": 2015,
+      "value": 65
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2015,
+      "value": 44
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2015,
+      "value": 81
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2015,
+      "value": 68
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2015,
+      "value": 76
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2015,
+      "value": 79
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2015,
+      "value": 66
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2015,
+      "value": 72
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2015,
+      "value": 61
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2015,
+      "value": 86
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2015,
+      "value": 82
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2015,
+      "value": 34
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2015,
+      "value": 68
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2015,
+      "value": 89
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2015,
+      "value": 75
+    },
+    {
+      "country": "WB_LAC",
+      "countryName": "WB_LAC",
+      "year": 2015,
+      "value": 79
+    },
+    {
+      "country": "SEN",
+      "countryName": "SEN",
+      "year": 2015,
+      "value": 42
+    },
+    {
+      "country": "WB_NAR",
+      "countryName": "WB_NAR",
+      "year": 2015,
+      "value": 87
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2015,
+      "value": 79
+    },
+    {
+      "country": "UZB",
+      "countryName": "UZB",
+      "year": 2015,
+      "value": 80
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2015,
+      "value": 74
+    },
+    {
+      "country": "COL",
+      "countryName": "COL",
+      "year": 2015,
+      "value": 80
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2015,
+      "value": 45
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2015,
+      "value": 59
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2015,
+      "value": 77
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2015,
+      "value": 80
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2016,
+      "value": 77
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2016,
+      "value": 49
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2016,
+      "value": 69
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2016,
+      "value": 40
+    },
+    {
+      "country": "LTU",
+      "countryName": "LTU",
+      "year": 2016,
+      "value": 75
+    },
+    {
+      "country": "MNE",
+      "countryName": "MNE",
+      "year": 2016,
+      "value": 69
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2016,
+      "value": 81
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2016,
+      "value": 28
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2016,
+      "value": 73
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2016,
+      "value": 81
+    },
+    {
+      "country": "ARM",
+      "countryName": "ARM",
+      "year": 2016,
+      "value": 71
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2016,
+      "value": 83
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2016,
+      "value": 82
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2016,
+      "value": 39
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2016,
+      "value": 82
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2016,
+      "value": 64
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2016,
+      "value": 80
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2016,
+      "value": 48
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2016,
+      "value": 51
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2016,
+      "value": 69
+    },
+    {
+      "country": "RWA",
+      "countryName": "RWA",
+      "year": 2016,
+      "value": 52
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2016,
+      "value": 82
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2016,
+      "value": 76
+    },
+    {
+      "country": "MCO",
+      "countryName": "MCO",
+      "year": 2016,
+      "value": 85
+    },
+    {
+      "country": "AUT",
+      "countryName": "AUT",
+      "year": 2016,
+      "value": 83
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2016,
+      "value": 86
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2016,
+      "value": 86
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2016,
+      "value": 55
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2016,
+      "value": 75
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2016,
+      "value": 82
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2016,
+      "value": 66
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2016,
+      "value": 69
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2016,
+      "value": 62
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2016,
+      "value": 69
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2016,
+      "value": 50
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2016,
+      "value": 77
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2016,
+      "value": 81
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2016,
+      "value": 70
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2016,
+      "value": 77
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2016,
+      "value": 70
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2016,
+      "value": 26
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2016,
+      "value": 66
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2016,
+      "value": 82
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2016,
+      "value": 36
+    },
+    {
+      "country": "YEM",
+      "countryName": "YEM",
+      "year": 2017,
+      "value": 44
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2017,
+      "value": 83
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2017,
+      "value": 88
+    },
+    {
+      "country": "GRC",
+      "countryName": "GRC",
+      "year": 2017,
+      "value": 75
+    },
+    {
+      "country": "ATG",
+      "countryName": "ATG",
+      "year": 2017,
+      "value": 82
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2017,
+      "value": 53
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2017,
+      "value": 87
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2017,
+      "value": 86
+    },
+    {
+      "country": "SWE",
+      "countryName": "SWE",
+      "year": 2017,
+      "value": 84
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2017,
+      "value": 80
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2017,
+      "value": 64
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2017,
+      "value": 82
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2017,
+      "value": 58
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2017,
+      "value": 85
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2017,
+      "value": 83
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2017,
+      "value": 71
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2017,
+      "value": 81
+    },
+    {
+      "country": "FJI",
+      "countryName": "FJI",
+      "year": 2017,
+      "value": 70
+    },
+    {
+      "country": "KWT",
+      "countryName": "KWT",
+      "year": 2017,
+      "value": 83
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2017,
+      "value": 50
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2017,
+      "value": 70
+    },
+    {
+      "country": "COK",
+      "countryName": "COK",
+      "year": 2017,
+      "value": 72
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2017,
+      "value": 89
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2017,
+      "value": 38
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2017,
+      "value": 66
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2017,
+      "value": 80
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2017,
+      "value": 47
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2017,
+      "value": 82
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2017,
+      "value": 88
+    },
+    {
+      "country": "TZA",
+      "countryName": "TZA",
+      "year": 2017,
+      "value": 44
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2017,
+      "value": 68
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2017,
+      "value": 41
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2017,
+      "value": 79
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2017,
+      "value": 71
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2017,
+      "value": 69
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2017,
+      "value": 78
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2017,
+      "value": 65
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2017,
+      "value": 81
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2017,
+      "value": 63
+    },
+    {
+      "country": "WB_MNA",
+      "countryName": "WB_MNA",
+      "year": 2017,
+      "value": 65
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2017,
+      "value": 73
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2017,
+      "value": 60
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2017,
+      "value": 51
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2017,
+      "value": 77
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2017,
+      "value": 72
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2018,
+      "value": 84
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2018,
+      "value": 77
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2018,
+      "value": 78
+    },
+    {
+      "country": "COK",
+      "countryName": "COK",
+      "year": 2018,
+      "value": 74
+    },
+    {
+      "country": "WB_ECA",
+      "countryName": "WB_ECA",
+      "year": 2018,
+      "value": 81
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2018,
+      "value": 81
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2018,
+      "value": 79
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2018,
+      "value": 67
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2018,
+      "value": 41
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2018,
+      "value": 29
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2018,
+      "value": 78
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2018,
+      "value": 81
+    },
+    {
+      "country": "LTU",
+      "countryName": "LTU",
+      "year": 2018,
+      "value": 76
+    },
+    {
+      "country": "LUX",
+      "countryName": "LUX",
+      "year": 2018,
+      "value": 84
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2018,
+      "value": 58
+    },
+    {
+      "country": "ZWE",
+      "countryName": "ZWE",
+      "year": 2018,
+      "value": 54
+    },
+    {
+      "country": "COD",
+      "countryName": "COD",
+      "year": 2018,
+      "value": 38
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2018,
+      "value": 86
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2018,
+      "value": 71
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2018,
+      "value": 27
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2018,
+      "value": 66
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2018,
+      "value": 69
+    },
+    {
+      "country": "MNE",
+      "countryName": "MNE",
+      "year": 2018,
+      "value": 68
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2018,
+      "value": 73
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2018,
+      "value": 55
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2018,
+      "value": 81
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2018,
+      "value": 68
+    },
+    {
+      "country": "MKD",
+      "countryName": "MKD",
+      "year": 2018,
+      "value": 66
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2018,
+      "value": 69
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2018,
+      "value": 45
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2018,
+      "value": 76
+    },
+    {
+      "country": "SVN",
+      "countryName": "SVN",
+      "year": 2018,
+      "value": 83
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2018,
+      "value": 85
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2018,
+      "value": 45
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2019,
+      "value": 92
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2019,
+      "value": 65
+    },
+    {
+      "country": "UZB",
+      "countryName": "UZB",
+      "year": 2019,
+      "value": 78
+    },
+    {
+      "country": "COD",
+      "countryName": "COD",
+      "year": 2019,
+      "value": 39
+    },
+    {
+      "country": "GIN",
+      "countryName": "GIN",
+      "year": 2019,
+      "value": 43
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2019,
+      "value": 83
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2019,
+      "value": 88
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2019,
+      "value": 78
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2019,
+      "value": 78
+    },
+    {
+      "country": "WB_UMI",
+      "countryName": "WB_UMI",
+      "year": 2019,
+      "value": 79
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2019,
+      "value": 76
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2019,
+      "value": 49
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2019,
+      "value": 81
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2019,
+      "value": 63
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2019,
+      "value": 82
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2019,
+      "value": 40
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2019,
+      "value": 74
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2019,
+      "value": 79
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2019,
+      "value": 83
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2019,
+      "value": 88
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2019,
+      "value": 40
+    },
+    {
+      "country": "WB_EAP",
+      "countryName": "WB_EAP",
+      "year": 2019,
+      "value": 78
+    },
+    {
+      "country": "LTU",
+      "countryName": "LTU",
+      "year": 2019,
+      "value": 76
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2019,
+      "value": 62
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2019,
+      "value": 76
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2019,
+      "value": 70
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2019,
+      "value": 86
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2019,
+      "value": 44
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2019,
+      "value": 70
+    },
+    {
+      "country": "TUV",
+      "countryName": "TUV",
+      "year": 2019,
+      "value": 63
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2019,
+      "value": 26
+    },
+    {
+      "country": "STP",
+      "countryName": "STP",
+      "year": 2019,
+      "value": 58
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2019,
+      "value": 66
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2019,
+      "value": 81
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2019,
+      "value": 70
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2019,
+      "value": 76
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2019,
+      "value": 31
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2019,
+      "value": 75
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2019,
+      "value": 48
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2019,
+      "value": 59
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2019,
+      "value": 65
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2019,
+      "value": 80
+    },
+    {
+      "country": "AUT",
+      "countryName": "AUT",
+      "year": 2019,
+      "value": 82
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2019,
+      "value": 69
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2019,
+      "value": 85
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2019,
+      "value": 51
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2019,
+      "value": 41
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2019,
+      "value": 64
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2019,
+      "value": 46
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2019,
+      "value": 83
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2019,
+      "value": 54
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2019,
+      "value": 55
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2019,
+      "value": 41
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2020,
+      "value": 69
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2020,
+      "value": 80
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2020,
+      "value": 79
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2020,
+      "value": 89
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2020,
+      "value": 75
+    },
+    {
+      "country": "KWT",
+      "countryName": "KWT",
+      "year": 2020,
+      "value": 83
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2020,
+      "value": 43
+    },
+    {
+      "country": "OMN",
+      "countryName": "OMN",
+      "year": 2020,
+      "value": 73
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2020,
+      "value": 86
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2020,
+      "value": 88
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2020,
+      "value": 83
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2020,
+      "value": 63
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2020,
+      "value": 67
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2020,
+      "value": 66
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2020,
+      "value": 80
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2020,
+      "value": 78
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2020,
+      "value": 84
+    },
+    {
+      "country": "SEAR_W_IDN",
+      "countryName": "SEAR_W_IDN",
+      "year": 2020,
+      "value": 65
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2020,
+      "value": 81
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2020,
+      "value": 71
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2020,
+      "value": 41
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2020,
+      "value": 84
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2020,
+      "value": 52
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2020,
+      "value": 54
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2020,
+      "value": 87
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2020,
+      "value": 34
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2020,
+      "value": 53
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2020,
+      "value": 46
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2020,
+      "value": 79
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2020,
+      "value": 54
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2020,
+      "value": 77
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2020,
+      "value": 77
+    },
+    {
+      "country": "WB_EAP",
+      "countryName": "WB_EAP",
+      "year": 2020,
+      "value": 79
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2020,
+      "value": 52
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2020,
+      "value": 38
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2020,
+      "value": 84
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2020,
+      "value": 71
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2021,
+      "value": 48
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2021,
+      "value": 70
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2021,
+      "value": 71
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2021,
+      "value": 74
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2021,
+      "value": 64
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2021,
+      "value": 69
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2021,
+      "value": 67
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2021,
+      "value": 70
+    },
+    {
+      "country": "WSM",
+      "countryName": "WSM",
+      "year": 2021,
+      "value": 62
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2021,
+      "value": 84
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2021,
+      "value": 36
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2021,
+      "value": 71
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2021,
+      "value": 79
+    },
+    {
+      "country": "FJI",
+      "countryName": "FJI",
+      "year": 2021,
+      "value": 69
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2021,
+      "value": 74
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2021,
+      "value": 79
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2021,
+      "value": 80
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2021,
+      "value": 69
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2021,
+      "value": 64
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2021,
+      "value": 74
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2021,
+      "value": 75
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2021,
+      "value": 38
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2021,
+      "value": 82
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2021,
+      "value": 79
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2021,
+      "value": 80
+    },
+    {
+      "country": "AUT",
+      "countryName": "AUT",
+      "year": 2021,
+      "value": 84
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2021,
+      "value": 64
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2021,
+      "value": 48
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2021,
+      "value": 34
+    },
+    {
+      "country": "SVN",
+      "countryName": "SVN",
+      "year": 2021,
+      "value": 83
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2021,
+      "value": 53
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2021,
+      "value": 41
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2021,
+      "value": 66
+    },
+    {
+      "country": "SEAR_W_IDN",
+      "countryName": "SEAR_W_IDN",
+      "year": 2021,
+      "value": 66
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2021,
+      "value": 68
+    },
+    {
+      "country": "WB_NAR",
+      "countryName": "WB_NAR",
+      "year": 2021,
+      "value": 88
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2022,
+      "value": 80
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2022,
+      "value": 48
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2022,
+      "value": 37
+    },
+    {
+      "country": "CPV",
+      "countryName": "CPV",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2022,
+      "value": 86
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2022,
+      "value": 89
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2022,
+      "value": 55
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2022,
+      "value": 45
+    },
+    {
+      "country": "RWA",
+      "countryName": "RWA",
+      "year": 2022,
+      "value": 58
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2022,
+      "value": 53
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2022,
+      "value": 78
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2022,
+      "value": 85
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2022,
+      "value": 72
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2022,
+      "value": 75
+    },
+    {
+      "country": "ARM",
+      "countryName": "ARM",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2022,
+      "value": 35
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2022,
+      "value": 88
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2022,
+      "value": 48
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2022,
+      "value": 92
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2022,
+      "value": 70
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2022,
+      "value": 84
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2022,
+      "value": 82
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2022,
+      "value": 52
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2022,
+      "value": 82
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2022,
+      "value": 67
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2022,
+      "value": 79
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2022,
+      "value": 84
+    },
+    {
+      "country": "KWT",
+      "countryName": "KWT",
+      "year": 2023,
+      "value": 84
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2023,
+      "value": 75
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2023,
+      "value": 82
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2023,
+      "value": 85
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2023,
+      "value": 49
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2023,
+      "value": 69
+    },
+    {
+      "country": "BDI",
+      "countryName": "BDI",
+      "year": 2023,
+      "value": 48
+    },
+    {
+      "country": "COD",
+      "countryName": "COD",
+      "year": 2023,
+      "value": 41
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2023,
+      "value": 57
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2023,
+      "value": 70
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2023,
+      "value": 80
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2023,
+      "value": 76
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2023,
+      "value": 85
+    },
+    {
+      "country": "COL",
+      "countryName": "COL",
+      "year": 2023,
+      "value": 82
+    },
+    {
+      "country": "CRI",
+      "countryName": "CRI",
+      "year": 2023,
+      "value": 84
+    },
+    {
+      "country": "UZB",
+      "countryName": "UZB",
+      "year": 2023,
+      "value": 79
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2023,
+      "value": 82
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2023,
+      "value": 73
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2023,
+      "value": 80
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2023,
+      "value": 70
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2023,
+      "value": 89
+    },
+    {
+      "country": "ARM",
+      "countryName": "ARM",
+      "year": 2023,
+      "value": 69
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2023,
+      "value": 39
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2023,
+      "value": 85
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2023,
+      "value": 74
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2023,
+      "value": 79
+    },
+    {
+      "country": "KGZ",
+      "countryName": "KGZ",
+      "year": 2023,
+      "value": 74
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2023,
+      "value": 83
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2023,
+      "value": 65
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2023,
+      "value": 84
+    },
+    {
+      "country": "WB_NAR",
+      "countryName": "WB_NAR",
+      "year": 2023,
+      "value": 88
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2023,
+      "value": 48
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2023,
+      "value": 80
+    },
+    {
+      "country": "TZA",
+      "countryName": "TZA",
+      "year": 2023,
+      "value": 49
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2023,
+      "value": 49
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2023,
+      "value": 58
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2023,
+      "value": 67
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2023,
+      "value": 33
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2023,
+      "value": 68
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2023,
+      "value": 56
+    },
+    {
+      "country": "WB_SAR",
+      "countryName": "WB_SAR",
+      "year": 2023,
+      "value": 68
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2023,
+      "value": 70
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2023,
+      "value": 67
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2023,
+      "value": 68
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2023,
+      "value": 71
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2023,
+      "value": 75
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2023,
+      "value": 89
+    },
+    {
+      "country": "WB_EAP",
+      "countryName": "WB_EAP",
+      "year": 2023,
+      "value": 80
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2023,
+      "value": 52
+    }
+  ]
+}
