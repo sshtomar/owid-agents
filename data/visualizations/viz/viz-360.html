@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Universal Health Coverage Service Index (SDG 3.8.1)</h1>
+  <p class="subtitle">Composite index (0–100) measuring coverage of essential health services, latest available year per country. Hover for details.</p>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Health Observatory — UHC_INDEX_REPORTED (SDG 3.8.1)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Canada","yr":2022,"v":92},{"n":"Norway","yr":2023,"v":89},{"n":"New Zealand","yr":2023,"v":89},{"n":"Australia","yr":2020,"v":89},{"n":"Iceland","yr":2017,"v":88},{"n":"UK","yr":2022,"v":88},{"n":"Singapore","yr":2020,"v":88},{"n":"South Korea","yr":2020,"v":87},{"n":"Cuba","yr":2022,"v":86},{"n":"Finland","yr":2018,"v":86},{"n":"Belgium","yr":2020,"v":86},{"n":"Switzerland","yr":2017,"v":86},{"n":"Monaco","yr":2016,"v":85},{"n":"Netherlands","yr":2023,"v":85},{"n":"China","yr":2023,"v":85},{"n":"Jamaica","yr":2021,"v":75},{"n":"Palau","yr":2023,"v":75},{"n":"Trinidad","yr":2023,"v":75},{"n":"Mauritius","yr":2022,"v":75},{"n":"Greece","yr":2017,"v":75},{"n":"Egypt","yr":2013,"v":74},{"n":"S. Africa","yr":2023,"v":74},{"n":"Andorra","yr":2021,"v":74},{"n":"Kyrgyzstan","yr":2023,"v":74},{"n":"Dominican Rep.","yr":2013,"v":74},{"n":"C. Afr. Rep.","yr":2023,"v":39},{"n":"Afghanistan","yr":2016,"v":39},{"n":"Togo","yr":2021,"v":38},{"n":"Congo","yr":2017,"v":38},{"n":"Niger","yr":2022,"v":37},{"n":"Mali","yr":2013,"v":36},{"n":"Benin","yr":2022,"v":35},{"n":"Madagascar","yr":2021,"v":34},{"n":"Ethiopia","yr":2023,"v":33},{"n":"Djibouti","yr":2002,"v":32},{"n":"Somalia","yr":2018,"v":29},{"n":"Chad","yr":2018,"v":27},{"n":"Papua NG","yr":2019,"v":26},{"n":"Mauritania","yr":2003,"v":24},{"n":"Mozambique","yr":2003,"v":23}];
+
+    function colorFor(v) {
+      if (v >= 80) return "#3D7A5A";
+      if (v >= 60) return "#5B9E78";
+      if (v >= 40) return "#F59E0B";
+      return "#EA5E33";
+    }
+
+    const rowH = 16, padLeft = 122, padRight = 30, padTop = 20, padBottom = 28;
+    const W = 700;
+    const H = data.length * rowH + padTop + padBottom;
+    const barW = W - padLeft - padRight;
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:700px" });
+    const tip = document.getElementById("tip");
+
+    // Reference line at 80
+    const x80 = padLeft + (80 / 100) * barW;
+    svg.appendChild(mkEl("line", {
+      x1: x80, y1: padTop - 4, x2: x80, y2: H - padBottom + 4,
+      stroke: "#CBD5E1", "stroke-width": "0.8", "stroke-dasharray": "3,2"
+    }));
+    svg.appendChild(mkEl("text", {
+      x: x80 + 2, y: padTop - 6, "font-size": "8", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace"
+    }, "80"));
+
+    // X axis
+    [0, 25, 50, 75, 100].forEach(v => {
+      const x = padLeft + (v / 100) * barW;
+      svg.appendChild(mkEl("text", {
+        x, y: H - padBottom + 12, "text-anchor": "middle",
+        "font-size": "8", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace"
+      }, v));
+    });
+
+    // Gap separator between top-25 and bottom-15
+    const gapIdx = 25;
+
+    data.forEach((d, i) => {
+      const y = padTop + i * rowH;
+      const bw = (d.v / 100) * barW;
+      const color = colorFor(d.v);
+      const bg = i % 2 === 0 ? "#F8F9FA" : "transparent";
+
+      if (i === gapIdx) {
+        svg.appendChild(mkEl("line", {
+          x1: 0, y1: y - 1, x2: W, y2: y - 1,
+          stroke: "#CBD5E1", "stroke-width": "1", "stroke-dasharray": "4,3"
+        }));
+      }
+
+      svg.appendChild(mkEl("rect", { x: 0, y, width: W, height: rowH, fill: bg }));
+
+      const bar = mkEl("rect", {
+        x: padLeft, y: y + 3, width: bw, height: rowH - 6,
+        fill: color, rx: "2", class: "bar", style: "cursor:pointer"
+      });
+
+      bar.addEventListener("mouseover", e => {
+        svg.querySelectorAll(".bar").forEach(el => el.style.opacity = "0.2");
+        bar.style.opacity = "1";
+        tip.textContent = `${d.n} (${d.yr}): UHC index ${d.v}/100`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      bar.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      bar.addEventListener("mouseout", () => {
+        svg.querySelectorAll(".bar").forEach(el => el.style.opacity = "1");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(bar);
+
+      // Country name
+      svg.appendChild(mkEl("text", {
+        x: padLeft - 4, y: y + rowH / 2 + 4,
+        "text-anchor": "end", "font-size": "9.5", fill: "#334155",
+        "font-family": "Inter, sans-serif"
+      }, d.n));
+
+      // Value label
+      if (bw > 18) {
+        svg.appendChild(mkEl("text", {
+          x: padLeft + bw - 4, y: y + rowH / 2 + 4,
+          "text-anchor": "end", "font-size": "8.5", fill: "#fff",
+          "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+        }, d.v));
+      } else {
+        svg.appendChild(mkEl("text", {
+          x: padLeft + bw + 4, y: y + rowH / 2 + 4,
+          "text-anchor": "start", "font-size": "8.5", fill: color,
+          "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+        }, d.v));
+      }
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#3D7A5A", label: "≥ 80 (strong coverage)" },
+      { color: "#5B9E78", label: "60–79" },
+      { color: "#F59E0B", label: "40–59" },
+      { color: "#EA5E33", label: "< 40 (fragile)" },
+    ];
+    legendItems.forEach((item, i) => {
+      const ix = padLeft + i * 148;
+      const ly = H - 6;
+      svg.appendChild(mkEl("rect", { x: ix, y: ly - 8, width: 10, height: 8, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: ix + 14, y: ly, "font-size": "8.5", fill: "#64748B", "font-family": "Inter, sans-serif" }, item.label));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

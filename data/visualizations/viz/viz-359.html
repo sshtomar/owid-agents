@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>HPV Vaccination Coverage Among Girls (9–14 years), 2024</h1>
+  <p class="subtitle">Share of the primary target cohort (girls 9–14) who received HPV vaccine. Hover to see exact coverage.</p>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Health Observatory — SDGHPVRECEIVED (SDG 3.b)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Burkina Faso","v":99},{"n":"Timor-Leste","v":99},{"n":"Uzbekistan","v":99},{"n":"Peru","v":97},{"n":"Laos","v":95},{"n":"Tanzania","v":94},{"n":"Portugal","v":92},{"n":"Mauritius","v":92},{"n":"Spain","v":90},{"n":"Bangladesh","v":90},{"n":"Mozambique","v":89},{"n":"Iceland","v":89},{"n":"Cyprus","v":89},{"n":"Ecuador","v":89},{"n":"Brunei","v":88},{"n":"Kyrgyzstan","v":88},{"n":"Canada","v":86},{"n":"El Salvador","v":86},{"n":"Cambodia","v":85},{"n":"Myanmar","v":83},{"n":"Mexico","v":82},{"n":"Denmark","v":81},{"n":"Malta","v":80},{"n":"Luxembourg","v":79},{"n":"Indonesia","v":79},{"n":"Malaysia","v":78},{"n":"St. Kitts","v":78},{"n":"UK","v":75},{"n":"Hungary","v":75},{"n":"Czechia","v":75},{"n":"Georgia","v":29},{"n":"Mongolia","v":25},{"n":"Slovakia","v":24},{"n":"Japan","v":17},{"n":"Romania","v":17},{"n":"Trinidad","v":16},{"n":"Gambia","v":15},{"n":"Grenada","v":5},{"n":"Philippines","v":5},{"n":"Montenegro","v":5},{"n":"Serbia","v":4},{"n":"Morocco","v":3}];
+
+    function colorFor(v) {
+      if (v >= 80) return "#3D7A5A";
+      if (v >= 60) return "#5B9E78";
+      if (v >= 40) return "#F59E0B";
+      if (v >= 20) return "#F29A44";
+      return "#EA5E33";
+    }
+
+    const rowH = 16, padLeft = 108, padRight = 56, padTop = 20, padBottom = 28;
+    const W = 680;
+    const H = data.length * rowH + padTop + padBottom;
+    const barW = W - padLeft - padRight;
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:680px" });
+    const tip = document.getElementById("tip");
+
+    // Reference line at 80%
+    const x80 = padLeft + (80 / 100) * barW;
+    svg.appendChild(mkEl("line", {
+      x1: x80, y1: padTop - 4, x2: x80, y2: H - padBottom + 4,
+      stroke: "#CBD5E1", "stroke-width": "0.8", "stroke-dasharray": "3,2"
+    }));
+    svg.appendChild(mkEl("text", {
+      x: x80 + 2, y: padTop - 6, "font-size": "8", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace"
+    }, "80%"));
+
+    // X axis labels
+    [0, 25, 50, 75, 100].forEach(v => {
+      const x = padLeft + (v / 100) * barW;
+      svg.appendChild(mkEl("text", {
+        x, y: H - padBottom + 12, "text-anchor": "middle",
+        "font-size": "8", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace"
+      }, v + "%"));
+    });
+
+    data.forEach((d, i) => {
+      const y = padTop + i * rowH;
+      const bw = (d.v / 100) * barW;
+      const color = colorFor(d.v);
+      const bg = i % 2 === 0 ? "#F8F9FA" : "transparent";
+
+      svg.appendChild(mkEl("rect", { x: 0, y: y, width: W, height: rowH, fill: bg }));
+
+      const bar = mkEl("rect", {
+        x: padLeft, y: y + 3, width: bw, height: rowH - 6,
+        fill: color, rx: "2", class: "bar", style: "cursor:pointer"
+      });
+
+      bar.addEventListener("mouseover", e => {
+        svg.querySelectorAll(".bar").forEach(el => el.style.opacity = "0.2");
+        bar.style.opacity = "1";
+        tip.textContent = `${d.n}: ${d.v}% HPV coverage`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      bar.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      bar.addEventListener("mouseout", () => {
+        svg.querySelectorAll(".bar").forEach(el => el.style.opacity = "1");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(bar);
+
+      // Country name
+      svg.appendChild(mkEl("text", {
+        x: padLeft - 4, y: y + rowH / 2 + 4,
+        "text-anchor": "end", "font-size": "9.5", fill: "#334155",
+        "font-family": "Inter, sans-serif"
+      }, d.n));
+
+      // Value label (only if bar is wide enough)
+      if (bw > 18) {
+        svg.appendChild(mkEl("text", {
+          x: padLeft + bw - 4, y: y + rowH / 2 + 4,
+          "text-anchor": "end", "font-size": "8.5", fill: "#fff",
+          "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+        }, d.v + "%"));
+      } else {
+        svg.appendChild(mkEl("text", {
+          x: padLeft + bw + 4, y: y + rowH / 2 + 4,
+          "text-anchor": "start", "font-size": "8.5", fill: color,
+          "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+        }, d.v + "%"));
+      }
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#3D7A5A", label: "≥ 80% coverage" },
+      { color: "#5B9E78", label: "60–79%" },
+      { color: "#F59E0B", label: "40–59%" },
+      { color: "#EA5E33", label: "< 20%" },
+    ];
+    legendItems.forEach((item, i) => {
+      const ix = padLeft + i * 148;
+      const ly = H - 6;
+      svg.appendChild(mkEl("rect", { x: ix, y: ly - 8, width: 10, height: 8, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: ix + 14, y: ly, "font-size": "8.5", fill: "#64748B", "font-family": "Inter, sans-serif" }, item.label));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

@@ -5858,6 +5858,96 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Pupils per Primary-School Teacher: 1990 vs. 2015",
+      "description": "Slope chart comparing pupil-teacher ratios in primary schools across 25 countries. South Korea (36\u219217) and Costa Rica (32\u219213) achieved dramatic reductions, while Benin, Cambodia, and Cote d'Ivoire actually worsened. Chad and Burundi still carry the highest loads.",
+      "datasetIds": [
+        "wb--SE-PRM-ENRL-TC-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "South Korea halved its ratio from 36 to 17 pupils per teacher",
+        "Costa Rica cut from 32 to 13 \u2014 one of the sharpest drops globally",
+        "Benin, Cambodia, and Cote d'Ivoire worsened over the same period",
+        "Chad still has 56 pupils per teacher \u2014 among the world's highest"
+      ],
+      "createdAt": "2026-07-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Manufacturing Value Added (% of GDP), 2000\u20132024",
+      "description": "Trend lines for 9 countries showing two diverging paths: deindustrialization in rich Western economies (France fell from 14% to 10%, Australia from 11% to 5%) versus industrialization in developing Asia (Bangladesh rose from 14% to 22%). South Korea maintained a stable high at 26-29%.",
+      "datasetIds": [
+        "wb--NV-IND-MANF-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "France's manufacturing share halved from 14% to under 10% over 24 years",
+        "Australia deindustrialized sharply from 11% to 5%",
+        "Bangladesh rose from 14% to 22% driven by garment exports",
+        "South Korea held steady at 26-29% \u2014 an outlier among high-income nations"
+      ],
+      "createdAt": "2026-07-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "HPV Vaccination Coverage Among Girls (9\u201314 years), 2024",
+      "description": "Horizontal bar chart of HPV vaccine coverage across 42 countries in 2024. Burkina Faso, Uzbekistan, and Timor-Leste lead at 99%, while Japan (17%) and the Philippines (5%) lag far behind despite economic capacity. Bangladesh (90%) shows income level does not determine uptake.",
+      "datasetIds": [
+        "who--SDGHPVRECEIVED"
+      ],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Burkina Faso, Timor-Leste, and Uzbekistan all reach 99% coverage",
+        "Japan at 17% \u2014 among the lowest despite high income, due to safety concerns",
+        "Philippines at 5% and Morocco at 3% despite established health systems",
+        "Bangladesh at 90% and Mozambique at 89% \u2014 low-income leaders"
+      ],
+      "createdAt": "2026-07-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Universal Health Coverage Service Index (SDG 3.8.1)",
+      "description": "Horizontal bar chart of the UHC service coverage index (0-100) for 40 countries, using each country's most recently available year. Canada leads at 92. Cuba matches Switzerland at 86. Chad and Mozambique sit at the bottom with scores under 30.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Canada leads at 92; Norway and New Zealand follow at 89",
+        "China scores 85 \u2014 equal to Switzerland and Netherlands",
+        "Cuba reaches 86, among the highest for any low-middle-income country",
+        "Chad (27) and Mozambique (23) show the bottom of global health access"
+      ],
+      "createdAt": "2026-07-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Exclusive Breastfeeding: First Survey vs. Latest Survey",
+      "description": "Slope chart showing each country's earliest available survey (~1986-2000) against its most recent (2013-2020). Sri Lanka climbed from 10% to 81% \u2014 one of public health's most striking transformations. Zambia, Cambodia, and Togo all gained 50+ percentage points. Egypt and Jordan declined.",
+      "datasetIds": [
+        "who--WHOSIS_000006"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Sri Lanka: 10% in 1987 to 81% in 2016 \u2014 most dramatic rise in the dataset",
+        "Zambia (10%\u219270%), Cambodia (11%\u219265%), Togo (13%\u219264%) all transformed",
+        "Egypt fell from 61% to 40% \u2014 and Jordan from 39% to 25%",
+        "Dominican Republic at 5% is among the lowest in any low-income country"
+      ],
+      "createdAt": "2026-07-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
   "lastUpdated": "2026-06-28T00:00:00.000Z"

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pupils per Primary-School Teacher: 1990 vs. 2015</h1>
+  <p class="subtitle">How many students share one teacher in primary school — and who reduced the load over 25 years.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — SE.PRM.ENRL.TC.ZS (UNESCO UIS)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Chad","a":67.2,"b":55.5},{"n":"Burundi","a":65.9,"b":43.2},{"n":"Burkina Faso","a":55.2,"b":42.2},{"n":"Cameroon","a":51.5,"b":41.5},{"n":"Djibouti","a":44.1,"b":33.0},{"n":"Afghanistan","a":41.2,"b":43.4},{"n":"Eritrea","a":38.2,"b":43.3},{"n":"Cote d'Ivoire","a":36.3,"b":42.1},{"n":"South Korea","a":36.3,"b":16.6},{"n":"Cambodia","a":35.0,"b":45.5},{"n":"Jamaica","a":33.6,"b":22.0},{"n":"Costa Rica","a":31.9,"b":12.7},{"n":"Gambia","a":31.1,"b":37.1},{"n":"Benin","a":30.5,"b":45.0},{"n":"Ecuador","a":30.4,"b":25.1},{"n":"Colombia","a":29.9,"b":24.2},{"n":"Algeria","a":27.8,"b":23.8},{"n":"China","a":22.3,"b":16.3},{"n":"Cyprus","a":21.4,"b":11.9},{"n":"Bahrain","a":20.9,"b":11.7},{"n":"Kazakhstan","a":20.7,"b":16.2},{"n":"Greece","a":19.6,"b":9.6},{"n":"Cuba","a":12.3,"b":8.9},{"n":"Italy","a":12.2,"b":12.0},{"n":"Austria","a":10.9,"b":10.6}];
+
+    const W = 720, H = 620;
+    const pad = { left: 140, right: 155, top: 50, bottom: 44 };
+
+    const minV = 0, maxV = 75;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    const xL = pad.left, xR = W - pad.right;
+
+    function colorFor(d) {
+      const change = d.b - d.a;
+      if (change > 8) return "#EA5E33";
+      if (change > 2) return "#F59E0B";
+      if (change > -5) return "#A3C77A";
+      if (change > -15) return "#5B9E78";
+      return "#3D7A5A";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      const topB = pad.top + 4, botB = H - pad.bottom - 4;
+      sorted.forEach(item => { item.y = Math.max(topB, Math.min(botB, item.y)); });
+      return sorted;
+    }
+
+    function mkEl(tag, attrs, text) {
+      const ns = "http://www.w3.org/2000/svg";
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:720px" });
+    const tip = document.getElementById("tip");
+
+    // Grid lines
+    [0, 15, 30, 45, 60, 75].forEach(v => {
+      svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#EEF0F2", "stroke-width": "0.7" }));
+      svg.appendChild(mkEl("text", {
+        x: (xL + xR) / 2, y: scale(v) - 3,
+        "text-anchor": "middle", "font-size": "9", fill: "#CBD5E1", "font-family": "JetBrains Mono, monospace"
+      }, v + " pupils/teacher"));
+    });
+
+    // Axes
+    svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: H - pad.bottom, stroke: "#CBD5E1", "stroke-width": "1" }));
+    svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: H - pad.bottom, stroke: "#CBD5E1", "stroke-width": "1" }));
+
+    // Column headers
+    ["1990", "2015"].forEach((yr, i) => {
+      svg.appendChild(mkEl("text", {
+        x: i === 0 ? xL : xR, y: pad.top - 16,
+        "text-anchor": "middle", "font-size": "13", fill: "#475569",
+        "font-family": "JetBrains Mono, monospace", "font-weight": "600"
+      }, yr));
+    });
+
+    const sortedData = [...data].sort((a, b) => b.a - a.a);
+
+    const leftLabels = sortedData.map(d => ({ ...d, y: scale(d.a) }));
+    const rightLabels = sortedData.map(d => ({ ...d, y: scale(d.b) }));
+    const leftRes = resolveCollisions(leftLabels, 12);
+    const rightRes = resolveCollisions(rightLabels, 12);
+
+    sortedData.forEach((d, i) => {
+      const color = colorFor(d);
+      const ya = scale(d.a), yb = scale(d.b);
+
+      const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.7", class: "vis-line" });
+      const dA = mkEl("circle", { cx: xL, cy: ya, r: "3.5", fill: color, class: "vis-dot" });
+      const dB = mkEl("circle", { cx: xR, cy: yb, r: "3.5", fill: color, class: "vis-dot" });
+      const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+
+      hit.addEventListener("mouseover", e => {
+        svg.querySelectorAll(".vis-line").forEach((el, j) => el.style.opacity = j === i ? "1" : "0.08");
+        svg.querySelectorAll(".vis-dot").forEach((el, j) => el.style.opacity = Math.floor(j / 2) === i ? "1" : "0.08");
+        const change = d.b - d.a;
+        tip.textContent = `${d.n}: ${d.a} → ${d.b} pupils/teacher (${change >= 0 ? "+" : ""}${change.toFixed(1)})`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mouseout", () => {
+        svg.querySelectorAll(".vis-line, .vis-dot").forEach(el => el.style.opacity = "1");
+        tip.style.opacity = "0";
+      });
+
+      svg.appendChild(line);
+      svg.appendChild(dA);
+      svg.appendChild(dB);
+      svg.appendChild(hit);
+    });
+
+    // Left labels
+    leftRes.forEach(item => {
+      const color = colorFor(item);
+      const origY = scale(item.a);
+      if (Math.abs(item.y - origY) > 2) {
+        svg.appendChild(mkEl("line", { x1: xL - 4, y1: origY, x2: xL - 10, y2: item.y, stroke: color, "stroke-width": "0.7", opacity: "0.5" }));
+      }
+      svg.appendChild(mkEl("text", {
+        x: xL - 12, y: item.y + 4,
+        "text-anchor": "end", "font-size": "10", fill: color, "font-family": "JetBrains Mono, monospace"
+      }, `${item.n}  ${item.a}`));
+    });
+
+    // Right labels
+    rightRes.forEach(item => {
+      const color = colorFor(item);
+      const origY = scale(item.b);
+      if (Math.abs(item.y - origY) > 2) {
+        svg.appendChild(mkEl("line", { x1: xR + 4, y1: origY, x2: xR + 10, y2: item.y, stroke: color, "stroke-width": "0.7", opacity: "0.5" }));
+      }
+      svg.appendChild(mkEl("text", {
+        x: xR + 12, y: item.y + 4,
+        "text-anchor": "start", "font-size": "10", fill: color, "font-family": "JetBrains Mono, monospace"
+      }, `${item.b}  ${item.n}`));
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#EA5E33", label: "Worsened (>8)" },
+      { color: "#F59E0B", label: "Slight increase" },
+      { color: "#5B9E78", label: "Improved" },
+      { color: "#3D7A5A", label: "Sharply improved" },
+    ];
+    legendItems.forEach((item, i) => {
+      const ix = pad.left + i * 145;
+      const ly = H - 10;
+      svg.appendChild(mkEl("rect", { x: ix, y: ly - 8, width: 10, height: 10, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: ix + 14, y: ly + 1, "font-size": "9", fill: "#64748B", "font-family": "Inter, sans-serif" }, item.label));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
