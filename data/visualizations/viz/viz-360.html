@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 800px; }
+  .cell { padding: 10px 12px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:nth-child(4n) { border-right: none; }
+  .cell:nth-last-child(-n+4) { border-bottom: none; }
+  .cell-name { font-size: 9px; font-weight: 600; color: #2B2A27; margin-bottom: 4px; letter-spacing: -0.1px; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 4px; }
+  .cell-val { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; }
+  canvas { display: block; width: 100%; }
+</style></head>
+<body>
+<h1>Population Growth Rate (Annual %), 1961–2024</h1>
+<p class="subtitle">Annual population growth rate for selected countries and regions. Sub-Saharan Africa sustains the fastest growth; China and Japan have turned negative. Sparklines show the arc from post-war baby boom to demographic slowdown.</p>
+<div class="tooltip" id="tip"></div>
+<div class="grid" id="grid"></div>
+<p class="source">Source: World Bank — SP.POP.GROW</p>
+<script>
+const data = [{"n":"Sub-Saharan Af.","s":[2.4,2.45,2.48,2.52,2.55,2.56,2.59,2.63,2.66,2.69,2.69,2.68,2.76,2.82,2.82,2.82,2.78,2.91,3.01,2.93,2.99,3.08,2.96,2.86,2.9,2.89,2.89,2.84,2.8,2.78,2.71,2.7,2.74,2.66,2.65,2.68,2.63,2.66,2.66,2.66,2.67,2.69,2.7,2.72,2.73,2.73,2.75,2.77,2.76,2.76,2.74,2.73,2.74,2.71,2.69,2.65,2.63,2.65,2.61,2.57,2.53,2.48,2.46,2.44],"y0":1961,"e":2.4,"l":2.46},{"n":"Ethiopia","s":[2.45,2.52,2.58,2.63,2.69,2.61,2.64,2.76,2.75,2.76,2.73,2.67,2.66,2.59,2.44,2.52,1.93,1.7,1.48,0.55,2.51,3.88,2.79,2.6,2.82,2.96,3.41,3.9,3.84,3.7,4.33,4.21,3.52,3.48,3.4,3.3,3.21,3.14,3.12,3.07,3.03,3.04,3.02,2.99,2.97,2.94,2.93,2.89,2.84,2.84,2.84,2.8,2.72,2.68,2.68,2.71,2.73,2.7,2.69,2.71,2.67,2.62,2.6,2.58],"y0":1961,"e":2.45,"l":2.6},{"n":"Kenya","s":[3.73,3.83,3.88,3.93,3.98,3.99,3.97,3.95,3.92,3.85,3.63,3.48,3.45,3.39,3.32,3.25,3.32,3.44,3.47,3.54,3.58,3.58,3.65,3.68,3.64,3.58,3.53,3.53,3.51,3.44,3.24,3.06,2.97,2.9,2.84,2.75,2.73,2.76,2.88,3.01,3.14,3.15,3.09,3.1,3.07,3.05,3.02,3.03,3.02,2.9,2.75,2.61,2.47,2.34,2.23,2.21,2.17,2.03,1.96,1.96,1.9,1.92,1.98,1.96],"y0":1961,"e":3.73,"l":1.98},{"n":"World","s":[1.36,1.77,2.12,2.09,2.06,2.09,2.04,2.05,2.08,2.08,2.1,2.0,1.98,1.93,1.86,1.8,1.75,1.75,1.77,1.76,1.77,1.81,1.8,1.76,1.76,1.78,1.79,1.78,1.75,1.74,1.67,1.63,1.59,1.54,1.5,1.49,1.46,1.44,1.4,1.36,1.34,1.31,1.29,1.29,1.27,1.27,1.26,1.27,1.25,1.22,1.22,1.26,1.23,1.21,1.18,1.16,1.13,1.08,1.05,0.98,0.83,0.87,0.93,0.96],"y0":1961,"e":1.36,"l":0.93},{"n":"India","s":[2.4,2.37,2.35,2.34,2.25,2.14,2.15,2.15,2.11,2.22,2.22,2.2,2.25,2.3,2.36,2.35,2.36,2.3,2.33,2.38,2.35,2.33,2.34,2.35,2.33,2.31,2.28,2.25,2.23,2.21,2.17,2.13,2.1,2.04,2.01,2.0,1.97,1.94,1.9,1.88,1.87,1.81,1.73,1.7,1.63,1.56,1.51,1.44,1.45,1.45,1.42,1.37,1.33,1.26,1.19,1.19,1.16,1.1,1.04,0.97,0.82,0.79,0.88,0.89],"y0":1961,"e":2.4,"l":0.88},{"n":"South Asia","s":[2.43,2.42,2.4,2.4,2.32,2.23,2.24,2.24,2.2,2.26,2.16,2.16,2.31,2.35,2.38,2.36,2.36,2.31,2.33,2.38,2.36,2.36,2.35,2.34,2.31,2.29,2.25,2.21,2.19,2.17,2.12,2.1,2.08,2.02,2.0,1.98,1.96,1.93,1.9,1.87,1.84,1.76,1.68,1.64,1.57,1.5,1.44,1.37,1.36,1.37,1.33,1.3,1.21,1.2,1.15,1.15,1.11,1.05,1.02,0.97,0.84,0.81,0.88,0.89],"y0":1961,"e":2.43,"l":0.88},{"n":"Indonesia","s":[2.79,2.81,2.83,2.86,2.53,2.37,2.6,2.71,2.76,2.75,2.71,2.66,2.63,2.57,2.53,2.49,2.46,2.44,2.42,2.39,2.35,2.31,2.28,2.23,2.14,2.02,1.94,1.91,1.87,1.81,1.77,1.73,1.7,1.69,1.66,1.65,1.63,1.58,1.5,1.43,1.39,1.36,1.32,1.27,1.28,1.33,1.32,1.3,1.27,1.26,1.28,1.29,1.24,1.18,1.12,1.07,1.02,0.97,0.94,0.85,0.7,0.75,0.84,0.81],"y0":1961,"e":2.79,"l":0.84},{"n":"Iran","s":[3.01,3.04,3.07,3.11,3.14,3.12,3.05,2.99,3.0,3.04,2.99,2.93,2.93,2.96,3.02,3.01,3.1,3.27,3.44,3.62,5.25,5.29,3.89,3.76,3.67,3.69,3.58,3.23,2.92,2.91,2.72,1.98,0.36,0.19,1.11,1.08,1.2,1.37,1.42,1.48,1.54,0.83,1.11,2.14,2.21,2.15,1.64,1.21,1.24,1.25,1.24,1.25,1.31,1.34,1.36,1.43,1.44,1.28,1.08,0.77,0.83,1.2,1.2,1.05],"y0":1961,"e":3.01,"l":1.2},{"n":"Brazil","s":[3.02,2.98,2.95,2.89,2.82,2.73,2.64,2.56,2.51,2.47,2.45,2.43,2.42,2.4,2.38,2.38,2.39,2.39,2.38,2.36,2.33,2.28,2.23,2.19,2.13,2.06,1.98,1.91,1.84,1.79,1.72,1.67,1.62,1.56,1.54,1.51,1.49,1.49,1.46,1.38,1.3,1.24,1.18,1.13,1.1,1.06,1.01,0.96,0.9,0.84,0.81,0.81,0.81,0.81,0.79,0.76,0.73,0.68,0.65,0.58,0.43,0.36,0.4,0.41],"y0":1961,"e":3.02,"l":0.4},{"n":"Europe & C. Asia","s":[1.14,1.15,1.14,1.13,1.08,0.95,0.94,0.9,0.88,0.77,0.77,0.84,0.8,0.76,0.72,0.72,0.71,0.7,0.67,0.69,0.65,0.59,0.58,0.6,0.61,0.63,0.64,0.64,0.63,0.52,0.46,0.41,0.34,0.25,0.21,0.18,0.15,0.11,0.11,0.13,0.14,0.19,0.26,0.29,0.29,0.3,0.28,0.4,0.4,0.37,0.23,0.39,0.38,0.41,0.44,0.45,0.38,0.37,0.38,0.19,0.08,-0.01,0.06,0.41],"y0":1961,"e":1.14,"l":0.06},{"n":"China","s":[-1.02,0.82,2.46,2.32,2.38,2.79,2.57,2.61,2.74,2.76,2.75,2.46,2.28,2.07,1.77,1.55,1.36,1.34,1.33,1.25,1.28,1.47,1.44,1.31,1.36,1.49,1.6,1.61,1.53,1.47,1.36,1.23,1.15,1.13,1.09,1.05,1.02,0.96,0.87,0.79,0.73,0.67,0.62,0.59,0.59,0.56,0.52,0.51,0.5,0.48,0.55,0.68,0.67,0.63,0.58,0.57,0.61,0.47,0.35,0.24,0.09,-0.01,-0.1,-0.12],"y0":1961,"e":-1.02,"l":-0.1},{"n":"South Korea","s":[2.97,2.86,2.78,2.62,2.54,2.51,2.34,2.32,2.26,2.18,1.97,1.88,1.77,1.71,1.68,1.6,1.56,1.52,1.52,1.56,1.56,1.55,1.47,1.23,0.98,0.99,0.99,0.98,0.99,0.99,0.99,1.04,1.02,1.01,1.01,0.95,0.94,0.72,0.71,0.84,0.77,0.58,0.52,0.4,0.21,0.53,0.51,0.76,0.51,0.5,0.77,0.53,0.46,0.63,0.53,0.4,0.28,0.43,0.35,0.14,-0.13,-0.19,0.08,0.07],"y0":1961,"e":2.97,"l":0.07},{"n":"Germany","s":[0.77,0.88,0.93,0.81,0.85,0.83,0.46,0.44,0.79,0.33,0.18,0.48,0.31,0.04,-0.37,-0.43,-0.23,-0.09,0.04,0.21,0.15,-0.1,-0.26,-0.35,-0.22,0.05,0.15,0.39,0.77,0.86,0.73,0.76,0.66,0.35,0.29,0.29,0.15,0.02,0.06,0.14,0.17,0.17,0.06,-0.02,-0.06,-0.11,-0.13,-0.19,-0.25,-0.15,-1.85,0.19,0.27,0.42,0.87,0.81,0.37,0.3,0.23,0.08,0.04,-0.02,0.13,0.27],"y0":1961,"e":0.77,"l":0.13},{"n":"Japan","s":[0.9,0.93,1.01,1.04,1.08,0.91,1.03,1.13,1.19,1.15,2.19,1.4,1.41,1.33,1.27,1.07,0.97,0.91,0.85,0.79,0.73,0.69,0.7,0.65,0.63,0.53,0.48,0.42,0.4,0.33,0.39,0.37,0.32,0.28,0.23,0.23,0.24,0.27,0.18,0.17,0.24,0.23,0.21,0.03,0.01,0.06,0.11,0.05,-0.01,0.02,-0.19,-0.16,-0.14,-0.13,-0.11,-0.05,-0.08,-0.13,-0.14,-0.29,-0.46,-0.44,-0.49,-0.44],"y0":1961,"e":0.9,"l":-0.49}];
+
+const tip = document.getElementById("tip");
+const grid = document.getElementById("grid");
+const CELL_W = 160, CELL_H = 54;
+const DPR = window.devicePixelRatio || 1;
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "cell-name";
+  nameDiv.textContent = d.n;
+  cell.appendChild(nameDiv);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = CELL_W * DPR;
+  canvas.height = CELL_H * DPR;
+  canvas.style.width = "100%";
+  canvas.style.height = CELL_H + "px";
+  cell.appendChild(canvas);
+
+  const valsDiv = document.createElement("div");
+  valsDiv.className = "cell-vals";
+  const v0 = document.createElement("span");
+  v0.className = "cell-val";
+  v0.textContent = d.e + "%";
+  const vL = document.createElement("span");
+  vL.className = "cell-val";
+  vL.style.color = d.l < 0 ? "#B34B3B" : (d.l > 2 ? "#3D7A5A" : "#7A786F");
+  vL.textContent = d.l + "%";
+  valsDiv.appendChild(v0);
+  valsDiv.appendChild(vL);
+  cell.appendChild(valsDiv);
+
+  grid.appendChild(cell);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(DPR, DPR);
+
+  const w = CELL_W, h = CELL_H;
+  const series = d.s;
+  const minV = Math.min(...series);
+  const maxV = Math.max(...series);
+  const range = maxV - minV || 1;
+  const norm = v => h - 4 - ((v - minV) / range) * (h - 8);
+  const xPos = (i) => (i / (series.length - 1)) * w;
+
+  // Zero line if crosses
+  if (minV < 0 && maxV > 0) {
+    const zy = norm(0);
+    ctx.strokeStyle = "#C2C0B5";
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(0, zy);
+    ctx.lineTo(w, zy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Sparkline
+  ctx.strokeStyle = "#EA5E33";
+  ctx.lineWidth = 1.2 * DPR / DPR;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  series.forEach((v, i) => {
+    const x = xPos(i), y = norm(v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Hover crosshair
+  let crosshairX = null;
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = mx / rect.width;
+    const idx = Math.round(ratio * (series.length - 1));
+    const safeIdx = Math.max(0, Math.min(series.length - 1, idx));
+    const year = d.y0 + safeIdx;
+    const val = series[safeIdx];
+
+    // Redraw with crosshair
+    ctx.clearRect(0, 0, w, h);
+    if (minV < 0 && maxV > 0) {
+      const zy = norm(0);
+      ctx.strokeStyle = "#C2C0B5";
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(0, zy);
+      ctx.lineTo(w, zy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.2;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = xPos(i), y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    const cx = xPos(safeIdx);
+    ctx.strokeStyle = "#C2C0B5";
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0);
+    ctx.lineTo(cx, h);
+    ctx.stroke();
+    ctx.fillStyle = "#EA5E33";
+    ctx.beginPath();
+    ctx.arc(cx, norm(val), 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    tip.textContent = `${d.n}  ${year}: ${val}%/yr`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+
+  cell.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    ctx.clearRect(0, 0, w, h);
+    if (minV < 0 && maxV > 0) {
+      const zy = norm(0);
+      ctx.strokeStyle = "#C2C0B5";
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(0, zy);
+      ctx.lineTo(w, zy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.2;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = xPos(i), y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  });
+});
+</script>
+</body></html>
