@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head>
+<body>
+<h1>International Tourism Arrivals: The COVID Collapse</h1>
+<p class="subtitle">International visitor arrivals (millions) for the top 10 destinations, 2000–2020. COVID-19 caused the sharpest drop in tourism history in 2020; Hong Kong lost 94% of visitors, China 81%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — ST.INT.ARVL</p>
+<script>
+const data = [{"n":"France","pts":[{"y":2004,"v":190.3},{"y":2005,"v":185.8},{"y":2006,"v":193.9},{"y":2007,"v":193.3},{"y":2008,"v":193.6},{"y":2009,"v":192.4},{"y":2010,"v":189.8},{"y":2011,"v":196.6},{"y":2012,"v":197.5},{"y":2013,"v":204.4},{"y":2014,"v":206.6},{"y":2015,"v":203.3},{"y":2016,"v":203.0},{"y":2017,"v":207.3},{"y":2018,"v":212.0},{"y":2019,"v":217.9},{"y":2020,"v":117.1}]},{"n":"China","pts":[{"y":2000,"v":83.4},{"y":2001,"v":89.0},{"y":2002,"v":97.9},{"y":2003,"v":91.7},{"y":2004,"v":109.0},{"y":2005,"v":120.3},{"y":2006,"v":124.9},{"y":2007,"v":131.9},{"y":2008,"v":130.0},{"y":2009,"v":126.5},{"y":2010,"v":133.8},{"y":2011,"v":135.4},{"y":2012,"v":132.4},{"y":2013,"v":129.1},{"y":2014,"v":128.5},{"y":2015,"v":133.8},{"y":2016,"v":141.8},{"y":2017,"v":153.3},{"y":2018,"v":158.6},{"y":2019,"v":162.5},{"y":2020,"v":30.4}]},{"n":"Italy","pts":[{"y":2000,"v":62.7},{"y":2001,"v":61.0},{"y":2002,"v":63.6},{"y":2003,"v":63.0},{"y":2004,"v":58.5},{"y":2005,"v":59.2},{"y":2006,"v":66.4},{"y":2007,"v":70.3},{"y":2008,"v":70.7},{"y":2009,"v":71.7},{"y":2010,"v":73.2},{"y":2011,"v":75.9},{"y":2012,"v":76.3},{"y":2013,"v":76.8},{"y":2014,"v":77.7},{"y":2015,"v":81.1},{"y":2016,"v":84.9},{"y":2017,"v":89.9},{"y":2018,"v":93.2},{"y":2019,"v":95.4},{"y":2020,"v":38.4}]},{"n":"Hungary","pts":[{"y":2000,"v":31.1},{"y":2001,"v":30.7},{"y":2002,"v":31.7},{"y":2003,"v":31.4},{"y":2004,"v":33.9},{"y":2005,"v":36.2},{"y":2006,"v":38.3},{"y":2007,"v":39.4},{"y":2008,"v":39.6},{"y":2009,"v":40.6},{"y":2010,"v":39.9},{"y":2011,"v":41.3},{"y":2012,"v":43.6},{"y":2013,"v":43.6},{"y":2014,"v":46.0},{"y":2015,"v":48.3},{"y":2016,"v":52.9},{"y":2017,"v":55.0},{"y":2018,"v":57.7},{"y":2019,"v":61.4},{"y":2020,"v":31.6}]},{"n":"Croatia","pts":[{"y":2000,"v":37.2},{"y":2001,"v":40.1},{"y":2002,"v":41.7},{"y":2003,"v":42.9},{"y":2004,"v":45.0},{"y":2005,"v":45.8},{"y":2006,"v":47.7},{"y":2007,"v":52.3},{"y":2008,"v":51.3},{"y":2009,"v":47.6},{"y":2010,"v":49.0},{"y":2011,"v":50.0},{"y":2012,"v":47.2},{"y":2013,"v":48.3},{"y":2014,"v":51.2},{"y":2015,"v":55.9},{"y":2016,"v":57.6},{"y":2017,"v":59.2},{"y":2018,"v":57.7},{"y":2019,"v":60.0},{"y":2020,"v":21.6}]},{"n":"Hong Kong","pts":[{"y":2000,"v":13.1},{"y":2001,"v":13.7},{"y":2002,"v":16.6},{"y":2003,"v":15.5},{"y":2004,"v":21.8},{"y":2005,"v":23.4},{"y":2006,"v":25.3},{"y":2007,"v":28.2},{"y":2008,"v":29.5},{"y":2009,"v":29.6},{"y":2010,"v":36.0},{"y":2011,"v":41.9},{"y":2012,"v":48.6},{"y":2013,"v":54.3},{"y":2014,"v":60.8},{"y":2015,"v":59.3},{"y":2016,"v":56.7},{"y":2017,"v":58.5},{"y":2018,"v":65.1},{"y":2019,"v":55.9},{"y":2020,"v":3.6}]},{"n":"Germany","pts":[{"y":2000,"v":19.0},{"y":2001,"v":17.9},{"y":2002,"v":18.0},{"y":2003,"v":18.4},{"y":2004,"v":20.1},{"y":2005,"v":21.5},{"y":2006,"v":23.6},{"y":2007,"v":24.4},{"y":2008,"v":24.9},{"y":2009,"v":24.2},{"y":2010,"v":26.9},{"y":2011,"v":28.4},{"y":2012,"v":30.4},{"y":2013,"v":31.5},{"y":2014,"v":33.0},{"y":2015,"v":35.0},{"y":2016,"v":35.6},{"y":2017,"v":37.5},{"y":2018,"v":38.9},{"y":2019,"v":39.6},{"y":2020,"v":12.4}]},{"n":"Greece","pts":[{"y":2000,"v":13.6},{"y":2001,"v":14.7},{"y":2002,"v":14.9},{"y":2003,"v":14.8},{"y":2004,"v":14.3},{"y":2005,"v":15.9},{"y":2006,"v":17.3},{"y":2013,"v":20.1},{"y":2014,"v":24.3},{"y":2015,"v":26.1},{"y":2016,"v":28.1},{"y":2017,"v":30.2},{"y":2018,"v":33.1},{"y":2019,"v":34.0},{"y":2020,"v":7.4}]},{"n":"Denmark","pts":[{"y":2003,"v":21.1},{"y":2004,"v":22.1},{"y":2005,"v":26.9},{"y":2006,"v":26.9},{"y":2007,"v":27.1},{"y":2008,"v":26.9},{"y":2009,"v":26.6},{"y":2010,"v":26.7},{"y":2011,"v":25.8},{"y":2012,"v":26.4},{"y":2013,"v":26.5},{"y":2014,"v":28.1},{"y":2015,"v":28.2},{"y":2016,"v":28.7},{"y":2017,"v":30.7},{"y":2018,"v":30.8},{"y":2019,"v":33.1},{"y":2020,"v":15.6}]},{"n":"Austria","pts":[{"y":2000,"v":18.0},{"y":2001,"v":18.2},{"y":2002,"v":18.6},{"y":2003,"v":19.1},{"y":2004,"v":19.4},{"y":2005,"v":20.0},{"y":2006,"v":20.3},{"y":2007,"v":20.8},{"y":2008,"v":21.9},{"y":2009,"v":21.4},{"y":2010,"v":22.0},{"y":2011,"v":23.0},{"y":2012,"v":24.2},{"y":2013,"v":24.8},{"y":2014,"v":25.3},{"y":2015,"v":26.7},{"y":2016,"v":28.1},{"y":2017,"v":29.5},{"y":2018,"v":30.8},{"y":2019,"v":31.9},{"y":2020,"v":15.1}]}];
+
+const COLORS = ["#EA5E33","#F29A44","#C49A45","#5B9E78","#3D7A5A","#8BAD72","#C4715A","#B34B3B","#7A786F","#2B2A27"];
+
+const W = 800, H = 480;
+const margin = { top: 40, right: 130, bottom: 40, left: 50 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Year range
+const yearMin = 2000, yearMax = 2020;
+const valMax = 230, valMin = 0;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[0, 50, 100, 150, 200].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v + "M";
+  svg.appendChild(t);
+});
+
+// X axis ticks
+[2000, 2005, 2010, 2015, 2019, 2020].forEach(yr => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(yr), y1: H - margin.bottom,
+    x2: xScale(yr), y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: xScale(yr), y: H - margin.bottom + 14, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = yr;
+  svg.appendChild(t);
+});
+
+// COVID annotation
+const x2020 = xScale(2020);
+svg.appendChild(mkEl("line", {
+  x1: x2020, y1: margin.top, x2: x2020, y2: H - margin.bottom,
+  stroke: "#EA5E33", "stroke-width": "0.8", "stroke-dasharray": "4,3", opacity: "0.6"
+}));
+const annot = mkEl("text", { x: x2020 - 5, y: margin.top + 12, "text-anchor": "end",
+  "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#EA5E33" });
+annot.textContent = "COVID-19";
+svg.appendChild(annot);
+
+// Collision resolver for endpoint labels
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    for (const item of sorted) {
+      item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Build endpoint label positions
+const labelItems = data.map((d, i) => {
+  const lastPt = d.pts[d.pts.length - 1];
+  return { n: d.n, y: yScale(lastPt.v), orig: yScale(lastPt.v), val: lastPt.v, i };
+});
+const resolvedLabels = resolveCollisions(labelItems, 11);
+const labelMap = {};
+resolvedLabels.forEach(item => labelMap[item.n] = item);
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = COLORS[i % COLORS.length];
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.style.opacity = "1";
+
+  // Build path
+  const pathD = d.pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  g.appendChild(mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" }));
+
+  // End dot
+  const lastPt = d.pts[d.pts.length - 1];
+  g.appendChild(mkEl("circle", { cx: xScale(lastPt.y), cy: yScale(lastPt.v), r: "3", fill: color }));
+
+  // Endpoint label
+  const lbl = labelMap[d.n];
+  if (Math.abs(lbl.y - lbl.orig) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: W - margin.right + 4, y1: lbl.orig,
+      x2: W - margin.right + 10, y2: lbl.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const pct2019 = d.pts.find(p => p.y === 2019);
+  const pct2020 = d.pts.find(p => p.y === 2020);
+  let dropStr = "";
+  if (pct2019 && pct2020) {
+    const drop = Math.round((pct2020.v - pct2019.v) / pct2019.v * 100);
+    dropStr = ` ${drop}%`;
+  }
+  const lt = mkEl("text", { x: W - margin.right + 14, y: lbl.y + 3.5, "text-anchor": "start",
+    "font-family": "Inter, sans-serif", "font-size": "9", fill: "#2B2A27", "font-weight": "500" });
+  lt.textContent = `${d.n}${dropStr}`;
+  g.appendChild(lt);
+
+  // Invisible hit path
+  const hitPath = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none" });
+  hitPath.style.cursor = "pointer";
+
+  const tip = document.getElementById("tip");
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const yearFloat = yearMin + ratio * (yearMax - yearMin);
+    const closest = d.pts.reduce((best, p) => Math.abs(p.y - yearFloat) < Math.abs(best.y - yearFloat) ? p : best, d.pts[0]);
+    tip.textContent = `${d.n}  ${closest.y}: ${closest.v}M arrivals`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    groups.forEach(og => { if (og !== g) og.style.opacity = "0.08"; });
+    g.style.opacity = "1";
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(og => og.style.opacity = "1");
+  });
+  g.appendChild(hitPath);
+
+  groups.push(g);
+  svg.appendChild(g);
+});
+</script>
+</body></html>
