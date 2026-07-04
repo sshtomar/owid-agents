@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #fff;
+    color: #0f172a;
+  }
+  h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+  #chart { width: 100%; }
+  .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  #tip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<h1>Anemia in Women: Progress Stalled in High-Burden Countries</h1>
+<p class="subtitle">Prevalence of anemia among non-pregnant women aged 15–49, 2000 vs 2023. Rising lines show worsening. Top 30 highest-burden countries.</p>
+<div id="chart"></div>
+<p class="source">Source: World Bank (SH.ANM.NPRG.ZS) — WHO Global Health Observatory estimates</p>
+<div id="tip"></div>
+<script>
+const data = [{"n":"Gabon","a":64.2,"b":60.3},{"n":"India","a":50.1,"b":54},{"n":"Cote d'Ivoire","a":54.8,"b":50.8},{"n":"Benin","a":58.5,"b":49},{"n":"Afghanistan","a":30.3,"b":46.9},{"n":"Congo, Rep.","a":56.7,"b":46.7},{"n":"Haiti","a":48.8,"b":46},{"n":"Chad","a":56.3,"b":45.9},{"n":"Gambia, The","a":59.8,"b":45.4},{"n":"Guinea","a":50.1,"b":45.3},{"n":"Guinea-Bissau","a":52.4,"b":45.3},{"n":"Burkina Faso","a":55.6,"b":43.9},{"n":"Angola","a":53,"b":43.6},{"n":"Equatorial Guinea","a":50.1,"b":41.1},{"n":"Cabo Verde","a":50,"b":40.5},{"n":"Congo, Dem. Rep.","a":54.6,"b":39.3},{"n":"Bahrain","a":45.3,"b":38.7},{"n":"Cameroon","a":45.5,"b":38.7},{"n":"Burundi","a":31.6,"b":38.4},{"n":"Cambodia","a":45.6,"b":37.8},{"n":"Guyana","a":47,"b":37.8},{"n":"Bangladesh","a":35.6,"b":37.5},{"n":"Azerbaijan","a":37.6,"b":35.6},{"n":"Ghana","a":46.4,"b":35.3},{"n":"Eritrea","a":36.5,"b":35.2},{"n":"Bhutan","a":28.5,"b":33.8},{"n":"Jordan","a":25.5,"b":33},{"n":"Kenya","a":33,"b":31.7},{"n":"Djibouti","a":31.4,"b":31.5},{"n":"Algeria","a":33.7,"b":31.4}];
+
+const W = 700, H = 620;
+const pad = { left: 130, right: 140, top: 50, bottom: 30 };
+const minV = 20, maxV = 70;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left, xR = W - pad.right;
+
+function mk(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to bounds
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, item.y));
+  }
+  return sorted;
+}
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 10) return "#B34B3B";   // big increase - red
+  if (change > 0)  return "#C4715A";   // small increase - orange-red
+  if (change > -8) return "#C49A45";   // small decrease - amber
+  if (change > -15) return "#8BAD72";  // moderate decrease - sage
+  return "#3D7A5A";                    // large decrease - green
+}
+
+const svg = mk("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+
+// Y grid + labels
+for (let v = 25; v <= 65; v += 5) {
+  const gy = scale(v);
+  svg.appendChild(mk("line", { x1: xL, y1: gy, x2: xR, y2: gy, stroke: "#E2E0D5", "stroke-width": "0.5", "stroke-dasharray": "3,3" }));
+  const t = mk("text", { x: xL - 5, y: gy + 4, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+}
+
+// Axis headers
+const hdrAttrs = { "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F", "text-anchor": "middle" };
+const h1 = mk("text", Object.assign({}, hdrAttrs, { x: xL, y: pad.top - 12 }));
+h1.textContent = "2000";
+svg.appendChild(h1);
+const h2 = mk("text", Object.assign({}, hdrAttrs, { x: xR, y: pad.top - 12 }));
+h2.textContent = "2023";
+svg.appendChild(h2);
+
+// Axis lines
+svg.appendChild(mk("line", { x1: xL, y1: pad.top - 6, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mk("line", { x1: xR, y1: pad.top - 6, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+// Resolve label collisions
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+const allLines = [];
+
+data.forEach((d) => {
+  const g = mk("g");
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+
+  const line = mk("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.2" });
+  g.appendChild(line);
+
+  // Endpoint dots
+  g.appendChild(mk("circle", { cx: xL, cy: ya, r: "2.5", fill: color }));
+  g.appendChild(mk("circle", { cx: xR, cy: yb, r: "2.5", fill: color }));
+
+  // Wide hit area
+  const hit = mk("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12", cursor: "pointer" });
+  g.appendChild(hit);
+
+  allLines.push({ g, line, d });
+
+  hit.addEventListener("mouseover", (e) => {
+    allLines.forEach(({ line: l, d: od }) => {
+      l.setAttribute("stroke-width", od === d ? "2.5" : "0.5");
+      l.setAttribute("opacity", od === d ? "1" : "0.12");
+    });
+    const change = (d.b - d.a).toFixed(1);
+    const dir = d.b > d.a ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a}% (2000) → ${d.b}% (2023) [${dir}${change} pp]`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mousemove", (e) => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    allLines.forEach(({ line: l }) => { l.setAttribute("stroke-width", "1.2"); l.setAttribute("opacity", "1"); });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+});
+
+// Left labels
+leftLabels.forEach(({ d, y: ly }) => {
+  const origY = scale(d.a);
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mk("line", { x1: xL - 1, y1: origY, x2: xL - 6, y2: ly, stroke: "#94a3b8", "stroke-width": "0.4" }));
+  }
+  const t = mk("text", { x: xL - 8, y: ly + 4, "text-anchor": "end", "font-family": "Inter, sans-serif", "font-size": "9", fill: "#374151" });
+  t.textContent = `${d.n}  ${d.a}%`;
+  svg.appendChild(t);
+});
+
+// Right labels
+rightLabels.forEach(({ d, y: ly }) => {
+  const origY = scale(d.b);
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mk("line", { x1: xR + 1, y1: origY, x2: xR + 6, y2: ly, stroke: "#94a3b8", "stroke-width": "0.4" }));
+  }
+  const t = mk("text", { x: xR + 8, y: ly + 4, "text-anchor": "start", "font-family": "Inter, sans-serif", "font-size": "9", fill: "#374151" });
+  t.textContent = `${d.b}%  ${d.n}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendY = H - 14;
+const legendItems = [
+  { color: "#B34B3B", label: "Worsened >10pp" },
+  { color: "#C4715A", label: "Slightly worse" },
+  { color: "#C49A45", label: "Small improvement" },
+  { color: "#8BAD72", label: "Improved >8pp" },
+  { color: "#3D7A5A", label: "Improved >15pp" },
+];
+let lx = pad.left;
+legendItems.forEach(({ color, label }) => {
+  svg.appendChild(mk("rect", { x: lx, y: legendY - 8, width: 10, height: 10, fill: color, rx: "2" }));
+  const t = mk("text", { x: lx + 13, y: legendY, "font-family": "Inter, sans-serif", "font-size": "9", fill: "#64748b" });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 100;
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

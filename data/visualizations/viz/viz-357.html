@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #fff;
+    color: #0f172a;
+  }
+  h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+  #chart { width: 100%; max-width: 760px; }
+  .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  #tip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<h1>Learning Poverty: Children Unable to Read at Minimum Proficiency</h1>
+<p class="subtitle">Share of children at end-of-primary age below minimum reading level, adjusted for out-of-school children. Most recent year available (2015-2023).</p>
+<div id="chart"></div>
+<p class="source">Source: World Bank Learning Poverty indicator (SE.LPV.PRIM)</p>
+<div id="tip"></div>
+<script>
+// Data exported from notebook -- do not modify
+const data = [{"n":"Congo, Dem. Rep.","v":96.6,"y":2019},{"n":"Burundi","v":95.8,"y":2019},{"n":"Chad","v":94.4,"y":2019},{"n":"Ethiopia","v":90.4,"y":2015},{"n":"Cambodia","v":90.0,"y":2019},{"n":"Guinea","v":82.7,"y":2019},{"n":"Cote d'Ivoire","v":79.9,"y":2019},{"n":"Honduras","v":79.3,"y":2019},{"n":"Kenya","v":79.3,"y":2023},{"n":"Guatemala","v":78.5,"y":2019},{"n":"Dominican Republic","v":77.7,"y":2019},{"n":"Burkina Faso","v":73.9,"y":2019},{"n":"Cameroon","v":71.9,"y":2019},{"n":"Congo, Rep.","v":70.0,"y":2019},{"n":"El Salvador","v":69.1,"y":2019},{"n":"Ecuador","v":65.9,"y":2019},{"n":"Jordan","v":62.2,"y":2021},{"n":"Argentina","v":59.1,"y":2019},{"n":"India","v":56.1,"y":2017},{"n":"Benin","v":55.8,"y":2019},{"n":"Indonesia","v":52.8,"y":2015},{"n":"Colombia","v":51.4,"y":2019},{"n":"Bangladesh","v":51.2,"y":2022},{"n":"Brazil","v":46.9,"y":2019},{"n":"Iran, Islamic Rep.","v":41.5,"y":2021},{"n":"Kosovo","v":37.9,"y":2021},{"n":"Azerbaijan","v":37.5,"y":2021},{"n":"Costa Rica","v":34.0,"y":2019},{"n":"Gabon","v":30.7,"y":2019},{"n":"Bahrain","v":30.2,"y":2021},{"n":"Armenia","v":27.2,"y":2019},{"n":"Chile","v":27.2,"y":2019},{"n":"China","v":18.2,"y":2016},{"n":"Bulgaria","v":18.2,"y":2021},{"n":"Germany","v":15.4,"y":2021},{"n":"Austria","v":15.0,"y":2021},{"n":"Israel","v":14.4,"y":2021},{"n":"Czechia","v":14.2,"y":2021},{"n":"Georgia","v":13.5,"y":2021},{"n":"Kazakhstan","v":10.4,"y":2021},{"n":"Cyprus","v":10.2,"y":2021},{"n":"Albania","v":10.2,"y":2021},{"n":"Hungary","v":9.2,"y":2021},{"n":"Australia","v":9.1,"y":2021},{"n":"Belgium","v":8.5,"y":2021},{"n":"France","v":6.6,"y":2021},{"n":"Italy","v":5.5,"y":2021},{"n":"Hong Kong SAR, China","v":5.4,"y":2021},{"n":"Denmark","v":5.1,"y":2021},{"n":"Finland","v":4.8,"y":2021},{"n":"Canada","v":4.3,"y":2016},{"n":"Croatia","v":3.9,"y":2021},{"n":"Japan","v":3.6,"y":2019},{"n":"Korea, Rep.","v":3.2,"y":2019},{"n":"Ireland","v":2.3,"y":2021}];
+
+const W = 700;
+const rowH = 18;
+const labelW = 160;
+const barMaxW = 430;
+const padLeft = 10;
+const padTop = 10;
+const padBottom = 20;
+const H = data.length * rowH + padTop + padBottom;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+
+function colorFor(v) {
+  if (v >= 70) return "#B34B3B";
+  if (v >= 50) return "#C4715A";
+  if (v >= 30) return "#C49A45";
+  if (v >= 15) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+function mk(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Background grid lines
+for (let pct of [25, 50, 75, 100]) {
+  const x = labelW + padLeft + (pct / 100) * barMaxW;
+  const line = mk("line", {
+    x1: x, y1: padTop, x2: x, y2: H - padBottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  });
+  svg.appendChild(line);
+  const lbl = mk("text", {
+    x: x, y: padTop - 3,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9",
+    fill: "#7A786F"
+  });
+  lbl.textContent = pct + "%";
+  svg.appendChild(lbl);
+}
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = padTop + i * rowH;
+  const barW = (d.v / 100) * barMaxW;
+  const barX = labelW + padLeft;
+  const barY = y + 3;
+  const barH2 = rowH - 6;
+
+  const g = mk("g");
+  g.style.cursor = "default";
+
+  // Row hover background
+  const bg = mk("rect", {
+    x: 0, y: y,
+    width: W, height: rowH,
+    fill: "transparent"
+  });
+  g.appendChild(bg);
+
+  // Bar
+  const rect = mk("rect", {
+    x: barX, y: barY,
+    width: barW, height: barH2,
+    fill: colorFor(d.v),
+    rx: "2"
+  });
+  g.appendChild(rect);
+
+  // Country label
+  const lbl = mk("text", {
+    x: labelW + padLeft - 6, y: y + rowH / 2 + 4,
+    "text-anchor": "end",
+    "font-family": "Inter, sans-serif",
+    "font-size": "10",
+    fill: "#2B2A27"
+  });
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  // Value label
+  if (barW > 25) {
+    const vlbl = mk("text", {
+      x: barX + barW - 4, y: y + rowH / 2 + 4,
+      "text-anchor": "end",
+      "font-family": "JetBrains Mono, monospace",
+      "font-size": "9",
+      fill: "#fff"
+    });
+    vlbl.textContent = d.v.toFixed(1) + "%";
+    g.appendChild(vlbl);
+  } else {
+    const vlbl = mk("text", {
+      x: barX + barW + 4, y: y + rowH / 2 + 4,
+      "text-anchor": "start",
+      "font-family": "JetBrains Mono, monospace",
+      "font-size": "9",
+      fill: "#64748b"
+    });
+    vlbl.textContent = d.v.toFixed(1) + "%";
+    g.appendChild(vlbl);
+  }
+
+  g.addEventListener("mouseover", (e) => {
+    bg.setAttribute("fill", "#F8F7F2");
+    tip.textContent = `${d.n}: ${d.v.toFixed(1)}% (${d.y})`;
+    tip.style.opacity = "1";
+  });
+  g.addEventListener("mousemove", (e) => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseout", () => {
+    bg.setAttribute("fill", "transparent");
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+});
+
+// Color legend
+const legendY = H - padBottom + 6;
+const legendItems = [
+  { color: "#B34B3B", label: "≥ 70%" },
+  { color: "#C4715A", label: "50–70%" },
+  { color: "#C49A45", label: "30–50%" },
+  { color: "#8BAD72", label: "15–30%" },
+  { color: "#3D7A5A", label: "< 15%" },
+];
+let lx = labelW + padLeft;
+legendItems.forEach(({ color, label }) => {
+  const r = mk("rect", { x: lx, y: legendY, width: 10, height: 10, fill: color, rx: "2" });
+  svg.appendChild(r);
+  const t = mk("text", {
+    x: lx + 13, y: legendY + 9,
+    "font-family": "Inter, sans-serif",
+    "font-size": "9",
+    fill: "#64748b"
+  });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 65;
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

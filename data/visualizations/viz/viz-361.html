@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #fff;
+    color: #0f172a;
+  }
+  h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+  #chart { width: 100%; }
+  .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  #tip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<h1>The Livestock Revolution: Production Index 1961–2022</h1>
+<p class="subtitle">Index of livestock production (2014–2016 = 100). Asia has transformed global animal agriculture since 1980. Indonesia's output grew 14-fold; India surpassed the West. Western Europe stagnated.</p>
+<div id="chart"></div>
+<p class="source">Source: World Bank / FAO (AG.PRD.LVSK.XD) — includes meat, milk, eggs, and other animal products</p>
+<div id="tip"></div>
+<script>
+const data = [{"n":"China","pts":[{"y":1961,"v":3.3},{"y":1965,"v":6.7},{"y":1970,"v":7.4},{"y":1975,"v":9.6},{"y":1980,"v":13.7},{"y":1985,"v":20.2},{"y":1990,"v":30.0},{"y":1995,"v":54.5},{"y":2000,"v":68.1},{"y":2005,"v":81.3},{"y":2010,"v":92.5},{"y":2015,"v":100.7},{"y":2020,"v":98.4},{"y":2022,"v":109.5}]},{"n":"India","pts":[{"y":1961,"v":15.9},{"y":1965,"v":16.1},{"y":1970,"v":17.4},{"y":1975,"v":20.6},{"y":1980,"v":24.9},{"y":1985,"v":32.8},{"y":1990,"v":39.0},{"y":1995,"v":41.7},{"y":2000,"v":49.8},{"y":2005,"v":59.3},{"y":2010,"v":78.8},{"y":2015,"v":99.8},{"y":2020,"v":128.1},{"y":2022,"v":132.5}]},{"n":"Indonesia","pts":[{"y":1961,"v":13.1},{"y":1965,"v":14.3},{"y":1970,"v":16.3},{"y":1975,"v":20.2},{"y":1980,"v":25.5},{"y":1985,"v":35.8},{"y":1990,"v":47.4},{"y":1995,"v":54.4},{"y":2000,"v":52.1},{"y":2005,"v":64.3},{"y":2010,"v":79.4},{"y":2015,"v":99.1},{"y":2020,"v":168.3},{"y":2022,"v":190.0}]},{"n":"Brazil","pts":[{"y":1961,"v":11.0},{"y":1965,"v":12.8},{"y":1970,"v":15.5},{"y":1975,"v":18.7},{"y":1980,"v":25.4},{"y":1985,"v":28.9},{"y":1990,"v":35.8},{"y":1995,"v":49.5},{"y":2000,"v":61.2},{"y":2005,"v":77.9},{"y":2010,"v":90.6},{"y":2015,"v":100.2},{"y":2020,"v":107.6},{"y":2022,"v":112.2}]},{"n":"Argentina","pts":[{"y":1961,"v":58.2},{"y":1965,"v":57.2},{"y":1970,"v":69.5},{"y":1975,"v":67.8},{"y":1980,"v":75.5},{"y":1985,"v":75.7},{"y":1990,"v":79.0},{"y":1995,"v":81.6},{"y":2000,"v":85.9},{"y":2005,"v":94.2},{"y":2010,"v":91.9},{"y":2015,"v":103.1},{"y":2020,"v":112.8},{"y":2022,"v":113.9}]},{"n":"Germany","pts":[{"y":1961,"v":70.8},{"y":1965,"v":77.1},{"y":1970,"v":88.3},{"y":1975,"v":93.8},{"y":1980,"v":104.1},{"y":1985,"v":108.6},{"y":1990,"v":106.4},{"y":1995,"v":87.3},{"y":2000,"v":88.6},{"y":2005,"v":89.6},{"y":2010,"v":96.5},{"y":2015,"v":100.5},{"y":2020,"v":98.5},{"y":2022,"v":93.3}]},{"n":"France","pts":[{"y":1961,"v":73.2},{"y":1965,"v":76.3},{"y":1970,"v":83.1},{"y":1975,"v":92.3},{"y":1980,"v":103.0},{"y":1985,"v":105.3},{"y":1990,"v":105.5},{"y":1995,"v":109.0},{"y":2000,"v":103.3},{"y":2005,"v":100.9},{"y":2010,"v":99.4},{"y":2015,"v":100.2},{"y":2020,"v":98.0},{"y":2022,"v":93.2}]},{"n":"Australia","pts":[{"y":1961,"v":49.9},{"y":1965,"v":60.2},{"y":1970,"v":67.2},{"y":1975,"v":69.1},{"y":1980,"v":67.9},{"y":1985,"v":66.3},{"y":1990,"v":81.7},{"y":1995,"v":82.0},{"y":2000,"v":91.4},{"y":2005,"v":88.2},{"y":2010,"v":85.9},{"y":2015,"v":102.4},{"y":2020,"v":90.6},{"y":2022,"v":87.5}]}];
+
+const W = 820, H = 480;
+const margin = { top: 40, right: 150, bottom: 40, left: 55 };
+
+const colors = {
+  "China":      "#EA5E33",
+  "India":      "#C49A45",
+  "Indonesia":  "#B34B3B",
+  "Brazil":     "#3D7A5A",
+  "Argentina":  "#5B9E78",
+  "Germany":    "#2563EB",
+  "France":     "#7C3AED",
+  "Australia":  "#0E7490"
+};
+
+const allPts = data.flatMap(s => s.pts);
+const yearMin = 1961, yearMax = 2022;
+const valMax = 200, valMin = 0;
+
+function xScale(y) {
+  return margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+}
+function yScale(v) {
+  return margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+}
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+function mk(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mk("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+
+// Reference line at 100 (= 2014-2016 baseline)
+const y100 = yScale(100);
+svg.appendChild(mk("line", { x1: margin.left, y1: y100, x2: W - margin.right, y2: y100, stroke: "#C2C0B5", "stroke-dasharray": "4,3", "stroke-width": "0.8" }));
+const t100 = mk("text", { x: margin.left + 4, y: y100 - 3, "font-family": "Inter, sans-serif", "font-size": "8", fill: "#7A786F" });
+t100.textContent = "Baseline (2014–2016 = 100)";
+svg.appendChild(t100);
+
+// Grid + Y labels
+for (let v of [50, 100, 150, 200]) {
+  const gy = yScale(v);
+  svg.appendChild(mk("line", { x1: margin.left, y1: gy, x2: W - margin.right, y2: gy, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mk("text", { x: margin.left - 5, y: gy + 4, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v;
+  svg.appendChild(t);
+}
+
+// X labels
+for (let y of [1961, 1970, 1980, 1990, 2000, 2010, 2022]) {
+  const gx = xScale(y);
+  const t = mk("text", { x: gx, y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+}
+
+const tip = document.getElementById("tip");
+const seriesGroups = [];
+
+// Endpoint labels
+const endLabels = data.map(s => {
+  const last = s.pts[s.pts.length - 1];
+  return { series: s, y: yScale(last.v), origY: yScale(last.v) };
+});
+resolveCollisions(endLabels, 12);
+
+data.forEach((s) => {
+  const g = mk("g");
+  const color = colors[s.n] || "#888";
+  const pathD = s.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const line = mk("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+  const hitPath = mk("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hitPath);
+
+  seriesGroups.push({ g, line, s });
+
+  hitPath.addEventListener("mousemove", (e) => {
+    seriesGroups.forEach(({ line: l, s: os }) => {
+      l.setAttribute("stroke-width", os === s ? "2.5" : "1");
+      l.setAttribute("opacity", os === s ? "1" : "0.12");
+    });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    const nearest = s.pts.reduce((a, b) => Math.abs(b.y - yr) < Math.abs(a.y - yr) ? b : a);
+    tip.textContent = `${s.n}: ${nearest.v} (${nearest.y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hitPath.addEventListener("mouseout", () => {
+    seriesGroups.forEach(({ line: l }) => { l.setAttribute("stroke-width", "1.8"); l.setAttribute("opacity", "1"); });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+endLabels.forEach(({ series: s, y: ly }) => {
+  const last = s.pts[s.pts.length - 1];
+  const origY = yScale(last.v);
+  const lx = xScale(last.y) + 6;
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mk("line", { x1: xScale(last.y), y1: origY, x2: lx - 2, y2: ly, stroke: colors[s.n] || "#888", "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  svg.appendChild(mk("circle", { cx: xScale(last.y), cy: origY, r: "3", fill: colors[s.n] || "#888" }));
+  const t = mk("text", { x: lx + 2, y: ly + 4, "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#2B2A27" });
+  t.textContent = `${last.v}  ${s.n}`;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>
