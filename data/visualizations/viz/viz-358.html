@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #fff;
+    color: #0f172a;
+  }
+  h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+  #chart { width: 100%; }
+  .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  #tip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<h1>The Research Density Race: R&amp;D Researchers per Million People</h1>
+<p class="subtitle">South Korea now employs more researchers per capita than any country tracked by the World Bank — nearly 9,500 per million. China's count has nearly quadrupled since 2000. 2000–2023.</p>
+<div id="chart"></div>
+<p class="source">Source: World Bank (SP.POP.SCIE.RD.P6) — full-time equivalent researchers in research and development</p>
+<div id="tip"></div>
+<script>
+const data = [{"n":"Korea, Rep.","pts":[{"y":2000,"v":2324},{"y":2001,"v":2907},{"y":2002,"v":3008},{"y":2003,"v":3190},{"y":2004,"v":3281},{"y":2005,"v":3763},{"y":2006,"v":4173},{"y":2007,"v":4615},{"y":2008,"v":4892},{"y":2009,"v":5038},{"y":2010,"v":5429},{"y":2011,"v":5909},{"y":2012,"v":6393},{"y":2013,"v":6458},{"y":2014,"v":6867},{"y":2015,"v":7020},{"y":2016,"v":7057},{"y":2017,"v":7453},{"y":2018,"v":7918},{"y":2019,"v":8329},{"y":2020,"v":8620},{"y":2021,"v":9071},{"y":2022,"v":9435},{"y":2023,"v":9472}]},{"n":"Denmark","pts":[{"y":2001,"v":3637},{"y":2002,"v":4759},{"y":2003,"v":4622},{"y":2004,"v":4848},{"y":2005,"v":5207},{"y":2006,"v":5315},{"y":2007,"v":5539},{"y":2008,"v":6520},{"y":2009,"v":6675},{"y":2010,"v":6764},{"y":2011,"v":7046},{"y":2012,"v":7182},{"y":2013,"v":7115},{"y":2014,"v":7358},{"y":2015,"v":7566},{"y":2016,"v":7852},{"y":2017,"v":7648},{"y":2018,"v":7598},{"y":2019,"v":7694},{"y":2020,"v":7651},{"y":2021,"v":7708},{"y":2022,"v":9037},{"y":2023,"v":8838}]},{"n":"Finland","pts":[{"y":2004,"v":7856},{"y":2005,"v":7559},{"y":2006,"v":7689},{"y":2007,"v":7391},{"y":2008,"v":7712},{"y":2009,"v":7669},{"y":2010,"v":7741},{"y":2011,"v":7442},{"y":2012,"v":7492},{"y":2013,"v":7223},{"y":2014,"v":7022},{"y":2015,"v":6856},{"y":2016,"v":6544},{"y":2017,"v":6731},{"y":2018,"v":6873},{"y":2019,"v":7246},{"y":2020,"v":7548},{"y":2021,"v":7870},{"y":2022,"v":8073},{"y":2023,"v":8315}]},{"n":"Austria","pts":[{"y":2002,"v":2992},{"y":2004,"v":3187},{"y":2005,"v":3471},{"y":2006,"v":3537},{"y":2007,"v":3824},{"y":2008,"v":4153},{"y":2009,"v":4158},{"y":2010,"v":4379},{"y":2011,"v":4431},{"y":2012,"v":4721},{"y":2013,"v":4782},{"y":2014,"v":5009},{"y":2015,"v":5073},{"y":2016,"v":5400},{"y":2017,"v":5416},{"y":2018,"v":5682},{"y":2019,"v":5959},{"y":2020,"v":5829},{"y":2021,"v":6323},{"y":2022,"v":6632},{"y":2023,"v":6634}]},{"n":"Germany","pts":[{"y":2000,"v":3154},{"y":2001,"v":3230},{"y":2002,"v":3241},{"y":2003,"v":3275},{"y":2004,"v":3291},{"y":2005,"v":3316},{"y":2006,"v":3412},{"y":2007,"v":3574},{"y":2008,"v":3727},{"y":2009,"v":3917},{"y":2010,"v":4056},{"y":2011,"v":4192},{"y":2012,"v":4356},{"y":2013,"v":4380},{"y":2014,"v":4336},{"y":2015,"v":4755},{"y":2016,"v":4840},{"y":2017,"v":5058},{"y":2018,"v":5209},{"y":2019,"v":5399},{"y":2020,"v":5390},{"y":2021,"v":5521},{"y":2022,"v":5802},{"y":2023,"v":5926}]},{"n":"Japan","pts":[{"y":2000,"v":5102},{"y":2001,"v":5136},{"y":2002,"v":4891},{"y":2003,"v":5113},{"y":2004,"v":5117},{"y":2005,"v":5322},{"y":2006,"v":5353},{"y":2007,"v":5344},{"y":2008,"v":5125},{"y":2009,"v":5114},{"y":2010,"v":5117},{"y":2011,"v":5123},{"y":2012,"v":5049},{"y":2013,"v":5167},{"y":2014,"v":5352},{"y":2015,"v":5198},{"y":2016,"v":5233},{"y":2017,"v":5320},{"y":2018,"v":5340},{"y":2019,"v":5376},{"y":2020,"v":5450},{"y":2021,"v":5590},{"y":2022,"v":5630},{"y":2023,"v":5609}]},{"n":"Belgium","pts":[{"y":2000,"v":2983},{"y":2001,"v":3141},{"y":2002,"v":2975},{"y":2003,"v":2985},{"y":2004,"v":3116},{"y":2005,"v":3173},{"y":2006,"v":3318},{"y":2007,"v":3431},{"y":2008,"v":3448},{"y":2009,"v":3555},{"y":2010,"v":3756},{"y":2011,"v":3880},{"y":2012,"v":4117},{"y":2013,"v":4162},{"y":2014,"v":4545},{"y":2015,"v":4732},{"y":2016,"v":4798},{"y":2017,"v":4757},{"y":2018,"v":5040},{"y":2019,"v":5291},{"y":2020,"v":5419},{"y":2021,"v":5771},{"y":2022,"v":5819},{"y":2023,"v":5990}]},{"n":"France","pts":[{"y":2000,"v":2903},{"y":2001,"v":2971},{"y":2002,"v":3101},{"y":2003,"v":3185},{"y":2004,"v":3321},{"y":2005,"v":3298},{"y":2006,"v":3405},{"y":2007,"v":3564},{"y":2008,"v":3636},{"y":2009,"v":3723},{"y":2010,"v":3850},{"y":2011,"v":3921},{"y":2012,"v":4052},{"y":2013,"v":4134},{"y":2014,"v":4210},{"y":2015,"v":4311},{"y":2016,"v":4392},{"y":2017,"v":4547},{"y":2018,"v":4671},{"y":2019,"v":4774},{"y":2020,"v":4883},{"y":2021,"v":5058},{"y":2022,"v":5182},{"y":2023,"v":5369}]},{"n":"Canada","pts":[{"y":2000,"v":3510},{"y":2001,"v":3688},{"y":2002,"v":3695},{"y":2003,"v":3888},{"y":2004,"v":4077},{"y":2005,"v":4234},{"y":2006,"v":4315},{"y":2007,"v":4597},{"y":2008,"v":4726},{"y":2009,"v":4466},{"y":2010,"v":4664},{"y":2011,"v":4803},{"y":2012,"v":4652},{"y":2013,"v":4648},{"y":2014,"v":4564},{"y":2015,"v":4546},{"y":2016,"v":4400},{"y":2017,"v":4429},{"y":2018,"v":4716},{"y":2019,"v":4851},{"y":2020,"v":5156},{"y":2021,"v":5508},{"y":2022,"v":5624}]},{"n":"China","pts":[{"y":2000,"v":550},{"y":2001,"v":583},{"y":2002,"v":632},{"y":2003,"v":668},{"y":2004,"v":713},{"y":2005,"v":857},{"y":2006,"v":931},{"y":2007,"v":1077},{"y":2008,"v":1198},{"y":2009,"v":861},{"y":2010,"v":899},{"y":2011,"v":972},{"y":2012,"v":1029},{"y":2013,"v":1080},{"y":2014,"v":1102},{"y":2015,"v":1163},{"y":2016,"v":1209},{"y":2017,"v":1236},{"y":2018,"v":1317},{"y":2019,"v":1484},{"y":2020,"v":1600},{"y":2021,"v":1686},{"y":2022,"v":1849},{"y":2023,"v":2107}]}];
+
+const W = 820, H = 480;
+const margin = { top: 40, right: 150, bottom: 40, left: 55 };
+
+const colors = {
+  "Korea, Rep.": "#EA5E33",
+  "Denmark":     "#3D7A5A",
+  "Finland":     "#5B9E78",
+  "Austria":     "#8BAD72",
+  "Germany":     "#2563EB",
+  "Japan":       "#7C3AED",
+  "Belgium":     "#DB6E8F",
+  "France":      "#C49A45",
+  "Canada":      "#0E7490",
+  "China":       "#B34B3B"
+};
+
+const allPts = data.flatMap(s => s.pts);
+const yearMin = Math.min(...allPts.map(p => p.y));
+const yearMax = Math.max(...allPts.map(p => p.y));
+const valMax = 10000;
+const valMin = 0;
+
+function xScale(y) {
+  return margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+}
+function yScale(v) {
+  return margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+}
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+function mk(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mk("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+
+// Y grid + labels
+for (let v of [2000, 4000, 6000, 8000, 10000]) {
+  const gy = yScale(v);
+  svg.appendChild(mk("line", { x1: margin.left, y1: gy, x2: W - margin.right, y2: gy, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mk("text", { x: margin.left - 5, y: gy + 4, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v.toLocaleString();
+  svg.appendChild(t);
+}
+
+// X axis year labels
+for (let y of [2000, 2005, 2010, 2015, 2020, 2023]) {
+  const gx = xScale(y);
+  const t = mk("text", { x: gx, y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+}
+
+// Y axis label
+const yLbl = mk("text", { x: 12, y: (margin.top + H - margin.bottom) / 2, "text-anchor": "middle", "font-family": "Inter, sans-serif", "font-size": "9", fill: "#94a3b8", transform: `rotate(-90, 12, ${(margin.top + H - margin.bottom) / 2})` });
+yLbl.textContent = "Researchers per million people";
+svg.appendChild(yLbl);
+
+const tip = document.getElementById("tip");
+const seriesGroups = [];
+
+// Endpoint label collision resolution
+const endLabels = data.map(s => {
+  const last = s.pts[s.pts.length - 1];
+  return { series: s, y: yScale(last.v), origY: yScale(last.v) };
+});
+resolveCollisions(endLabels, 12);
+
+// Draw series
+data.forEach((s, si) => {
+  const g = mk("g");
+  const color = colors[s.name] || "#888";
+
+  const pathD = s.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const line = mk("path", { d: pathD, stroke: colors[s.n] || "#888", "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  const hitPath = mk("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hitPath);
+
+  seriesGroups.push({ g, line, s });
+
+  hitPath.addEventListener("mousemove", (e) => {
+    seriesGroups.forEach(({ line: l, s: os }) => {
+      l.setAttribute("stroke-width", os === s ? "2.5" : "1");
+      l.setAttribute("opacity", os === s ? "1" : "0.12");
+    });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    const nearest = s.pts.reduce((a, b) => Math.abs(b.y - yr) < Math.abs(a.y - yr) ? b : a);
+    tip.textContent = `${s.n}: ${nearest.v.toLocaleString()} researchers/million (${nearest.y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hitPath.addEventListener("mouseout", () => {
+    seriesGroups.forEach(({ line: l }) => {
+      l.setAttribute("stroke-width", "1.8");
+      l.setAttribute("opacity", "1");
+    });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+endLabels.forEach(({ series: s, y: ly }) => {
+  const last = s.pts[s.pts.length - 1];
+  const origY = yScale(last.v);
+  const lx = xScale(last.y) + 6;
+  // Leader line if label moved
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mk("line", {
+      x1: xScale(last.y), y1: origY,
+      x2: lx - 2, y2: ly,
+      stroke: colors[s.n] || "#888", "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+  const dot = mk("circle", { cx: xScale(last.y), cy: origY, r: "3", fill: colors[s.n] || "#888" });
+  svg.appendChild(dot);
+  const t = mk("text", {
+    x: lx + 2, y: ly + 4,
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9", fill: "#2B2A27"
+  });
+  const name = s.n === "Korea, Rep." ? "Korea" : s.n;
+  t.textContent = `${last.v.toLocaleString()}  ${name}`;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

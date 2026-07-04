@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #fff;
+    color: #0f172a;
+  }
+  h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+  #chart { width: 100%; max-width: 720px; }
+  .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+  #tip {
+    position: fixed;
+    background: #1e293b;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<h1>Child Wasting: Acute Undernutrition Under Age 5</h1>
+<p class="subtitle">Share of children under 5 who are wasted (low weight for height), a marker of acute malnutrition. Most recent year available (2010–2024). Top 40 countries.</p>
+<div id="chart"></div>
+<p class="source">Source: World Bank (SH.STA.WAST.ZS) — UNICEF/WHO/World Bank joint malnutrition estimates</p>
+<div id="tip"></div>
+<script>
+const data = [{"n":"India","v":18.7,"y":2020},{"n":"Eritrea","v":14.6,"y":2010},{"n":"Djibouti","v":12.1,"y":2023},{"n":"Bangladesh","v":10.7,"y":2022},{"n":"Cambodia","v":9.6,"y":2021},{"n":"Burkina Faso","v":9.3,"y":2021},{"n":"Indonesia","v":8.4,"y":2023},{"n":"Benin","v":8.3,"y":2021},{"n":"Congo, Rep.","v":8.2,"y":2014},{"n":"Cote d'Ivoire","v":8.1,"y":2021},{"n":"Burundi","v":7.8,"y":2024},{"n":"Chad","v":7.8,"y":2022},{"n":"Guinea-Bissau","v":7.8,"y":2019},{"n":"Congo, Dem. Rep.","v":7.2,"y":2023},{"n":"Ethiopia","v":6.8,"y":2019},{"n":"Barbados","v":6.8,"y":2012},{"n":"Guyana","v":6.5,"y":2019},{"n":"Guinea","v":6.4,"y":2022},{"n":"Bulgaria","v":5.9,"y":2014},{"n":"Ghana","v":5.8,"y":2022},{"n":"Bhutan","v":5.1,"y":2023},{"n":"Comoros","v":5.1,"y":2022},{"n":"Gambia, The","v":5.1,"y":2020},{"n":"Haiti","v":5.0,"y":2023},{"n":"Angola","v":4.9,"y":2015},{"n":"Fiji","v":4.6,"y":2021},{"n":"Kenya","v":4.5,"y":2022},{"n":"Armenia","v":4.4,"y":2016},{"n":"Cameroon","v":4.3,"y":2018},{"n":"Iran, Islamic Rep.","v":4.3,"y":2017},{"n":"Afghanistan","v":3.6,"y":2022},{"n":"Kiribati","v":3.5,"y":2018},{"n":"Azerbaijan","v":3.5,"y":2023},{"n":"Brazil","v":3.4,"y":2019},{"n":"Gabon","v":3.4,"y":2020},{"n":"Jamaica","v":3.2,"y":2018},{"n":"Kazakhstan","v":3.1,"y":2015},{"n":"Equatorial Guinea","v":3.1,"y":2011},{"n":"Iraq","v":3.0,"y":2018},{"n":"El Salvador","v":2.9,"y":2021}];
+
+const W = 700;
+const rowH = 18;
+const labelW = 170;
+const barMaxW = 400;
+const padLeft = 10;
+const padTop = 10;
+const padBottom = 28;
+const H = data.length * rowH + padTop + padBottom;
+
+function mk(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(v) {
+  if (v >= 15) return "#B34B3B";
+  if (v >= 10) return "#C4715A";
+  if (v >= 7)  return "#C49A45";
+  if (v >= 4)  return "#8BAD72";
+  return "#3D7A5A";
+}
+
+const maxV = 20;
+const svg = mk("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+
+// Grid lines
+for (let pct of [5, 10, 15, 20]) {
+  const x = labelW + padLeft + (pct / maxV) * barMaxW;
+  svg.appendChild(mk("line", { x1: x, y1: padTop, x2: x, y2: H - padBottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mk("text", { x: x, y: padTop - 3, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = pct + "%";
+  svg.appendChild(t);
+}
+
+// WHO emergency threshold reference line at 15%
+const xEmergency = labelW + padLeft + (15 / maxV) * barMaxW;
+svg.appendChild(mk("line", { x1: xEmergency, y1: padTop, x2: xEmergency, y2: H - padBottom, stroke: "#B34B3B", "stroke-width": "0.8", "stroke-dasharray": "4,3", opacity: "0.6" }));
+const tEmergency = mk("text", { x: xEmergency + 3, y: padTop + 10, "font-family": "Inter, sans-serif", "font-size": "8", fill: "#B34B3B", opacity: "0.7" });
+tEmergency.textContent = "WHO emergency";
+svg.appendChild(tEmergency);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = padTop + i * rowH;
+  const barW = (d.v / maxV) * barMaxW;
+  const barX = labelW + padLeft;
+  const barY = y + 3;
+  const barH2 = rowH - 6;
+
+  const g = mk("g");
+  g.style.cursor = "default";
+
+  const bg = mk("rect", { x: 0, y: y, width: W, height: rowH, fill: "transparent" });
+  g.appendChild(bg);
+
+  const rect = mk("rect", { x: barX, y: barY, width: barW, height: barH2, fill: colorFor(d.v), rx: "2" });
+  g.appendChild(rect);
+
+  const lbl = mk("text", { x: labelW + padLeft - 6, y: y + rowH / 2 + 4, "text-anchor": "end", "font-family": "Inter, sans-serif", "font-size": "10", fill: "#2B2A27" });
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  if (barW > 22) {
+    const vlbl = mk("text", { x: barX + barW - 4, y: y + rowH / 2 + 4, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#fff" });
+    vlbl.textContent = d.v.toFixed(1) + "%";
+    g.appendChild(vlbl);
+  } else {
+    const vlbl = mk("text", { x: barX + barW + 4, y: y + rowH / 2 + 4, "text-anchor": "start", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#64748b" });
+    vlbl.textContent = d.v.toFixed(1) + "%";
+    g.appendChild(vlbl);
+  }
+
+  g.addEventListener("mouseover", (e) => {
+    bg.setAttribute("fill", "#F8F7F2");
+    tip.textContent = `${d.n}: ${d.v.toFixed(1)}% wasted (${d.y})`;
+    tip.style.opacity = "1";
+  });
+  g.addEventListener("mousemove", (e) => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseout", () => {
+    bg.setAttribute("fill", "transparent");
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+});
+
+// Legend
+const legendY = H - padBottom + 8;
+const legendItems = [
+  { color: "#B34B3B", label: "≥ 15%" },
+  { color: "#C4715A", label: "10–15%" },
+  { color: "#C49A45", label: "7–10%" },
+  { color: "#8BAD72", label: "4–7%" },
+  { color: "#3D7A5A", label: "< 4%" },
+];
+let lx = labelW + padLeft;
+legendItems.forEach(({ color, label }) => {
+  svg.appendChild(mk("rect", { x: lx, y: legendY, width: 10, height: 10, fill: color, rx: "2" }));
+  const t = mk("text", { x: lx + 13, y: legendY + 9, "font-family": "Inter, sans-serif", "font-size": "9", fill: "#64748b" });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 65;
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>
