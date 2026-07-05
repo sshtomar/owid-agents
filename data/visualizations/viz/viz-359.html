@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Aging Burden: Old-Age Dependency Ratio, 1970–2024</h1>
+<p class="subtitle">Elderly population (65+) as a share of working-age population (15–64). Japan's ratio has more than quadrupled since 1970 — South Korea is on the same trajectory.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Age Dependency Ratio, Old (SP.POP.DPND.OL)</p>
+<script>
+const data = [{"n":"Japan","pts":[{"y":1970,"v":10.1},{"y":1971,"v":10.4},{"y":1972,"v":10.7},{"y":1973,"v":11.0},{"y":1974,"v":11.3},{"y":1975,"v":11.6},{"y":1976,"v":12.0},{"y":1977,"v":12.3},{"y":1978,"v":12.7},{"y":1979,"v":13.1},{"y":1980,"v":13.4},{"y":1981,"v":13.8},{"y":1982,"v":14.2},{"y":1983,"v":14.4},{"y":1984,"v":14.8},{"y":1985,"v":15.2},{"y":1986,"v":15.6},{"y":1987,"v":15.9},{"y":1988,"v":16.4},{"y":1989,"v":16.8},{"y":1990,"v":17.4},{"y":1991,"v":18.1},{"y":1992,"v":18.8},{"y":1993,"v":19.5},{"y":1994,"v":20.2},{"y":1995,"v":21.0},{"y":1996,"v":21.9},{"y":1997,"v":22.8},{"y":1998,"v":23.7},{"y":1999,"v":24.6},{"y":2000,"v":25.6},{"y":2001,"v":26.6},{"y":2002,"v":27.6},{"y":2003,"v":28.5},{"y":2004,"v":29.5},{"y":2005,"v":30.7},{"y":2006,"v":32.1},{"y":2007,"v":33.4},{"y":2008,"v":34.7},{"y":2009,"v":35.7},{"y":2010,"v":36.4},{"y":2011,"v":37.5},{"y":2012,"v":39.4},{"y":2013,"v":41.3},{"y":2014,"v":43.1},{"y":2015,"v":44.7},{"y":2016,"v":46.0},{"y":2017,"v":47.1},{"y":2018,"v":47.9},{"y":2019,"v":48.5},{"y":2020,"v":49.1},{"y":2021,"v":49.7},{"y":2022,"v":50.1},{"y":2023,"v":50.3},{"y":2024,"v":50.7}]},{"n":"Germany","pts":[{"y":1970,"v":21.6},{"y":1971,"v":22.0},{"y":1972,"v":22.3},{"y":1973,"v":22.6},{"y":1974,"v":23.0},{"y":1975,"v":23.3},{"y":1976,"v":23.5},{"y":1977,"v":23.7},{"y":1978,"v":23.9},{"y":1979,"v":23.9},{"y":1980,"v":23.7},{"y":1981,"v":23.0},{"y":1982,"v":22.1},{"y":1983,"v":21.3},{"y":1984,"v":20.9},{"y":1985,"v":20.9},{"y":1986,"v":21.1},{"y":1987,"v":21.4},{"y":1988,"v":21.5},{"y":1989,"v":21.5},{"y":1990,"v":21.5},{"y":1991,"v":21.6},{"y":1992,"v":21.7},{"y":1993,"v":21.9},{"y":1994,"v":22.2},{"y":1995,"v":22.5},{"y":1996,"v":22.8},{"y":1997,"v":22.9},{"y":1998,"v":23.2},{"y":1999,"v":23.7},{"y":2000,"v":24.2},{"y":2001,"v":24.9},{"y":2002,"v":25.6},{"y":2003,"v":26.3},{"y":2004,"v":27.3},{"y":2005,"v":28.3},{"y":2006,"v":29.4},{"y":2007,"v":30.3},{"y":2008,"v":30.8},{"y":2009,"v":31.2},{"y":2010,"v":31.3},{"y":2011,"v":31.1},{"y":2012,"v":31.3},{"y":2013,"v":31.6},{"y":2014,"v":31.8},{"y":2015,"v":32.0},{"y":2016,"v":32.2},{"y":2017,"v":32.6},{"y":2018,"v":33.0},{"y":2019,"v":33.4},{"y":2020,"v":33.9},{"y":2021,"v":34.6},{"y":2022,"v":35.3},{"y":2023,"v":36.0},{"y":2024,"v":36.9}]},{"n":"Italy","pts":[{"y":1970,"v":17.2},{"y":1971,"v":17.6},{"y":1972,"v":18.0},{"y":1973,"v":18.4},{"y":1974,"v":18.8},{"y":1975,"v":19.1},{"y":1976,"v":19.4},{"y":1977,"v":19.8},{"y":1978,"v":20.1},{"y":1979,"v":20.4},{"y":1980,"v":20.5},{"y":1981,"v":20.3},{"y":1982,"v":20.1},{"y":1983,"v":19.7},{"y":1984,"v":19.3},{"y":1985,"v":19.5},{"y":1986,"v":19.9},{"y":1987,"v":20.4},{"y":1988,"v":20.9},{"y":1989,"v":21.4},{"y":1990,"v":21.8},{"y":1991,"v":22.2},{"y":1992,"v":22.7},{"y":1993,"v":23.2},{"y":1994,"v":24.4},{"y":1995,"v":24.9},{"y":1996,"v":24.9},{"y":1997,"v":25.4},{"y":1998,"v":25.9},{"y":1999,"v":26.4},{"y":2000,"v":27.0},{"y":2001,"v":27.5},{"y":2002,"v":28.1},{"y":2003,"v":28.6},{"y":2004,"v":29.1},{"y":2005,"v":29.6},{"y":2006,"v":30.2},{"y":2007,"v":30.6},{"y":2008,"v":30.7},{"y":2009,"v":30.9},{"y":2010,"v":31.2},{"y":2011,"v":31.7},{"y":2012,"v":32.3},{"y":2013,"v":32.9},{"y":2014,"v":33.7},{"y":2015,"v":34.3},{"y":2016,"v":34.8},{"y":2017,"v":35.2},{"y":2018,"v":35.6},{"y":2019,"v":36.2},{"y":2020,"v":36.6},{"y":2021,"v":37.1},{"y":2022,"v":37.6},{"y":2023,"v":38.1},{"y":2024,"v":38.8}]},{"n":"France","pts":[{"y":1970,"v":20.6},{"y":1971,"v":20.8},{"y":1972,"v":21.0},{"y":1973,"v":21.1},{"y":1974,"v":21.3},{"y":1975,"v":21.5},{"y":1976,"v":21.6},{"y":1977,"v":21.8},{"y":1978,"v":21.9},{"y":1979,"v":22.1},{"y":1980,"v":21.9},{"y":1981,"v":21.2},{"y":1982,"v":20.6},{"y":1983,"v":20.0},{"y":1984,"v":19.6},{"y":1985,"v":19.6},{"y":1986,"v":19.9},{"y":1987,"v":20.3},{"y":1988,"v":20.6},{"y":1989,"v":20.9},{"y":1990,"v":21.2},{"y":1991,"v":21.6},{"y":1992,"v":22.0},{"y":1993,"v":22.3},{"y":1994,"v":22.7},{"y":1995,"v":23.1},{"y":1996,"v":23.5},{"y":1997,"v":23.8},{"y":1998,"v":24.1},{"y":1999,"v":24.4},{"y":2000,"v":24.6},{"y":2001,"v":24.8},{"y":2002,"v":24.9},{"y":2003,"v":25.0},{"y":2004,"v":25.2},{"y":2005,"v":25.3},{"y":2006,"v":25.3},{"y":2007,"v":25.3},{"y":2008,"v":25.5},{"y":2009,"v":25.7},{"y":2010,"v":25.9},{"y":2011,"v":26.5},{"y":2012,"v":27.3},{"y":2013,"v":28.2},{"y":2014,"v":29.1},{"y":2015,"v":30.0},{"y":2016,"v":30.8},{"y":2017,"v":31.5},{"y":2018,"v":32.2},{"y":2019,"v":32.9},{"y":2020,"v":33.6},{"y":2021,"v":34.1},{"y":2022,"v":34.7},{"y":2023,"v":35.4},{"y":2024,"v":36.1}]},{"n":"Brazil","pts":[{"y":1970,"v":5.4},{"y":1971,"v":5.5},{"y":1972,"v":5.6},{"y":1973,"v":5.6},{"y":1974,"v":5.7},{"y":1975,"v":5.8},{"y":1976,"v":5.8},{"y":1977,"v":5.9},{"y":1978,"v":5.9},{"y":1979,"v":6.0},{"y":1980,"v":6.1},{"y":1981,"v":6.1},{"y":1982,"v":6.2},{"y":1983,"v":6.2},{"y":1984,"v":6.3},{"y":1985,"v":6.3},{"y":1986,"v":6.4},{"y":1987,"v":6.5},{"y":1988,"v":6.6},{"y":1989,"v":6.7},{"y":1990,"v":6.8},{"y":1991,"v":6.9},{"y":1992,"v":7.0},{"y":1993,"v":7.2},{"y":1994,"v":7.3},{"y":1995,"v":7.4},{"y":1996,"v":7.5},{"y":1997,"v":7.6},{"y":1998,"v":7.7},{"y":1999,"v":7.8},{"y":2000,"v":7.9},{"y":2001,"v":8.0},{"y":2002,"v":8.2},{"y":2003,"v":8.3},{"y":2004,"v":8.4},{"y":2005,"v":8.6},{"y":2006,"v":8.8},{"y":2007,"v":9.0},{"y":2008,"v":9.2},{"y":2009,"v":9.5},{"y":2010,"v":9.7},{"y":2011,"v":10.0},{"y":2012,"v":10.3},{"y":2013,"v":10.6},{"y":2014,"v":11.0},{"y":2015,"v":11.4},{"y":2016,"v":11.9},{"y":2017,"v":12.3},{"y":2018,"v":12.8},{"y":2019,"v":13.3},{"y":2020,"v":13.8},{"y":2021,"v":14.2},{"y":2022,"v":14.7},{"y":2023,"v":15.3},{"y":2024,"v":15.9}]},{"n":"China","pts":[{"y":1970,"v":6.7},{"y":1971,"v":6.7},{"y":1972,"v":6.8},{"y":1973,"v":6.8},{"y":1974,"v":6.9},{"y":1975,"v":7.1},{"y":1976,"v":7.2},{"y":1977,"v":7.3},{"y":1978,"v":7.3},{"y":1979,"v":7.3},{"y":1980,"v":7.4},{"y":1981,"v":7.4},{"y":1982,"v":7.5},{"y":1983,"v":7.5},{"y":1984,"v":7.5},{"y":1985,"v":7.6},{"y":1986,"v":7.6},{"y":1987,"v":7.7},{"y":1988,"v":7.8},{"y":1989,"v":7.9},{"y":1990,"v":8.1},{"y":1991,"v":8.3},{"y":1992,"v":8.4},{"y":1993,"v":8.7},{"y":1994,"v":8.9},{"y":1995,"v":9.1},{"y":1996,"v":9.3},{"y":1997,"v":9.5},{"y":1998,"v":9.8},{"y":1999,"v":10.0},{"y":2000,"v":10.3},{"y":2001,"v":10.5},{"y":2002,"v":10.6},{"y":2003,"v":10.8},{"y":2004,"v":10.9},{"y":2005,"v":11.0},{"y":2006,"v":11.1},{"y":2007,"v":11.3},{"y":2008,"v":11.5},{"y":2009,"v":11.7},{"y":2010,"v":11.9},{"y":2011,"v":12.2},{"y":2012,"v":12.5},{"y":2013,"v":12.9},{"y":2014,"v":13.4},{"y":2015,"v":14.0},{"y":2016,"v":14.7},{"y":2017,"v":15.5},{"y":2018,"v":16.4},{"y":2019,"v":17.3},{"y":2020,"v":18.2},{"y":2021,"v":19.1},{"y":2022,"v":19.9},{"y":2023,"v":20.7},{"y":2024,"v":21.2}]},{"n":"India","pts":[{"y":1970,"v":6.7},{"y":1971,"v":6.7},{"y":1972,"v":6.8},{"y":1973,"v":6.8},{"y":1974,"v":6.9},{"y":1975,"v":6.9},{"y":1976,"v":7.0},{"y":1977,"v":7.0},{"y":1978,"v":7.0},{"y":1979,"v":7.0},{"y":1980,"v":7.0},{"y":1981,"v":7.0},{"y":1982,"v":7.0},{"y":1983,"v":7.0},{"y":1984,"v":7.0},{"y":1985,"v":7.0},{"y":1986,"v":7.0},{"y":1987,"v":7.0},{"y":1988,"v":7.0},{"y":1989,"v":7.0},{"y":1990,"v":7.0},{"y":1991,"v":7.0},{"y":1992,"v":7.1},{"y":1993,"v":7.1},{"y":1994,"v":7.1},{"y":1995,"v":7.2},{"y":1996,"v":7.2},{"y":1997,"v":7.2},{"y":1998,"v":7.3},{"y":1999,"v":7.3},{"y":2000,"v":7.3},{"y":2001,"v":7.4},{"y":2002,"v":7.4},{"y":2003,"v":7.5},{"y":2004,"v":7.5},{"y":2005,"v":7.6},{"y":2006,"v":7.6},{"y":2007,"v":7.6},{"y":2008,"v":7.7},{"y":2009,"v":7.7},{"y":2010,"v":7.8},{"y":2011,"v":7.8},{"y":2012,"v":7.9},{"y":2013,"v":8.0},{"y":2014,"v":8.1},{"y":2015,"v":8.3},{"y":2016,"v":8.6},{"y":2017,"v":8.8},{"y":2018,"v":9.0},{"y":2019,"v":9.3},{"y":2020,"v":9.5},{"y":2021,"v":9.7},{"y":2022,"v":9.9},{"y":2023,"v":10.2},{"y":2024,"v":10.5}]},{"n":"Indonesia","pts":[{"y":1970,"v":5.7},{"y":1975,"v":6.3},{"y":1980,"v":6.6},{"y":1985,"v":6.6},{"y":1990,"v":6.7},{"y":1995,"v":7.2},{"y":2000,"v":7.8},{"y":2005,"v":8.5},{"y":2010,"v":8.9},{"y":2015,"v":9.1},{"y":2020,"v":9.8},{"y":2024,"v":10.7}]},{"n":"South Korea","pts":[{"y":1970,"v":6.2},{"y":1971,"v":6.2},{"y":1972,"v":6.3},{"y":1973,"v":6.3},{"y":1974,"v":6.3},{"y":1975,"v":6.2},{"y":1976,"v":6.2},{"y":1977,"v":6.2},{"y":1978,"v":6.1},{"y":1979,"v":6.1},{"y":1980,"v":6.2},{"y":1981,"v":6.2},{"y":1982,"v":6.3},{"y":1983,"v":6.4},{"y":1984,"v":6.4},{"y":1985,"v":6.5},{"y":1986,"v":6.6},{"y":1987,"v":6.7},{"y":1988,"v":6.8},{"y":1989,"v":6.9},{"y":1990,"v":7.1},{"y":1991,"v":7.2},{"y":1992,"v":7.4},{"y":1993,"v":7.6},{"y":1994,"v":7.9},{"y":1995,"v":8.1},{"y":1996,"v":8.3},{"y":1997,"v":8.6},{"y":1998,"v":9.0},{"y":1999,"v":9.4},{"y":2000,"v":9.9},{"y":2001,"v":10.4},{"y":2002,"v":10.9},{"y":2003,"v":11.4},{"y":2004,"v":12.0},{"y":2005,"v":12.5},{"y":2006,"v":13.1},{"y":2007,"v":13.7},{"y":2008,"v":14.2},{"y":2009,"v":14.6},{"y":2010,"v":15.1},{"y":2011,"v":15.6},{"y":2012,"v":16.0},{"y":2013,"v":16.5},{"y":2014,"v":17.1},{"y":2015,"v":17.7},{"y":2016,"v":18.2},{"y":2017,"v":19.0},{"y":2018,"v":19.8},{"y":2019,"v":20.8},{"y":2020,"v":22.0},{"y":2021,"v":23.3},{"y":2022,"v":24.6},{"y":2023,"v":25.9},{"y":2024,"v":27.5}]}];
+
+const COLORS = ["#EA5E33","#3D7A5A","#F29A44","#4472C4","#C49A45","#8B6BB0","#5B9E78","#9A9890","#B34B3B"];
+
+const W = 800, H = 440;
+const margin = { top: 36, right: 130, bottom: 36, left: 44 };
+const yearMin = 1970, yearMax = 2024;
+const valMin = 0, valMax = 55;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text"); lbl.textContent = v + "%";
+  lbl.setAttribute("x", margin.left - 6); lbl.setAttribute("y", yScale(v) + 3);
+  lbl.setAttribute("text-anchor", "end"); lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "8"); lbl.setAttribute("fill", "#7A786F");
+  svg.appendChild(lbl);
+});
+
+[1970, 1980, 1990, 2000, 2010, 2020, 2024].forEach(y => {
+  const lbl = mkEl("text"); lbl.textContent = y;
+  lbl.setAttribute("x", xScale(y)); lbl.setAttribute("y", H - margin.bottom + 14);
+  lbl.setAttribute("text-anchor", "middle"); lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "8"); lbl.setAttribute("fill", "#7A786F");
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = margin.top - 2, bot = H - margin.bottom + 4;
+  sorted.forEach(item => { item.y = Math.max(top, Math.min(bot, item.y)); });
+  return sorted;
+}
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+const endLabels = data.map((series, i) => {
+  const last = series.pts[series.pts.length - 1];
+  return { n: series.n, y: yScale(last.v), v: last.v, i };
+});
+const resolved = resolveCollisions(endLabels, 11);
+const labelMap = {};
+resolved.forEach(item => { labelMap[item.i] = item.y; });
+
+data.forEach((series, i) => {
+  const color = COLORS[i % COLORS.length];
+  const g = mkEl("g");
+  g.style.opacity = "1"; g.style.cursor = "pointer";
+
+  const pathD = series.pts.map((p, j) =>
+    `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`
+  ).join(" ");
+
+  g.appendChild(mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  }));
+
+  const hitPath = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hitPath);
+
+  const last = series.pts[series.pts.length - 1];
+  const labelY = labelMap[i];
+  const anchorX = xScale(last.y) + 5;
+  const actualY = yScale(last.v);
+  if (Math.abs(labelY - actualY) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: anchorX, y1: actualY, x2: anchorX + 1, y2: labelY,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const lbl = mkEl("text"); lbl.textContent = `${last.v.toFixed(1)}% ${series.n}`;
+  lbl.setAttribute("x", anchorX + 3); lbl.setAttribute("y", labelY + 3);
+  lbl.setAttribute("font-family", "'Inter', sans-serif");
+  lbl.setAttribute("font-size", "8.5"); lbl.setAttribute("font-weight", "500");
+  lbl.setAttribute("fill", color);
+  g.appendChild(lbl);
+
+  hitPath.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yIdx = Math.round(ratio * (series.pts.length - 1));
+    const pt = series.pts[Math.min(yIdx, series.pts.length - 1)];
+    tip.textContent = `${series.n} ${pt.y}: ${pt.v.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+</script>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Primary School Completion Rate: ~2000 vs. ~2022</h1>
+<p class="subtitle">Share of children completing primary school (% of relevant age group). Low-income countries made sweeping gains over two decades — some doubling their completion rates.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Primary Completion Rate (SE.PRM.CMPT.ZS)</p>
+<script>
+const data = [{"n":"Cote d'Ivoire","before":37.7,"after":80.2},{"n":"Cambodia","before":50.6,"after":91.0},{"n":"DR Congo","before":39.6,"after":75.7},{"n":"Ghana","before":63.0,"after":97.5},{"n":"Bhutan","before":52.9,"after":86.5},{"n":"Ethiopia","before":27.0,"after":54.4},{"n":"Burkina Faso","before":25.2,"after":52.0},{"n":"Guinea","before":33.7,"after":59.9},{"n":"India","before":74.8,"after":94.5},{"n":"Guatemala","before":56.2,"after":86.5},{"n":"Dominican Rep.","before":78.3,"after":90.0},{"n":"Jordan","before":85.7,"after":97.0},{"n":"Indonesia","before":95.4,"after":100.0},{"n":"Colombia","before":97.0,"after":97.1},{"n":"Argentina","before":98.4,"after":98.9},{"n":"Cuba","before":96.2,"after":91.1},{"n":"Honduras","before":76.9,"after":72.0},{"n":"Germany","before":103.5,"after":96.8}];
+
+const W = 700, H = 560;
+const pad = { left: 130, right: 140, top: 40, bottom: 20 };
+const minV = 20, maxV = 108;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left, xRight = W - pad.right;
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Column headers
+const hdrStyle = { "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F" };
+const h1 = mkEl("text", {...hdrStyle, "text-anchor": "middle"}); h1.textContent = "~2000"; h1.setAttribute("x", xLeft); h1.setAttribute("y", pad.top - 14); svg.appendChild(h1);
+const h2 = mkEl("text", {...hdrStyle, "text-anchor": "middle"}); h2.textContent = "~2022"; h2.setAttribute("x", xRight); h2.setAttribute("y", pad.top - 14); svg.appendChild(h2);
+
+// 100% reference line
+[100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+    stroke: "#C2C0B5", "stroke-dasharray": "4,3", "stroke-width": "0.6"
+  }));
+  const lbl = mkEl("text"); lbl.textContent = "100%"; lbl.setAttribute("x", xLeft - 8); lbl.setAttribute("y", scale(v) + 3);
+  lbl.setAttribute("text-anchor", "end"); lbl.setAttribute("font-family", "'JetBrains Mono', monospace"); lbl.setAttribute("font-size", "7"); lbl.setAttribute("fill", "#9A9890");
+  svg.appendChild(lbl);
+});
+
+function colorForChange(d) {
+  const c = d.after - d.before;
+  if (c > 40) return "#3D7A5A";
+  if (c > 25) return "#5B9E78";
+  if (c > 12) return "#8BAD72";
+  if (c > 2)  return "#C49A45";
+  if (c >= -3) return "#7A786F";
+  return "#C4715A";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to chart bounds
+  const top = pad.top - 2, bot = H - pad.bottom + 4;
+  for (let i = 0; i < sorted.length; i++) {
+    sorted[i].y = Math.max(top, Math.min(bot, sorted[i].y));
+  }
+  return sorted;
+}
+
+const leftLabels = data.map((d, i) => ({ n: d.n, v: d.before, y: scale(d.before), i }));
+const rightLabels = data.map((d, i) => ({ n: d.n, v: d.after, y: scale(d.after), i }));
+const rLeft = resolveCollisions(leftLabels, 13);
+const rRight = resolveCollisions(rightLabels, 13);
+const leftYMap = {}, rightYMap = {};
+rLeft.forEach(item => { leftYMap[item.i] = item.y; });
+rRight.forEach(item => { rightYMap[item.i] = item.y; });
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const g = mkEl("g");
+  g.style.opacity = "1";
+  g.style.cursor = "pointer";
+
+  // Connecting line
+  g.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(d.before), x2: xRight, y2: scale(d.after),
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  }));
+
+  // Invisible wide hit area
+  const hit = mkEl("line", {
+    x1: xLeft, y1: scale(d.before), x2: xRight, y2: scale(d.after),
+    stroke: "transparent", "stroke-width": "12"
+  });
+  g.appendChild(hit);
+
+  // Dots at endpoints
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: scale(d.before), r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: scale(d.after), r: "3", fill: color }));
+
+  // Left label
+  const ly = leftYMap[i];
+  if (Math.abs(ly - scale(d.before)) > 2) {
+    g.appendChild(mkEl("line", { x1: xLeft - 4, y1: scale(d.before), x2: xLeft - 4, y2: ly, stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const ll = mkEl("text"); ll.textContent = `${d.before.toFixed(0)}  ${d.n}`;
+  ll.setAttribute("x", xLeft - 8); ll.setAttribute("y", ly + 3.5);
+  ll.setAttribute("text-anchor", "end"); ll.setAttribute("font-family", "'Inter', sans-serif");
+  ll.setAttribute("font-size", "9"); ll.setAttribute("fill", "#2B2A27");
+  g.appendChild(ll);
+
+  // Right label
+  const ry = rightYMap[i];
+  if (Math.abs(ry - scale(d.after)) > 2) {
+    g.appendChild(mkEl("line", { x1: xRight + 4, y1: scale(d.after), x2: xRight + 4, y2: ry, stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const chg = d.after - d.before;
+  const rl = mkEl("text"); rl.textContent = `${d.after.toFixed(0)}  ${chg >= 0 ? '+' : ''}${chg.toFixed(0)}`;
+  rl.setAttribute("x", xRight + 8); rl.setAttribute("y", ry + 3.5);
+  rl.setAttribute("font-family", "'Inter', sans-serif");
+  rl.setAttribute("font-size", "9"); rl.setAttribute("fill", color);
+  g.appendChild(rl);
+
+  // Hover
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    tip.textContent = `${d.n}: ${d.before}% → ${d.after}% (${chg >= 0 ? '+' : ''}${chg.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Legend
+const legend = [
+  { color: "#3D7A5A", label: "+40pp gain" },
+  { color: "#5B9E78", label: "+25–40pp" },
+  { color: "#8BAD72", label: "+12–25pp" },
+  { color: "#C49A45", label: "+2–12pp" },
+  { color: "#C4715A", label: "Decline" },
+];
+legend.forEach((l, i) => {
+  const lx = pad.left + i * 104;
+  const ly = H - 2;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 9, height: 9, fill: l.color, rx: "1" }));
+  const lt = mkEl("text"); lt.textContent = l.label;
+  lt.setAttribute("x", lx + 12); lt.setAttribute("y", ly + 1);
+  lt.setAttribute("font-family", "'Inter', sans-serif"); lt.setAttribute("font-size", "8");
+  lt.setAttribute("fill", "#7A786F");
+  svg.appendChild(lt);
+});
+</script>
+</body></html>

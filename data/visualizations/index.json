@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Consumer Price Inflation, 2000\u20132024",
+      "description": "Trend lines showing annual consumer price inflation (%) for 10 major economies over 25 years. The 2021\u20132022 global surge hit all economies, but baseline inflation varied dramatically \u2014 from Japan's near-zero deflation to Ghana's chronic double-digit rates.",
+      "datasetIds": [
+        "wb--FP-CPI-TOTL-ZG"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan had negative inflation for much of 2000\u20132021, a deflationary outlier",
+        "Ghana ran at 10\u201340% inflation throughout the period",
+        "All 10 economies saw inflation spike in 2022, converging briefly"
+      ],
+      "createdAt": "2026-07-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Primary School Completion Rate: ~2000 vs. ~2022",
+      "description": "Slope chart comparing primary school completion rates (% of relevant age group) around 2000 vs. 2022 for 18 countries. Sub-Saharan African and Southeast Asian countries made sweeping gains, some nearly doubling their rates.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "C\u00f4te d'Ivoire improved from 37.7% to 80.2% \u2014 a 42pp gain in two decades",
+        "Cambodia went from 50.6% to 91%, Ghana from 63% to 97.5%",
+        "Burkina Faso and Ethiopia are still below 55%, with the furthest to go"
+      ],
+      "createdAt": "2026-07-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "The Aging Burden: Old-Age Dependency Ratio, 1970\u20132024",
+      "description": "Trend lines showing the elderly population (65+) as a share of working-age population (15\u201364) from 1970 to 2024. Japan's ratio has more than quadrupled; South Korea is accelerating on the same path.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan's ratio crossed 50% in 2022 \u2014 one retired person for every two workers",
+        "South Korea's dependency ratio is rising faster now than Japan's did in the 1980s",
+        "India and Indonesia remain under 11%, providing a demographic dividend"
+      ],
+      "createdAt": "2026-07-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Renewable Energy Share of Total Final Consumption: 1990 vs. 2022",
+      "description": "Slope chart comparing renewables as % of total final energy consumption (including transport and heat) in 1990 vs. 2022. Europe deliberately scaled up from near-zero; many developing nations saw shares fall as fossil fuels grew faster than renewables.",
+      "datasetIds": [
+        "wb--EG-FEC-RNEW-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Estonia went from 3.5% to 38%, Denmark from 7% to 39.5% \u2014 deliberate policy transition",
+        "Bangladesh fell from 71.7% to 25% as fossil fuels powered economic growth",
+        "Iceland reached 82.4%, already nearly fully renewable"
+      ],
+      "createdAt": "2026-07-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Breast Cancer 5-Year Survival Rate, 2021",
+      "description": "Horizontal bar chart ranking 28 countries by 5-year breast cancer net survival rate. The gap between high-income and low-income countries is nearly 70 percentage points \u2014 driven by late-stage diagnosis and treatment access.",
+      "datasetIds": [
+        "who--CANCERSURVIVAL_BREASTCANCER"
+      ],
+      "chartType": "bar",
+      "highlights": [
+        "Sweden (92.5%) and Monaco (94%) lead; Central African Republic (24.6%) and Lesotho (26.6%) are at the bottom",
+        "Nigeria and Somalia below 30%, compared to USA, Australia, Japan all above 90%",
+        "Brazil (90.3%) matches high-income peers despite being upper-middle-income"
+      ],
+      "createdAt": "2026-07-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-05T00:00:00.000Z"
 }

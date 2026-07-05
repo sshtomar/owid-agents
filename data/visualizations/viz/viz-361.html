@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Breast Cancer 5-Year Survival Rate, 2021</h1>
+<p class="subtitle">Net survival rate (%) five years after diagnosis. In high-income countries, more than 9 in 10 patients survive. In Sub-Saharan Africa, fewer than 3 in 10 do — a gap driven by late-stage diagnosis and access to treatment.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — Breast Cancer Survival (CANCERSURVIVAL_BREASTCANCER) · 2021</p>
+<script>
+const data = [{"n":"Monaco","v":94.0},{"n":"Sweden","v":92.5},{"n":"Cyprus","v":91.8},{"n":"Japan","v":91.7},{"n":"Belgium","v":91.5},{"n":"Finland","v":91.4},{"n":"Denmark","v":91.0},{"n":"USA","v":90.9},{"n":"Australia","v":90.8},{"n":"Israel","v":90.4},{"n":"Brazil","v":90.3},{"n":"South Korea","v":88.6},{"n":"Argentina","v":84.9},{"n":"Mexico","v":81.2},{"n":"Chile","v":80.7},{"n":"China","v":80.5},{"n":"Thailand","v":77.6},{"n":"India","v":65.7},{"n":"Egypt","v":65.1},{"n":"South Africa","v":54.4},{"n":"Ghana","v":49.0},{"n":"Kenya","v":43.4},{"n":"Ethiopia","v":43.3},{"n":"Eswatini","v":30.6},{"n":"Somalia","v":29.9},{"n":"Nigeria","v":27.7},{"n":"Lesotho","v":26.6},{"n":"Cent. African Rep.","v":24.6}];
+
+const barH = 18, gap = 4;
+const padL = 130, padR = 60, padT = 16, padB = 16;
+const maxVal = 100;
+const W = 680;
+const H = data.length * (barH + gap) + padT + padB;
+const barW = W - padL - padR;
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function colorForVal(v) {
+  if (v >= 88) return "#3D7A5A";
+  if (v >= 75) return "#5B9E78";
+  if (v >= 60) return "#8BAD72";
+  if (v >= 45) return "#C49A45";
+  if (v >= 35) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Background grid lines at 25%, 50%, 75%, 100%
+[25, 50, 75, 100].forEach(v => {
+  const x = padL + (v / maxVal) * barW;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: padT - 4,
+    x2: x, y2: H - padB + 4,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text"); lbl.textContent = v + "%";
+  lbl.setAttribute("x", x); lbl.setAttribute("y", padT - 6);
+  lbl.setAttribute("text-anchor", "middle");
+  lbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  lbl.setAttribute("font-size", "7"); lbl.setAttribute("fill", "#9A9890");
+  svg.appendChild(lbl);
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = padT + i * (barH + gap);
+  const color = colorForVal(d.v);
+  const w = (d.v / maxVal) * barW;
+
+  // Background bar
+  svg.appendChild(mkEl("rect", {
+    x: padL, y: y, width: barW, height: barH,
+    fill: "#E2E0D5", rx: "2"
+  }));
+
+  // Value bar
+  const bar = mkEl("rect", {
+    x: padL, y: y, width: w, height: barH,
+    fill: color, rx: "2"
+  });
+  bar.style.cursor = "pointer";
+  svg.appendChild(bar);
+
+  // Country name (left)
+  const lbl = mkEl("text"); lbl.textContent = d.n;
+  lbl.setAttribute("x", padL - 6); lbl.setAttribute("y", y + barH / 2 + 3.5);
+  lbl.setAttribute("text-anchor", "end");
+  lbl.setAttribute("font-family", "'Inter', sans-serif");
+  lbl.setAttribute("font-size", "9"); lbl.setAttribute("fill", "#2B2A27");
+  svg.appendChild(lbl);
+
+  // Value (right of bar)
+  const vlbl = mkEl("text"); vlbl.textContent = d.v.toFixed(1) + "%";
+  vlbl.setAttribute("x", padL + w + 5); vlbl.setAttribute("y", y + barH / 2 + 3.5);
+  vlbl.setAttribute("font-family", "'JetBrains Mono', monospace");
+  vlbl.setAttribute("font-size", "8"); vlbl.setAttribute("fill", color);
+  svg.appendChild(vlbl);
+
+  // Hover
+  [bar].forEach(el => {
+    el.addEventListener("mouseenter", e => {
+      svg.querySelectorAll("rect[fill]").forEach(r => { if (r !== bar && r.getAttribute("fill") !== "#E2E0D5") r.style.opacity = "0.2"; });
+      tip.textContent = `${d.n}: ${d.v}% 5-year survival`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 24) + "px";
+    });
+    el.addEventListener("mouseleave", () => {
+      svg.querySelectorAll("rect").forEach(r => { r.style.opacity = "1"; });
+      tip.style.opacity = "0";
+    });
+  });
+});
+
+// Legend
+const legend = [
+  { color: "#3D7A5A", label: "≥88%" },
+  { color: "#5B9E78", label: "75–88%" },
+  { color: "#8BAD72", label: "60–75%" },
+  { color: "#C49A45", label: "45–60%" },
+  { color: "#C4715A", label: "35–45%" },
+  { color: "#B34B3B", label: "<35%" },
+];
+const legendY = H + 4;
+legend.forEach((l, i) => {
+  const lx = padL + i * 82;
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY, width: 9, height: 9, fill: l.color, rx: "1" }));
+  const lt = mkEl("text"); lt.textContent = l.label;
+  lt.setAttribute("x", lx + 12); lt.setAttribute("y", legendY + 8);
+  lt.setAttribute("font-family", "'Inter', sans-serif"); lt.setAttribute("font-size", "8");
+  lt.setAttribute("fill", "#7A786F");
+  svg.appendChild(lt);
+});
+svg.setAttribute("viewBox", `0 0 ${W} ${H + 18}`);
+</script>
+</body></html>
