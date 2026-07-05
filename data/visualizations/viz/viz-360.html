@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Renewable Energy Share of Total Final Consumption: 1990 vs. 2022</h1>
+<p class="subtitle">Renewable energy as % of total final energy consumption (including transport and heat). European countries scaled up dramatically — while many developing nations saw shares fall as fossil fuel use grew faster.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Renewable Energy Consumption (EG.FEC.RNEW.ZS)</p>
+<script>
+const data = [{"n":"Iceland","a":54.7,"b":82.4,"chg":27.7},{"n":"Finland","a":24.5,"b":50.2,"chg":25.7},{"n":"Brazil","a":49.8,"b":46.5,"chg":-3.3},{"n":"Denmark","a":7.0,"b":39.5,"chg":32.5},{"n":"Ghana","a":80.6,"b":39.0,"chg":-41.6},{"n":"Estonia","a":3.5,"b":38.0,"chg":34.5},{"n":"India","a":53.0,"b":34.9,"chg":-18.1},{"n":"Bangladesh","a":71.7,"b":25.0,"chg":-46.7},{"n":"El Salvador","a":67.1,"b":21.9,"chg":-45.2},{"n":"Greece","a":7.8,"b":21.5,"chg":13.7},{"n":"Indonesia","a":59.2,"b":20.2,"chg":-39.0},{"n":"Germany","a":2.1,"b":17.6,"chg":15.5},{"n":"Italy","a":3.8,"b":17.5,"chg":13.7},{"n":"France","a":10.5,"b":16.2,"chg":5.7},{"n":"China","a":33.9,"b":15.2,"chg":-18.7},{"n":"Bolivia","a":37.0,"b":12.8,"chg":-24.2}];
+
+const W = 700, H = 580;
+const pad = { left: 130, right: 140, top: 40, bottom: 20 };
+const minV = 0, maxV = 90;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left, xRight = W - pad.right;
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Column headers
+const hdrStyle = { "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F" };
+const h1 = mkEl("text", {...hdrStyle, "text-anchor": "middle"}); h1.textContent = "1990"; h1.setAttribute("x", xLeft); h1.setAttribute("y", pad.top - 14); svg.appendChild(h1);
+const h2 = mkEl("text", {...hdrStyle, "text-anchor": "middle"}); h2.textContent = "2022"; h2.setAttribute("x", xRight); h2.setAttribute("y", pad.top - 14); svg.appendChild(h2);
+
+// Grid lines at 25, 50, 75%
+[0, 25, 50, 75].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+});
+
+function colorForChange(d) {
+  const c = d.chg;
+  if (c > 25) return "#3D7A5A";
+  if (c > 10) return "#5B9E78";
+  if (c > 0)  return "#8BAD72";
+  if (c > -15) return "#C49A45";
+  if (c > -30) return "#C4715A";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = pad.top - 2, bot = H - pad.bottom + 4;
+  sorted.forEach(item => { item.y = Math.max(top, Math.min(bot, item.y)); });
+  return sorted;
+}
+
+const leftLabels = data.map((d, i) => ({ n: d.n, y: scale(d.a), i }));
+const rightLabels = data.map((d, i) => ({ n: d.n, y: scale(d.b), i }));
+const rLeft = resolveCollisions(leftLabels, 13);
+const rRight = resolveCollisions(rightLabels, 13);
+const leftYMap = {}, rightYMap = {};
+rLeft.forEach(item => { leftYMap[item.i] = item.y; });
+rRight.forEach(item => { rightYMap[item.i] = item.y; });
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const g = mkEl("g");
+  g.style.opacity = "1"; g.style.cursor = "pointer";
+
+  g.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(d.a), x2: xRight, y2: scale(d.b),
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  }));
+  const hit = mkEl("line", {
+    x1: xLeft, y1: scale(d.a), x2: xRight, y2: scale(d.b),
+    stroke: "transparent", "stroke-width": "12"
+  });
+  g.appendChild(hit);
+
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: scale(d.a), r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: scale(d.b), r: "3", fill: color }));
+
+  // Left label
+  const ly = leftYMap[i];
+  if (Math.abs(ly - scale(d.a)) > 2) {
+    g.appendChild(mkEl("line", { x1: xLeft - 4, y1: scale(d.a), x2: xLeft - 4, y2: ly, stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const ll = mkEl("text"); ll.textContent = `${d.a}%  ${d.n}`;
+  ll.setAttribute("x", xLeft - 8); ll.setAttribute("y", ly + 3.5);
+  ll.setAttribute("text-anchor", "end"); ll.setAttribute("font-family", "'Inter', sans-serif");
+  ll.setAttribute("font-size", "9"); ll.setAttribute("fill", "#2B2A27");
+  g.appendChild(ll);
+
+  // Right label
+  const ry = rightYMap[i];
+  if (Math.abs(ry - scale(d.b)) > 2) {
+    g.appendChild(mkEl("line", { x1: xRight + 4, y1: scale(d.b), x2: xRight + 4, y2: ry, stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const rl = mkEl("text"); rl.textContent = `${d.b}%  ${d.chg >= 0 ? '+' : ''}${d.chg}pp`;
+  rl.setAttribute("x", xRight + 8); rl.setAttribute("y", ry + 3.5);
+  rl.setAttribute("font-family", "'Inter', sans-serif");
+  rl.setAttribute("font-size", "9"); rl.setAttribute("fill", color);
+  g.appendChild(rl);
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    const sign = d.chg >= 0 ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${sign}${d.chg}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Legend
+const legend = [
+  { color: "#3D7A5A", label: "+25pp or more" },
+  { color: "#5B9E78", label: "+10–25pp" },
+  { color: "#8BAD72", label: "0–10pp" },
+  { color: "#C4715A", label: "−15–0pp" },
+  { color: "#B34B3B", label: "−30pp or more" },
+];
+legend.forEach((l, i) => {
+  const lx = pad.left + i * 100;
+  const ly = H;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 9, height: 9, fill: l.color, rx: "1" }));
+  const lt = mkEl("text"); lt.textContent = l.label;
+  lt.setAttribute("x", lx + 12); lt.setAttribute("y", ly);
+  lt.setAttribute("font-family", "'Inter', sans-serif"); lt.setAttribute("font-size", "8");
+  lt.setAttribute("fill", "#7A786F");
+  svg.appendChild(lt);
+});
+</script>
+</body></html>
