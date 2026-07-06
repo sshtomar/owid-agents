@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Universal Health Coverage: Progress Over Two Decades",
+      "description": "Slope chart comparing UHC Service Coverage Index scores from the early 2000s to 2022-2023. Nepal (+40), Rwanda (+37), and India (+33) show the steepest gains; Norway and Cuba lead overall.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Nepal improved from 18 to 58 \u2014 the largest absolute gain in the selection",
+        "Rwanda rose from 21 to 58; India from 36 to 69",
+        "Norway and Cuba sit at the top (89 and 86), but with modest gains of ~12 points"
+      ],
+      "createdAt": "2026-07-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "The Aging World: Old-Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing how many people aged 65+ exist per 100 working-age adults, for 9 countries over 64 years. Japan's ratio nearly sextupled; India and Indonesia remain young.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan's old-age dependency ratio rose from 8.9 in 1960 to 49.1 in 2024 \u2014 by far the highest",
+        "South Korea is accelerating sharply, from 6 to 22 in the same period",
+        "India and Indonesia remain below 10, still benefiting from a young demographic dividend"
+      ],
+      "createdAt": "2026-07-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Natural Gas in the Power Mix, 1990\u20132024",
+      "description": "Trend lines showing the share of electricity generated from natural gas for 9 countries. Israel switched almost entirely to gas after major offshore discoveries; Finland phased it out.",
+      "datasetIds": [
+        "wb--EG-ELC-NGAS-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Israel went from 0% to 70% after Tamar (2013) and Leviathan (2019) gas field start-ups",
+        "Finland deliberately reduced gas from 14% to under 1% as part of its clean-energy push",
+        "Ireland, Italy and Argentina cluster at 44\u201348%, all heavily reliant on gas-fired power"
+      ],
+      "createdAt": "2026-07-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Anemia Prevalence Among Women: 2000 vs. 2023",
+      "description": "Slope chart comparing the share of non-pregnant women aged 15-49 with anemia across 14 countries. Most improved, but India's rate rose from 50% to 54% \u2014 a notable setback.",
+      "datasetIds": [
+        "wb--SH-ANM-NPRG-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Brazil cut its rate by nearly 10 percentage points (31% to 21%); Ghana by 11pp",
+        "India is the largest outlier: anemia prevalence rose from 50% to 54%",
+        "West Africa (Gabon, Cote d'Ivoire, Benin) remains the highest-burden region at 49\u201360%"
+      ],
+      "createdAt": "2026-07-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Countries with the Most Threatened Mammal Species, 2022",
+      "description": "Horizontal bar chart showing the 20 countries with the highest count of IUCN-threatened mammal species. Indonesia leads by a wide margin, followed by India, Brazil, China and Australia.",
+      "datasetIds": [
+        "wb--EN-MAM-THRD-NO"
+      ],
+      "chartType": "bar-chart",
+      "highlights": [
+        "Indonesia has 212 threatened mammal species \u2014 more than double India or Brazil",
+        "Tropical megadiverse countries (Indonesia, India, Brazil, China, Australia) dominate the top 5",
+        "Congo Dem. Rep. and Cameroon appear in the top 10, highlighting Africa's biodiversity at risk"
+      ],
+      "createdAt": "2026-07-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-06T00:00:00.000Z"
 }

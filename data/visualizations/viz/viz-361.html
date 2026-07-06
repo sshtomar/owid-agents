@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Countries with the Most Threatened Mammal Species, 2022</h1>
+<p class="subtitle">Number of mammal species classified as threatened by the IUCN Red List. Tropical megadiverse countries dominate — Indonesia alone has more than twice the count of India or Brazil.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank / IUCN Red List — Mammal species, threatened (count, 2022)</p>
+<script>
+const data = [{"n":"Indonesia","v":212,"y":2022},{"n":"India","v":99,"y":2022},{"n":"Brazil","v":97,"y":2022},{"n":"China","v":78,"y":2022},{"n":"Australia","v":69,"y":2022},{"n":"Colombia","v":63,"y":2022},{"n":"Ecuador","v":49,"y":2022},{"n":"Cameroon","v":48,"y":2022},{"n":"Congo, Dem. Rep.","v":48,"y":2022},{"n":"Cambodia","v":44,"y":2022},{"n":"Ethiopia","v":40,"y":2022},{"n":"Argentina","v":39,"y":2022},{"n":"Bangladesh","v":39,"y":2022},{"n":"Brunei Darussalam","v":37,"y":2022},{"n":"Cote d'Ivoire","v":34,"y":2022},{"n":"Guinea","v":32,"y":2022},{"n":"Kenya","v":32,"y":2022},{"n":"Japan","v":29,"y":2022},{"n":"Bhutan","v":28,"y":2022},{"n":"Angola","v":24,"y":2022}];
+
+const W = 680, H = 540;
+const margin = { top: 20, right: 60, bottom: 30, left: 150 };
+const barH = 18;
+const barGap = 6;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Color based on value rank (warm = high, cool = lower)
+function barColor(i, n) {
+  const t = i / (data.length - 1);
+  if (t < 0.15) return "#EA5E33";
+  if (t < 0.30) return "#F29A44";
+  if (t < 0.50) return "#C49A45";
+  if (t < 0.70) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+const maxVal = data[0].v;
+const xScale = v => margin.left + v / maxVal * (W - margin.left - margin.right);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+const totalH = margin.top + data.length * (barH + barGap) + margin.bottom;
+svg.setAttribute("viewBox", `0 0 ${W} ${totalH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Subtle grid lines
+[50, 100, 150, 200].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", {x1: x, y1: margin.top, x2: x, y2: totalH - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const t = mkEl("text", {x: x, y: margin.top - 6, "text-anchor": "middle",
+    fill: "#7A786F", "font-family": "'JetBrains Mono', monospace", "font-size": "8"});
+  t.textContent = v;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+const bars = [];
+
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const color = barColor(i);
+
+  // Country label
+  const tL = mkEl("text", { x: margin.left - 6, y: y + barH * 0.65, "text-anchor": "end",
+    fill: "#2B2A27", "font-size": "10", "font-weight": i < 3 ? "600" : "400" });
+  tL.textContent = d.n;
+  svg.appendChild(tL);
+
+  // Bar
+  const rect = mkEl("rect", { x: margin.left, y, width: xScale(d.v) - margin.left, height: barH,
+    fill: color, rx: "2" });
+  svg.appendChild(rect);
+  bars.push(rect);
+
+  // Value label
+  const tR = mkEl("text", { x: xScale(d.v) + 5, y: y + barH * 0.65, fill: "#2B2A27",
+    "font-size": "9", "font-weight": "500", "font-family": "'JetBrains Mono', monospace" });
+  tR.textContent = d.v;
+  svg.appendChild(tR);
+
+  // Hover zone
+  const hit = mkEl("rect", { x: 0, y, width: W, height: barH + barGap * 0.5,
+    fill: "transparent" });
+  svg.appendChild(hit);
+
+  hit.addEventListener("mouseenter", () => {
+    bars.forEach((b, j) => b.setAttribute("opacity", j === i ? "1" : "0.3"));
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${d.v} threatened mammal species`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    bars.forEach(b => b.setAttribute("opacity", "1"));
+    tip.style.opacity = "0";
+  });
+});
+
+// X-axis baseline
+svg.appendChild(mkEl("line", {x1: margin.left, y1: totalH - margin.bottom,
+  x2: W - margin.right, y2: totalH - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.5"}));
+</script>
+</body></html>
