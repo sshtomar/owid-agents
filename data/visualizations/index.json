@@ -5858,6 +5858,74 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourism Arrivals, 2005-2020",
+      "description": "Trend lines showing annual international tourist arrivals for the world top destinations from 2005 to 2020, highlighting the dramatic COVID-19 collapse.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "France led with 218 million arrivals in 2019, dropping to 117 million in 2020 (-46%)",
+        "China saw arrivals collapse from 163 million to 30 million (-81%) in 2020",
+        "Japan had achieved rapid growth to 32 million arrivals before COVID wiped out nearly all of it"
+      ],
+      "createdAt": "2026-07-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Child Wasting: Acute Malnutrition in Under-5s",
+      "description": "Horizontal bar chart of the 15 countries with the highest rates of child wasting (low weight-for-height), indicating acute malnutrition, using most recent data.",
+      "datasetIds": [
+        "wb--SH-STA-WAST-ZS"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "India has the highest rate at 18.7% of children under 5 wasted as of 2020",
+        "South Asia and Sub-Saharan Africa bear the greatest burden of child wasting",
+        "Djibouti (12.1%) and Bangladesh (10.7%) follow India in severity"
+      ],
+      "createdAt": "2026-07-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Nuclear Electricity Production (% of Total), 1990-2024",
+      "description": "Trend lines showing the share of electricity from nuclear sources for 8 key countries, revealing Frances dominance, Japans Fukushima collapse, and Germanys phase-out.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "France generates ~67% of its electricity from nuclear, the highest share of any large economy",
+        "Japan cut nuclear from 32% to near zero after Fukushima in 2011, slowly recovering to 9.5% by 2024",
+        "Germany completed its phase-out in 2023, going from 28% to essentially zero"
+      ],
+      "createdAt": "2026-07-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Fossil Fuel Electricity: 2000 vs. 2023",
+      "description": "Slope chart comparing fossil fuel electricity share (coal, oil, gas) in 2000 and 2023, showing which countries have made the energy transition and which remain dependent.",
+      "datasetIds": [
+        "wb--EG-ELC-FOSL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Denmark cut fossil fuel electricity from 83% to 11%, the biggest drop among large economies",
+        "Algeria and Bangladesh remain near 100% fossil fuel dependent with almost no change since 2000",
+        "France and Brazil started and ended near 10%, showing that some economies never relied on fossil fuels for electricity"
+      ],
+      "createdAt": "2026-07-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
     }
   ],
   "lastUpdated": "2026-06-28T00:00:00.000Z"
