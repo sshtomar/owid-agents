@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Child Wasting: Acute Malnutrition in Under-5s</h1>
+<p class="subtitle">Share of children under 5 who are wasted (low weight-for-height), indicating acute malnutrition. South Asia and Sub-Saharan Africa bear the highest burden. Data from most recent year available per country (2019-2024).</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank (SH.STA.WAST.ZS) &mdash; Prevalence of wasting, weight for height (% of children under 5)</p>
+<script>
+// Data from notebook -- do not modify
+const data = [{"n":"India","v":18.7,"y":2020},{"n":"Djibouti","v":12.1,"y":2023},{"n":"Bangladesh","v":10.7,"y":2022},{"n":"Cambodia","v":9.6,"y":2021},{"n":"Burkina Faso","v":9.3,"y":2021},{"n":"Indonesia","v":8.4,"y":2023},{"n":"Benin","v":8.3,"y":2021},{"n":"Cote d'Ivoire","v":8.1,"y":2021},{"n":"Burundi","v":7.8,"y":2024},{"n":"Chad","v":7.8,"y":2022},{"n":"Guinea-Bissau","v":7.8,"y":2019},{"n":"Congo, Dem. Rep.","v":7.2,"y":2023},{"n":"Ethiopia","v":6.8,"y":2019},{"n":"Guyana","v":6.5,"y":2019},{"n":"Guinea","v":6.4,"y":2022}];
+
+const W = 680, H = 440;
+const margin = { top: 28, right: 60, bottom: 20, left: 148 };
+const barH = 18, barGap = 8;
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const totalH = margin.top + data.length * (barH + barGap) + margin.bottom;
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${totalH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxVal = 20;
+const xScale = v => margin.left + v / maxVal * (W - margin.left - margin.right);
+
+// Color by severity
+function barColor(v) {
+  if (v >= 15) return "#B34B3B";
+  if (v >= 10) return "#C4715A";
+  if (v >= 8)  return "#EA5E33";
+  if (v >= 6)  return "#F29A44";
+  return "#C49A45";
+}
+
+// Grid lines
+[5, 10, 15, 20].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top - 8,
+    x2: xScale(v), y2: totalH - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: xScale(v), y: margin.top - 12,
+    "text-anchor": "middle", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// Baseline
+svg.appendChild(mkEl("line", {
+  x1: xScale(0), y1: margin.top - 8,
+  x2: xScale(0), y2: totalH - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "0.5"
+}));
+
+// Bars
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const color = barColor(d.v);
+
+  // Country label
+  const nameLbl = mkEl("text", {
+    x: margin.left - 6, y: y + barH / 2 + 3.5,
+    "text-anchor": "end", fill: "#2B2A27",
+    "font-size": "10.5", "font-weight": i === 0 ? "600" : "400"
+  });
+  nameLbl.textContent = d.n;
+  svg.appendChild(nameLbl);
+
+  // Bar background
+  svg.appendChild(mkEl("rect", {
+    x: xScale(0), y,
+    width: W - margin.left - margin.right,
+    height: barH,
+    fill: "#E2E0D5", rx: "1"
+  }));
+
+  // Bar fill
+  const bar = mkEl("rect", {
+    x: xScale(0), y,
+    width: xScale(d.v) - xScale(0),
+    height: barH,
+    fill: color, rx: "1"
+  });
+  svg.appendChild(bar);
+
+  // Value label
+  const valLbl = mkEl("text", {
+    x: xScale(d.v) + 5, y: y + barH / 2 + 3.5,
+    fill: "#2B2A27", "font-size": "9.5", "font-weight": "500",
+    "font-family": "JetBrains Mono, monospace"
+  });
+  valLbl.textContent = d.v + "%";
+  svg.appendChild(valLbl);
+
+  // Hover area
+  const hitArea = mkEl("rect", {
+    x: margin.left - 148, y,
+    width: W - margin.right + 100,
+    height: barH,
+    fill: "transparent"
+  });
+  hitArea.addEventListener("mousemove", e => {
+    svg.querySelectorAll("rect[fill]").forEach(r => {
+      if (r !== hitArea) r.style.opacity = "0.3";
+    });
+    bar.style.opacity = "1";
+    showTip(`${d.n} · ${d.y}: ${d.v}% of children under 5 are wasted`, e);
+  });
+  hitArea.addEventListener("mouseleave", () => {
+    svg.querySelectorAll("rect").forEach(r => r.style.opacity = "1");
+    hideTip();
+  });
+  svg.appendChild(hitArea);
+});
+
+// Legend
+const legendItems = [
+  { label: ">=15% (severe)", color: "#B34B3B" },
+  { label: "10-15%", color: "#C4715A" },
+  { label: "8-10%", color: "#EA5E33" },
+  { label: "6-8%", color: "#F29A44" },
+];
+let lx = margin.left;
+const ly = totalH - 8;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 8, height: 8, fill: item.color, rx: "1" }));
+  const t = mkEl("text", { x: lx + 10, y: ly, fill: "#7A786F", "font-size": "8.5" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 90;
+});
+</script>
+</body></html>
