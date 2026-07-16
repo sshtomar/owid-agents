@@ -5858,7 +5858,93 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Crude Death Rate, 1960-2023",
+      "description": "Trend lines showing crude death rates across 16 countries. Two forces collide: health progress drives rates down globally, while aging populations in Europe and East Asia are pushing them back up.",
+      "datasetIds": [
+        "wb--SP-DYN-CDRT-IN"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Bulgaria's death rate rose from 8.1 to 15.7 per 1,000 due to emigration of young people and aging",
+        "Japan's rate climbed from 7.6 to 13.0 as its population aged dramatically",
+        "Bangladesh fell from 21.6 to 5.0 -- one of history's steepest declines in mortality",
+        "Ethiopia dropped from 23.9 to 6.0 through improved healthcare and nutrition"
+      ],
+      "createdAt": "2026-07-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Old-Age Dependency Ratio, 1960-2024",
+      "description": "Trend lines showing the ratio of elderly (65+) to working-age people (15-64) across 16 countries. Japan leads the world at 50.7 elderly per 100 workers, while Africa stays flat near 5-6.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan surged from 8.9% to 50.7% -- the most aged society ever recorded",
+        "Korea's ratio is rising faster than any other country, from 5.6% to 27.5% since 1960",
+        "Ethiopia and Iraq remain near 5-6% -- barely changed in 64 years",
+        "Greece and Italy are converging toward Japan's trajectory"
+      ],
+      "createdAt": "2026-07-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Youth Dependency Ratio: 2000 vs 2023",
+      "description": "Slope chart comparing youth dependency (children 0-14 per 100 workers) between 2000 and 2023 across 40 countries. Shows the divergence between Africa's persistent youth bulge and East Asia's low youth ratios.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-YG"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Central African Republic has 101 children per 100 workers in 2023 -- more children than working adults",
+        "Korea dropped to just 15.5%, facing a critical shortage of young people",
+        "Afghanistan fell from 105% to 80% as fertility declined despite conflict",
+        "China dropped from 36% to 24%, reflecting its demographic transition"
+      ],
+      "createdAt": "2026-07-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Electricity from Natural Gas, 1990-2022",
+      "description": "Trend lines showing the share of electricity generated from natural gas for 18 countries. Middle East nations dominate at near 100%, while Japan pivoted sharply to gas after Fukushima 2011.",
+      "datasetIds": [
+        "wb--EG-ELC-NGAS-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Bahrain and Algeria generate virtually 100% of electricity from gas",
+        "Japan jumped from 20% to 34% gas share after the 2011 Fukushima disaster shut down nuclear plants",
+        "Azerbaijan swung wildly (58% to 19% to 93%) reflecting geopolitical shifts",
+        "China and India use less than 3% gas for power, relying almost entirely on coal"
+      ],
+      "createdAt": "2026-07-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Energy Use per Capita, 1990-2020",
+      "description": "Sparkline grid showing per-capita energy consumption (kg of oil equivalent) for 20 countries over 30 years. Iceland uses 57x more energy per person than Bangladesh, reflecting enormous global inequality in energy access.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "Iceland's per-capita energy use (16,084 kgoe) is the highest in the dataset, powered by geothermal and hydropower",
+        "China tripled its energy use per capita from 773 to 2,466 kgoe between 1990 and 2020",
+        "High-income countries plateaued or declined after 2000; developing countries are still rising",
+        "Bangladesh uses just 279 kgoe per person -- 57x less than Iceland"
+      ],
+      "createdAt": "2026-07-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-16T00:00:00.000Z"
 }

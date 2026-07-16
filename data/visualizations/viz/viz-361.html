@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      background: #FAFAF7;
+      color: #2B2A27;
+      padding: 28px 24px 20px;
+    }
+    h1 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 6px; }
+    .highlights { font-size: 12px; color: #7A786F; margin-bottom: 18px; line-height: 1.5; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border-top: 1px solid #E2E0D5;
+      border-left: 1px solid #E2E0D5;
+    }
+    .cell {
+      padding: 12px 10px 10px;
+      border-bottom: 1px solid #E2E0D5;
+      border-right: 1px solid #E2E0D5;
+      cursor: crosshair;
+      position: relative;
+      background: #FAFAF7;
+      transition: background 0.1s;
+    }
+    .cell:hover { background: #F3F2ED; }
+    .cell-name {
+      font-size: 9px; font-weight: 500; color: #2B2A27;
+      margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cell-canvas { display: block; width: 100%; height: 44px; }
+    .cell-values {
+      display: flex; justify-content: space-between;
+      font-family: "JetBrains Mono", monospace; font-size: 8px; color: #7A786F;
+      margin-top: 3px;
+    }
+    .tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e1e1e; color: #fff; font-size: 11px;
+      font-family: "JetBrains Mono", monospace;
+      padding: 5px 8px; border-radius: 4px;
+      transition: opacity 0.1s; white-space: nowrap; z-index: 99;
+    }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Energy Use per Capita, 1990-2020</h1>
+  <p class="subtitle">Kilograms of oil equivalent per person per year. Sorted from highest to lowest energy consumption.</p>
+  <p class="highlights">Iceland (16,084 kgoe) uses 57x more energy per person than Bangladesh (279 kgoe). High-income countries have plateaued or declined. China tripled its use. Ethiopia barely moved despite growth.</p>
+  <div class="grid" id="grid"></div>
+  <p class="source">Source: World Bank, EG.USE.PCAP.KG.OE</p>
+  <div class="tip" id="tip"></div>
+
+  <script>
+    // Data from notebook -- wb--EG-USE-PCAP-KG-OE, 1990-2020
+    const data = [{"n":"Iceland","s":[9058,8191,7917,8381,8446,8405,8991,8777,9292,10354,11405,10926,11168,11093,10893,10877,13185,15188,17341,17937,17025,18162,17634,18213,17947,16911,15702,16235,17347,16701,16084],"y0":1990,"latest":16084},{"n":"Bahrain","s":[10576,10672,11505,11628,12069,11538,11566,12331,12558,12576,12833,12648,12215,11895,11271,11975,11582,11534,11594,10433,10318,10624,9997,11219,10257,10406,9879,9444,9534,10388,10834],"y0":1990,"latest":10834},{"n":"Canada","s":[7642,7529,7617,7783,7971,7995,8071,8070,7963,8118,8225,8017,7943,8303,8371,8370,8427,8356,8098,7696,7661,7716,7638,7669,7780,7690,7945,8175,8162,8126,7495],"y0":1990,"latest":7495},{"n":"Finland","s":[5692,5743,5381,5617,5973,5662,6070,6277,6320,6284,6257,6406,6723,7072,7129,6556,7107,6969,6655,6255,6813,6523,6266,6138,6246,5922,6121,6070,6165,6025,5739],"y0":1990,"latest":5739},{"n":"Australia","s":[5048,4925,4961,5171,5127,5138,5430,5498,5585,5645,5681,5486,5480,5616,5652,5625,5775,5854,5951,5844,5763,5699,5534,5533,5407,5319,5217,5163,5086,5232,5159],"y0":1990,"latest":5159},{"n":"Belgium","s":[4804,5002,5042,4898,5186,5262,5528,5534,5621,5611,5663,5606,5398,5610,5615,5550,5446,5302,5425,5161,5510,5063,4823,5000,4701,4662,4904,4864,4660,4776,4386],"y0":1990,"latest":4386},{"n":"Czechia","s":[4820,4387,4269,4131,3987,4043,4173,4210,4078,3809,4022,4141,4201,4387,4487,4431,4520,4486,4360,4078,4309,4144,4110,4111,3984,3982,3928,4090,4081,4002,3765],"y0":1990,"latest":3765},{"n":"Austria","s":[3241,3416,3246,3256,3235,3374,3581,3551,3607,3592,3571,3759,3772,3957,3975,4084,4105,4010,4028,3820,4065,3928,3899,3925,3750,3796,3797,3840,3718,3766,3547],"y0":1990,"latest":3547},{"n":"Kazakhstan","s":[4282,4338,4549,3799,3411,3123,2763,2462,2514,2324,2302,2218,2538,2737,3205,3187,3764,4065,4253,3820,4106,4532,4270,4646,3698,3051,3389,3404,3814,3753,3388],"y0":1990,"latest":3388},{"n":"Germany","s":[4422,4303,4191,4123,4089,4120,4247,4204,4178,4080,4094,4210,4109,4097,4132,4110,4236,4024,4082,3822,4030,3892,3913,3986,3794,3781,3765,3763,3659,3571,3349],"y0":1990,"latest":3349},{"n":"Iran, Islamic Rep.","s":[1188,1282,1323,1419,1572,1628,1553,1717,1725,1929,1852,1979,2031,2075,2215,2405,2460,2561,2711,2672,2640,2659,2741,2759,2884,2737,2861,3027,2921,3178,3257],"y0":1990,"latest":3257},{"n":"France","s":[3840,4039,3949,3997,3831,3976,4187,4044,4147,4118,4130,4240,4220,4297,4327,4314,4214,4142,4138,3938,4040,3951,3929,3926,3756,3799,3718,3705,3669,3606,3229],"y0":1990,"latest":3229},{"n":"China","s":[773,741,757,793,821,873,885,877,872,881,898,922,976,1105,1249,1370,1490,1596,1630,1729,1900,2028,2085,2137,2178,2175,2149,2216,2311,2398,2466],"y0":1990,"latest":2466},{"n":"Brazil","s":[942,943,937,946,980,999,1036,1072,1082,1091,1081,1087,1103,1108,1157,1174,1202,1260,1317,1262,1384,1390,1433,1488,1522,1482,1415,1432,1403,1416,1379],"y0":1990,"latest":1379},{"n":"Indonesia","s":[462,477,490,534,524,575,587,595,568,587,586,591,606,597,635,637,644,629,633,675,674,670,686,701,710,704,724,761,832,851,856],"y0":1990,"latest":856},{"n":"Egypt, Arab Rep.","s":[576,560,560,568,536,558,579,590,616,615,570,634,637,648,692,779,806,844,859,862,838,860,866,825,833,811,873,897,871,845,805],"y0":1990,"latest":805},{"n":"India","s":[324,331,336,339,348,362,368,376,378,393,395,393,397,400,416,425,442,461,482,509,532,547,572,577,610,622,627,648,668,667,632],"y0":1990,"latest":632},{"n":"Ghana","s":[344,347,350,358,364,372,376,384,396,401,322,313,304,281,270,262,274,263,276,274,296,303,329,324,321,326,328,351,379,380,392],"y0":1990,"latest":392},{"n":"Ethiopia","s":[368,367,361,363,364,365,365,364,364,363,364,367,367,368,368,365,366,368,369,368,368,371,372,376,380,380,383,382,384,386,380],"y0":1990,"latest":380},{"n":"Bangladesh","s":[114,111,114,117,122,129,128,131,132,135,136,148,148,153,154,160,168,174,181,188,196,200,208,217,223,237,256,264,261,278,279],"y0":1990,"latest":279}];
+
+    const COLS = 4;
+    const grid = document.getElementById("grid");
+    const tip = document.getElementById("tip");
+
+    function colorForLatest(v) {
+      if (v >= 7000) return "#B34B3B";
+      if (v >= 4000) return "#C4715A";
+      if (v >= 2000) return "#C49A45";
+      if (v >= 800) return "#8BAD72";
+      if (v >= 400) return "#5B9E78";
+      return "#3D7A5A";
+    }
+
+    data.forEach((d, idx) => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "cell-name";
+      // Shorten long names
+      let name = d.n;
+      if (name === "Iran, Islamic Rep.") name = "Iran";
+      if (name === "Egypt, Arab Rep.") name = "Egypt";
+      nameEl.textContent = name;
+      cell.appendChild(nameEl);
+
+      const canvas = document.createElement("canvas");
+      canvas.className = "cell-canvas";
+      const DPR = window.devicePixelRatio || 1;
+      canvas.style.height = "44px";
+      cell.appendChild(canvas);
+
+      const valRow = document.createElement("div");
+      valRow.className = "cell-values";
+      const series = d.s.filter(v => v !== null);
+      valRow.innerHTML = `<span>${series[0].toLocaleString()}</span><span>${d.latest.toLocaleString()}</span>`;
+      cell.appendChild(valRow);
+
+      grid.appendChild(cell);
+
+      // Draw after layout
+      requestAnimationFrame(() => {
+        const cellW = cell.clientWidth - 20;
+        const cellH = 44;
+        canvas.width = cellW * DPR;
+        canvas.height = cellH * DPR;
+        canvas.style.width = cellW + "px";
+        const ctx = canvas.getContext("2d");
+        ctx.scale(DPR, DPR);
+
+        const vals = d.s.map(v => v !== null ? v : NaN);
+        const valid = vals.filter(v => !isNaN(v));
+        const minV = Math.min(...valid);
+        const maxV = Math.max(...valid);
+        const rangeV = maxV - minV || 1;
+        const norm = v => cellH - ((v - minV) / rangeV) * (cellH - 4) - 2;
+
+        const color = colorForLatest(d.latest);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.2;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        let started = false;
+        vals.forEach((v, i) => {
+          if (isNaN(v)) return;
+          const x = (i / (vals.length - 1)) * cellW;
+          const y = norm(v);
+          if (!started) { ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        // Hover crosshair
+        let crosshairX = null;
+        cell.addEventListener("mousemove", e => {
+          const rect = canvas.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const ratio = Math.max(0, Math.min(1, mx / cellW));
+          const idx2 = Math.round(ratio * (vals.length - 1));
+          const year = d.y0 + idx2;
+          const v = vals[idx2];
+          if (!isNaN(v)) {
+            tip.textContent = `${name} (${year}): ${v.toLocaleString()} kgoe`;
+            tip.style.opacity = "1";
+            tip.style.left = (e.clientX + 12) + "px";
+            tip.style.top = (e.clientY - 24) + "px";
+            crosshairX = mx;
+            // Redraw with crosshair
+            ctx.clearRect(0, 0, cellW, cellH);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.2;
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            let s2 = false;
+            vals.forEach((v2, j) => {
+              if (isNaN(v2)) return;
+              const x2 = (j / (vals.length - 1)) * cellW;
+              const y2 = norm(v2);
+              if (!s2) { ctx.moveTo(x2, y2); s2 = true; }
+              else ctx.lineTo(x2, y2);
+            });
+            ctx.stroke();
+            // crosshair
+            ctx.strokeStyle = "#2B2A27";
+            ctx.lineWidth = 0.8;
+            ctx.setLineDash([2, 2]);
+            ctx.beginPath();
+            ctx.moveTo(mx, 0);
+            ctx.lineTo(mx, cellH);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            // dot
+            const vy = norm(v);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(mx, vy, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+        cell.addEventListener("mouseleave", () => {
+          tip.style.opacity = "0";
+          ctx.clearRect(0, 0, cellW, cellH);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.2;
+          ctx.lineJoin = "round";
+          ctx.beginPath();
+          let s3 = false;
+          vals.forEach((v, i) => {
+            if (isNaN(v)) return;
+            const x = (i / (vals.length - 1)) * cellW;
+            const y = norm(v);
+            if (!s3) { ctx.moveTo(x, y); s3 = true; }
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
