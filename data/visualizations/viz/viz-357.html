@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      background: #FAFAF7;
+      color: #2B2A27;
+      padding: 28px 24px 20px;
+    }
+    h1 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 6px; }
+    .highlights { font-size: 12px; color: #7A786F; margin-bottom: 18px; line-height: 1.5; }
+    #chart { width: 100%; }
+    .tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e1e1e; color: #fff; font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+      padding: 6px 9px; border-radius: 4px;
+      transition: opacity 0.1s; white-space: nowrap; z-index: 99;
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 12px; font-size: 11px; color: #7A786F; font-family: "JetBrains Mono", monospace; }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-swatch { width: 20px; height: 3px; border-radius: 1px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Crude Death Rate, 1960-2023</h1>
+  <p class="subtitle">Deaths per 1,000 people across 16 countries. Two forces collide: health progress drives rates down, aging pushes them back up.</p>
+  <p class="highlights">Bulgaria (8.1 &rarr; 15.7) and Japan (7.6 &rarr; 13.0) now have higher death rates than 1960 due to population aging. Bangladesh (21.6 &rarr; 5.0) and Ethiopia (23.9 &rarr; 6.0) achieved the steepest declines.</p>
+  <div id="chart"></div>
+  <div class="legend" id="legend"></div>
+  <p class="source">Source: World Bank, SP.DYN.CDRT.IN</p>
+  <div class="tip" id="tip"></div>
+
+  <script>
+    // Data from notebook -- wb--SP-DYN-CDRT-IN, every 5 years 1960-2020 + 2023
+    const data = [{"n":"Bulgaria","s":[8.1,8.2,9.1,10.3,11.1,12,12.5,13.6,14.1,14.8,14.9,15.8,19,15.7],"y0":1960,"step":5,"last":15.7},{"n":"Belarus","s":[7.75,7.36,7.93,8.75,9.9,10.6,10.8,13.1,13.5,14.5,14.5,12.6,15.78,13.34],"y0":1960,"step":5,"last":13.34},{"n":"Japan","s":[7.6,7.1,6.9,6.3,6.2,6.3,6.7,7.4,7.7,8.6,9.5,10.3,11.1,13],"y0":1960,"step":5,"last":13},{"n":"Germany","s":[12,12,12.5,12.6,12.2,12,11.6,10.8,10.2,10.1,10.5,11.3,11.9,12.3],"y0":1960,"step":5,"last":12.3},{"n":"Italy","s":[9.6,9.9,9.7,10,9.8,9.7,9.6,9.8,9.8,9.8,9.8,10.8,12.5,11.4],"y0":1960,"step":5,"last":11.4},{"n":"France","s":[11.4,11.1,10.8,10.4,10.2,9.8,9.3,9.1,8.9,8.5,8.5,8.9,9.9,9.4],"y0":1960,"step":5,"last":9.4},{"n":"China","s":[25.43,9.5,7.6,7.32,6.34,6.78,6.67,6.57,6.45,6.51,7.11,7.07,7.07,7.87],"y0":1960,"step":5,"last":7.87},{"n":"Indonesia","s":[17.77,20.83,13.57,11.76,10.29,8.91,8.09,7.5,7.43,7.38,7.53,7.5,8.84,7.53],"y0":1960,"step":5,"last":7.53},{"n":"Ghana","s":[19.18,19.18,18.78,16.33,15.09,13.68,11.75,10.76,9.99,9.31,8.6,7.84,7.44,7.04],"y0":1960,"step":5,"last":7.04},{"n":"Korea","s":[12.97,11.42,8,7.7,7.3,5.9,5.6,5.3,5.2,5.1,5.1,5.4,5.9,6.9],"y0":1960,"step":5,"last":6.9},{"n":"India","s":[19.42,19.36,17.01,15.53,13.75,12.16,10.73,9.57,8.63,7.82,7.16,6.73,7.21,6.61],"y0":1960,"step":5,"last":6.61},{"n":"Congo","s":[17.86,15.47,13.8,12.55,11.39,10.52,10.67,11.48,11.26,9.62,8.23,7.17,6.8,6.29],"y0":1960,"step":5,"last":6.29},{"n":"Ethiopia","s":[23.93,22.85,22.39,25.37,22.17,26.54,19.71,17.18,14.68,12.07,8.98,7.21,6.4,5.96],"y0":1960,"step":5,"last":5.96},{"n":"Bangladesh","s":[21.62,19.78,22.15,16.58,15.45,13.77,11.96,10.15,8.28,6.82,6.05,5.64,6.13,5.01],"y0":1960,"step":5,"last":5.01},{"n":"Iran","s":[23.79,19.78,16.32,12.77,10.98,8.88,7.25,5.4,4.96,4.73,4.61,4.62,6.44,4.67],"y0":1960,"step":5,"last":4.67},{"n":"Iraq","s":[14.54,13.27,10.92,9.99,9.58,9.74,11.09,7.15,6.8,6.61,5.41,4.74,5.0,4.13],"y0":1960,"step":5,"last":4.13}];
+
+    const W = 800, H = 480;
+    const margin = { top: 30, right: 110, bottom: 36, left: 44 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+
+    const Y0 = 1960, STEP = 5;
+    const numPts = data[0].s.length;
+    const yearMax = Y0 + (numPts - 2) * STEP + 3; // last point is 2023
+    const allYears = data[0].s.map((_, i) => i < numPts - 1 ? Y0 + i * STEP : 2023);
+
+    const allVals = data.flatMap(d => d.s.filter(v => v !== null));
+    const valMin = 0, valMax = Math.max(...allVals) * 1.05;
+
+    const xScale = idx => margin.left + (idx / (numPts - 1)) * innerW;
+    const yScale = v => margin.top + (1 - (v - valMin) / (valMax - valMin)) * innerH;
+
+    function colorForTrend(series) {
+      const first = series[0], last = series[series.length - 1];
+      const change = last - first;
+      if (change > 5) return "#C4715A";
+      if (change > 0) return "#C49A45";
+      if (change > -8) return "#5B9E78";
+      if (change > -15) return "#3D7A5A";
+      return "#2A5C42";
+    }
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = W + "px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Grid lines
+    [0, 5, 10, 15, 20, 25].forEach(v => {
+      if (v > valMax) return;
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+      svg.appendChild(mkEl("text", { x: margin.left - 5, y: y + 4, "text-anchor": "end", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" })).textContent = v;
+    });
+
+    // X axis labels
+    [1960, 1980, 2000, 2023].forEach(yr => {
+      const idx = allYears.indexOf(yr);
+      if (idx === -1) return;
+      const x = xScale(idx);
+      svg.appendChild(mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" })).textContent = yr;
+    });
+
+    // Endpoint label positions (for collision resolution)
+    const labelItems = data.map(d => {
+      const lastVal = d.s[numPts - 1];
+      return { d, y: yScale(lastVal), origY: yScale(lastVal) };
+    });
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      // Clamp to chart bounds
+      for (const item of sorted) {
+        item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+      }
+      return sorted;
+    }
+
+    const resolved = resolveCollisions(labelItems, 11);
+    const labelMap = new Map(resolved.map(item => [item.d.n, item.y]));
+
+    // Draw lines
+    const groups = [];
+    data.forEach(d => {
+      const color = colorForTrend(d.s.filter(v => v !== null));
+      const g = mkEl("g", {});
+      g.style.cursor = "pointer";
+
+      const pts = d.s.map((v, i) => ({ x: xScale(i), y: yScale(v), v, year: allYears[i] })).filter(p => p.v !== null);
+      const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+
+      const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+      const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+
+      const labelY = labelMap.get(d.n) || yScale(d.s[numPts - 1]);
+      const lastPt = pts[pts.length - 1];
+
+      // Leader line if needed
+      const origY = yScale(d.s[numPts - 1]);
+      if (Math.abs(labelY - origY) > 2) {
+        const leader = mkEl("line", {
+          x1: lastPt.x + 2, y1: origY,
+          x2: lastPt.x + 8, y2: labelY,
+          stroke: color, "stroke-width": "0.7", opacity: "0.6"
+        });
+        g.appendChild(leader);
+      }
+
+      const lbl = mkEl("text", {
+        x: lastPt.x + 10, y: labelY + 3.5,
+        fill: color, "font-size": "9", "font-family": "JetBrains Mono, monospace", "font-weight": "500"
+      });
+      lbl.textContent = `${d.s[numPts - 1]}  ${d.n}`;
+
+      g.appendChild(line);
+      g.appendChild(hit);
+      g.appendChild(lbl);
+      svg.appendChild(g);
+      groups.push({ g, line, lbl, d, color, pts });
+    });
+
+    const tip = document.getElementById("tip");
+
+    groups.forEach(({ g, line, lbl, d, color, pts }) => {
+      g.addEventListener("mouseenter", () => {
+        groups.forEach(gr => {
+          if (gr.d.n !== d.n) {
+            gr.line.style.opacity = "0.1";
+            gr.lbl.style.opacity = "0.1";
+          }
+        });
+        line.setAttribute("stroke-width", "2.5");
+      });
+      g.addEventListener("mousemove", e => {
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left - margin.left;
+        const ratio = Math.max(0, Math.min(1, mx / innerW));
+        const idx = Math.round(ratio * (numPts - 1));
+        const p = pts.find(p2 => p2.year === allYears[idx]) || pts[pts.length - 1];
+        tip.textContent = `${d.n} (${p.year}): ${p.v} deaths/1,000`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      g.addEventListener("mouseleave", () => {
+        groups.forEach(gr => {
+          gr.line.style.opacity = "1";
+          gr.lbl.style.opacity = "1";
+        });
+        line.setAttribute("stroke-width", "1.5");
+        tip.style.opacity = "0";
+      });
+    });
+
+    document.getElementById("chart").appendChild(svg);
+
+    // Legend
+    const legendItems = [
+      { color: "#C4715A", label: "Rising (aging population)" },
+      { color: "#C49A45", label: "Slightly rising" },
+      { color: "#5B9E78", label: "Declining" },
+      { color: "#2A5C42", label: "Strongly declining" }
+    ];
+    const legendEl = document.getElementById("legend");
+    legendItems.forEach(({ color, label }) => {
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      item.innerHTML = `<div class="legend-swatch" style="background:${color}"></div><span>${label}</span>`;
+      legendEl.appendChild(item);
+    });
+  </script>
+</body>
+</html>
