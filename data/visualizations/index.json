@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "HIV Treatment Scale-Up: Antiretroviral Therapy Coverage",
+      "description": "Slope chart showing % of people living with HIV receiving antiretroviral therapy, comparing 2010 and 2024 across 17 countries. One of global health's great success stories: sub-Saharan Africa scaled from near-zero to 80-95% coverage in 14 years.",
+      "datasetIds": [
+        "wb--SH-HIV-ARTC-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Botswana rose from 49% to 95%, Eswatini from 31% to 94%",
+        "Cameroon and Ethiopia reached 88% coverage from under 15% in 2010",
+        "Afghanistan remains at 11%, Djibouti at 25% \u2014 lagging far behind"
+      ],
+      "createdAt": "2026-07-17T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "The Diverging World: Old-Age Dependency, 1960\u20132024",
+      "description": "Trend line chart showing elderly dependants per 100 working-age people across 10 countries. Japan has surged to 50.7% while Angola and Ethiopia remain near 5% \u2014 a demographic split defining global economics in the 21st century.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Japan's old-age dependency (50.7%) is nearly 10x Ethiopia's (5.6%)",
+        "South Korea's fastest recent rise \u2014 from 5.6% in 1960 to 27.5% in 2024",
+        "China's ratio is accelerating sharply post-2015, now at 21.2%"
+      ],
+      "createdAt": "2026-07-17T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Nuclear's Shrinking Role: Electricity from Nuclear Sources",
+      "description": "Slope chart comparing nuclear electricity share in 1990 vs. ~2023 for 16 countries. Germany's phase-out and Japan's post-Fukushima decline contrast with new entrants Belarus and Armenia, and a quietly rising France.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Germany collapsed from 27.7% to 1.4% \u2014 phased out all reactors by 2023",
+        "Japan dropped from 23.2% to 9.5% following the 2011 Fukushima disaster",
+        "Czechia and Bulgaria grew their nuclear share \u2014 now both near 40%"
+      ],
+      "createdAt": "2026-07-17T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Air Quality: PM2.5 Pollution Exposure, 1990\u20132023",
+      "description": "Trend line chart showing mean annual PM2.5 exposure across 10 countries from 1990 to 2023. Europe and Brazil have dramatically cut particle pollution; Bangladesh and India remain far above the WHO safe limit of 5 \u00b5g/m\u00b3.",
+      "datasetIds": [
+        "wb--EN-ATM-PM25-MC-M3"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Germany halved PM2.5 exposure: 22.4 \u00b5g/m\u00b3 in 1990 to 8.8 \u00b5g/m\u00b3 in 2023",
+        "Bangladesh remains at 69.3 \u00b5g/m\u00b3 \u2014 nearly 14x the WHO safe limit",
+        "China improved after 2013 peak of 51.7 \u00b5g/m\u00b3, now at 32.0 \u00b5g/m\u00b3"
+      ],
+      "createdAt": "2026-07-17T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Genuine Wealth: Adjusted Net Savings, 1995\u20132021",
+      "description": "Trend line chart showing savings rates after deducting natural capital depletion and pollution damage. Bangladesh and India are building genuine wealth; Guinea has been consuming its future for decades at rates as low as -26%.",
+      "datasetIds": [
+        "wb--NY-ADJ-SVNG-GN-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Bangladesh rose from 11% to 32% \u2014 investing in human capital while preserving resources",
+        "Guinea has posted negative adjusted savings most years since 2004, reaching -26% in 2015",
+        "Brazil turned negative after 2013 \u2014 resource extraction outpacing genuine investment"
+      ],
+      "createdAt": "2026-07-17T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-17T00:00:00.000Z"
 }
