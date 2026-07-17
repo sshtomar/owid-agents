@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: "Inter", -apple-system, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; max-width: 720px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; background: #1e293b; color: #f8fafc;
+      padding: 6px 10px; border-radius: 4px; font-size: 12px;
+      pointer-events: none; opacity: 0; transition: opacity 0.1s;
+      white-space: nowrap; z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nuclear's Shrinking Role: Electricity from Nuclear Sources</h1>
+  <p class="subtitle">% of total electricity production from nuclear, 1990 vs. ~2023 — exits, entrances, and stubborn France</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Electricity Production from Nuclear Sources (EG.ELC.NUCL.ZS)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [
+      {"n":"France","a":74.6,"b":66.8},
+      {"n":"Belgium","a":60.2,"b":40.5},
+      {"n":"South Korea","a":48.4,"b":31.1},
+      {"n":"Hungary","a":48.3,"b":42.2},
+      {"n":"Finland","a":35.3,"b":39.2},
+      {"n":"Bulgaria","a":34.8,"b":40.2},
+      {"n":"Germany","a":27.7,"b":1.4},
+      {"n":"Japan","a":23.2,"b":9.5},
+      {"n":"Czechia","a":20.1,"b":40.2},
+      {"n":"Canada","a":15.1,"b":13.9},
+      {"n":"Argentina","a":14.3,"b":7.3},
+      {"n":"Belarus","a":0,"b":28.3},
+      {"n":"Armenia","a":0,"b":30.8},
+      {"n":"China","a":0,"b":4.6},
+      {"n":"India","a":2.1,"b":2.4},
+      {"n":"Brazil","a":1.0,"b":2.1}
+    ];
+
+    const W = 700, H = 620;
+    const pad = { left: 130, right: 150, top: 50, bottom: 40 };
+    const minV = 0, maxV = 80;
+
+    function scale(v) {
+      return pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+    }
+
+    function colorForChange(d) {
+      const c = d.b - d.a;
+      if (c > 15) return "#3D7A5A";
+      if (c > 5) return "#8BAD72";
+      if (c > -5) return "#C49A45";
+      if (c > -20) return "#C4715A";
+      return "#B34B3B";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const ns = "http://www.w3.org/2000/svg";
+    function el(tag, attrs, text) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (text !== undefined) e.textContent = text;
+      return e;
+    }
+
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: "overflow:visible" });
+    document.getElementById("chart").appendChild(svg);
+
+    // Column headers
+    svg.appendChild(el("text", { x: pad.left, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono", "font-size": "10", "font-weight": "500" }, "1990"));
+    svg.appendChild(el("text", { x: W - pad.right, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono", "font-size": "10", "font-weight": "500" }, "~2023"));
+
+    // Axis lines
+    svg.appendChild(el("line", { x1: pad.left, y1: pad.top - 8, x2: pad.left, y2: H - pad.bottom - 20, stroke: "#E2E0D5", "stroke-width": "1" }));
+    svg.appendChild(el("line", { x1: W - pad.right, y1: pad.top - 8, x2: W - pad.right, y2: H - pad.bottom - 20, stroke: "#E2E0D5", "stroke-width": "1" }));
+
+    const rows = data.map(d => {
+      const ya = scale(d.a);
+      const yb = scale(d.b);
+      const color = colorForChange(d);
+      const g = el("g", { style: "cursor:default" });
+
+      const line = el("line", {
+        x1: pad.left, y1: ya, x2: W - pad.right, y2: yb,
+        stroke: color, "stroke-width": "1.5", opacity: "1"
+      });
+      g.appendChild(line);
+
+      g.appendChild(el("circle", { cx: pad.left, cy: ya, r: "4", fill: color }));
+      g.appendChild(el("circle", { cx: W - pad.right, cy: yb, r: "4", fill: color }));
+
+      const hit = el("line", { x1: pad.left, y1: ya, x2: W - pad.right, y2: yb, stroke: "transparent", "stroke-width": "12" });
+      g.appendChild(hit);
+
+      return { d, g, ya, yb, line, color };
+    });
+
+    rows.forEach(r => svg.appendChild(r.g));
+
+    // Left labels
+    const leftLabels = resolveCollisions(rows.map(r => ({ y: r.ya, row: r })), 12);
+    leftLabels.forEach(item => {
+      const pct = item.row.d.a > 0 ? `${item.row.d.a}%` : "none";
+      svg.appendChild(el("text", {
+        x: pad.left - 8, y: item.y + 4, "text-anchor": "end",
+        fill: "#2B2A27", "font-family": "Inter", "font-size": "10", "font-weight": "500"
+      }, `${item.row.d.n}  ${pct}`));
+      if (Math.abs(item.y - item.row.ya) > 3) {
+        svg.appendChild(el("line", { x1: pad.left - 5, y1: item.row.ya, x2: pad.left - 5, y2: item.y, stroke: "#D0CEC6", "stroke-width": "0.5" }));
+      }
+    });
+
+    // Right labels
+    const rightLabels = resolveCollisions(rows.map(r => ({ y: r.yb, row: r })), 12);
+    rightLabels.forEach(item => {
+      svg.appendChild(el("text", {
+        x: W - pad.right + 8, y: item.y + 4, "text-anchor": "start",
+        fill: "#2B2A27", "font-family": "Inter", "font-size": "10", "font-weight": "500"
+      }, `${item.row.d.b}%  ${item.row.d.n}`));
+      if (Math.abs(item.y - item.row.yb) > 3) {
+        svg.appendChild(el("line", { x1: W - pad.right + 5, y1: item.row.yb, x2: W - pad.right + 5, y2: item.y, stroke: "#D0CEC6", "stroke-width": "0.5" }));
+      }
+    });
+
+    // Legend
+    const lgnd = [
+      ["#3D7A5A", "Growing (+15pp+)"],
+      ["#8BAD72", "Stable (±5pp)"],
+      ["#C49A45", "Slight decline"],
+      ["#C4715A", "Large decline"],
+      ["#B34B3B", "Dramatic exit"]
+    ];
+    let lx = pad.left - 10;
+    lgnd.forEach(([c, label]) => {
+      svg.appendChild(el("rect", { x: lx, y: H - pad.bottom + 10, width: 10, height: 10, fill: c, rx: "2" }));
+      svg.appendChild(el("text", { x: lx + 14, y: H - pad.bottom + 19, fill: "#7A786F", "font-family": "Inter", "font-size": "9" }, label));
+      lx += 115;
+    });
+
+    // Hover
+    const tip = document.getElementById("tip");
+    rows.forEach(r => {
+      r.g.addEventListener("mousemove", e => {
+        rows.forEach(o => o.line.setAttribute("opacity", o === r ? "1" : "0.1"));
+        const change = r.d.b - r.d.a;
+        const sign = change >= 0 ? "+" : "";
+        tip.textContent = `${r.d.n}: ${r.d.a}% → ${r.d.b}% (${sign}${change.toFixed(1)}pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      r.g.addEventListener("mouseleave", () => {
+        rows.forEach(o => o.line.setAttribute("opacity", "1"));
+        tip.style.opacity = "0";
+      });
+    });
+  </script>
+</body>
+</html>
