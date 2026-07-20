@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>China's Railway Revolution: Rail Network Size, 1995–2021</h1>
+<p class="subtitle">Total railway route-kilometers. China doubled its network from 55,000 km to 110,000 km while building the world's largest high-speed rail system. Germany and France trimmed their networks; India grew steadily from a larger base.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — IS.RRS.TOTL.KM, Rail Lines (Total Route-km)</p>
+<script>
+const data = [
+  {n:"India",      pts:[{y:1995,v:62660},{y:1996,v:62915},{y:1997,v:62725},{y:1998,v:62495},{y:1999,v:62810},{y:2000,v:62759},{y:2001,v:63028},{y:2002,v:63140},{y:2003,v:63122},{y:2004,v:63221},{y:2005,v:63485},{y:2006,v:63332},{y:2007,v:63327},{y:2008,v:63273},{y:2009,v:64015},{y:2010,v:63974},{y:2011,v:64460},{y:2012,v:64600},{y:2013,v:65436},{y:2014,v:65808},{y:2015,v:66030},{y:2016,v:66687},{y:2017,v:67368},{y:2018,v:69249},{y:2019,v:67414},{y:2020,v:67955},{y:2021,v:68102}]},
+  {n:"China",      pts:[{y:1995,v:54616},{y:1996,v:56678},{y:1997,v:57566},{y:1998,v:57583},{y:1999,v:57394},{y:2000,v:58656},{y:2001,v:59079},{y:2002,v:59530},{y:2003,v:60446},{y:2004,v:61015},{y:2005,v:62200},{y:2006,v:63411},{y:2007,v:63636},{y:2008,v:60809},{y:2009,v:65491},{y:2010,v:66239},{y:2011,v:72487},{y:2012,v:85843},{y:2013,v:79306},{y:2014,v:85320},{y:2015,v:89966},{y:2016,v:91675},{y:2017,v:93742},{y:2018,v:96353},{y:2019,v:102462},{y:2020,v:106235},{y:2021,v:109767}]},
+  {n:"Germany",    pts:[{y:1995,v:41718},{y:1996,v:40826},{y:1997,v:38450},{y:1998,v:38150},{y:1999,v:37589},{y:2000,v:36642},{y:2001,v:36050},{y:2002,v:35868},{y:2003,v:36054},{y:2004,v:34724},{y:2005,v:34228},{y:2006,v:34128},{y:2007,v:33977},{y:2008,v:33862},{y:2009,v:33721},{y:2010,v:33714},{y:2011,v:33575},{y:2012,v:33506},{y:2013,v:33449},{y:2014,v:33426},{y:2015,v:33332},{y:2016,v:33380},{y:2017,v:33488},{y:2018,v:33440},{y:2019,v:33423},{y:2020,v:33399},{y:2021,v:33401}]},
+  {n:"France",     pts:[{y:1995,v:31997},{y:1996,v:31910},{y:1997,v:31879},{y:1998,v:31793},{y:1999,v:29171},{y:2000,v:29330},{y:2001,v:29503},{y:2002,v:29410},{y:2003,v:29327},{y:2004,v:29304},{y:2005,v:28470},{y:2006,v:29620},{y:2007,v:29976},{y:2008,v:29959},{y:2009,v:33698},{y:2010,v:29929},{y:2011,v:30071},{y:2012,v:29406},{y:2013,v:29979},{y:2015,v:28866},{y:2016,v:29236},{y:2017,v:29248},{y:2018,v:28241},{y:2019,v:28157},{y:2020,v:27872},{y:2021,v:27716}]},
+  {n:"Kazakhstan", pts:[{y:1995,v:13736},{y:1996,v:13537},{y:1997,v:13660},{y:1998,v:13642},{y:1999,v:13601},{y:2000,v:13545},{y:2001,v:13597},{y:2002,v:13597},{y:2003,v:13770},{y:2004,v:14203},{y:2005,v:14204},{y:2006,v:14205},{y:2007,v:14205},{y:2008,v:14205},{y:2009,v:14192},{y:2010,v:14184},{y:2011,v:14319},{y:2012,v:14758},{y:2013,v:14767},{y:2014,v:14767},{y:2015,v:14767},{y:2016,v:15529},{y:2017,v:16040},{y:2018,v:16060},{y:2019,v:16060},{y:2020,v:16063},{y:2021,v:16005}]},
+  {n:"Iran",       pts:[{y:1995,v:5332},{y:1996,v:5372},{y:1997,v:5733},{y:1998,v:6002},{y:1999,v:6005},{y:2000,v:6042},{y:2001,v:6048},{y:2002,v:6152},{y:2003,v:6154},{y:2004,v:6405},{y:2005,v:7131},{y:2006,v:7265},{y:2007,v:7335},{y:2008,v:7554},{y:2009,v:7903},{y:2010,v:8216},{y:2011,v:8367},{y:2012,v:8368},{y:2013,v:8592},{y:2014,v:8559},{y:2015,v:8559},{y:2016,v:8576},{y:2017,v:9021},{y:2018,v:9327},{y:2019,v:9454},{y:2020,v:9453},{y:2021,v:9455}]},
+  {n:"South Korea",pts:[{y:1995,v:3101},{y:1996,v:3120},{y:1997,v:3118},{y:1998,v:3125},{y:1999,v:3118},{y:2000,v:3123},{y:2001,v:3125},{y:2002,v:3129},{y:2003,v:3140},{y:2004,v:3374},{y:2005,v:3392},{y:2006,v:3392},{y:2007,v:3399},{y:2008,v:3381},{y:2009,v:3378},{y:2010,v:3618},{y:2011,v:3637},{y:2012,v:3650},{y:2013,v:3666},{y:2014,v:3668},{y:2015,v:3944},{y:2016,v:4071},{y:2017,v:4071},{y:2018,v:4200},{y:2019,v:4109},{y:2020,v:4284},{y:2021,v:4308}]},
+];
+
+const COLORS = {
+  'China':       '#EA5E33',
+  'India':       '#F29A44',
+  'Germany':     '#8BAD72',
+  'France':      '#5B9E78',
+  'Kazakhstan':  '#C49A45',
+  'Iran':        '#A6C4A2',
+  'South Korea': '#6B9BA6',
+};
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 780, H = 460;
+const PAD = { top: 36, right: 160, bottom: 36, left: 60 };
+const YEAR_MIN = 1995, YEAR_MAX = 2021;
+const VAL_MIN = 0, VAL_MAX = 115000;
+
+const xScale = y => PAD.left + (y - YEAR_MIN) / (YEAR_MAX - YEAR_MIN) * (W - PAD.left - PAD.right);
+const yScale = v => PAD.top + (VAL_MAX - v) / (VAL_MAX - VAL_MIN) * (H - PAD.top - PAD.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, txt) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (const [k,v] of Object.entries(attrs||{})) el.setAttribute(k,String(v));
+  if (txt !== undefined) el.textContent = txt;
+  return el;
+}
+
+// Grid lines
+[0, 25000, 50000, 75000, 100000].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:PAD.left,y1:yScale(v),x2:W-PAD.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const label = v === 0 ? "0" : (v/1000)+"k";
+  svg.appendChild(mkEl("text",{x:PAD.left-5,y:yScale(v)+3.5,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},label));
+});
+
+// X axis
+[1995,2000,2005,2010,2015,2020].forEach(yr => {
+  svg.appendChild(mkEl("line",{x1:xScale(yr),y1:PAD.top,x2:xScale(yr),y2:H-PAD.bottom,stroke:"#E2E0D5","stroke-width":"0.5","stroke-dasharray":"3,3"}));
+  svg.appendChild(mkEl("text",{x:xScale(yr),y:H-PAD.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},yr));
+});
+
+const tip = document.getElementById("tip");
+const lineEls = [];
+
+data.forEach((d, di) => {
+  const color = COLORS[d.n] || '#7A786F';
+  const pts = d.pts;
+  const pathD = pts.map((p,i) => `${i===0?"M":"L"}${xScale(p.y)},${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path",{d:pathD,stroke:color,"stroke-width": d.n==="China"?"2":"1.5","fill":"none","stroke-linejoin":"round","stroke-linecap":"round"});
+  const hit  = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"14","fill":"none","style":"cursor:crosshair"});
+
+  svg.appendChild(line);
+  svg.appendChild(hit);
+  lineEls.push(line);
+
+  hit.addEventListener("mousemove", e => {
+    lineEls.forEach((l,i) => l.setAttribute("stroke-opacity", i===di ? "1" : "0.08"));
+    line.setAttribute("stroke-width","2.5");
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * W / rect.width;
+    const ratio = Math.max(0,Math.min(1,(mx - PAD.left)/(W-PAD.left-PAD.right)));
+    const idx = Math.round(ratio*(pts.length-1));
+    const p = pts[idx];
+    tip.textContent = `${d.n} (${p.y}): ${p.v.toLocaleString()} km`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top  = (e.clientY-22)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lineEls.forEach(l => { l.setAttribute("stroke-opacity","1"); l.setAttribute("stroke-width", l===lineEls[1]?"2":"1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+
+// Endpoint labels
+const labelItems = data.map(d => {
+  const last = d.pts[d.pts.length-1];
+  return { n: d.n, origY: yScale(last.v), y: yScale(last.v), v: last.v };
+});
+const resolved = resolveCollisions(labelItems, 12);
+resolved.forEach(lb => {
+  lb.y = Math.max(PAD.top+4, Math.min(H-PAD.bottom-4, lb.y));
+});
+
+resolved.forEach(lb => {
+  const color = COLORS[lb.n] || '#7A786F';
+  const x0 = W - PAD.right;
+  if (Math.abs(lb.y - lb.origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:x0,y1:lb.origY,x2:x0+4,y2:lb.y,stroke:color,"stroke-width":"0.6",opacity:"0.5"}));
+  }
+  const label = (Math.round(lb.v/1000))+"k  "+lb.n;
+  svg.appendChild(mkEl("text",{x:x0+6,y:lb.y+3.5,"font-family":"JetBrains Mono, monospace","font-size":"9","fill":color},label));
+});
+</script>
+</body></html>

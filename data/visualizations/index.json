@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Natural Gas's Rising Role in Electricity Generation, 1990\u20132024",
+      "description": "Trend lines showing the share of electricity produced from natural gas for 10 countries. Israel switched from near-zero to 70% after developing offshore fields; Japan spiked after Fukushima; Argentina and Italy rely heavily on gas.",
+      "datasetIds": [
+        "wb--EG-ELC-NGAS-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Israel shifted from 0% to 70% gas electricity after developing Tamar and Leviathan offshore fields",
+        "Japan spiked from 28% to 39% in 2011 following Fukushima nuclear shutdowns",
+        "France keeps gas below 6% thanks to its dominant nuclear fleet"
+      ],
+      "createdAt": "2026-07-20T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Natural Resource Dependency: 2000 vs. 2019",
+      "description": "Slope chart comparing total natural resources rents (% of GDP) for 14 resource-rich economies. Most oil and gas exporters saw dependency fall as economies grew or commodity prices shifted. A few mineral-rich nations saw it rise.",
+      "datasetIds": [
+        "wb--NY-GDP-TOTL-RT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Equatorial Guinea fell from 89% to 25% as oil revenues diversified into a broader economy",
+        "Chad rose from 11% to 20% as oil extraction expanded after the Chad-Cameroon pipeline opened",
+        "Iraq remained the most resource-dependent large economy at 41% in 2019"
+      ],
+      "createdAt": "2026-07-20T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Women Are Marrying Later, 1960\u20132018",
+      "description": "Trend lines showing the singulate mean age at first marriage for women across 10 countries. European and high-income countries rose from ~22 to ~32 years. South Asian and African countries show smaller but persistent gains, keeping a 10-year gap.",
+      "datasetIds": [
+        "wb--SP-DYN-SMAM-FE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Hungary rose from 20.9 to 32.9 years \u2014 the largest absolute gain in the set",
+        "Bangladesh remains lowest at 18.8 years despite a 2.4-year rise since 1974",
+        "All 10 countries show an upward trend \u2014 a universal social transformation"
+      ],
+      "createdAt": "2026-07-20T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Exclusive Breastfeeding Rates: Wide Global Variation",
+      "description": "Horizontal bar chart ranking 20 countries by exclusive breastfeeding rate (% of infants under 6 months, most recent survey). Sub-Saharan Africa and South Asia lead; some Latin American and Eastern European countries fall below 20%.",
+      "datasetIds": [
+        "wb--SH-STA-BFED-ZS"
+      ],
+      "chartType": "bar",
+      "highlights": [
+        "Burundi leads at 71.9% \u2014 well above the WHO target of 50% by 2025",
+        "Dominican Republic at 4.6% is among the lowest globally despite regional peers reaching 50%+",
+        "India at 58% represents a major public health success given its 1.4 billion population"
+      ],
+      "createdAt": "2026-07-20T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "China's Railway Revolution: Rail Network Size, 1995\u20132021",
+      "description": "Trend lines comparing total railway route-km for 7 countries. China doubled its network from 55,000 to 110,000 km while building the world's largest high-speed rail system. Germany and France trimmed their networks; India grew steadily.",
+      "datasetIds": [
+        "wb--IS-RRS-TOTL-KM"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China doubled its railway network from 55k km in 1995 to 110k km in 2021",
+        "Germany shed over 8,000 km of track since 1995 through line closures and rationalization",
+        "India grew from 63k to 68k km \u2014 steady growth from the world's largest network in 1995"
+      ],
+      "createdAt": "2026-07-20T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-20T00:00:00.000Z"
 }

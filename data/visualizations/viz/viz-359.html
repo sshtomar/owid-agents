@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Women Are Marrying Later, 1960–2018</h1>
+<p class="subtitle">Singulate mean age at first marriage for women. European and high-income countries rose from ~22 to ~32 years. South and Southeast Asian countries started lower and gained ground slowly, keeping a persistent 10-year gap.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SP.DYN.SMAM.FE, Singulate Mean Age at First Marriage, Female</p>
+<script>
+const data = [
+  {n:"Hungary",  pts:[{y:1970,v:20.9},{y:1975,v:21.1},{y:1980,v:21},{y:1985,v:21.7},{y:1990,v:22.2},{y:1995,v:24.2},{y:2000,v:26.5},{y:2005,v:28.8},{y:2010,v:31.1},{y:2015,v:32.8},{y:2018,v:32.9}]},
+  {n:"Denmark",  pts:[{y:1970,v:22.1},{y:1975,v:23.4},{y:1980,v:25.2},{y:1985,v:27.5},{y:1990,v:29.3},{y:1995,v:25},{y:2000,v:30.8},{y:2005,v:30.8},{y:2010,v:30.8},{y:2015,v:31.7},{y:2018,v:31.9}]},
+  {n:"Finland",  pts:[{y:1970,v:22.5},{y:1975,v:23.3},{y:1980,v:24.6},{y:1985,v:26.1},{y:1990,v:27.9},{y:1995,v:29.2},{y:2000,v:30.3},{y:2005,v:30.5},{y:2010,v:30.2},{y:2015,v:30.3},{y:2018,v:30.7}]},
+  {n:"Italy",    pts:[{y:1971,v:22.6},{y:1981,v:23.2},{y:1991,v:26.1},{y:2000,v:28.6},{y:2005,v:29.5},{y:2010,v:30.6},{y:2015,v:31.4},{y:2018,v:32.2}]},
+  {n:"Germany",  pts:[{y:1987,v:26},{y:1992,v:26.8},{y:2001,v:30.1},{y:2006,v:31},{y:2012,v:31.9},{y:2015,v:31.4},{y:2018,v:31.7}]},
+  {n:"Australia",pts:[{y:1971,v:21.5},{y:1976,v:22},{y:1981,v:23.5},{y:1986,v:24.8},{y:1990,v:26},{y:1996,v:27.7},{y:2001,v:28.9},{y:2006,v:29.7},{y:2011,v:29.9},{y:2016,v:29.9}]},
+  {n:"Indonesia",pts:[{y:1971,v:19.3},{y:1980,v:20},{y:1987,v:21.7},{y:1995,v:22.2},{y:2000,v:22.5},{y:2007,v:22.3},{y:2012,v:21.8},{y:2017,v:22.4}]},
+  {n:"India",    pts:[{y:1971,v:17.7},{y:1981,v:18.7},{y:1991,v:19.3},{y:2001,v:20.2},{y:2006,v:20.2},{y:2011,v:20.7},{y:2016,v:21.4}]},
+  {n:"Bangladesh",pts:[{y:1974,v:16.4},{y:1981,v:16.7},{y:1991,v:18.1},{y:2000,v:18.8},{y:2006,v:18.7},{y:2011,v:19.4},{y:2014,v:18.8}]},
+  {n:"Ghana",    pts:[{y:1960,v:17.8},{y:1970,v:19.4},{y:1988,v:20.2},{y:1998,v:21},{y:2006,v:22.8},{y:2010,v:24.1},{y:2017,v:23.7}]},
+];
+
+const COLORS = {
+  'Hungary':   '#EA5E33',
+  'Denmark':   '#F29A44',
+  'Finland':   '#E8BD5A',
+  'Italy':     '#C49A45',
+  'Germany':   '#8BAD72',
+  'Australia': '#5B9E78',
+  'Indonesia': '#6B9BA6',
+  'India':     '#8B6FAA',
+  'Bangladesh':'#AA7B7B',
+  'Ghana':     '#A67B5B',
+};
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 780, H = 460;
+const PAD = { top: 36, right: 155, bottom: 36, left: 50 };
+const YEAR_MIN = 1960, YEAR_MAX = 2018;
+const VAL_MIN = 14, VAL_MAX = 36;
+
+const xScale = y => PAD.left + (y - YEAR_MIN) / (YEAR_MAX - YEAR_MIN) * (W - PAD.left - PAD.right);
+const yScale = v => PAD.top + (VAL_MAX - v) / (VAL_MAX - VAL_MIN) * (H - PAD.top - PAD.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, txt) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (const [k,v] of Object.entries(attrs||{})) el.setAttribute(k,String(v));
+  if (txt !== undefined) el.textContent = txt;
+  return el;
+}
+
+// Grid lines
+[15, 20, 25, 30, 35].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:PAD.left,y1:yScale(v),x2:W-PAD.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:PAD.left-5,y:yScale(v)+3.5,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},v+" yrs"));
+});
+
+// X axis
+[1960,1970,1980,1990,2000,2010].forEach(yr => {
+  svg.appendChild(mkEl("line",{x1:xScale(yr),y1:PAD.top,x2:xScale(yr),y2:H-PAD.bottom,stroke:"#E2E0D5","stroke-width":"0.5","stroke-dasharray":"3,3"}));
+  svg.appendChild(mkEl("text",{x:xScale(yr),y:H-PAD.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},yr));
+});
+
+const tip = document.getElementById("tip");
+const lineEls = [];
+
+data.forEach((d, di) => {
+  const color = COLORS[d.n] || '#7A786F';
+  const pts = d.pts;
+  const pathD = pts.map((p,i) => `${i===0?"M":"L"}${xScale(p.y)},${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path",{d:pathD,stroke:color,"stroke-width":"1.5","fill":"none","stroke-linejoin":"round","stroke-linecap":"round"});
+  const hit  = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"14","fill":"none","style":"cursor:crosshair"});
+
+  svg.appendChild(line);
+  svg.appendChild(hit);
+  lineEls.push(line);
+
+  hit.addEventListener("mousemove", e => {
+    lineEls.forEach((l,i) => l.setAttribute("stroke-opacity", i===di ? "1" : "0.08"));
+    line.setAttribute("stroke-width","2.5");
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * W / rect.width;
+    const ratio = Math.max(0,Math.min(1,(mx - PAD.left)/(W-PAD.left-PAD.right)));
+    const idx = Math.round(ratio*(pts.length-1));
+    const p = pts[idx];
+    tip.textContent = `${d.n} (${p.y}): ${p.v} yrs`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top  = (e.clientY-22)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lineEls.forEach(l => { l.setAttribute("stroke-opacity","1"); l.setAttribute("stroke-width","1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+
+// Endpoint labels
+const labelItems = data.map(d => {
+  const last = d.pts[d.pts.length-1];
+  return { n: d.n, origY: yScale(last.v), y: yScale(last.v), v: last.v };
+});
+const resolved = resolveCollisions(labelItems, 12);
+resolved.forEach(lb => {
+  lb.y = Math.max(PAD.top+4, Math.min(H-PAD.bottom-4, lb.y));
+});
+
+resolved.forEach(lb => {
+  const color = COLORS[lb.n] || '#7A786F';
+  const x0 = W - PAD.right;
+  if (Math.abs(lb.y - lb.origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:x0,y1:lb.origY,x2:x0+4,y2:lb.y,stroke:color,"stroke-width":"0.6",opacity:"0.5"}));
+  }
+  svg.appendChild(mkEl("text",{x:x0+6,y:lb.y+3.5,"font-family":"JetBrains Mono, monospace","font-size":"9","fill":color},`${lb.v} ${lb.n}`));
+});
+</script>
+</body></html>

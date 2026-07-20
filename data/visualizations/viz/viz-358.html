@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display:flex; gap: 20px; margin-bottom: 12px; flex-wrap: wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:10px; color:#7A786F; font-family:'JetBrains Mono',monospace; }
+  .legend-swatch { width:12px; height:3px; border-radius:1px; }
+</style></head><body>
+<h1>Natural Resource Dependency: 2000 vs. 2019</h1>
+<p class="subtitle">Total natural resources rents as % of GDP for resource-rich economies. Most oil and gas exporters saw dependency fall as economies grew or commodity prices shifted. A few mineral-rich nations saw it rise.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A"></div>&gt;20pp decrease</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#8BAD72"></div>10–20pp decrease</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C2C0B5"></div>&lt;10pp decrease</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#EA5E33"></div>Increase</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — NY.GDP.TOTL.RT.ZS, Total Natural Resources Rents (% of GDP)</p>
+<script>
+const data = [
+  {n:"Equatorial Guinea", a:88.6, b:25.4, y:2000},
+  {n:"Congo Rep.",  a:59.7, b:39.2, y:2000},
+  {n:"Angola",      a:59.1, b:28.9, y:2000},
+  {n:"Iraq",        a:48.9, b:40.6, y:2000},
+  {n:"Gabon",       a:47.8, b:19.2, y:2000},
+  {n:"Azerbaijan",  a:35.1, b:23.4, y:2000},
+  {n:"Brunei",      a:35.0, b:20.8, y:2000},
+  {n:"Iran",        a:33.1, b:27.8, y:2000},
+  {n:"Kazakhstan",  a:27.3, b:17.9, y:2000},
+  {n:"Algeria",     a:26.7, b:18.5, y:2000},
+  {n:"Chad",        a:10.6, b:19.6, y:2000},
+  {n:"Ghana",       a:13.8, b: 9.8, y:2000},
+  {n:"Congo DR",    a: 7.5, b:12.8, y:2000},
+  {n:"Burkina Faso",a: 5.3, b: 8.3, y:2000},
+];
+
+function colorForChange(d) {
+  const chg = d.b - d.a;
+  if (chg > 0)   return "#EA5E33";
+  if (chg > -10) return "#C2C0B5";
+  if (chg > -20) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 700, H = 560;
+const PAD = { top: 48, right: 10, bottom: 28, left: 10 };
+const XL = 170, XR = 530;
+const VAL_MAX = 95, VAL_MIN = 0;
+const CH = H - PAD.top - PAD.bottom;
+
+const yScale = v => PAD.top + (VAL_MAX - v) / (VAL_MAX - VAL_MIN) * CH;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, txt) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (const [k,v] of Object.entries(attrs||{})) el.setAttribute(k,String(v));
+  if (txt !== undefined) el.textContent = txt;
+  return el;
+}
+
+// Column headers
+svg.appendChild(mkEl("text",{x:XL,y:PAD.top-18,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F","font-weight":"500"},"2000"));
+svg.appendChild(mkEl("text",{x:XR,y:PAD.top-18,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F","font-weight":"500"},"2019"));
+
+// Axis lines
+svg.appendChild(mkEl("line",{x1:XL,y1:PAD.top-12,x2:XL,y2:H-PAD.bottom,stroke:"#C2C0B5","stroke-width":"0.8"}));
+svg.appendChild(mkEl("line",{x1:XR,y1:PAD.top-12,x2:XR,y2:H-PAD.bottom,stroke:"#C2C0B5","stroke-width":"0.8"}));
+
+// Grid lines + y labels
+[0,20,40,60,80].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:XL,y1:yScale(v),x2:XR,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.4"}));
+  svg.appendChild(mkEl("text",{x:XL-6,y:yScale(v)+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"8","fill":"#9A9890"},v+"%"));
+});
+
+const tip = document.getElementById("tip");
+const lineEls = [];
+
+// Build label positions
+const leftLabels  = data.map(d => ({n:d.n, y:yScale(d.a), origY:yScale(d.a), side:'L'}));
+const rightLabels = data.map(d => ({n:d.n, y:yScale(d.b), origY:yScale(d.b), side:'R'}));
+const resolvedL = resolveCollisions(leftLabels, 13);
+const resolvedR = resolveCollisions(rightLabels, 13);
+resolvedL.forEach(l => { l.y = Math.max(PAD.top, Math.min(H-PAD.bottom, l.y)); });
+resolvedR.forEach(l => { l.y = Math.max(PAD.top, Math.min(H-PAD.bottom, l.y)); });
+
+const leftMap  = Object.fromEntries(resolvedL.map(l => [l.n, l.y]));
+const rightMap = Object.fromEntries(resolvedR.map(r => [r.n, r.y]));
+
+data.forEach((d, di) => {
+  const color = colorForChange(d);
+  const yA = yScale(d.a), yB = yScale(d.b);
+
+  // Connecting line
+  const line = mkEl("line",{x1:XL,y1:yA,x2:XR,y2:yB,stroke:color,"stroke-width":"1.5"});
+  // Hit area
+  const hit = mkEl("line",{x1:XL,y1:yA,x2:XR,y2:yB,stroke:"transparent","stroke-width":"14","style":"cursor:pointer"});
+
+  svg.appendChild(line);
+  svg.appendChild(hit);
+  lineEls.push({line, d});
+
+  hit.addEventListener("mouseenter", () => {
+    lineEls.forEach(({line:l}) => l.setAttribute("stroke-opacity","0.1"));
+    line.setAttribute("stroke-opacity","1");
+    line.setAttribute("stroke-width","2.5");
+    const chg = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% (2000) → ${d.b}% (2019)  (${chg>0?"+":""}${chg.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top  = (e.clientY-22)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lineEls.forEach(({line:l}) => { l.setAttribute("stroke-opacity","1"); l.setAttribute("stroke-width","1.5"); });
+    tip.style.opacity = "0";
+  });
+
+  // Dots
+  svg.appendChild(mkEl("circle",{cx:XL,cy:yA,r:"3",fill:color}));
+  svg.appendChild(mkEl("circle",{cx:XR,cy:yB,r:"3",fill:color}));
+});
+
+function shortName(n) {
+  return n.replace("Equatorial Guinea","Eq. Guinea").replace("Burkina Faso","Burkina Faso");
+}
+
+// Left labels (right-aligned)
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ly = leftMap[d.n];
+  const origY = yScale(d.a);
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:XL-2,y1:origY,x2:XL-6,y2:ly,stroke:color,"stroke-width":"0.5",opacity:"0.6"}));
+  }
+  svg.appendChild(mkEl("text",{x:XL-8,y:ly+3.5,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":color},`${shortName(d.n)}  ${d.a}%`));
+});
+
+// Right labels (left-aligned)
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ry = rightMap[d.n];
+  const origY = yScale(d.b);
+  if (Math.abs(ry - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:XR+2,y1:origY,x2:XR+6,y2:ry,stroke:color,"stroke-width":"0.5",opacity:"0.6"}));
+  }
+  svg.appendChild(mkEl("text",{x:XR+8,y:ry+3.5,"text-anchor":"start","font-family":"JetBrains Mono, monospace","font-size":"9","fill":color},`${d.b}%  ${shortName(d.n)}`));
+});
+</script>
+</body></html>

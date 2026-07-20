@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Natural Gas's Rising Role in Electricity Generation, 1990–2024</h1>
+<p class="subtitle">Share of electricity produced from natural gas (% of total). Israel switched from near-zero to 70% after developing offshore gas fields. Japan's 2011 spike followed Fukushima nuclear shutdowns. Argentina and Italy rely heavily on gas as a bridge fuel.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EG.ELC.NGAS.ZS, Electricity Production from Natural Gas Sources</p>
+<script>
+const data = [{"n":"Israel","pts":[{"y":1990,"v":0},{"y":1991,"v":0},{"y":1992,"v":0},{"y":1993,"v":0},{"y":1994,"v":0},{"y":1995,"v":0},{"y":1996,"v":0.1},{"y":1997,"v":0.1},{"y":1998,"v":0},{"y":1999,"v":0.1},{"y":2000,"v":0},{"y":2001,"v":0},{"y":2002,"v":0.1},{"y":2003,"v":0.1},{"y":2004,"v":9.2},{"y":2005,"v":11.6},{"y":2006,"v":18},{"y":2007,"v":19.6},{"y":2008,"v":27},{"y":2009,"v":32.8},{"y":2010,"v":37.5},{"y":2011,"v":33.1},{"y":2012,"v":16.8},{"y":2013,"v":43},{"y":2014,"v":48.4},{"y":2015,"v":51.6},{"y":2016,"v":61},{"y":2017,"v":63.2},{"y":2018,"v":66.8},{"y":2019,"v":63.7},{"y":2020,"v":67.1},{"y":2021,"v":69},{"y":2022,"v":69},{"y":2023,"v":70.9},{"y":2024,"v":69.8}]},{"n":"Argentina","pts":[{"y":1990,"v":27},{"y":1991,"v":30.5},{"y":1992,"v":28.9},{"y":1993,"v":26.5},{"y":1994,"v":23},{"y":1995,"v":30.7},{"y":1996,"v":39.9},{"y":1997,"v":34.4},{"y":1998,"v":37.6},{"y":1999,"v":50.4},{"y":2000,"v":47},{"y":2001,"v":37.6},{"y":2002,"v":37.3},{"y":2003,"v":42.5},{"y":2004,"v":47.2},{"y":2005,"v":45},{"y":2006,"v":41.9},{"y":2007,"v":45.7},{"y":2008,"v":47.5},{"y":2009,"v":46},{"y":2010,"v":44.4},{"y":2011,"v":45.9},{"y":2012,"v":49.8},{"y":2013,"v":47.7},{"y":2014,"v":49.3},{"y":2015,"v":48.5},{"y":2016,"v":51.8},{"y":2017,"v":57.2},{"y":2018,"v":59.4},{"y":2019,"v":60.2},{"y":2020,"v":56.4},{"y":2021,"v":55.2},{"y":2022,"v":48.8},{"y":2023,"v":45.6},{"y":2024,"v":48.9}]},{"n":"Italy","pts":[{"y":1990,"v":18.3},{"y":1991,"v":16.4},{"y":1992,"v":15.7},{"y":1993,"v":17.9},{"y":1994,"v":17.6},{"y":1995,"v":19.5},{"y":1996,"v":20.5},{"y":1997,"v":24.4},{"y":1998,"v":27.3},{"y":1999,"v":32.7},{"y":2000,"v":36.6},{"y":2001,"v":37.3},{"y":2002,"v":34.8},{"y":2003,"v":39.9},{"y":2004,"v":42.8},{"y":2005,"v":49.1},{"y":2006,"v":50.3},{"y":2007,"v":55},{"y":2008,"v":54.1},{"y":2009,"v":50.3},{"y":2010,"v":50.6},{"y":2011,"v":47.8},{"y":2012,"v":43.1},{"y":2013,"v":37.6},{"y":2014,"v":33.5},{"y":2015,"v":39.2},{"y":2016,"v":43.5},{"y":2017,"v":47.4},{"y":2018,"v":44.4},{"y":2019,"v":48.2},{"y":2020,"v":47.7},{"y":2021,"v":49.8},{"y":2022,"v":49.8},{"y":2023,"v":44.9},{"y":2024,"v":43.7}]},{"n":"Japan","pts":[{"y":1990,"v":19.3},{"y":1991,"v":20},{"y":1992,"v":19.8},{"y":1993,"v":19.5},{"y":1994,"v":19.8},{"y":1995,"v":19.7},{"y":1996,"v":20.6},{"y":1997,"v":21.2},{"y":1998,"v":22.1},{"y":1999,"v":23.5},{"y":2000,"v":23.8},{"y":2001,"v":24.2},{"y":2002,"v":24.2},{"y":2003,"v":25.3},{"y":2004,"v":23.6},{"y":2005,"v":21.9},{"y":2006,"v":24.1},{"y":2007,"v":25.6},{"y":2008,"v":26.5},{"y":2009,"v":27.4},{"y":2010,"v":28.4},{"y":2011,"v":36.9},{"y":2012,"v":39.2},{"y":2013,"v":40},{"y":2014,"v":42.2},{"y":2015,"v":40.1},{"y":2016,"v":41},{"y":2017,"v":39.4},{"y":2018,"v":38.1},{"y":2019,"v":37.1},{"y":2020,"v":38.8},{"y":2021,"v":34.2},{"y":2022,"v":33.8},{"y":2023,"v":33},{"y":2024,"v":29.8}]},{"n":"Greece","pts":[{"y":1990,"v":0.3},{"y":1991,"v":0.3},{"y":1992,"v":0.2},{"y":1993,"v":0.2},{"y":1994,"v":0.2},{"y":1995,"v":0.2},{"y":1996,"v":0.2},{"y":1997,"v":0.8},{"y":1998,"v":3.7},{"y":1999,"v":7.9},{"y":2000,"v":11},{"y":2001,"v":11.4},{"y":2002,"v":12.9},{"y":2003,"v":13.7},{"y":2004,"v":15.2},{"y":2005,"v":13.6},{"y":2006,"v":17.5},{"y":2007,"v":21.7},{"y":2008,"v":21.6},{"y":2009,"v":18},{"y":2010,"v":17.1},{"y":2011,"v":23.5},{"y":2012,"v":21.9},{"y":2013,"v":19},{"y":2014,"v":13.4},{"y":2015,"v":17.5},{"y":2016,"v":27.3},{"y":2017,"v":31},{"y":2018,"v":26.4},{"y":2019,"v":29.8},{"y":2020,"v":39.8},{"y":2021,"v":41.1},{"y":2022,"v":36.3},{"y":2023,"v":32},{"y":2024,"v":37.4}]},{"n":"World","pts":[{"y":1990,"v":14.7},{"y":1991,"v":14.6},{"y":1992,"v":14.6},{"y":1993,"v":14.7},{"y":1994,"v":14.9},{"y":1995,"v":15.1},{"y":1996,"v":15.2},{"y":1997,"v":16},{"y":1998,"v":16.5},{"y":1999,"v":17.5},{"y":2000,"v":17.8},{"y":2001,"v":18.6},{"y":2002,"v":19.2},{"y":2003,"v":19.4},{"y":2004,"v":19.9},{"y":2005,"v":20.1},{"y":2006,"v":20.5},{"y":2007,"v":21.1},{"y":2008,"v":21.5},{"y":2009,"v":21.8},{"y":2010,"v":22.3},{"y":2011,"v":22},{"y":2012,"v":22.4},{"y":2013,"v":21.5},{"y":2014,"v":21.5},{"y":2015,"v":22.7},{"y":2016,"v":23.3},{"y":2017,"v":22.9},{"y":2018,"v":23.1},{"y":2019,"v":23.3},{"y":2020,"v":23.5},{"y":2021,"v":22.8},{"y":2022,"v":22.2},{"y":2023,"v":22.1},{"y":2024,"v":22.1}]},{"n":"Germany","pts":[{"y":1990,"v":7.4},{"y":1991,"v":6.7},{"y":1992,"v":6.1},{"y":1993,"v":6.6},{"y":1994,"v":7.6},{"y":1995,"v":8},{"y":1996,"v":8.6},{"y":1997,"v":9},{"y":1998,"v":9.7},{"y":1999,"v":9.9},{"y":2000,"v":9.1},{"y":2001,"v":10},{"y":2002,"v":9.3},{"y":2003,"v":10.5},{"y":2004,"v":10.4},{"y":2005,"v":11.9},{"y":2006,"v":12},{"y":2007,"v":12.4},{"y":2008,"v":14.1},{"y":2009,"v":13.8},{"y":2010,"v":14.3},{"y":2011,"v":14.2},{"y":2012,"v":12.4},{"y":2013,"v":10.8},{"y":2014,"v":9.9},{"y":2015,"v":9.7},{"y":2016,"v":12.7},{"y":2017,"v":13.4},{"y":2018,"v":13},{"y":2019,"v":15},{"y":2020,"v":16.7},{"y":2021,"v":16.4},{"y":2022,"v":14.4},{"y":2023,"v":15.8},{"y":2024,"v":17.5}]},{"n":"Australia","pts":[{"y":1990,"v":9.3},{"y":1991,"v":6.9},{"y":1992,"v":7.3},{"y":1993,"v":7.5},{"y":1994,"v":7.3},{"y":1995,"v":8.6},{"y":1996,"v":7},{"y":1997,"v":6.2},{"y":1998,"v":6.6},{"y":1999,"v":7.8},{"y":2000,"v":7.7},{"y":2001,"v":7.7},{"y":2002,"v":13.9},{"y":2003,"v":13.3},{"y":2004,"v":13.5},{"y":2005,"v":10.4},{"y":2006,"v":9.8},{"y":2007,"v":13.1},{"y":2008,"v":14.4},{"y":2009,"v":16.1},{"y":2010,"v":17.6},{"y":2011,"v":19.3},{"y":2012,"v":19.4},{"y":2013,"v":20.5},{"y":2014,"v":22},{"y":2015,"v":20.8},{"y":2016,"v":19.6},{"y":2017,"v":19.6},{"y":2018,"v":20.6},{"y":2019,"v":20},{"y":2020,"v":20.8},{"y":2021,"v":18.7},{"y":2022,"v":18.1},{"y":2023,"v":17.8},{"y":2024,"v":17.3}]},{"n":"France","pts":[{"y":1990,"v":0.7},{"y":1991,"v":0.7},{"y":1992,"v":0.7},{"y":1993,"v":0.7},{"y":1994,"v":0.8},{"y":1995,"v":0.8},{"y":1996,"v":0.8},{"y":1997,"v":1},{"y":1998,"v":1},{"y":1999,"v":1.5},{"y":2000,"v":2.1},{"y":2001,"v":2.8},{"y":2002,"v":3.3},{"y":2003,"v":3.4},{"y":2004,"v":3.7},{"y":2005,"v":4},{"y":2006,"v":3.8},{"y":2007,"v":3.9},{"y":2008,"v":3.8},{"y":2009,"v":3.8},{"y":2010,"v":4.2},{"y":2011,"v":5.1},{"y":2012,"v":4},{"y":2013,"v":3.2},{"y":2014,"v":2.3},{"y":2015,"v":3.6},{"y":2016,"v":6.2},{"y":2017,"v":7.2},{"y":2018,"v":5.2},{"y":2019,"v":6.9},{"y":2020,"v":6.6},{"y":2021,"v":6},{"y":2022,"v":9.3},{"y":2023,"v":5.7},{"y":2024,"v":3.1}]},{"n":"Brazil","pts":[{"y":1990,"v":0.1},{"y":1991,"v":0.2},{"y":1992,"v":0.2},{"y":1993,"v":0.2},{"y":1994,"v":0.2},{"y":1995,"v":0.2},{"y":1996,"v":0.3},{"y":1997,"v":0.4},{"y":1998,"v":0.4},{"y":1999,"v":0.8},{"y":2000,"v":1.2},{"y":2001,"v":3},{"y":2002,"v":3.6},{"y":2003,"v":3.6},{"y":2004,"v":5},{"y":2005,"v":4.7},{"y":2006,"v":4.4},{"y":2007,"v":3.5},{"y":2008,"v":6.2},{"y":2009,"v":2.9},{"y":2010,"v":7.1},{"y":2011,"v":4.7},{"y":2012,"v":8.5},{"y":2013,"v":12.1},{"y":2014,"v":14.1},{"y":2015,"v":14.1},{"y":2016,"v":10.4},{"y":2017,"v":11.8},{"y":2018,"v":9.8},{"y":2019,"v":10.4},{"y":2020,"v":9.5},{"y":2021,"v":13.3},{"y":2022,"v":6.2},{"y":2023,"v":5.5},{"y":2024,"v":6.4}]}];
+
+const COLORS = {
+  'Israel':    '#EA5E33',
+  'Argentina': '#F29A44',
+  'Italy':     '#E8BD5A',
+  'Japan':     '#94B55D',
+  'Greece':    '#C49A45',
+  'World':     '#7A786F',
+  'Germany':   '#5B9E78',
+  'Australia': '#A6C4A2',
+  'France':    '#8B9EBD',
+  'Brazil':    '#6B7FAA',
+};
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 780, H = 460;
+const PAD = { top: 36, right: 155, bottom: 36, left: 52 };
+const YEAR_MIN = 1990, YEAR_MAX = 2024;
+const VAL_MIN = 0, VAL_MAX = 75;
+
+const xScale = y => PAD.left + (y - YEAR_MIN) / (YEAR_MAX - YEAR_MIN) * (W - PAD.left - PAD.right);
+const yScale = v => PAD.top + (VAL_MAX - v) / (VAL_MAX - VAL_MIN) * (H - PAD.top - PAD.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, txt) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (const [k,v] of Object.entries(attrs||{})) el.setAttribute(k,String(v));
+  if (txt !== undefined) el.textContent = txt;
+  return el;
+}
+
+// Grid lines
+[0, 20, 40, 60].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:PAD.left,y1:yScale(v),x2:W-PAD.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:PAD.left-5,y:yScale(v)+3.5,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},v+"%"));
+});
+
+// X axis year labels
+[1990,2000,2010,2020].forEach(yr => {
+  svg.appendChild(mkEl("line",{x1:xScale(yr),y1:PAD.top,x2:xScale(yr),y2:H-PAD.bottom,stroke:"#E2E0D5","stroke-width":"0.5","stroke-dasharray":"3,3"}));
+  svg.appendChild(mkEl("text",{x:xScale(yr),y:H-PAD.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},yr));
+});
+
+const tip = document.getElementById("tip");
+const lineEls = [];
+
+data.forEach((d,di) => {
+  const color = COLORS[d.n] || '#7A786F';
+  const pts = d.pts.filter(p => p.v !== null && p.v !== undefined);
+  if (!pts.length) return;
+
+  const pathD = pts.map((p,i) => `${i===0?"M":"L"}${xScale(p.y)},${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path",{d:pathD,stroke:color,"stroke-width":"1.5","fill":"none","stroke-linejoin":"round","stroke-linecap":"round"});
+  const hit  = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"14","fill":"none","style":"cursor:crosshair"});
+
+  svg.appendChild(line);
+  svg.appendChild(hit);
+  lineEls.push(line);
+
+  hit.addEventListener("mousemove", e => {
+    lineEls.forEach((l,i) => l.setAttribute("stroke-opacity", i===di ? "1" : "0.08"));
+    line.setAttribute("stroke-width","2.5");
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * W / rect.width;
+    const ratio = Math.max(0,Math.min(1,(mx - PAD.left)/(W-PAD.left-PAD.right)));
+    const idx = Math.round(ratio*(pts.length-1));
+    const p = pts[idx];
+    tip.textContent = `${d.n} (${p.y}): ${p.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top  = (e.clientY-22)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lineEls.forEach(l => { l.setAttribute("stroke-opacity","1"); l.setAttribute("stroke-width","1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+
+// Endpoint labels
+const labelItems = data.map(d => {
+  const last = d.pts[d.pts.length-1];
+  return { n: d.n, origY: yScale(last.v), y: yScale(last.v), v: last.v };
+});
+const resolved = resolveCollisions(labelItems, 12);
+resolved.forEach(lb => {
+  lb.y = Math.max(PAD.top+4, Math.min(H-PAD.bottom-4, lb.y));
+});
+
+resolved.forEach(lb => {
+  const color = COLORS[lb.n] || '#7A786F';
+  const x0 = W - PAD.right;
+  if (Math.abs(lb.y - lb.origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:x0,y1:lb.origY,x2:x0+4,y2:lb.y,stroke:color,"stroke-width":"0.6",opacity:"0.5"}));
+  }
+  svg.appendChild(mkEl("text",{x:x0+6,y:lb.y+3.5,"font-family":"JetBrains Mono, monospace","font-size":"9","fill":color},`${lb.v}% ${lb.n}`));
+});
+</script>
+</body></html>
