@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Patent Applications by Residents, 1990–2021</h1>
+  <p class="subtitle">China filed 1.4 million resident patents in 2021 — 244x more than in 1990. Japan's count fell over the same period.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — IP.PAT.RESD (WIPO)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [
+      {"n":"China","pts":[{"y":1990,"v":5832},{"y":1991,"v":7372},{"y":1992,"v":10022},{"y":1993,"v":12084},{"y":1994,"v":11191},{"y":1995,"v":10011},{"y":1996,"v":11628},{"y":1997,"v":12672},{"y":1998,"v":13751},{"y":1999,"v":15626},{"y":2000,"v":25346},{"y":2001,"v":30038},{"y":2002,"v":39806},{"y":2003,"v":56769},{"y":2004,"v":65786},{"y":2005,"v":93485},{"y":2006,"v":122318},{"y":2007,"v":153060},{"y":2008,"v":194579},{"y":2009,"v":229096},{"y":2010,"v":293066},{"y":2011,"v":415829},{"y":2012,"v":535313},{"y":2013,"v":704936},{"y":2014,"v":801135},{"y":2015,"v":968252},{"y":2016,"v":1204981},{"y":2017,"v":1245709},{"y":2018,"v":1393815},{"y":2019,"v":1243568},{"y":2020,"v":1344817},{"y":2021,"v":1426644}]},
+      {"n":"Japan","pts":[{"y":1990,"v":333230},{"y":1991,"v":335933},{"y":1992,"v":338019},{"y":1993,"v":332345},{"y":1994,"v":319938},{"y":1995,"v":334612},{"y":1996,"v":340101},{"y":1997,"v":350807},{"y":1998,"v":359381},{"y":1999,"v":360180},{"y":2000,"v":387364},{"y":2001,"v":386767},{"y":2002,"v":369458},{"y":2003,"v":358184},{"y":2004,"v":368416},{"y":2005,"v":367960},{"y":2006,"v":347060},{"y":2007,"v":333498},{"y":2008,"v":330110},{"y":2009,"v":295315},{"y":2010,"v":290081},{"y":2011,"v":287580},{"y":2012,"v":287013},{"y":2013,"v":271731},{"y":2014,"v":265959},{"y":2015,"v":258839},{"y":2016,"v":260244},{"y":2017,"v":260292},{"y":2018,"v":253630},{"y":2019,"v":245372},{"y":2020,"v":227348},{"y":2021,"v":222452}]},
+      {"n":"Korea, Rep.","pts":[{"y":1990,"v":9082},{"y":1991,"v":13253},{"y":1992,"v":15951},{"y":1993,"v":21449},{"y":1994,"v":28554},{"y":1995,"v":59228},{"y":1996,"v":68405},{"y":1997,"v":67359},{"y":1998,"v":50596},{"y":1999,"v":55970},{"y":2000,"v":72831},{"y":2001,"v":73714},{"y":2002,"v":76570},{"y":2003,"v":90313},{"y":2004,"v":105250},{"y":2005,"v":122188},{"y":2006,"v":125476},{"y":2007,"v":128701},{"y":2008,"v":127114},{"y":2009,"v":127316},{"y":2010,"v":131805},{"y":2011,"v":138034},{"y":2012,"v":148136},{"y":2013,"v":159978},{"y":2014,"v":164073},{"y":2015,"v":167275},{"y":2016,"v":163424},{"y":2017,"v":159084},{"y":2018,"v":162561},{"y":2019,"v":171603},{"y":2020,"v":180477},{"y":2021,"v":186245}]},
+      {"n":"Germany","pts":[{"y":1990,"v":30724},{"y":1991,"v":32256},{"y":1992,"v":33919},{"y":1993,"v":34752},{"y":1994,"v":36715},{"y":1995,"v":38103},{"y":1996,"v":42322},{"y":1997,"v":44438},{"y":1998,"v":46523},{"y":1999,"v":50029},{"y":2000,"v":51736},{"y":2001,"v":49989},{"y":2002,"v":47598},{"y":2003,"v":47818},{"y":2004,"v":48448},{"y":2005,"v":48367},{"y":2006,"v":48012},{"y":2007,"v":47853},{"y":2008,"v":49240},{"y":2009,"v":47859},{"y":2010,"v":47047},{"y":2011,"v":46986},{"y":2012,"v":46620},{"y":2013,"v":47353},{"y":2014,"v":48154},{"y":2015,"v":47384},{"y":2016,"v":48480},{"y":2017,"v":47785},{"y":2018,"v":46617},{"y":2019,"v":46632},{"y":2020,"v":42260},{"y":2021,"v":39822}]},
+      {"n":"India","pts":[{"y":1990,"v":1147},{"y":1991,"v":1267},{"y":1992,"v":1248},{"y":1993,"v":1209},{"y":1994,"v":1588},{"y":1995,"v":1545},{"y":1996,"v":1661},{"y":1997,"v":1926},{"y":1998,"v":2247},{"y":1999,"v":2206},{"y":2000,"v":2206},{"y":2001,"v":2379},{"y":2002,"v":2693},{"y":2003,"v":3425},{"y":2004,"v":4014},{"y":2005,"v":4721},{"y":2006,"v":5686},{"y":2007,"v":6296},{"y":2008,"v":6425},{"y":2009,"v":7262},{"y":2010,"v":8853},{"y":2011,"v":8841},{"y":2012,"v":9553},{"y":2013,"v":10669},{"y":2014,"v":12040},{"y":2015,"v":12579},{"y":2016,"v":13199},{"y":2017,"v":14961},{"y":2018,"v":16289},{"y":2019,"v":19454},{"y":2020,"v":23141},{"y":2021,"v":26267}]}
+    ];
+
+    const COLORS = {
+      "China":       "#EA5E33",
+      "Japan":       "#3D7A5A",
+      "Korea, Rep.": "#F29A44",
+      "Germany":     "#5B9E78",
+      "India":       "#9B7CC8"
+    };
+
+    const W = 820, H = 460;
+    const margin = { top: 30, right: 140, bottom: 40, left: 70 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+    const yearMin = 1990, yearMax = 2021;
+    const valMin = 0, valMax = 1500000;
+
+    function xScale(year) { return margin.left + (year - yearMin) / (yearMax - yearMin) * innerW; }
+    function yScale(v) { return margin.top + (valMax - v) / (valMax - valMin) * innerH; }
+    function fmt(v) {
+      if (v >= 1000000) return (v / 1000000).toFixed(1) + "M";
+      if (v >= 1000) return (v / 1000).toFixed(0) + "K";
+      return v.toFixed(0);
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = "860px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Grid lines
+    [0, 250000, 500000, 750000, 1000000, 1250000, 1500000].forEach(v => {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#e5e3dc", "stroke-width": "0.8" }));
+      svg.appendChild(mkEl("text", { x: margin.left - 6, y: y + 4, "text-anchor": "end", "font-size": "10", "font-family": "JetBrains Mono", fill: "#7A786F" })).textContent = fmt(v);
+    });
+
+    // X axis ticks
+    [1990, 1995, 2000, 2005, 2010, 2015, 2021].forEach(yr => {
+      const x = xScale(yr);
+      svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: margin.top + innerH, stroke: "#e5e3dc", "stroke-width": "0.5", "stroke-dasharray": "3,3" }));
+      svg.appendChild(mkEl("text", { x, y: margin.top + innerH + 16, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono", fill: "#7A786F" })).textContent = yr;
+    });
+
+    const yLbl = mkEl("text", { x: 14, y: margin.top + innerH / 2, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", transform: `rotate(-90, 14, ${margin.top + innerH / 2})` });
+    yLbl.textContent = "Patent applications (residents)";
+    svg.appendChild(yLbl);
+
+    const endLabels = data.map(d => {
+      const last = d.pts[d.pts.length - 1];
+      return { name: d.n, y: yScale(last.v) };
+    });
+    const resolved = resolveCollisions(endLabels, 13);
+
+    const groups = [];
+    data.forEach(d => {
+      const color = COLORS[d.n] || "#888";
+      const g = mkEl("g", {});
+      g.style.cursor = "pointer";
+
+      const pathD = d.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+      const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+      g.appendChild(line);
+
+      const last = d.pts[d.pts.length - 1];
+      g.appendChild(mkEl("circle", { cx: xScale(last.y), cy: yScale(last.v), r: "3", fill: color }));
+
+      const labelInfo = resolved.find(r => r.name === d.n);
+      const labelY = labelInfo ? labelInfo.y : yScale(last.v);
+      const labelActualY = yScale(last.v);
+
+      if (Math.abs(labelY - labelActualY) > 3) {
+        g.appendChild(mkEl("line", { x1: xScale(last.y) + 6, y1: labelActualY, x2: W - margin.right + 6, y2: labelY, stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+      }
+
+      const lbl = mkEl("text", { x: W - margin.right + 8, y: labelY + 3.5, "font-size": "9.5", "font-family": "JetBrains Mono", fill: color });
+      lbl.textContent = `${fmt(last.v)}  ${d.n}`;
+      g.appendChild(lbl);
+
+      const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+      g.appendChild(hit);
+
+      groups.push({ g, line, lbl, series: d, color });
+      svg.appendChild(g);
+    });
+
+    const tip = document.getElementById("tip");
+    groups.forEach(({ g, line, lbl, series }) => {
+      g.addEventListener("mouseenter", () => {
+        groups.forEach(other => {
+          other.line.setAttribute("opacity", other.series.n === series.n ? "1" : "0.1");
+          other.lbl.setAttribute("opacity", other.series.n === series.n ? "1" : "0.15");
+          other.line.setAttribute("stroke-width", other.series.n === series.n ? "2.5" : "1.8");
+        });
+      });
+      g.addEventListener("mousemove", e => {
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+        const yr = yearMin + Math.round(ratio * (yearMax - yearMin));
+        const pt = series.pts.find(p => p.y === yr) || series.pts[series.pts.length - 1];
+        tip.textContent = `${series.n} ${pt.y}: ${pt.v.toLocaleString()} patents`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      g.addEventListener("mouseleave", () => {
+        groups.forEach(other => {
+          other.line.setAttribute("opacity", "1");
+          other.lbl.setAttribute("opacity", "1");
+          other.line.setAttribute("stroke-width", "1.8");
+        });
+        tip.style.opacity = "0";
+      });
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

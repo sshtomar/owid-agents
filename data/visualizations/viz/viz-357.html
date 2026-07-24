@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #fafaf8; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; background: #1e293b; color: #f1f5f9;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: "JetBrains Mono", monospace;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Age Dependency Ratio, 1990–2024</h1>
+  <p class="subtitle">Dependents (under-15 and over-64) as % of working-age population (15–64). Japan's ratio nearly doubled; Ethiopia's is finally falling.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — SP.POP.DPND</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Japan","pts":[{"y":1990,"v":43.2},{"y":1992,"v":42.9},{"y":1994,"v":43.1},{"y":1996,"v":44.0},{"y":1998,"v":45.2},{"y":2000,"v":46.7},{"y":2002,"v":48.5},{"y":2004,"v":50.3},{"y":2006,"v":53.0},{"y":2008,"v":55.7},{"y":2010,"v":57.4},{"y":2012,"v":60.5},{"y":2014,"v":64.5},{"y":2016,"v":67.3},{"y":2018,"v":69.0},{"y":2020,"v":69.9},{"y":2022,"v":70.2},{"y":2024,"v":70.1}]},{"n":"Germany","pts":[{"y":1990,"v":44.8},{"y":1992,"v":45.5},{"y":1994,"v":46.1},{"y":1996,"v":46.4},{"y":1998,"v":46.6},{"y":2000,"v":47.3},{"y":2002,"v":48.2},{"y":2004,"v":49.3},{"y":2006,"v":50.8},{"y":2008,"v":51.8},{"y":2010,"v":52.1},{"y":2012,"v":51.6},{"y":2014,"v":51.8},{"y":2016,"v":52.6},{"y":2018,"v":53.9},{"y":2020,"v":55.3},{"y":2022,"v":57.2},{"y":2024,"v":59.0}]},{"n":"France","pts":[{"y":1990,"v":51.8},{"y":1992,"v":52.5},{"y":1994,"v":52.8},{"y":1996,"v":53.0},{"y":1998,"v":53.2},{"y":2000,"v":53.7},{"y":2002,"v":53.9},{"y":2004,"v":53.7},{"y":2006,"v":53.6},{"y":2008,"v":53.9},{"y":2010,"v":54.6},{"y":2012,"v":56.3},{"y":2014,"v":58.1},{"y":2016,"v":59.7},{"y":2018,"v":60.8},{"y":2020,"v":61.8},{"y":2022,"v":62.4},{"y":2024,"v":63.0}]},{"n":"China","pts":[{"y":1990,"v":51.8},{"y":1992,"v":51.5},{"y":1994,"v":50.9},{"y":1996,"v":49.6},{"y":1998,"v":47.8},{"y":2000,"v":46.1},{"y":2002,"v":43.5},{"y":2004,"v":40.7},{"y":2006,"v":38.2},{"y":2008,"v":37.4},{"y":2010,"v":37.2},{"y":2012,"v":37.7},{"y":2014,"v":38.9},{"y":2016,"v":40.4},{"y":2018,"v":42.5},{"y":2020,"v":44.1},{"y":2022,"v":44.7},{"y":2024,"v":44.2}]},{"n":"Brazil","pts":[{"y":1990,"v":65.6},{"y":1992,"v":63.5},{"y":1994,"v":61.1},{"y":1996,"v":58.6},{"y":1998,"v":56.2},{"y":2000,"v":53.9},{"y":2002,"v":51.8},{"y":2004,"v":49.8},{"y":2006,"v":48.3},{"y":2008,"v":46.9},{"y":2010,"v":45.7},{"y":2012,"v":44.6},{"y":2014,"v":43.8},{"y":2016,"v":43.4},{"y":2018,"v":43.4},{"y":2020,"v":43.6},{"y":2022,"v":43.8},{"y":2024,"v":44.3}]},{"n":"India","pts":[{"y":1990,"v":74.2},{"y":1992,"v":73.0},{"y":1994,"v":71.8},{"y":1996,"v":70.2},{"y":1998,"v":68.4},{"y":2000,"v":66.6},{"y":2002,"v":64.7},{"y":2004,"v":62.9},{"y":2006,"v":60.9},{"y":2008,"v":58.9},{"y":2010,"v":56.9},{"y":2012,"v":55.1},{"y":2014,"v":53.2},{"y":2016,"v":51.6},{"y":2018,"v":50.0},{"y":2020,"v":48.7},{"y":2022,"v":47.5},{"y":2024,"v":46.6}]},{"n":"Bangladesh","pts":[{"y":1990,"v":85.9},{"y":1992,"v":82.7},{"y":1994,"v":79.2},{"y":1996,"v":75.4},{"y":1998,"v":71.9},{"y":2000,"v":68.9},{"y":2002,"v":67.1},{"y":2004,"v":65.9},{"y":2006,"v":64.5},{"y":2008,"v":63.3},{"y":2010,"v":62.0},{"y":2012,"v":60.0},{"y":2014,"v":57.6},{"y":2016,"v":55.4},{"y":2018,"v":54.3},{"y":2020,"v":54.1},{"y":2022,"v":53.6},{"y":2024,"v":52.6}]},{"n":"Ethiopia","pts":[{"y":1990,"v":95.9},{"y":1992,"v":95.9},{"y":1994,"v":97.1},{"y":1996,"v":98.2},{"y":1998,"v":100.0},{"y":2000,"v":101.5},{"y":2002,"v":101.7},{"y":2004,"v":100.9},{"y":2006,"v":99.5},{"y":2008,"v":97.2},{"y":2010,"v":94.0},{"y":2012,"v":90.2},{"y":2014,"v":86.3},{"y":2016,"v":82.7},{"y":2018,"v":79.5},{"y":2020,"v":77.1},{"y":2022,"v":74.9},{"y":2024,"v":73.3}]}];
+
+    const COLORS = {
+      "Japan":     "#EA5E33",
+      "Germany":   "#F29A44",
+      "France":    "#C4715A",
+      "China":     "#3D7A5A",
+      "Brazil":    "#5B9E78",
+      "India":     "#8BAD72",
+      "Bangladesh":"#C49A45",
+      "Ethiopia":  "#9B7CC8"
+    };
+
+    const W = 820, H = 460;
+    const margin = { top: 30, right: 130, bottom: 40, left: 55 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+    const yearMin = 1990, yearMax = 2024;
+    const valMin = 35, valMax = 110;
+
+    function xScale(year) { return margin.left + (year - yearMin) / (yearMax - yearMin) * innerW; }
+    function yScale(v) { return margin.top + (valMax - v) / (valMax - valMin) * innerH; }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = "860px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Grid lines
+    [40, 50, 60, 70, 80, 90, 100].forEach(v => {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#e5e3dc", "stroke-width": "0.8" }));
+      svg.appendChild(mkEl("text", { x: margin.left - 6, y: y + 4, "text-anchor": "end", "font-size": "10", "font-family": "JetBrains Mono", fill: "#7A786F" })).textContent = v;
+    });
+
+    // X axis ticks
+    [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+      const x = xScale(yr);
+      svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: margin.top + innerH, stroke: "#e5e3dc", "stroke-width": "0.5", "stroke-dasharray": "3,3" }));
+      svg.appendChild(mkEl("text", { x, y: margin.top + innerH + 16, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono", fill: "#7A786F" })).textContent = yr;
+    });
+
+    // Y axis label
+    const yLbl = mkEl("text", { x: 12, y: margin.top + innerH / 2, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", transform: `rotate(-90, 12, ${margin.top + innerH / 2})` });
+    yLbl.textContent = "Dependency ratio (%)";
+    svg.appendChild(yLbl);
+
+    // Prepare endpoint labels for collision resolution
+    const endLabels = data.map(d => {
+      const last = d.pts[d.pts.length - 1];
+      return { name: d.n, y: yScale(last.v), origY: yScale(last.v) };
+    });
+    const resolved = resolveCollisions(endLabels, 13);
+
+    // Draw lines
+    const groups = [];
+    data.forEach(d => {
+      const color = COLORS[d.n] || "#888";
+      const g = mkEl("g", {});
+      g.style.cursor = "pointer";
+
+      const pathD = d.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+      const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+      g.appendChild(line);
+
+      // End dot
+      const last = d.pts[d.pts.length - 1];
+      g.appendChild(mkEl("circle", { cx: xScale(last.y), cy: yScale(last.v), r: "3", fill: color }));
+
+      // End label
+      const labelInfo = resolved.find(r => r.name === d.n);
+      const labelY = labelInfo ? labelInfo.y : yScale(last.v);
+      const labelActualY = yScale(last.v);
+
+      if (Math.abs(labelY - labelActualY) > 3) {
+        g.appendChild(mkEl("line", { x1: xScale(last.y) + 6, y1: labelActualY, x2: W - margin.right + 6, y2: labelY, stroke: color, "stroke-width": "0.5", opacity: "0.4" }));
+      }
+
+      const lbl = mkEl("text", { x: W - margin.right + 8, y: labelY + 3.5, "font-size": "9.5", "font-family": "JetBrains Mono", fill: color });
+      lbl.textContent = `${last.v.toFixed(0)}  ${d.n}`;
+      g.appendChild(lbl);
+
+      // Invisible hit area
+      const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+      g.appendChild(hit);
+
+      groups.push({ g, line, lbl, series: d, color });
+      svg.appendChild(g);
+    });
+
+    // Interactivity
+    const tip = document.getElementById("tip");
+    groups.forEach(({ g, line, lbl, series, color }) => {
+      g.addEventListener("mouseenter", e => {
+        groups.forEach(other => {
+          other.line.setAttribute("opacity", other.series.n === series.n ? "1" : "0.1");
+          other.lbl.setAttribute("opacity", other.series.n === series.n ? "1" : "0.15");
+          other.line.setAttribute("stroke-width", other.series.n === series.n ? "2.5" : "1.8");
+        });
+      });
+      g.addEventListener("mousemove", e => {
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+        const yr = yearMin + Math.round(ratio * (yearMax - yearMin) / 2) * 2;
+        const pt = series.pts.find(p => p.y === yr) || series.pts[series.pts.length - 1];
+        tip.textContent = `${series.n} ${pt.y}: ${pt.v.toFixed(1)}%`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      g.addEventListener("mouseleave", () => {
+        groups.forEach(other => {
+          other.line.setAttribute("opacity", "1");
+          other.lbl.setAttribute("opacity", "1");
+          other.line.setAttribute("stroke-width", "1.8");
+        });
+        tip.style.opacity = "0";
+      });
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

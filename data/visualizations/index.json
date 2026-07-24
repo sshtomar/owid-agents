@@ -5858,7 +5858,78 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Age Dependency Ratio, 1990–2024",
+      "description": "Trend lines showing how the ratio of dependents (under-15 and over-64) to working-age population has diverged: Japan nearly doubled from 43% to 70%, while Ethiopia fell from a peak of 102% to 73%.",
+      "datasetIds": ["wb--SP-POP-DPND"],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan's dependency ratio rose from 43% in 1990 to 70% in 2024 — the fastest aging among large economies",
+        "China dipped to 37% in 2010 (peak demographic dividend) but has since climbed back toward 44%",
+        "Ethiopia peaked above 100% around 2002 and is finally declining as fertility falls"
+      ],
+      "createdAt": "2026-07-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Patent Applications by Residents, 1990–2021",
+      "description": "Trend lines showing China's explosive rise from 5,832 resident patents in 1990 to 1.4 million in 2021, dwarfing Japan's decline and South Korea's steady growth.",
+      "datasetIds": ["wb--IP-PAT-RESD"],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China filed 1.43 million resident patents in 2021 — 244x its 1990 total and 6x Japan's peak",
+        "Japan's patent filings peaked around 387,000 in 2000 and have fallen nearly 40% since",
+        "South Korea grew from 9,000 patents in 1990 to 186,000 by 2021, a 20-fold increase"
+      ],
+      "createdAt": "2026-07-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Tuberculosis Incidence: 2000 vs. 2022",
+      "description": "Slope chart comparing TB incidence (new cases per 100,000 people) in 2000 and 2022 across 9 high-burden countries. Ethiopia and Cambodia cut rates by over 65%; Indonesia and Bangladesh made almost no progress.",
+      "datasetIds": ["wb--SH-TBS-INCD"],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Ethiopia reduced TB incidence by 70% (489 to 146 per 100,000), the largest improvement in the set",
+        "Cambodia fell 68% from 853 to 277 per 100,000 over 22 years",
+        "Indonesia (370 to 375) and Bangladesh (221 to 221) showed essentially no improvement"
+      ],
+      "createdAt": "2026-07-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Crude Death Rate, 1970–2024",
+      "description": "Trend lines showing deaths per 1,000 people across 7 countries and Sub-Saharan Africa. Japan's rate nearly doubled as the population aged, while Sub-Saharan Africa cut its rate from 21 to 8 over 54 years.",
+      "datasetIds": ["wb--SP-DYN-CDRT-IN"],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan's crude death rate rose from 6.9 (1970) to 13.3 (2024) despite improving medicine — driven entirely by aging",
+        "Sub-Saharan Africa halved its crude death rate from 20.7 to 8.0, one of history's great public health gains",
+        "India dropped from 17.0 to 6.6, reflecting both fewer deaths and a still-young age structure"
+      ],
+      "createdAt": "2026-07-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Population Growth Rate, 1980–2024",
+      "description": "Trend lines showing annual population growth rates. Sub-Saharan Africa holds above 2.4%; Japan and China have crossed into negative territory, while India and Brazil converge toward 1%.",
+      "datasetIds": ["wb--SP-POP-GROW"],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan (-0.44%) and China (-0.12%) now have shrinking populations; Japan has been below zero since 2012",
+        "Sub-Saharan Africa remains at 2.44% — still adding tens of millions of people per year",
+        "India (0.89%) and Brazil (0.41%) have both decelerated rapidly from above 2% in 1980"
+      ],
+      "createdAt": "2026-07-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-24T00:00:00.000Z"
 }
