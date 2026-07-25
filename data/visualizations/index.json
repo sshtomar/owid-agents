@@ -5858,6 +5858,87 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "DPT Immunization Coverage by World Region, 1980-2024",
+      "description": "Trend lines showing how vaccination coverage against diphtheria, pertussis, and tetanus rose across world regions over 44 years. Africa and South Asia closed a massive gap. The 2020-21 COVID disruption is visible in all regions.",
+      "datasetIds": [
+        "wb--SH-IMM-IDPT"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Africa West & Central rose from 1.4% in 1980 to 74% in 2024 \u2014 a 50-fold increase",
+        "South Asia crossed the 90% WHO target by 2017; now at 94.5%",
+        "All regions show a visible dip in 2020-21 from COVID-19 disruptions to health services"
+      ],
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Mineral Rents as % of GDP: 2000 vs. 2020",
+      "description": "Slope chart comparing mineral rent dependency (metals and ores) between 2000 and 2020 for the 18 most resource-dependent economies. Reveals which countries have grown more reliant on extractive industries.",
+      "datasetIds": [
+        "wb--NY-GDP-MINR-RT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Congo DRC jumped from near-zero to 5.6% of GDP driven by cobalt and coltan demand",
+        "Chile stable near 4.5%, copper remaining the backbone of its economy",
+        "Guyana declined: gold extraction peaked earlier in the period"
+      ],
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Share of Population Under 15 by World Region, 1960-2024",
+      "description": "Trend lines tracking the demographic transition: the share of children (0-14) in total population across world regions since 1960. Sub-Saharan Africa is the last region to begin this transition.",
+      "datasetIds": [
+        "wb--SP-POP-0014-TO-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "East Asia & Pacific dropped from 40% in 1960 to 18% in 2024 \u2014 the fastest transition recorded",
+        "Africa West & Central has barely moved: 41.5% in 1960, still 41.3% in 2024",
+        "World average fell from 37% to 25%, masking a stark regional divergence"
+      ],
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Manufacturing Value Added as % of GDP: Rise and Plateau",
+      "description": "Trend lines showing how manufacturing's share of GDP has evolved across eight economies representing three waves of industrialization. China's peak and plateau mirrors earlier developers; Bangladesh is still rising.",
+      "datasetIds": [
+        "wb--NV-IND-MANF-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "South Korea peaked near 29% in 2010 and has held steady, unlike earlier developers",
+        "Bangladesh grew from 5% (1960) to 22% (2024) driven by the garments sector",
+        "India has remained flat at 13-17% for 60 years, below its industrial potential"
+      ],
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Anemia Among Women of Reproductive Age: Top 30 Countries, 2000-2023",
+      "description": "Sparkline grid showing anemia prevalence trends for the 30 highest-burden countries. Most are in Sub-Saharan Africa, but India and Bangladesh are rising \u2014 a counter-intuitive finding given economic growth.",
+      "datasetIds": [
+        "wb--SH-ANM-ALLW-ZS"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "India now at 53.7% \u2014 anemia worsening despite decades of economic growth",
+        "Afghanistan rose from 31.6% (2000) to 45.4% (2023), driven by conflict and malnutrition",
+        "Gabon has persistently high rates (~60%) despite upper-middle income status"
+      ],
+      "createdAt": "2026-07-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
   "lastUpdated": "2026-06-28T00:00:00.000Z"
