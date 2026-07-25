@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Mineral Rents as % of GDP: 2000 vs. 2020</h1>
+<p class="subtitle">Mineral rents measure the economic surplus from extracting metals, ores, and non-fuel minerals. Countries at the top of this chart derive a significant share of national income from the ground — a pattern often associated with volatile growth and weak institutions.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Mineral Rents (NY.GDP.MINR.RT.ZS)</p>
+<script>
+// bef = 2000 value, aft = 2020 value
+const data = [{"n":"Congo, Dem. Rep.","bef":0.08,"aft":5.63},{"n":"Kazakhstan","bef":0.86,"aft":4.7},{"n":"Chile","bef":4.34,"aft":4.6},{"n":"Burkina Faso","bef":0.04,"aft":4.36},{"n":"Australia","bef":0.94,"aft":4.09},{"n":"Guyana","bef":7.52,"aft":2.66},{"n":"Ghana","bef":3.03,"aft":2.24},{"n":"Armenia","bef":0.27,"aft":2.15},{"n":"Iran, Islamic Rep.","bef":0.08,"aft":1.45},{"n":"Dominican Rep.","bef":0.32,"aft":1.2},{"n":"Brazil","bef":0.29,"aft":1.14},{"n":"Georgia","bef":0.21,"aft":0.82},{"n":"Cote d'Ivoire","bef":0.0,"aft":0.72},{"n":"India","bef":0.26,"aft":0.69},{"n":"Fiji","bef":0.47,"aft":0.48},{"n":"Indonesia","bef":0.99,"aft":0.47},{"n":"Bolivia","bef":0.28,"aft":0.45},{"n":"Guatemala","bef":0.05,"aft":0.35}];
+
+const W = 700, H = 560;
+const pad = { left: 140, right: 140, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = 8.5;
+const minV = 0;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const lx = pad.left;
+const rx = W - pad.right;
+
+// Column headers
+const h2000 = mkEl("text", { x: lx, y: 28, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500" });
+h2000.textContent = "2000";
+svg.appendChild(h2000);
+const h2020 = mkEl("text", { x: rx, y: 28, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500" });
+h2020.textContent = "2020";
+svg.appendChild(h2020);
+
+function colorForChange(bef, aft) {
+  const delta = aft - bef;
+  if (delta > 3) return "#EA5E33";
+  if (delta > 1) return "#F29A44";
+  if (delta > 0) return "#F5D38A";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const color = colorForChange(d.bef, d.aft);
+  const ya = scale(d.bef);
+  const yb = scale(d.aft);
+  const g = mkEl("g");
+  svg.appendChild(g);
+
+  const line = mkEl("line", { x1: lx, y1: ya, x2: rx, y2: yb, stroke: color, "stroke-width": "1.5" });
+  g.appendChild(line);
+
+  const dotA = mkEl("circle", { cx: lx, cy: ya, r: "3", fill: color });
+  g.appendChild(dotA);
+  const dotB = mkEl("circle", { cx: rx, cy: yb, r: "3", fill: color });
+  g.appendChild(dotB);
+
+  const hit = mkEl("line", { x1: lx, y1: ya, x2: rx, y2: yb, stroke: "transparent", "stroke-width": "12", style: "cursor:pointer" });
+  g.appendChild(hit);
+
+  groups.push({ g, line, d, color });
+
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach(gr => gr.g.style.opacity = gr.d === d ? "1" : "0.12");
+    tip.style.opacity = "1";
+    const delta = d.aft - d.bef;
+    const sign = delta >= 0 ? "+" : "";
+    tip.textContent = `${d.n}: ${d.bef}% → ${d.aft}% (${sign}${delta.toFixed(2)}pp)`;
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gr => gr.g.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+});
+
+// Left labels (2000 values)
+const leftItems = data.map(d => ({ y: scale(d.bef), name: d.n, val: d.bef, color: colorForChange(d.bef, d.aft) }));
+resolveCollisions(leftItems, 13).forEach(item => {
+  const lbl = mkEl("text", { x: lx - 7, y: item.y + 3.5, "text-anchor": "end", fill: item.color, "font-family": "JetBrains Mono, monospace", "font-size": "9" });
+  lbl.textContent = `${item.name}  ${item.val}%`;
+  svg.appendChild(lbl);
+});
+
+// Right labels (2020 values)
+const rightItems = data.map(d => ({ y: scale(d.aft), name: d.n, val: d.aft, color: colorForChange(d.bef, d.aft) }));
+resolveCollisions(rightItems, 13).forEach(item => {
+  const lbl = mkEl("text", { x: rx + 7, y: item.y + 3.5, "text-anchor": "start", fill: item.color, "font-family": "JetBrains Mono, monospace", "font-size": "9" });
+  lbl.textContent = `${item.val}%  ${item.name}`;
+  svg.appendChild(lbl);
+});
+
+// Legend
+const legendItems = [
+  { color: "#EA5E33", label: "Increased >3pp" },
+  { color: "#F29A44", label: "Increased 1-3pp" },
+  { color: "#F5D38A", label: "Small increase" },
+  { color: "#A6C4A2", label: "Decreased" }
+];
+legendItems.forEach((item, i) => {
+  const lx2 = W / 2 - 80 + i * 120;
+  svg.appendChild(mkEl("rect", { x: lx2, y: H - 10, width: 8, height: 8, fill: item.color }));
+  const lt = mkEl("text", { x: lx2 + 11, y: H - 3, fill: "#7A786F", "font-size": "8", "font-family": "JetBrains Mono, monospace" });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+});
+
+</script>
+</body></html>
