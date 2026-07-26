@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #0f172a; color: #fff; font-size: 12px;
+      padding: 6px 10px; border-radius: 4px; white-space: nowrap;
+      transition: opacity 0.1s; z-index: 100; font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Out-of-Pocket Health Expenditure</h1>
+  <p class="subtitle">Share of current health spending paid directly by patients — in Bangladesh and Armenia, households cover ~80% of health costs themselves. In France or Germany, under 11%.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank (SH.XPD.OOPC.CH.ZS), most recent year 2017–2024</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Armenia","v":80.5,"y":2023},{"n":"Bangladesh","v":79.3,"y":2023},{"n":"Afghanistan","v":77.1,"y":2023},{"n":"Cameroon","v":67.7,"y":2023},{"n":"Equatorial Guinea","v":66.0,"y":2023},{"n":"Azerbaijan","v":64.6,"y":2023},{"n":"Guinea-Bissau","v":61.6,"y":2023},{"n":"Cambodia","v":60.6,"y":2023},{"n":"Georgia","v":58.8,"y":2023},{"n":"Guatemala","v":57.2,"y":2023},{"n":"Comoros","v":56.6,"y":2023},{"n":"Guinea","v":54.4,"y":2023},{"n":"Iraq","v":54.0,"y":2023},{"n":"Honduras","v":53.1,"y":2023},{"n":"Haiti","v":52.4,"y":2023},{"n":"Chad","v":51.7,"y":2023},{"n":"Ethiopia","v":46.3,"y":2023},{"n":"India","v":43.9,"y":2023},{"n":"Burkina Faso","v":43.8,"y":2023},{"n":"Iran, Islamic Rep.","v":43.1,"y":2023},{"n":"Chile","v":39.1,"y":2024},{"n":"Congo, Dem. Rep.","v":38.0,"y":2023},{"n":"Bulgaria","v":35.5,"y":2023},{"n":"Greece","v":34.3,"y":2023},{"n":"Korea, Rep.","v":33.7,"y":2024},{"n":"China","v":32.2,"y":2023},{"n":"Indonesia","v":31.1,"y":2023},{"n":"Ecuador","v":30.9,"y":2023},{"n":"Brazil","v":26.2,"y":2023},{"n":"Argentina","v":24.5,"y":2023},{"n":"Kenya","v":24.2,"y":2023},{"n":"Hungary","v":23.1,"y":2023},{"n":"Italy","v":22.3,"y":2024},{"n":"Belgium","v":21.5,"y":2023},{"n":"Israel","v":20.5,"y":2023},{"n":"Austria","v":16.5,"y":2024},{"n":"Australia","v":15.8,"y":2023},{"n":"Canada","v":15.3,"y":2024},{"n":"Colombia","v":14.7,"y":2024},{"n":"Japan","v":12.2,"y":2023},{"n":"Germany","v":10.7,"y":2024},{"n":"Ireland","v":10.6,"y":2024},{"n":"Croatia","v":9.4,"y":2023},{"n":"France","v":9.2,"y":2024},{"n":"Botswana","v":4.3,"y":2023}];
+
+    const DISPLAY = {
+      "Iran, Islamic Rep.": "Iran",
+      "Congo, Dem. Rep.": "DR Congo",
+      "Korea, Rep.": "South Korea",
+      "Cote d'Ivoire": "Côte d'Ivoire",
+      "Gambia, The": "Gambia"
+    };
+
+    const W = 820, H = data.length * 16 + 70;
+    const M = { top: 24, right: 72, bottom: 28, left: 120 };
+
+    function mkEl(tag, attrs, text) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      if (text != null) el.textContent = text;
+      return el;
+    }
+
+    function barColor(v) {
+      if (v >= 60) return "#E63946";
+      if (v >= 40) return "#F4A261";
+      if (v >= 25) return "#E9C46A";
+      if (v >= 15) return "#2A9D8F";
+      return "#457B9D";
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:820px;display:block` });
+
+    const barW = W - M.left - M.right;
+    const xS = v => M.left + v / 85 * barW;
+
+    // Grid
+    [0, 20, 40, 60, 80].forEach(v => {
+      svg.appendChild(mkEl("line", { x1: xS(v), y1: M.top - 8, x2: xS(v), y2: H - M.bottom, stroke: "#e2e8f0", "stroke-width": "1" }));
+      svg.appendChild(mkEl("text", { x: xS(v), y: H - M.bottom + 13, "text-anchor": "middle", fill: "#94a3b8", "font-size": "9", "font-family": "JetBrains Mono, monospace" }, v + "%"));
+    });
+
+    const BAR_H = 12;
+    const tip = document.getElementById("tip");
+
+    data.forEach((d, i) => {
+      const y = M.top + i * 16;
+      const name = DISPLAY[d.n] || d.n;
+      const color = barColor(d.v);
+      const bw = d.v / 85 * barW;
+
+      const bar = mkEl("rect", { x: M.left, y, width: bw, height: BAR_H, fill: color, rx: "2" });
+      svg.appendChild(bar);
+
+      svg.appendChild(mkEl("text", { x: M.left - 6, y: y + 9, "text-anchor": "end", fill: "#374151", "font-size": "9.5", "font-family": "Inter, sans-serif" }, name));
+      svg.appendChild(mkEl("text", { x: M.left + bw + 5, y: y + 9, fill: "#64748b", "font-size": "9", "font-family": "JetBrains Mono, monospace" }, d.v + "%"));
+
+      const hitArea = mkEl("rect", { x: 0, y: y - 2, width: W, height: BAR_H + 4, fill: "transparent", cursor: "pointer" });
+      hitArea.addEventListener("mouseenter", e => { bar.setAttribute("opacity", "0.75"); });
+      hitArea.addEventListener("mousemove", e => {
+        tip.textContent = `${name}: ${d.v}% out-of-pocket (${d.y})`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hitArea.addEventListener("mouseleave", () => { bar.setAttribute("opacity", "1"); tip.style.opacity = "0"; });
+      svg.appendChild(hitArea);
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#E63946", label: ">= 60% (catastrophic)" },
+      { color: "#F4A261", label: "40–60%" },
+      { color: "#E9C46A", label: "25–40%" },
+      { color: "#2A9D8F", label: "15–25%" },
+      { color: "#457B9D", label: "< 15% (well-insured)" }
+    ];
+    let lx = M.left;
+    const ly = H - M.bottom + 20;
+    legendItems.forEach(item => {
+      svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 10, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: lx + 13, y: ly, fill: "#64748b", "font-size": "9.5", "font-family": "Inter, sans-serif" }, item.label));
+      lx += 132;
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
