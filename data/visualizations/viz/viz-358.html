@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #0f172a; color: #fff; font-size: 12px;
+      padding: 6px 10px; border-radius: 4px; white-space: nowrap;
+      transition: opacity 0.1s; z-index: 100; font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Youth Literacy Rate (Ages 15–24)</h1>
+  <p class="subtitle">Share of young people who can read and write — most recent available year. West and Central Africa lag furthest behind.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank (SE.ADT.1524.LT.ZS), most recent year 2011–2024</p>
+  <div id="tip"></div>
+  <script>
+    // Countries with data from 2011 or later, individual countries only
+    const data = [{"n":"Chad","v":45.1,"y":2019},{"n":"Guinea","v":53.9,"y":2018},{"n":"Afghanistan","v":62.7,"y":2022},{"n":"Burkina Faso","v":62.8,"y":2022},{"n":"Cote d'Ivoire","v":66.8,"y":2021},{"n":"Gambia, The","v":67.5,"y":2021},{"n":"Benin","v":71.2,"y":2022},{"n":"Congo, Dem. Rep.","v":77.9,"y":2023},{"n":"Djibouti","v":79.6,"y":2017},{"n":"Angola","v":80.7,"y":2023},{"n":"Cameroon","v":81.9,"y":2018},{"n":"Guinea-Bissau","v":82.2,"y":2022},{"n":"Ethiopia","v":84.7,"y":2022},{"n":"Burundi","v":88.4,"y":2020},{"n":"Haiti","v":88.9,"y":2017},{"n":"Kiribati","v":90.4,"y":2019},{"n":"Comoros","v":90.8,"y":2021},{"n":"Ghana","v":91.5,"y":2021},{"n":"Iraq","v":92.4,"y":2021},{"n":"Kenya","v":93.2,"y":2014},{"n":"Bangladesh","v":93.4,"y":2022},{"n":"Jamaica","v":93.6,"y":2022},{"n":"Indonesia","v":93.8,"y":2022},{"n":"Gabon","v":94.0,"y":2021},{"n":"Guatemala","v":95.4,"y":2024},{"n":"Honduras","v":95.8,"y":2024},{"n":"Belize","v":96.2,"y":2022},{"n":"Cambodia","v":96.6,"y":2023},{"n":"India","v":97.3,"y":2024},{"n":"Bhutan","v":97.7,"y":2022},{"n":"Dominican Republic","v":98.2,"y":2024},{"n":"El Salvador","v":98.2,"y":2024},{"n":"Cabo Verde","v":98.3,"y":2024},{"n":"Eswatini","v":98.7,"y":2022},{"n":"Jordan","v":98.7,"y":2024},{"n":"Iran, Islamic Rep.","v":98.7,"y":2023},{"n":"Colombia","v":99.0,"y":2024},{"n":"Ecuador","v":99.0,"y":2024},{"n":"Albania","v":99.1,"y":2023},{"n":"Guyana","v":99.1,"y":2020},{"n":"Chile","v":99.3,"y":2022},{"n":"Brazil","v":99.5,"y":2024},{"n":"Greece","v":99.5,"y":2011},{"n":"Bahrain","v":99.5,"y":2024},{"n":"Cuba","v":99.6,"y":2019},{"n":"Georgia","v":99.7,"y":2024},{"n":"Argentina","v":99.7,"y":2020},{"n":"China","v":99.8,"y":2020},{"n":"Bolivia","v":99.8,"y":2024},{"n":"Italy","v":99.9,"y":2019},{"n":"Belarus","v":99.9,"y":2019},{"n":"Azerbaijan","v":99.9,"y":2023},{"n":"Armenia","v":99.9,"y":2023},{"n":"Estonia","v":99.9,"y":2011},{"n":"Korea, Rep.","v":99.9,"y":2011},{"n":"Barbados","v":100.0,"y":2012}];
+
+    const DISPLAY = { "Gambia, The": "Gambia", "Iran, Islamic Rep.": "Iran", "Congo, Dem. Rep.": "DR Congo", "Cote d'Ivoire": "Côte d'Ivoire", "Korea, Rep.": "South Korea" };
+
+    const W = 820, H = data.length * 16 + 60;
+    const M = { top: 20, right: 80, bottom: 24, left: 110 };
+
+    function mkEl(tag, attrs, text) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      if (text != null) el.textContent = text;
+      return el;
+    }
+
+    function barColor(v) {
+      if (v < 60) return "#E63946";
+      if (v < 75) return "#F4A261";
+      if (v < 85) return "#E9C46A";
+      if (v < 95) return "#2A9D8F";
+      return "#457B9D";
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:820px;display:block` });
+
+    const BAR_H = 12;
+    const barW = W - M.left - M.right;
+    const xS = v => M.left + v / 100 * barW;
+
+    // X axis labels
+    [0, 25, 50, 75, 100].forEach(v => {
+      svg.appendChild(mkEl("line", { x1: xS(v), y1: M.top - 8, x2: xS(v), y2: H - M.bottom, stroke: "#e2e8f0", "stroke-width": "1" }));
+      svg.appendChild(mkEl("text", { x: xS(v), y: H - M.bottom + 13, "text-anchor": "middle", fill: "#94a3b8", "font-size": "9", "font-family": "JetBrains Mono, monospace" }, v + "%"));
+    });
+
+    const tip = document.getElementById("tip");
+
+    data.forEach((d, i) => {
+      const y = M.top + i * 16;
+      const name = DISPLAY[d.n] || d.n;
+      const color = barColor(d.v);
+      const bw = d.v / 100 * barW;
+
+      const bar = mkEl("rect", { x: M.left, y: y, width: bw, height: BAR_H, fill: color, rx: "2" });
+      svg.appendChild(bar);
+
+      // Country name
+      svg.appendChild(mkEl("text", { x: M.left - 6, y: y + 9, "text-anchor": "end", fill: "#374151", "font-size": "9.5", "font-family": "Inter, sans-serif" }, name));
+
+      // Value label
+      const labelX = M.left + bw + 5;
+      svg.appendChild(mkEl("text", { x: labelX, y: y + 9, fill: "#64748b", "font-size": "9", "font-family": "JetBrains Mono, monospace" }, d.v + "%"));
+
+      // Hover
+      const hitArea = mkEl("rect", { x: M.left - 100, y: y - 2, width: W, height: BAR_H + 4, fill: "transparent", cursor: "pointer" });
+      hitArea.addEventListener("mouseenter", e => {
+        bar.setAttribute("opacity", "0.75");
+        tip.textContent = `${name}: ${d.v}% (${d.y})`;
+        tip.style.opacity = "1";
+      });
+      hitArea.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hitArea.addEventListener("mouseleave", () => {
+        bar.setAttribute("opacity", "1");
+        tip.style.opacity = "0";
+      });
+      svg.appendChild(hitArea);
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#E63946", label: "Under 60%" },
+      { color: "#F4A261", label: "60–74%" },
+      { color: "#E9C46A", label: "75–84%" },
+      { color: "#2A9D8F", label: "85–94%" },
+      { color: "#457B9D", label: "95–100%" }
+    ];
+    let lx = M.left;
+    const ly = H - M.bottom + 20;
+    legendItems.forEach(item => {
+      svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 10, fill: item.color, rx: "2" }));
+      svg.appendChild(mkEl("text", { x: lx + 13, y: ly, fill: "#64748b", "font-size": "9.5", "font-family": "Inter, sans-serif" }, item.label));
+      lx += 90;
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

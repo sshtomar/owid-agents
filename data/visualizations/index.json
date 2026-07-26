@@ -5859,6 +5859,82 @@
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
     }
+  ,
+    {
+      "id": "viz-357",
+      "title": "Gross National Savings (% of GDP), 1980–2024",
+      "description": "Trend lines showing how gross savings rates evolved across China, India, Germany, Japan, South Korea, Brazil, and Greece. China's high-savings model contrasts sharply with Greece's collapse during the 2010–2012 debt crisis.",
+      "datasetIds": ["wb--NY-GNS-ICTR-ZS"],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China sustained savings above 40% of GDP through most of the 2000s",
+        "Greece plunged from 22% in 2007 to under 5% in 2011 during the debt crisis",
+        "India doubled its savings rate from 15% in 1980 to 37% by 2007"
+      ],
+      "createdAt": "2026-07-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Youth Literacy Rate Across Countries",
+      "description": "Horizontal bar chart of youth literacy rates (ages 15–24) for 56 countries, using the most recent available data. West and Central Africa show the largest gaps, with Chad at 45% and Guinea at 54%.",
+      "datasetIds": ["wb--SE-ADT-1524-LT-ZS"],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Chad (45%) and Guinea (54%) have the lowest youth literacy rates in the dataset",
+        "Most countries in Europe, East Asia, and Latin America exceed 99%",
+        "Bangladesh at 93% shows strong gains despite high poverty"
+      ],
+      "createdAt": "2026-07-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "International Tourism Arrivals, 1995–2020",
+      "description": "Trend lines for France, China, Italy, Germany, and Japan showing annual visitor arrivals in millions. The 2020 COVID-19 shock is stark: France dropped from 218M to 117M, China from 163M to 30M.",
+      "datasetIds": ["wb--ST-INT-ARVL"],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "France consistently holds the top spot, reaching 218M arrivals in 2019",
+        "Japan grew from 3M in 1995 to 32M in 2019 — a 10x surge",
+        "COVID-19 in 2020 erased a decade of growth for all five countries"
+      ],
+      "createdAt": "2026-07-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Out-of-Pocket Health Expenditure by Country",
+      "description": "Horizontal bar chart showing the share of current health spending paid directly by patients. In Armenia and Bangladesh (~80%), households bear most health costs themselves; in France, Germany, and Ireland, under 11%.",
+      "datasetIds": ["wb--SH-XPD-OOPC-CH-ZS"],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Armenia (80%), Bangladesh (79%), and Afghanistan (77%) top the list — minimal social health insurance",
+        "France (9%), Germany (11%), and Ireland (11%) have comprehensive public coverage",
+        "India at 44% means nearly half of all health spending comes from patients' pockets"
+      ],
+      "createdAt": "2026-07-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Aquaculture Production, 1980–2024",
+      "description": "Trend lines showing farmed fish, shellfish, and seaweed production in million metric tons. China's dominance is striking — producing more than all other countries combined since the early 1990s.",
+      "datasetIds": ["wb--ER-FSH-AQUA-MT"],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "China grew from 3M mt in 1980 to 82M mt in 2024 — a 26x increase",
+        "Indonesia surged from 0.2M mt in 1980 to 16M mt, driven by shrimp farming",
+        "Japan's aquaculture output has slowly declined since the 1990s"
+      ],
+      "createdAt": "2026-07-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
+    }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-26T00:00:00.000Z"
 }
