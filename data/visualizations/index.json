@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Income Share of the Richest 10%",
+      "description": "Slope chart comparing the share of national income captured by the top 10% of earners across 19 countries, early 2000s vs. most recent year. Latin America concentrates more than twice the income share seen in Northern Europe.",
+      "datasetIds": [
+        "wb--SI-DST-10TH-10"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Colombia and Brazil's top 10% take 40-43% of national income",
+        "Bolivia cut its top-10% share from 44% to 31% over two decades",
+        "Belarus and Czechia have the lowest top-decile share at under 22%"
+      ],
+      "createdAt": "2026-07-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Child Wasting: Countries Most Affected",
+      "description": "Horizontal bar chart of the share of children under 5 with low weight-for-height (acute malnutrition), most recent survey year since 2015. India's rate of 18.7% is dramatically above all other countries.",
+      "datasetIds": [
+        "wb--SH-STA-WAST-ZS"
+      ],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "India's 18.7% wasting rate is nearly 1.6x higher than second-placed Djibouti",
+        "South Asia (India, Bangladesh, Cambodia) and West Africa dominate the top 20",
+        "The WHO threshold for a 'very high' wasting burden is 10%"
+      ],
+      "createdAt": "2026-07-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Hydropower Dependency: Countries Near 100%",
+      "description": "Trend lines showing the share of electricity from hydroelectric sources (1990-2024) for countries that rely almost entirely on water. Drought-driven power shortages are a climate risk for these economies.",
+      "datasetIds": [
+        "wb--EG-ELC-HYRO-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Congo DRC has been near 100% hydropower for 30+ years",
+        "Cameroon fell from 99% to ~63% as its economy diversified after 2006",
+        "Ecuador's hydro share swings by 30+ percentage points based on rainfall"
+      ],
+      "createdAt": "2026-07-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Natural Resources Rents as Share of GDP",
+      "description": "Trend lines for resource-dependent countries showing total rents from oil, gas, coal, minerals, and forests as % of GDP, 2000-2021. Commodity price cycles are visible as sharp synchronized spikes and crashes.",
+      "datasetIds": [
+        "wb--NY-GDP-TOTL-RT-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Iraq's resource rents peaked near 65% of GDP during the 2004-2008 oil boom",
+        "Guyana's rents jumped from ~7% to 34% in 2021 after offshore oil discovery",
+        "The 2014-2016 oil price collapse is visible as a synchronized dip across all countries"
+      ],
+      "createdAt": "2026-07-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Progress on Universal Health Coverage, 2000-2023",
+      "description": "Slope chart showing UHC Service Coverage Index gains from ~2000 to ~2022 across 19 countries. All countries improved; China rose from 65 to 85, nearly matching Norway. Sub-Saharan Africa still lags far behind.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "China improved from 65 to 85, one of the largest absolute gains among middle-income countries",
+        "Ethiopia rose from 14 to 33 \u2014 a 136% increase but still among the lowest globally",
+        "No country in the dataset regressed; the worst performers still improved by 5+ points"
+      ],
+      "createdAt": "2026-07-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-28T00:00:00.000Z"
 }

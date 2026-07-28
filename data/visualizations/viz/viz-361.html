@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Progress on Universal Health Coverage, 2000–2023</h1>
+<p class="subtitle">UHC Service Coverage Index (0–100) measures access to essential health services including reproductive health, child health, infectious diseases, and non-communicable diseases. Every country improved — but the gap between rich and poor nations remains stark.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — UHC Service Coverage Index (SDG 3.8.1)</p>
+<script>
+const data = [
+  {"n":"Norway","lo":76,"hi":89},
+  {"n":"Cuba","lo":74,"hi":86},
+  {"n":"Netherlands","lo":77,"hi":85},
+  {"n":"China","lo":65,"hi":85},
+  {"n":"Argentina","lo":74,"hi":80},
+  {"n":"Ukraine","lo":71,"hi":80},
+  {"n":"Paraguay","lo":62,"hi":79},
+  {"n":"Jamaica","lo":64,"hi":75},
+  {"n":"Bhutan","lo":46,"hi":69},
+  {"n":"Philippines","lo":57,"hi":68},
+  {"n":"Eswatini","lo":51,"hi":67},
+  {"n":"Pakistan","lo":37,"hi":56},
+  {"n":"Comoros","lo":32,"hi":52},
+  {"n":"Burundi","lo":25,"hi":48},
+  {"n":"Eritrea","lo":27,"hi":41},
+  {"n":"Niger","lo":18,"hi":37},
+  {"n":"Benin","lo":22,"hi":35},
+  {"n":"Madagascar","lo":15,"hi":34},
+  {"n":"Ethiopia","lo":14,"hi":33}
+];
+
+const W = 680, H = 580;
+const pad = { left: 130, right: 140, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 10, maxV = 95;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left, xR = W - pad.right;
+
+function colorForChange(chg) {
+  if (chg >= 20) return "#3D7A5A";
+  if (chg >= 14) return "#5B9E78";
+  if (chg >= 8) return "#8BAD72";
+  if (chg >= 5) return "#C49A45";
+  return "#C4715A";
+}
+
+// Grid
+[20, 30, 40, 50, 60, 70, 80, 90].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: xL - 6, y: scale(v) + 3.5, "text-anchor": "end", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = v;
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 10, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 10, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+
+// Period labels
+svg.appendChild(mkEl("text", { x: xL, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" })).textContent = "~2000";
+svg.appendChild(mkEl("text", { x: xR, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" })).textContent = "~2022";
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const rows = [];
+
+data.forEach(d => {
+  const yA = scale(d.lo), yB = scale(d.hi);
+  const color = colorForChange(d.hi - d.lo);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: color, "stroke-width": "1.5", opacity: "1" });
+  g.appendChild(line);
+
+  g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "2.5", fill: color }));
+
+  const hit = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "12", cursor: "pointer" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseenter", e => {
+    rows.forEach(r => r.g.style.opacity = "0.12");
+    g.style.opacity = "1";
+    const chg = d.hi - d.lo;
+    tip.textContent = `${d.n}: ${d.lo} → ${d.hi} (+${chg} pts)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    rows.forEach(r => r.g.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  rows.push({ d, g });
+});
+
+// Resolve label collisions
+const leftLabels = data.map(d => ({ d, y: scale(d.lo), origY: scale(d.lo) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.hi), origY: scale(d.hi) }));
+const resolvedL = resolveCollisions(leftLabels.map(l => ({ ...l })), 12);
+const resolvedR = resolveCollisions(rightLabels.map(l => ({ ...l })), 12);
+const lMap = Object.fromEntries(resolvedL.map(l => [l.d.n, l.y]));
+const rMap = Object.fromEntries(resolvedR.map(l => [l.d.n, l.y]));
+
+data.forEach(d => {
+  const color = colorForChange(d.hi - d.lo);
+  const lY = Math.max(pad.top, Math.min(H - pad.bottom, lMap[d.n]));
+  const rY = Math.max(pad.top, Math.min(H - pad.bottom, rMap[d.n]));
+  const origLY = scale(d.lo), origRY = scale(d.hi);
+
+  if (Math.abs(lY - origLY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xL - 2, y1: origLY, x2: xL - 14, y2: lY, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  if (Math.abs(rY - origRY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xR + 2, y1: origRY, x2: xR + 14, y2: rY, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const lt = mkEl("text", { x: xL - 16, y: lY + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9" });
+  lt.textContent = `${d.n}  ${d.lo}`;
+  svg.appendChild(lt);
+
+  const rt = mkEl("text", { x: xR + 16, y: rY + 3.5, "text-anchor": "start", fill: color, "font-size": "9", "font-weight": "500" });
+  rt.textContent = `${d.hi}  ${d.n}`;
+  svg.appendChild(rt);
+});
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "+20 pts" },
+  { color: "#5B9E78", label: "+14–20" },
+  { color: "#8BAD72", label: "+8–14" },
+  { color: "#C49A45", label: "+5–8" },
+  { color: "#C4715A", label: "<+5" }
+];
+let lx = pad.left;
+const ly = H - 4;
+svg.appendChild(mkEl("text", { x: lx, y: ly, "text-anchor": "start", fill: "#7A786F", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = "GAIN:";
+lx += 38;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: "8", height: "8", fill: item.color, rx: "1" }));
+  svg.appendChild(mkEl("text", { x: lx + 11, y: ly, fill: "#7A786F", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = item.label;
+  lx += 56;
+});
+</script>
+</body></html>
