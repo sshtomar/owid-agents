@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Child Wasting: Countries Most Affected</h1>
+<p class="subtitle">Share of children under 5 with low weight-for-height (acute malnutrition), most recent survey year since 2015. Wasting reflects recent food deprivation or disease and is a leading cause of child mortality.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — World Development Indicators (SH.STA.WAST.ZS)</p>
+<script>
+const data = [
+  {"n":"India","v":18.7,"y":2020},
+  {"n":"Djibouti","v":12.1,"y":2023},
+  {"n":"Bangladesh","v":10.7,"y":2022},
+  {"n":"Cambodia","v":9.6,"y":2021},
+  {"n":"Burkina Faso","v":9.3,"y":2021},
+  {"n":"Indonesia","v":8.4,"y":2023},
+  {"n":"Benin","v":8.3,"y":2021},
+  {"n":"Cote d'Ivoire","v":8.1,"y":2021},
+  {"n":"Burundi","v":7.8,"y":2024},
+  {"n":"Chad","v":7.8,"y":2022},
+  {"n":"Guinea-Bissau","v":7.8,"y":2019},
+  {"n":"Congo, Dem. Rep.","v":7.2,"y":2023},
+  {"n":"Ethiopia","v":6.8,"y":2019},
+  {"n":"Guyana","v":6.5,"y":2019},
+  {"n":"Guinea","v":6.4,"y":2022},
+  {"n":"Ghana","v":5.8,"y":2022},
+  {"n":"Bhutan","v":5.1,"y":2023},
+  {"n":"Comoros","v":5.1,"y":2022},
+  {"n":"Gambia, The","v":5.1,"y":2020},
+  {"n":"Haiti","v":5.0,"y":2023}
+];
+
+const W = 680, H = 520;
+const pad = { left: 140, right: 80, top: 30, bottom: 30 };
+const barH = 17, barGap = 7;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = 20;
+const xScale = v => pad.left + v / maxV * (W - pad.left - pad.right);
+
+function colorForVal(v) {
+  if (v >= 15) return "#EA5E33";
+  if (v >= 10) return "#F29A44";
+  if (v >= 7) return "#F5D38A";
+  return "#A6C4A2";
+}
+
+// Vertical reference line at global average (~7% threshold for high wasting)
+const warnX = xScale(10);
+svg.appendChild(mkEl("line", { x1: warnX, y1: pad.top - 8, x2: warnX, y2: H - pad.bottom + 5, stroke: "#C2C0B5", "stroke-dasharray": "3,3", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("text", { x: warnX + 3, y: pad.top - 10, fill: "#7A786F", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = "10%";
+
+// X axis ticks
+[0, 5, 10, 15, 20].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x, y: H - pad.bottom + 12, "text-anchor": "middle", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = v + "%";
+});
+
+// Baseline
+svg.appendChild(mkEl("line", { x1: pad.left, y1: pad.top - 8, x2: pad.left, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+
+const tip = document.getElementById("tip");
+const bars = [];
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + barGap);
+  const x2 = xScale(d.v);
+  const color = colorForVal(d.v);
+
+  const g = mkEl("g", { cursor: "pointer" });
+
+  // Bar
+  const rect = mkEl("rect", { x: pad.left, y, width: x2 - pad.left, height: barH, fill: color, rx: "1.5", opacity: "0.9" });
+  g.appendChild(rect);
+
+  // Value label
+  const vl = mkEl("text", { x: x2 + 5, y: y + barH * 0.68, fill: "#2B2A27", "font-size": "9", "font-weight": "500" });
+  vl.textContent = d.v + "%";
+  g.appendChild(vl);
+
+  // Country label
+  const cl = mkEl("text", { x: pad.left - 6, y: y + barH * 0.68, "text-anchor": "end", fill: "#2B2A27", "font-size": "9.5" });
+  cl.textContent = d.n;
+  g.appendChild(cl);
+
+  g.addEventListener("mouseenter", e => {
+    bars.forEach(b => b.rect.setAttribute("opacity", "0.2"));
+    rect.setAttribute("opacity", "1");
+    tip.textContent = `${d.n}: ${d.v}% (${d.y} survey)`;
+    tip.style.opacity = "1";
+  });
+  g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    bars.forEach(b => b.rect.setAttribute("opacity", "0.9"));
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  bars.push({ d, g, rect });
+});
+
+// X axis label
+svg.appendChild(mkEl("text", { x: pad.left + (W - pad.left - pad.right) / 2, y: H - 4, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" })).textContent = "% OF CHILDREN UNDER 5 AFFECTED";
+</script>
+</body></html>

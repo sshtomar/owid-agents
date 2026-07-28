@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Natural Resources Rents as Share of GDP</h1>
+<p class="subtitle">Total rents from oil, gas, coal, minerals, and forests as a percentage of GDP, 2000–2021. Sharp spikes mirror commodity price booms; countries with persistently high rents often face weaker governance and economic diversification challenges.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — World Development Indicators (NY.GDP.TOTL.RT.ZS)</p>
+<script>
+const data = [
+  {"n":"Iraq","pts":[{"y":2000,"v":48.9},{"y":2002,"v":47.0},{"y":2004,"v":64.8},{"y":2006,"v":63.7},{"y":2008,"v":55.7},{"y":2010,"v":43.6},{"y":2012,"v":49.9},{"y":2014,"v":46.9},{"y":2016,"v":33.2},{"y":2018,"v":46.1},{"y":2020,"v":27.4},{"y":2021,"v":43.4}]},
+  {"n":"Congo, Rep.","pts":[{"y":2000,"v":59.7},{"y":2002,"v":46.6},{"y":2004,"v":40.1},{"y":2006,"v":53.3},{"y":2008,"v":52.6},{"y":2010,"v":43.9},{"y":2012,"v":41.4},{"y":2014,"v":27.7},{"y":2016,"v":17.0},{"y":2018,"v":42.7},{"y":2020,"v":26.2},{"y":2021,"v":37.7}]},
+  {"n":"Angola","pts":[{"y":2000,"v":59.1},{"y":2002,"v":32.9},{"y":2004,"v":33.8},{"y":2006,"v":40.8},{"y":2008,"v":52.6},{"y":2010,"v":38.2},{"y":2012,"v":34.7},{"y":2014,"v":22.1},{"y":2016,"v":20.9},{"y":2018,"v":32.0},{"y":2020,"v":20.2},{"y":2021,"v":30.0}]},
+  {"n":"Iran","pts":[{"y":2000,"v":33.1},{"y":2002,"v":22.9},{"y":2004,"v":27.2},{"y":2006,"v":34.8},{"y":2008,"v":33.5},{"y":2010,"v":23.1},{"y":2012,"v":21.1},{"y":2014,"v":24.9},{"y":2016,"v":13.1},{"y":2018,"v":34.2},{"y":2020,"v":23.2},{"y":2021,"v":30.4}]},
+  {"n":"Azerbaijan","pts":[{"y":2000,"v":35.1},{"y":2002,"v":25.9},{"y":2004,"v":28.7},{"y":2006,"v":41.5},{"y":2008,"v":43.0},{"y":2010,"v":27.9},{"y":2012,"v":29.0},{"y":2014,"v":22.5},{"y":2016,"v":14.8},{"y":2018,"v":27.6},{"y":2020,"v":13.0},{"y":2021,"v":29.9}]},
+  {"n":"Kazakhstan","pts":[{"y":2000,"v":27.3},{"y":2002,"v":23.1},{"y":2004,"v":28.3},{"y":2006,"v":28.8},{"y":2008,"v":33.2},{"y":2010,"v":21.7},{"y":2012,"v":22.0},{"y":2014,"v":17.3},{"y":2016,"v":11.0},{"y":2018,"v":20.8},{"y":2020,"v":12.8},{"y":2021,"v":26.8}]},
+  {"n":"Guyana","pts":[{"y":2000,"v":15.5},{"y":2002,"v":12.8},{"y":2004,"v":21.2},{"y":2006,"v":9.7},{"y":2008,"v":10.4},{"y":2010,"v":14.6},{"y":2012,"v":16.5},{"y":2014,"v":10.8},{"y":2016,"v":16.1},{"y":2018,"v":6.6},{"y":2020,"v":13.9},{"y":2021,"v":33.7}]},
+  {"n":"DR Congo","pts":[{"y":2000,"v":7.5},{"y":2002,"v":18.9},{"y":2004,"v":24.1},{"y":2006,"v":24.0},{"y":2008,"v":28.5},{"y":2010,"v":26.0},{"y":2012,"v":27.1},{"y":2014,"v":24.6},{"y":2016,"v":20.6},{"y":2018,"v":18.4},{"y":2020,"v":15.9},{"y":2021,"v":38.8}]},
+  {"n":"Algeria","pts":[{"y":2000,"v":26.7},{"y":2002,"v":23.5},{"y":2004,"v":26.2},{"y":2006,"v":34.2},{"y":2008,"v":32.9},{"y":2010,"v":25.5},{"y":2012,"v":26.3},{"y":2014,"v":22.6},{"y":2016,"v":12.8},{"y":2018,"v":20.7},{"y":2020,"v":14.0},{"y":2021,"v":22.6}]},
+  {"n":"Chad","pts":[{"y":2000,"v":10.6},{"y":2002,"v":8.7},{"y":2004,"v":34.9},{"y":2006,"v":34.3},{"y":2008,"v":33.9},{"y":2010,"v":23.8},{"y":2012,"v":24.8},{"y":2014,"v":15.7},{"y":2016,"v":13.1},{"y":2018,"v":20.9},{"y":2020,"v":13.9},{"y":2021,"v":21.3}]}
+];
+
+const COLORS = ["#EA5E33","#F29A44","#C4715A","#3D7A5A","#8BAD72","#5B9E78","#C49A45","#B34B3B","#6B8EAD","#9A9890"];
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 110, bottom: 36, left: 55 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 2000, yearMax = 2021;
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const maxV = 70;
+const yScale = v => margin.top + (maxV - v) / maxV * (H - margin.top - margin.bottom);
+
+// Grid
+[0, 10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = v + "%";
+});
+
+// X axis ticks
+[2000, 2004, 2008, 2012, 2016, 2020].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.4" }));
+  svg.appendChild(mkEl("text", { x, y: H - margin.bottom + 12, "text-anchor": "middle", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = y;
+});
+
+// Oil price boom annotation
+const boom1x1 = xScale(2004), boom1x2 = xScale(2008);
+svg.appendChild(mkEl("rect", { x: boom1x1, y: margin.top, width: boom1x2 - boom1x1, height: H - margin.top - margin.bottom, fill: "#F29A44", opacity: "0.06" }));
+
+svg.appendChild(mkEl("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const lines = [];
+const endLabels = [];
+
+data.forEach((series, si) => {
+  const color = COLORS[si % COLORS.length];
+  const g = mkEl("g", {});
+
+  const pts = series.pts;
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const path = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.6", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(path);
+
+  const last = pts[pts.length - 1];
+  g.appendChild(mkEl("circle", { cx: xScale(last.y), cy: yScale(last.v), r: "3", fill: color }));
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseenter", () => {
+    lines.forEach(l => l.path.setAttribute("opacity", "0.1"));
+    path.setAttribute("opacity", "1");
+    path.setAttribute("stroke-width", "2.5");
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const approxYear = yearMin + ratio * (yearMax - yearMin);
+    const closest = pts.reduce((a, b) => Math.abs(b.y - approxYear) < Math.abs(a.y - approxYear) ? b : a);
+    tip.textContent = `${series.n} (${closest.y}): ${closest.v}% of GDP`;
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lines.forEach(l => { l.path.setAttribute("opacity", "1"); l.path.setAttribute("stroke-width", "1.6"); });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  lines.push({ series, g, path });
+  endLabels.push({ name: series.n, y: yScale(last.v), origY: yScale(last.v), color, val: last.v });
+});
+
+const resolved = resolveCollisions(endLabels.map(l => ({ ...l })), 12);
+const resolvedMap = Object.fromEntries(resolved.map(l => [l.name, l.y]));
+
+endLabels.forEach(l => {
+  const lY = Math.max(margin.top + 4, Math.min(H - margin.bottom - 4, resolvedMap[l.name]));
+  if (Math.abs(lY - l.origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 3, y1: l.origY, x2: W - margin.right + 10, y2: lY, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  const t = mkEl("text", { x: W - margin.right + 12, y: lY + 3.5, fill: l.color, "font-size": "9", "font-weight": "500" });
+  t.textContent = l.name;
+  svg.appendChild(t);
+});
+
+// Boom annotation
+svg.appendChild(mkEl("text", { x: (boom1x1 + boom1x2) / 2, y: margin.top + 12, "text-anchor": "middle", fill: "#C49A45", "font-size": "8", "font-family": "JetBrains Mono, monospace" })).textContent = "OIL BOOM";
+</script>
+</body></html>
