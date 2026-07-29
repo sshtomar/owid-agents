@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 780px; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; }
+  .cell { padding: 12px 10px 10px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:hover { background: #EFEEE6; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 6px; letter-spacing: 0.1px; }
+  .cell-vals { display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; }
+  .cell-first { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #9A9890; }
+  .cell-last { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500; color: #2B2A27; }
+  canvas { display: block; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Patent Applications by Residents, 1990–2021</h1>
+<p class="subtitle">Number of patent applications filed by residents in each country's patent office. China's surge — from 5,800 applications in 1990 to 1.4 million in 2021 — is without historical parallel. Japan and Germany have plateaued or declined; South Korea and India are rising steadily.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Patent Applications, Residents (IP.PAT.RESD)</p>
+<script>
+// Series from 1990 to 2021 (32 values). 0 = no data reported.
+const rawData = [
+  {"n":"China",      "s":[5832,7372,10022,12084,11191,10011,11628,12672,13751,15626,25346,30038,39806,56769,65786,93485,122318,153060,194579,229096,293066,415829,535313,704936,801135,968252,1204981,1245709,1393815,1243568,1344817,1426644]},
+  {"n":"Japan",      "s":[333230,335933,338019,332345,319938,334612,340101,350807,359381,360180,387364,386767,369458,358184,368416,367960,347060,333498,330110,295315,290081,287580,287013,271731,265959,258839,260244,260292,253630,245372,227348,222452]},
+  {"n":"South Korea","s":[9082,13253,15951,21449,28554,59228,68405,67359,50596,55970,72831,73714,76570,90313,105250,122188,125476,128701,127114,127316,131805,138034,148136,159978,164073,167275,163424,159084,162561,171603,180477,186245]},
+  {"n":"Germany",    "s":[30724,32256,33919,34752,36715,38103,42322,44438,46523,50029,51736,49989,47598,47818,48448,48367,48012,47853,49240,47859,47047,46986,46620,47353,48154,47384,48480,47785,46617,46632,42260,39822]},
+  {"n":"India",      "s":[1147,1267,1248,1209,1588,1545,1661,1926,2247,2206,2206,2379,2693,3425,4014,4721,5686,6296,6425,7262,8853,8841,9553,10669,12040,12579,13199,14961,16289,19454,23141,26267]},
+  {"n":"Iran",       "s":[182,262,225,278,266,278,288,284,337,366,410,691,910,1287,2426,4051,5970,10648,15403,12184,11108,11529,10622,11305,13683,0,14930,15264,11908,11569,11396,10210]},
+  {"n":"France",     "s":[12378,12597,12539,12638,12519,12419,12916,13252,13251,13592,13870,13499,13519,13511,14230,14327,14529,14722,14658,14100,14748,14655,14540,14690,14500,14306,14206,14415,14303,14103,12771,13386]},
+  {"n":"Italy",      "s":[0,0,7568,7493,7872,0,6997,0,0,6281,7877,0,0,0,0,0,0,9255,8588,8814,8877,8794,8439,8307,8601,0,8848,8643,8921,9229,10061,10281]},
+  {"n":"Canada",     "s":[2549,2182,2807,3623,2480,2431,2583,3344,3809,4061,4187,3963,3959,3929,5231,5183,5522,4998,5061,5067,4550,4754,4709,4567,4198,4277,4078,4053,4349,4238,4452,4710]},
+  {"n":"Brazil",     "s":[2389,2319,2100,2429,2269,2707,2611,2756,2491,2816,3179,3439,3481,3866,4044,4054,3956,4194,4280,4271,4228,4695,4798,4959,4659,4641,5200,5480,4980,5464,5280,4666]},
+  {"n":"Indonesia",  "s":[0,34,67,38,29,61,40,79,93,152,157,212,234,201,227,235,288,284,386,415,508,533,0,663,702,1058,1101,2271,1407,3093,1309,1397]},
+  {"n":"Australia",  "s":[1712,1717,1695,1663,1699,1784,1797,1760,1862,1858,1928,2187,2364,2418,2559,2555,2837,2718,2821,2494,2409,2383,2627,3061,1988,2291,2620,2503,2757,2637,2368,2966]}
+];
+const Y0 = 1990, YEAR_MAX = 2021, N = 32;
+
+function fmtN(v) {
+  if (v >= 1e6) return (v/1e6).toFixed(1)+"M";
+  if (v >= 1e3) return Math.round(v/1e3)+"k";
+  return v.toLocaleString();
+}
+
+const grid = document.getElementById("grid");
+const tip = document.getElementById("tip");
+const DPR = window.devicePixelRatio || 1;
+const CELL_W = 178, CELL_H = 68;
+
+rawData.forEach(d => {
+  // Filter out 0s (no-data) for sparkline rendering
+  const validPts = d.s.map((v, i) => ({ i, v })).filter(p => p.v > 0);
+  const sMin = Math.min(...validPts.map(p => p.v));
+  const sMax = Math.max(...validPts.map(p => p.v));
+  const firstValid = validPts[0];
+  const lastValid = validPts[validPts.length - 1];
+
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "cell-name";
+  nameEl.textContent = d.n;
+  cell.appendChild(nameEl);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = CELL_W * DPR;
+  canvas.height = CELL_H * DPR;
+  canvas.style.width = CELL_W + "px";
+  canvas.style.height = CELL_H + "px";
+  cell.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(DPR, DPR);
+
+  function drawSparkline(highlightIdx) {
+    ctx.clearRect(0, 0, CELL_W, CELL_H);
+    const padL = 2, padR = 2, padT = 4, padB = 4;
+    const cW = CELL_W - padL - padR;
+    const cH = CELL_H - padT - padB;
+    const range = sMax - sMin || 1;
+
+    const xOf = (i) => padL + (i / (N - 1)) * cW;
+    const yOf = (v) => padT + cH - ((v - sMin) / range) * cH;
+
+    // Draw area fill
+    if (validPts.length > 1) {
+      ctx.beginPath();
+      ctx.moveTo(xOf(validPts[0].i), cH + padT);
+      validPts.forEach(p => ctx.lineTo(xOf(p.i), yOf(p.v)));
+      ctx.lineTo(xOf(validPts[validPts.length - 1].i), cH + padT);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(234,94,51,0.08)";
+      ctx.fill();
+    }
+
+    // Draw line
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.2;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    let first = true;
+    validPts.forEach(p => {
+      const x = xOf(p.i), y = yOf(p.v);
+      if (first) { ctx.moveTo(x, y); first = false; }
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Highlight dot
+    if (highlightIdx !== undefined) {
+      const pts = validPts.filter(p => p.i <= highlightIdx);
+      if (pts.length > 0) {
+        const p = pts[pts.length - 1];
+        ctx.beginPath();
+        ctx.arc(xOf(p.i), yOf(p.v), 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#EA5E33";
+        ctx.fill();
+        // Crosshair
+        ctx.strokeStyle = "rgba(43,42,39,0.2)";
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([2,2]);
+        ctx.beginPath();
+        ctx.moveTo(xOf(highlightIdx), padT);
+        ctx.lineTo(xOf(highlightIdx), padT + cH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+  }
+
+  drawSparkline();
+
+  const valsEl = document.createElement("div");
+  valsEl.className = "cell-vals";
+  const fEl = document.createElement("span");
+  fEl.className = "cell-first";
+  fEl.textContent = `${Y0}: ${fmtN(firstValid ? firstValid.v : 0)}`;
+  const lEl = document.createElement("span");
+  lEl.className = "cell-last";
+  lEl.textContent = `${Y0 + (lastValid ? lastValid.i : N-1)}: ${fmtN(lastValid ? lastValid.v : 0)}`;
+  valsEl.appendChild(fEl);
+  valsEl.appendChild(lEl);
+  cell.appendChild(valsEl);
+
+  // Interactivity
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, mx / CELL_W));
+    const idx = Math.round(ratio * (N - 1));
+    const yr = Y0 + idx;
+    const v = d.s[idx];
+    drawSparkline(idx);
+    if (v > 0) {
+      tip.textContent = `${d.n} · ${yr}: ${v.toLocaleString()} patents`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 24) + "px";
+    } else {
+      tip.style.opacity = "0";
+    }
+  });
+  cell.addEventListener("mouseleave", () => {
+    drawSparkline();
+    tip.style.opacity = "0";
+  });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>

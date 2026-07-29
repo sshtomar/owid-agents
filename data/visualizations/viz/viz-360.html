@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Battle-Related Deaths by Country, 1989–2024</h1>
+<p class="subtitle">Estimated annual deaths from organised armed conflict. Ethiopia's Tigray war (2020–2022) and Israel's 2023–2024 conflict produced spikes that dwarf earlier peaks. Afghanistan's war lasted over three decades. Values capped at 35,000 for readability — Ethiopia's 2022 peak reached ~125,000.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Battle-Related Deaths (VC.BTL.DETH)</p>
+<script>
+// Annual series from 1989 to 2024 (36 values)
+const data = [
+  {"n":"Afghanistan","color":"#EA5E33","s":[5174,1478,3302,4276,4071,8937,5499,3177,6396,6256,4629,5235,5055,890,687,715,1595,4750,6911,5552,6341,6864,7403,7721,8056,12284,17303,17985,19014,25676,29940,20475,35787,917,237,260]},
+  {"n":"Ethiopia","color":"#C4715A","s":[24358,49698,12225,165,36,75,29,52,0,1040,30704,48257,40,50,50,50,83,50,177,50,515,151,51,50,77,25,49,50,0,0,67,20916,124550,163210,1688,2824]},
+  {"n":"Iraq","color":"#F29A44","s":[50,94,23059,340,120,241,757,607,1336,50,274,53,36,26,7927,4095,2608,3928,2217,2233,1045,1118,1043,638,1882,13168,10139,9630,10248,1294,822,902,872,993,469,396]},
+  {"n":"Israel","color":"#F5D38A","s":[5,18,16,31,49,44,35,71,0,0,0,79,244,613,308,385,123,465,276,668,696,27,78,235,0,2378,0,0,0,53,48,0,269,84,26712,21440]},
+  {"n":"Congo, Dem. Rep.","color":"#8BAD72","s":[0,0,0,0,0,1,0,1371,4599,3431,3282,1473,501,100,0,0,34,177,632,767,1961,300,324,804,1532,993,197,794,3632,817,766,1200,1019,1723,689,1138]},
+  {"n":"India","color":"#5B9E78","s":[1002,2393,3153,3078,1503,1178,836,833,950,881,2041,2902,1320,1903,1727,1667,1382,1373,1086,1083,1115,1028,439,416,405,473,504,637,665,824,594,584,430,310,217,437]}
+];
+const Y0 = 1989, YEAR_MAX = 2024, N = 36;
+
+const W = 820, H = 460;
+const M = { top: 40, right: 158, bottom: 36, left: 62 };
+const VAL_MIN = 0, VAL_MAX = 35000;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+// Clip path to prevent overflow
+const defs = mkEl("defs", {});
+const clipRect = mkEl("clipPath", { id: "chartArea" });
+clipRect.appendChild(mkEl("rect", { x: M.left, y: M.top, width: W - M.left - M.right, height: H - M.top - M.bottom }));
+defs.appendChild(clipRect);
+svg.appendChild(defs);
+
+const xScale = yr => M.left + (yr - Y0) / (YEAR_MAX - Y0) * (W - M.left - M.right);
+const yScale = v => M.top + (VAL_MAX - Math.min(v, VAL_MAX)) / (VAL_MAX - VAL_MIN) * (H - M.top - M.bottom);
+
+// Grid lines
+[0, 10000, 20000, 30000].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: M.left, y1: yScale(v), x2: W - M.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: M.left - 6, y: yScale(v) + 4, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  lbl.textContent = v === 0 ? "0" : (v / 1000) + "k";
+  svg.appendChild(lbl);
+});
+
+// Cap note
+const capLbl = mkEl("text", { x: M.left + 4, y: M.top + 10, "font-family": "JetBrains Mono, monospace",
+  "font-size": "8", fill: "#C4715A", opacity: "0.8" });
+capLbl.textContent = "cap: 35k";
+svg.appendChild(capLbl);
+
+// X axis ticks
+[1989, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  const x = xScale(yr);
+  svg.appendChild(mkEl("line", { x1: x, y1: H - M.bottom, x2: x, y2: H - M.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.8" }));
+  const lbl = mkEl("text", { x: x, y: H - M.bottom + 14, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  lbl.textContent = yr;
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+const endLabels = [];
+
+data.forEach(series => {
+  const g = mkEl("g", { "clip-path": "url(#chartArea)" });
+  let d = "";
+  series.s.forEach((v, i) => {
+    const yr = Y0 + i;
+    const x = xScale(yr), y = yScale(v);
+    d += `${i === 0 ? "M" : "L"} ${x} ${y} `;
+  });
+  const line = mkEl("path", { d, stroke: series.color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+  const hit = mkEl("path", { d, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hit);
+  svg.appendChild(g);
+
+  // Endpoint at 2024 (last value in series)
+  const lastV = series.s[N - 1];
+  const clampedV = Math.min(lastV, VAL_MAX);
+  endLabels.push({ name: series.n, val: lastV, y: yScale(clampedV), color: series.color });
+  groups.push({ g, line, hit, series });
+});
+
+// Endpoint label collision resolution
+const resolved = resolveCollisions(endLabels.map((l, i) => ({ ...l, idx: i })), 12);
+const resolvedMap = {};
+resolved.forEach(r => resolvedMap[r.idx] = r.y);
+
+endLabels.forEach((lbl, i) => {
+  const ly = resolvedMap[i];
+  const origY = lbl.y;
+  const lx = W - M.right + 8;
+  if (Math.abs(ly - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: W - M.right + 2, y1: origY, x2: lx + 1, y2: ly,
+      stroke: lbl.color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const txt = mkEl("text", { x: lx, y: ly + 4, "font-size": "9",
+    "font-family": "Inter, sans-serif", "font-weight": "500", fill: lbl.color });
+  txt.textContent = `${lbl.val.toLocaleString()}  ${lbl.name}`;
+  svg.appendChild(txt);
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({ line, hit, series }) => {
+  hit.style.cursor = "pointer";
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gr => {
+      gr.line.setAttribute("opacity", gr.series === series ? "1" : "0.1");
+      gr.line.setAttribute("stroke-width", gr.series === series ? "2.5" : "1.5");
+    });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - M.left) / (W - M.left - M.right)));
+    const idx = Math.round(ratio * (N - 1));
+    const yr = Y0 + idx;
+    const v = series.s[idx];
+    tip.textContent = `${series.n} · ${yr}: ${v.toLocaleString()} deaths`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gr => {
+      gr.line.setAttribute("opacity", "1");
+      gr.line.setAttribute("stroke-width", "1.5");
+    });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
