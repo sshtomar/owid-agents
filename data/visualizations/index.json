@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourism Arrivals, 2000\u20132020",
+      "description": "Trend lines showing annual international tourist arrivals (millions) for nine major destinations. Two decades of steady growth ended abruptly in 2020 when COVID-19 travel restrictions collapsed arrivals by 50\u201394% in a single year.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Hong Kong saw arrivals drop 94% in 2020 \u2014 from 55.9M to just 3.6M",
+        "Japan grew from 4.8M arrivals in 2000 to 31.9M by 2019, then collapsed to 4.1M",
+        "China led all destinations with 162.5M arrivals in 2019 before COVID"
+      ],
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Use per Capita, 1990 vs 2023",
+      "description": "Slope chart comparing kilograms of oil equivalent per person in 1990 versus 2023 across 15 countries. European economies cut energy intensity as industries shifted and efficiency improved; East Asian and developing nations surged.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "South Korea's energy use grew 156% (2,088 to 5,337 kg OE) driven by industrialisation",
+        "China surged 269% from a low base, while Germany cut use by 34%",
+        "Iceland uses more energy per person than any other country due to geothermal industry"
+      ],
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Old-Age Dependency Ratio, 1960\u20132020",
+      "description": "Trend lines showing elderly population (65+) as a share of working-age population (15\u201364) across eight countries in five-year steps. Japan has aged faster than any other major economy; South Korea is now on a similarly steep trajectory.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan's old-age dependency ratio rose from 8.9% in 1960 to 49.1% in 2020",
+        "South Korea went from 5.6% to 22% \u2014 the fastest recent acceleration",
+        "India remains at 9.5%, giving it a large working-age demographic advantage"
+      ],
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Battle-Related Deaths by Country, 1989\u20132024",
+      "description": "Annual estimated deaths from organised armed conflict for six countries. Ethiopia's Tigray war produced the highest single-year toll in the dataset; Afghanistan's conflict lasted over three decades; Israel's 2023 escalation reached levels not seen since the 1990s Balkans wars.",
+      "datasetIds": [
+        "wb--VC-BTL-DETH"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Ethiopia's Tigray war (2020\u20132022) peaked at ~125,000 deaths in 2022 \u2014 chart capped at 35k",
+        "Afghanistan sustained 3,000\u201330,000 deaths per year for over 30 years",
+        "Israel's 2023\u20132024 conflict produced 26,000+ deaths \u2014 highest since Bosnia 1992\u20131995"
+      ],
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Patent Applications by Residents, 1990\u20132021",
+      "description": "Sparkline grid showing annual patent filings by domestic residents across 12 countries. China's surge \u2014 from 5,800 applications in 1990 to 1.4 million in 2021 \u2014 is without historical parallel and now accounts for the majority of global filings.",
+      "datasetIds": [
+        "wb--IP-PAT-RESD"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "China grew 245x in 31 years, from 5,832 to 1,426,644 patent applications",
+        "Japan peaked around 2000 at 387,000 applications and has declined since",
+        "India and South Korea show sustained growth; Indonesia accelerating from near-zero"
+      ],
+      "createdAt": "2026-07-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-29T00:00:00.000Z"
 }
