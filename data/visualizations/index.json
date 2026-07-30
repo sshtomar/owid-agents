@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The World's Most Densely Populated Countries",
+      "description": "Horizontal bar chart showing the 20 most densely populated countries in 2023 (people per sq. km). Hong Kong tops the list at 7,177, followed by Bahrain and Bangladesh.",
+      "datasetIds": [
+        "wb--EN-POP-DNST"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Hong Kong leads at 7,177 people per sq. km \u2014 5x the next densest country",
+        "Bangladesh (1,319/km\u00b2) is the densest large nation, ahead of South Korea and India",
+        "Belgium and Germany are among the densest in Western Europe"
+      ],
+      "createdAt": "2026-07-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Fossil Fuel Energy Dependence: 1990 vs. 2015",
+      "description": "Slope chart comparing fossil fuel share of total energy consumption between 1990 and 2015 for 25 countries. Shows major shifts away from fossil fuels \u2014 and some countries moving the other way.",
+      "datasetIds": [
+        "wb--EG-USE-COMM-FO-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Croatia and Bulgaria cut fossil fuel share by over 45 percentage points",
+        "Japan reversed course after Fukushima, rising from 85% to 94% fossil fuels",
+        "Bangladesh and Ghana surged as fossil-fueled economic growth accelerated"
+      ],
+      "createdAt": "2026-07-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Nuclear Electricity: Share of Power Generation, 1990\u20132024",
+      "description": "Trend lines showing nuclear power as a share of electricity generation for the 10 most nuclear-dependent countries. Captures Fukushima's collapse of Japan's nuclear fleet and Germany's phase-out.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "France generates over two-thirds of electricity from nuclear \u2014 by far the world's highest share",
+        "Japan's nuclear share collapsed from 25% to near-zero after Fukushima (2011) and is slowly recovering",
+        "Finland's Olkiluoto-3 reactor drove a surge to 42% in 2023"
+      ],
+      "createdAt": "2026-07-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Population Growth Rate by World Region, 1961\u20132024",
+      "description": "Sparkline grid showing annual population growth (%) for 7 major world regions from 1961 to 2024. Sub-Saharan Africa remains at ~2.4%; East Asia & Pacific has nearly stalled at 0.2%.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "Sub-Saharan Africa's growth rate has stayed above 2.4% for six decades",
+        "East Asia & Pacific dropped from 2.6% to 0.2% \u2014 driven by China's demographic transition",
+        "Europe & Central Asia briefly went negative in 2022, rebounding with migration flows"
+      ],
+      "createdAt": "2026-07-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Wealth Trajectories: Adjusted National Income per Capita, 2000 vs. 2021",
+      "description": "Slope chart comparing adjusted net national income per capita in 2000 vs 2021 across 20 countries on a log scale. Shows diverging wealth paths from Denmark ($59k) to Burkina Faso ($670).",
+      "datasetIds": [
+        "wb--NY-ADJ-NNTY-PC-CD"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Denmark more than doubled adjusted income from $25k to $59k over two decades",
+        "Azerbaijan grew 10x from $382 to $3,965 on the back of oil revenues",
+        "The bottom-tier countries (Burundi, DRC, Ethiopia) remain under $800 despite nominal growth"
+      ],
+      "createdAt": "2026-07-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-07-30T00:00:00.000Z"
 }

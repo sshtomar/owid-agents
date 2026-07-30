@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The World's Most Densely Populated Countries</h1>
+<p class="subtitle">People per square kilometre of land area, 2023. Ranges from city-states to large nations with concentrated urban cores.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Population Density (EN.POP.DNST)</p>
+<script>
+const data = [{"n":"Hong Kong SAR, China","v":7177.2},{"n":"Bahrain","v":1971.3},{"n":"Bangladesh","v":1319.2},{"n":"Barbados","v":656.6},{"n":"Burundi","v":533.1},{"n":"Korea, Rep.","v":529.8},{"n":"India","v":483.7},{"n":"Comoros","v":457.0},{"n":"Israel","v":455.1},{"n":"Haiti","v":422.3},{"n":"Belgium","v":386.3},{"n":"Grenada","v":344.4},{"n":"Japan","v":341.5},{"n":"El Salvador","v":304.5},{"n":"Gambia, The","v":266.6},{"n":"Jamaica","v":262.2},{"n":"Germany","v":238.4},{"n":"Dominican Republic","v":235.1},{"n":"Korea, Dem. People's Rep.","v":219.4},{"n":"Antigua and Barbuda","v":212.1}];
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 24) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const W = 680, H = 520;
+const margin = { top: 16, right: 140, bottom: 16, left: 170 };
+const barH = 18, gap = 6;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = data[0].v;
+const chartW = W - margin.left - margin.right;
+const xScale = v => (v / maxV) * chartW;
+
+// Color scale: warm for top, cool for lower
+const colors = ["#EA5E33","#EA5E33","#F29A44","#F29A44","#F5D38A","#F5D38A",
+                "#A6C4A2","#A6C4A2","#A6C4A2","#A6C4A2",
+                "#A6C4A2","#A6C4A2","#A6C4A2","#A6C4A2","#A6C4A2",
+                "#A6C4A2","#A6C4A2","#A6C4A2","#A6C4A2","#A6C4A2"];
+
+// Grid lines at reasonable intervals
+[500, 1000, 2000, 4000, 7000].forEach(v => {
+  if (v > maxV) return;
+  const x = margin.left + xScale(v);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: margin.top, x2: x, y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: x, y: margin.top - 4,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8",
+    fill: "#9A9890"
+  })).textContent = v >= 1000 ? (v/1000) + "k" : v;
+});
+
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + gap);
+  const bw = xScale(d.v);
+  const color = colors[i];
+
+  const g = mkEl("g", {});
+  svg.appendChild(g);
+
+  // Background hit area
+  const hit = mkEl("rect", {
+    x: 0, y: y - 2,
+    width: W, height: barH + 4,
+    fill: "transparent", cursor: "pointer"
+  });
+
+  // Bar
+  const bar = mkEl("rect", {
+    x: margin.left, y: y,
+    width: bw, height: barH,
+    fill: color, rx: "2"
+  });
+
+  // Country label (left)
+  const label = mkEl("text", {
+    x: margin.left - 8, y: y + barH / 2 + 4,
+    "text-anchor": "end",
+    "font-family": "Inter, sans-serif",
+    "font-size": "10",
+    "font-weight": "500",
+    fill: "#2B2A27"
+  });
+  label.textContent = d.n.replace("Korea, Rep.", "South Korea")
+    .replace("Korea, Dem. People's Rep.", "North Korea")
+    .replace("Gambia, The", "Gambia");
+
+  // Value label (right of bar)
+  const valLabel = mkEl("text", {
+    x: margin.left + bw + 6, y: y + barH / 2 + 4,
+    "text-anchor": "start",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9",
+    fill: "#7A786F"
+  });
+  valLabel.textContent = d.v >= 1000 ? (d.v/1000).toFixed(1) + "k" : d.v.toFixed(0);
+
+  g.appendChild(bar);
+  g.appendChild(label);
+  g.appendChild(valLabel);
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseover", e => {
+    bar.setAttribute("opacity", "0.8");
+    showTip(`${label.textContent}: ${d.v.toLocaleString()} people/km²`, e);
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    bar.setAttribute("opacity", "1");
+    hideTip();
+  });
+});
+
+// X axis label
+const xLabel = mkEl("text", {
+  x: margin.left + chartW / 2, y: H - 2,
+  "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace",
+  "font-size": "8",
+  fill: "#9A9890"
+});
+xLabel.textContent = "PEOPLE PER SQ. KM";
+svg.appendChild(xLabel);
+</script>
+</body></html>
