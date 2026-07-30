@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Nuclear Electricity: Share of Power Generation, 1990–2024</h1>
+<p class="subtitle">France leads the world with over two-thirds from nuclear. Germany exited by 2023; Japan collapsed after Fukushima in 2011 and is slowly restarting. Finland's Olkiluoto-3 drove a 2023 surge.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Electricity Production from Nuclear Sources (EG.ELC.NUCL.ZS)</p>
+<script>
+// Data exported from notebook
+const data = [{"n":"France","pts":[{"y":1990,"v":74.6},{"y":1991,"v":72.7},{"y":1992,"v":73.0},{"y":1993,"v":77.9},{"y":1994,"v":75.5},{"y":1995,"v":76.3},{"y":1996,"v":77.4},{"y":1997,"v":78.3},{"y":1998,"v":75.9},{"y":1999,"v":75.0},{"y":2000,"v":76.9},{"y":2001,"v":76.6},{"y":2002,"v":78.1},{"y":2003,"v":77.8},{"y":2004,"v":78.1},{"y":2005,"v":78.4},{"y":2006,"v":78.3},{"y":2007,"v":77.2},{"y":2008,"v":76.6},{"y":2009,"v":76.5},{"y":2010,"v":75.3},{"y":2011,"v":77.1},{"y":2012,"v":74.2},{"y":2013,"v":72.7},{"y":2014,"v":76.2},{"y":2015,"v":75.4},{"y":2016,"v":71.4},{"y":2017,"v":70.8},{"y":2018,"v":70.9},{"y":2019,"v":69.8},{"y":2020,"v":66.4},{"y":2021,"v":68.3},{"y":2022,"v":62.2},{"y":2023,"v":64.3},{"y":2024,"v":66.8}]},{"n":"Belgium","pts":[{"y":1990,"v":60.2},{"y":1991,"v":59.6},{"y":1992,"v":60.2},{"y":1993,"v":59.2},{"y":1994,"v":56.3},{"y":1995,"v":55.6},{"y":1996,"v":56.9},{"y":1997,"v":60.1},{"y":1998,"v":55.5},{"y":1999,"v":58.0},{"y":2000,"v":57.3},{"y":2001,"v":58.1},{"y":2002,"v":57.7},{"y":2003,"v":56.0},{"y":2004,"v":56.2},{"y":2005,"v":55.6},{"y":2006,"v":55.1},{"y":2007,"v":54.7},{"y":2008,"v":54.0},{"y":2009,"v":51.8},{"y":2010,"v":50.7},{"y":2011,"v":53.2},{"y":2012,"v":48.5},{"y":2013,"v":51.1},{"y":2014,"v":46.5},{"y":2015,"v":37.4},{"y":2016,"v":50.8},{"y":2017,"v":48.7},{"y":2018,"v":38.1},{"y":2019,"v":46.5},{"y":2020,"v":38.5},{"y":2021,"v":50.1},{"y":2022,"v":45.7},{"y":2023,"v":39.4},{"y":2024,"v":40.5}]},{"n":"Hungary","pts":[{"y":1990,"v":48.3},{"y":1991,"v":45.8},{"y":1992,"v":44.1},{"y":1993,"v":41.9},{"y":1994,"v":41.9},{"y":1995,"v":41.2},{"y":1996,"v":40.4},{"y":1997,"v":39.5},{"y":1998,"v":37.5},{"y":1999,"v":37.3},{"y":2000,"v":40.3},{"y":2001,"v":38.8},{"y":2002,"v":38.6},{"y":2003,"v":32.3},{"y":2004,"v":35.3},{"y":2005,"v":38.7},{"y":2006,"v":37.5},{"y":2007,"v":36.7},{"y":2008,"v":37.0},{"y":2009,"v":43.0},{"y":2010,"v":42.2},{"y":2011,"v":43.5},{"y":2012,"v":45.6},{"y":2013,"v":50.7},{"y":2014,"v":53.2},{"y":2015,"v":52.2},{"y":2016,"v":50.3},{"y":2017,"v":48.9},{"y":2018,"v":49.1},{"y":2019,"v":47.5},{"y":2020,"v":46.0},{"y":2021,"v":44.3},{"y":2022,"v":44.2},{"y":2023,"v":44.8},{"y":2024,"v":42.2}]},{"n":"Korea, Rep.","pts":[{"y":1990,"v":48.4},{"y":1991,"v":46.9},{"y":1992,"v":42.0},{"y":1993,"v":38.6},{"y":1994,"v":34.4},{"y":1995,"v":35.8},{"y":1996,"v":35.5},{"y":1997,"v":34.0},{"y":1998,"v":41.0},{"y":1999,"v":42.7},{"y":2000,"v":37.7},{"y":2001,"v":36.2},{"y":2002,"v":36.4},{"y":2003,"v":37.5},{"y":2004,"v":35.3},{"y":2005,"v":37.9},{"y":2006,"v":36.7},{"y":2007,"v":35.2},{"y":2008,"v":35.7},{"y":2009,"v":33.9},{"y":2010,"v":31.3},{"y":2011,"v":29.4},{"y":2012,"v":28.1},{"y":2013,"v":25.8},{"y":2014,"v":29.0},{"y":2015,"v":30.0},{"y":2016,"v":28.8},{"y":2017,"v":25.9},{"y":2018,"v":22.5},{"y":2019,"v":24.9},{"y":2020,"v":27.0},{"y":2021,"v":25.2},{"y":2022,"v":28.2},{"y":2023,"v":29.6},{"y":2024,"v":31.1}]},{"n":"Bulgaria","pts":[{"y":1990,"v":34.8},{"y":1991,"v":32.3},{"y":1992,"v":32.4},{"y":1993,"v":36.8},{"y":1994,"v":40.2},{"y":1995,"v":41.3},{"y":1996,"v":42.3},{"y":1997,"v":41.5},{"y":1998,"v":40.5},{"y":1999,"v":41.3},{"y":2000,"v":44.4},{"y":2001,"v":44.5},{"y":2002,"v":47.4},{"y":2003,"v":40.6},{"y":2004,"v":40.4},{"y":2005,"v":42.0},{"y":2006,"v":42.5},{"y":2007,"v":33.8},{"y":2008,"v":35.0},{"y":2009,"v":35.5},{"y":2010,"v":32.7},{"y":2011,"v":32.1},{"y":2012,"v":33.4},{"y":2013,"v":32.3},{"y":2014,"v":33.4},{"y":2015,"v":31.2},{"y":2016,"v":34.8},{"y":2017,"v":34.1},{"y":2018,"v":34.4},{"y":2019,"v":37.4},{"y":2020,"v":40.8},{"y":2021,"v":34.7},{"y":2022,"v":32.6},{"y":2023,"v":40.2}]},{"n":"Armenia","pts":[{"y":1995,"v":5.5},{"y":1996,"v":37.4},{"y":1997,"v":26.7},{"y":1998,"v":25.7},{"y":1999,"v":36.3},{"y":2000,"v":33.7},{"y":2001,"v":34.6},{"y":2002,"v":41.3},{"y":2003,"v":36.3},{"y":2004,"v":36.5},{"y":2005,"v":43.0},{"y":2006,"v":44.4},{"y":2007,"v":43.3},{"y":2008,"v":42.7},{"y":2009,"v":44.0},{"y":2010,"v":38.4},{"y":2011,"v":34.3},{"y":2012,"v":28.8},{"y":2013,"v":30.6},{"y":2014,"v":31.8},{"y":2015,"v":35.7},{"y":2016,"v":32.5},{"y":2017,"v":33.7},{"y":2018,"v":26.6},{"y":2019,"v":28.6},{"y":2020,"v":35.2},{"y":2021,"v":25.4},{"y":2022,"v":31.0},{"y":2023,"v":30.8}]},{"n":"Finland","pts":[{"y":1990,"v":35.3},{"y":1991,"v":33.6},{"y":1992,"v":33.4},{"y":1993,"v":32.6},{"y":1994,"v":29.6},{"y":1995,"v":30.0},{"y":1996,"v":28.1},{"y":1997,"v":30.2},{"y":1998,"v":31.1},{"y":1999,"v":33.1},{"y":2000,"v":32.1},{"y":2001,"v":30.6},{"y":2002,"v":29.7},{"y":2003,"v":27.0},{"y":2004,"v":26.5},{"y":2005,"v":33.0},{"y":2006,"v":27.8},{"y":2007,"v":28.8},{"y":2008,"v":29.6},{"y":2009,"v":32.6},{"y":2010,"v":28.3},{"y":2011,"v":31.5},{"y":2012,"v":32.6},{"y":2013,"v":33.1},{"y":2014,"v":34.6},{"y":2015,"v":33.9},{"y":2016,"v":33.7},{"y":2017,"v":33.3},{"y":2018,"v":32.4},{"y":2019,"v":34.8},{"y":2020,"v":33.6},{"y":2021,"v":32.7},{"y":2022,"v":35.1},{"y":2023,"v":42.1},{"y":2024,"v":39.2}]},{"n":"Czechia","pts":[{"y":1990,"v":20.1},{"y":1991,"v":20.0},{"y":1992,"v":20.7},{"y":1993,"v":21.4},{"y":1994,"v":22.1},{"y":1995,"v":20.1},{"y":1996,"v":20.0},{"y":1997,"v":19.3},{"y":1998,"v":20.2},{"y":1999,"v":20.6},{"y":2000,"v":18.5},{"y":2001,"v":19.8},{"y":2002,"v":24.5},{"y":2003,"v":31.1},{"y":2004,"v":31.2},{"y":2005,"v":29.9},{"y":2006,"v":30.9},{"y":2007,"v":29.7},{"y":2008,"v":31.7},{"y":2009,"v":33.1},{"y":2010,"v":32.6},{"y":2011,"v":32.3},{"y":2012,"v":34.7},{"y":2013,"v":35.4},{"y":2014,"v":35.2},{"y":2015,"v":32.0},{"y":2016,"v":28.9},{"y":2017,"v":32.6},{"y":2018,"v":34.0},{"y":2019,"v":34.8},{"y":2020,"v":36.9},{"y":2021,"v":36.1},{"y":2022,"v":36.6},{"y":2023,"v":39.5},{"y":2024,"v":40.2}]},{"n":"Japan","pts":[{"y":1990,"v":23.2},{"y":1991,"v":23.8},{"y":1992,"v":24.7},{"y":1993,"v":27.3},{"y":1994,"v":27.8},{"y":1995,"v":29.4},{"y":1996,"v":29.9},{"y":1997,"v":30.8},{"y":1998,"v":32.2},{"y":1999,"v":30.2},{"y":2000,"v":30.2},{"y":2001,"v":30.5},{"y":2002,"v":27.6},{"y":2003,"v":22.7},{"y":2004,"v":25.9},{"y":2005,"v":27.5},{"y":2006,"v":27.3},{"y":2007,"v":23.1},{"y":2008,"v":23.3},{"y":2009,"v":25.7},{"y":2010,"v":24.6},{"y":2011,"v":9.2},{"y":2012,"v":1.5},{"y":2013,"v":0.8},{"y":2014,"v":0},{"y":2015,"v":0.9},{"y":2016,"v":1.7},{"y":2017,"v":3.0},{"y":2018,"v":6.1},{"y":2019,"v":6.1},{"y":2020,"v":3.8},{"y":2021,"v":6.7},{"y":2022,"v":5.5},{"y":2023,"v":8.4},{"y":2024,"v":9.5}]},{"n":"Germany","pts":[{"y":1990,"v":27.7},{"y":1991,"v":27.3},{"y":1992,"v":29.5},{"y":1993,"v":29.1},{"y":1994,"v":28.5},{"y":1995,"v":28.5},{"y":1996,"v":28.8},{"y":1997,"v":30.9},{"y":1998,"v":29.1},{"y":1999,"v":30.6},{"y":2000,"v":29.4},{"y":2001,"v":29.2},{"y":2002,"v":28.1},{"y":2003,"v":27.1},{"y":2004,"v":27.0},{"y":2005,"v":26.2},{"y":2006,"v":26.1},{"y":2007,"v":21.9},{"y":2008,"v":23.2},{"y":2009,"v":22.6},{"y":2010,"v":22.2},{"y":2011,"v":17.6},{"y":2012,"v":15.8},{"y":2013,"v":15.2},{"y":2014,"v":15.5},{"y":2015,"v":14.2},{"y":2016,"v":13.0},{"y":2017,"v":11.7},{"y":2018,"v":11.9},{"y":2019,"v":12.4},{"y":2020,"v":11.2},{"y":2021,"v":11.7},{"y":2022,"v":6.0},{"y":2023,"v":1.4}]}];
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 24) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 130, bottom: 36, left: 50 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function mkText(attrs, text) {
+  const el = mkEl("text", attrs);
+  el.textContent = text;
+  return el;
+}
+
+const yearMin = 1990, yearMax = 2024;
+const valMin = 0, valMax = 85;
+const chartW = W - margin.left - margin.right;
+const chartH = H - margin.top - margin.bottom;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * chartW;
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * chartH;
+
+// Colors for 10 lines
+const palette = ["#EA5E33","#F29A44","#3D7A5A","#5B9E78","#8BAD72","#A6C4A2",
+                 "#C49A45","#C4715A","#B34B3B","#7A786F"];
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkText({
+    x: margin.left - 6, y: yScale(v) + 3, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"
+  }, v + "%"));
+});
+
+// X axis labels
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  svg.appendChild(mkText({
+    x: xScale(y), y: H - margin.bottom + 14, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"
+  }, y));
+});
+
+// Fukushima annotation
+const fukX = xScale(2011);
+svg.appendChild(mkEl("line", {
+  x1: fukX, y1: margin.top, x2: fukX, y2: H - margin.bottom,
+  stroke: "#EA5E33", "stroke-width": "0.8", "stroke-dasharray": "3,3", "stroke-opacity": "0.5"
+}));
+svg.appendChild(mkText({
+  x: fukX + 3, y: margin.top + 10,
+  "font-family": "JetBrains Mono, monospace", "font-size": "7.5", fill: "#EA5E33"
+}, "Fukushima"));
+
+// Collision resolution for endpoint labels
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Compute endpoint labels
+const endLabels = data.map((d, i) => {
+  const lastPt = d.pts[d.pts.length - 1];
+  return { d, i, y: yScale(lastPt.v), origY: yScale(lastPt.v), lastY: lastPt.y, lastV: lastPt.v };
+});
+resolveCollisions(endLabels, 11);
+const endLabelPos = {};
+endLabels.forEach(item => { endLabelPos[item.d.n] = item.y; });
+
+// Draw each series
+const groups = [];
+data.forEach((d, i) => {
+  const color = palette[i];
+  const g = mkEl("g", { "data-idx": i });
+  svg.appendChild(g);
+  groups.push(g);
+
+  // Line path
+  const pathParts = d.pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`);
+  const line = mkEl("path", {
+    d: pathParts.join(" "),
+    stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round"
+  });
+  g.appendChild(line);
+
+  // Endpoint label
+  const lastPt = d.pts[d.pts.length - 1];
+  const labelY = endLabelPos[d.n];
+  const actualY = yScale(lastPt.v);
+
+  if (Math.abs(labelY - actualY) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xScale(lastPt.y) + 4, y1: actualY,
+      x2: W - margin.right + 6, y2: labelY,
+      stroke: color, "stroke-width": "0.5", "stroke-opacity": "0.5"
+    }));
+  }
+
+  const name = d.n.replace("Korea, Rep.", "S. Korea");
+  g.appendChild(mkText({
+    x: W - margin.right + 8, y: labelY + 3.5, "text-anchor": "start",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    fill: color
+  }, `${lastPt.v.toFixed(0)}%  ${name}`));
+
+  // Invisible wide hit path
+  const hit = mkEl("path", {
+    d: pathParts.join(" "),
+    stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer"
+  });
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseover", e => {
+    groups.forEach(gg => gg.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    showTip(`${d.n}: ${lastPt.v.toFixed(1)}% nuclear (${lastPt.y})`, e);
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / chartW));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    const nearest = d.pts.reduce((a, b) => Math.abs(b.y - yr) < Math.abs(a.y - yr) ? b : a);
+    tip.textContent = `${d.n}: ${nearest.v.toFixed(1)}% (${nearest.y})`;
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(gg => gg.style.opacity = "1");
+    line.setAttribute("stroke-width", "1.5");
+    hideTip();
+  });
+});
+
+// Y axis label
+svg.appendChild(mkText({
+  x: 10, y: margin.top + chartH / 2,
+  "text-anchor": "middle", transform: `rotate(-90, 10, ${margin.top + chartH / 2})`,
+  "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"
+}, "% OF ELECTRICITY FROM NUCLEAR"));
+</script>
+</body></html>

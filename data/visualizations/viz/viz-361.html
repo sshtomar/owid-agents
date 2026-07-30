@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Wealth Trajectories: Adjusted National Income per Capita, 2000 vs. 2021</h1>
+<p class="subtitle">Adjusted net national income strips out capital depreciation and includes net foreign transfers — a more sustainable measure of wealth than GDP. Denmark more than doubled; Azerbaijan quadrupled; Burundi and DR Congo remain under $400.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Adjusted Net National Income per Capita (NY.ADJ.NNTY.PC.CD)</p>
+<script>
+// Data exported from notebook
+const data = [{"n":"Denmark","a":24663,"b":58796},{"n":"Ireland","a":19930,"b":48856},{"n":"Australia","a":17265,"b":45711},{"n":"Finland","a":20068,"b":44416},{"n":"Israel","a":17005,"b":43495},{"n":"Austria","a":20392,"b":43282},{"n":"Germany","a":19549,"b":42982},{"n":"Canada","a":19386,"b":41986},{"n":"Barbados","a":10176,"b":14760},{"n":"Croatia","a":3943,"b":14553},{"n":"Costa Rica","a":3414,"b":11172},{"n":"Chile","a":4064,"b":11117},{"n":"Ecuador","a":1005,"b":4421},{"n":"Guatemala","a":1483,"b":4189},{"n":"Georgia","a":654,"b":4085},{"n":"Azerbaijan","a":382,"b":3965},{"n":"Guinea","a":300,"b":855},{"n":"Ethiopia","a":92,"b":787},{"n":"Guinea-Bissau","a":240,"b":678},{"n":"Burkina Faso","a":233,"b":670}];
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 24) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const W = 700, H = 580;
+const pad = { left: 130, right: 145, top: 44, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function mkText(attrs, text) {
+  const el = mkEl("text", attrs);
+  el.textContent = text;
+  return el;
+}
+
+// Log scale for the wide income range
+const allVals = data.flatMap(d => [d.a, d.b]).filter(v => v > 0);
+const logMin = Math.log10(50), logMax = Math.log10(65000);
+const chartH = H - pad.top - pad.bottom;
+const xLeft = pad.left, xRight = W - pad.right;
+
+const yScale = v => pad.top + (logMax - Math.log10(Math.max(v, 50))) / (logMax - logMin) * chartH;
+
+// Grid lines at round values
+[100, 500, 1000, 5000, 10000, 30000, 60000].forEach(v => {
+  const y = yScale(v);
+  if (y < pad.top - 5 || y > H - pad.bottom + 5) return;
+  svg.appendChild(mkEl("line", {
+    x1: xLeft - 4, y1: y, x2: xRight + 4, y2: y,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const label = v >= 1000 ? "$" + (v/1000) + "k" : "$" + v;
+  svg.appendChild(mkText({
+    x: xLeft - 8, y: y + 3.5, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"
+  }, label));
+});
+
+// Column headers
+svg.appendChild(mkText({
+  x: xLeft, y: pad.top - 16, "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F"
+}, "2000"));
+svg.appendChild(mkText({
+  x: xRight, y: pad.top - 16, "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F"
+}, "2021"));
+
+// Collision resolution
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Compute label positions
+const leftLabels = data.map(d => ({ d, y: yScale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: yScale(d.b) }));
+resolveCollisions(leftLabels, 12);
+resolveCollisions(rightLabels, 12);
+const leftPos = {}, rightPos = {};
+leftLabels.forEach(item => { leftPos[item.d.n] = item.y; });
+rightLabels.forEach(item => { rightPos[item.d.n] = item.y; });
+
+// Color by income level in 2021
+function colorForVal(v) {
+  if (v > 30000) return "#3D7A5A";
+  if (v > 10000) return "#8BAD72";
+  if (v > 3000)  return "#C49A45";
+  if (v > 1000)  return "#C4715A";
+  return "#B34B3B";
+}
+
+// Format value for display
+function fmtVal(v) {
+  if (v >= 10000) return "$" + Math.round(v/1000) + "k";
+  if (v >= 1000) return "$" + (v/1000).toFixed(1) + "k";
+  return "$" + v;
+}
+
+// Draw lines
+data.forEach(d => {
+  const color = colorForVal(d.b);
+  const ya = yScale(d.a);
+  const yb = yScale(d.b);
+  const lyPos = leftPos[d.n];
+  const ryPos = rightPos[d.n];
+
+  const g = mkEl("g", { "data-name": d.n });
+  svg.appendChild(g);
+
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.5", "stroke-opacity": "0.85"
+  });
+  g.appendChild(line);
+
+  // Leader lines
+  if (Math.abs(lyPos - ya) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xLeft - 6, y1: ya, x2: xLeft - 12, y2: lyPos,
+      stroke: color, "stroke-width": "0.5", "stroke-opacity": "0.5"
+    }));
+  }
+  if (Math.abs(ryPos - yb) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xRight + 6, y1: yb, x2: xRight + 12, y2: ryPos,
+      stroke: color, "stroke-width": "0.5", "stroke-opacity": "0.5"
+    }));
+  }
+
+  // Left label
+  g.appendChild(mkText({
+    x: xLeft - 14, y: lyPos + 3.5, "text-anchor": "end",
+    "font-family": "Inter, sans-serif", "font-size": "9", fill: "#2B2A27"
+  }, d.n + "  " + fmtVal(d.a)));
+
+  // Right label
+  g.appendChild(mkText({
+    x: xRight + 14, y: ryPos + 3.5, "text-anchor": "start",
+    "font-family": "Inter, sans-serif", "font-size": "9", fill: "#2B2A27"
+  }, fmtVal(d.b) + "  " + d.n));
+
+  // Invisible hit area
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "12", cursor: "pointer"
+  });
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseover", e => {
+    svg.querySelectorAll("g[data-name]").forEach(el => el.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    const mult = (d.b / d.a).toFixed(1);
+    showTip(`${d.n}: ${fmtVal(d.a)} → ${fmtVal(d.b)}  (×${mult})`, e);
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    svg.querySelectorAll("g[data-name]").forEach(el => el.style.opacity = "1");
+    line.setAttribute("stroke-width", "1.5");
+    hideTip();
+  });
+});
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "> $30k (high income)" },
+  { color: "#8BAD72", label: "$10k–30k" },
+  { color: "#C49A45", label: "$3k–10k" },
+  { color: "#C4715A", label: "$1k–3k" },
+  { color: "#B34B3B", label: "< $1k (low income)" },
+];
+legendItems.forEach((item, i) => {
+  const lx = xRight + 8;
+  const ly = H - 80 + i * 16;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 10, height: 10, fill: item.color, rx: "1" }));
+  svg.appendChild(mkText({
+    x: lx + 14, y: ly + 2, "text-anchor": "start",
+    "font-family": "JetBrains Mono, monospace", "font-size": "7.5", fill: "#7A786F"
+  }, item.label));
+});
+
+// Y axis label note
+svg.appendChild(mkText({
+  x: 8, y: pad.top + chartH / 2,
+  "text-anchor": "middle", transform: `rotate(-90, 8, ${pad.top + chartH / 2})`,
+  "font-family": "JetBrains Mono, monospace", "font-size": "7.5", fill: "#9A9890"
+}, "LOG SCALE"));
+</script>
+</body></html>
