@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px;
+      background: #fff; color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    svg { display: block; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 4px;
+      white-space: nowrap; transition: opacity 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manufactures Exports: Rise and Retreat, 1990 vs 2022</h1>
+  <p class="subtitle">Manufactured goods as % of total merchandise exports — who deepened industrial capacity, who shifted away</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Manufactures exports (% of merchandise exports), TX.VAL.MANF.ZS.UN</p>
+  <div id="tip"></div>
+  <script>
+    // {n: name, yr1: before year, v1: before value, yr2: after year, v2: after value}
+    // China earliest data is 1992; all others use 1990
+    const data = [{"n":"China","yr1":1992,"v1":78.7,"yr2":2022,"v2":92.6},{"n":"Japan","yr1":1990,"v1":95.9,"yr2":2022,"v2":83.2},{"n":"Korea, Rep.","yr1":1990,"v1":93.2,"yr2":2022,"v2":84.9},{"n":"Germany","yr1":1990,"v1":88.9,"yr2":2022,"v2":82.9},{"n":"Italy","yr1":1990,"v1":88.0,"yr2":2022,"v2":78.5},{"n":"Ireland","yr1":1990,"v1":69.1,"yr2":2022,"v2":89.6},{"n":"Jordan","yr1":1990,"v1":50.8,"yr2":2022,"v2":75.7},{"n":"Hungary","yr1":1990,"v1":65.9,"yr2":2022,"v2":82.8},{"n":"Brazil","yr1":1990,"v1":51.8,"yr2":2022,"v2":25.3},{"n":"Canada","yr1":1990,"v1":57.8,"yr2":2022,"v2":40.6},{"n":"Finland","yr1":1990,"v1":82.8,"yr2":2022,"v2":64.0},{"n":"India","yr1":1990,"v1":70.1,"yr2":2022,"v2":62.3},{"n":"Indonesia","yr1":1990,"v1":35.2,"yr2":2022,"v2":42.6},{"n":"Greece","yr1":1990,"v1":53.0,"yr2":2022,"v2":34.3},{"n":"France","yr1":1990,"v1":76.8,"yr2":2022,"v2":76.4}];
+
+    const W = 680, H = 640;
+    const pad = { left: 140, right: 150, top: 48, bottom: 24 };
+    const innerH = H - pad.top - pad.bottom;
+
+    const xL = pad.left;
+    const xR = W - pad.right;
+    const minV = 0, maxV = 100;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * innerH;
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width","100%");
+    svg.style.maxWidth = W + "px";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+    function mkText(tag, attrs, text) {
+      const el = mkEl(tag, attrs);
+      el.textContent = text;
+      return el;
+    }
+
+    // Column headers
+    svg.appendChild(mkText("text", { x: xL, y: pad.top - 16, "text-anchor": "middle",
+      "font-size": "11", "font-weight": "600", fill: "#475569",
+      "font-family": "ui-monospace, monospace" }, "1990"));
+    svg.appendChild(mkText("text", { x: xR, y: pad.top - 16, "text-anchor": "middle",
+      "font-size": "11", "font-weight": "600", fill: "#475569",
+      "font-family": "ui-monospace, monospace" }, "2022"));
+
+    // Axis lines
+    svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: pad.top + innerH,
+      stroke: "#e2e8f0", "stroke-width": "1" }));
+    svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: pad.top + innerH,
+      stroke: "#e2e8f0", "stroke-width": "1" }));
+
+    // Reference lines
+    [20, 40, 60, 80].forEach(v => {
+      svg.appendChild(mkEl("line", {
+        x1: xL, y1: scale(v), x2: xR, y2: scale(v),
+        stroke: "#f1f5f9", "stroke-width": "1", "stroke-dasharray": "3,3"
+      }));
+      svg.appendChild(mkText("text", {
+        x: (xL + xR) / 2, y: scale(v) - 2,
+        "text-anchor": "middle", "font-size": "8", fill: "#cbd5e1",
+        "font-family": "ui-monospace, monospace"
+      }, v + "%"));
+    });
+
+    function colorForChange(d) {
+      const ch = d.v2 - d.v1;
+      if (ch >= 15) return "#3D7A5A";
+      if (ch >= 5) return "#5B9E78";
+      if (ch >= -5) return "#C49A45";
+      if (ch >= -15) return "#C4715A";
+      return "#B34B3B";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let j = 1; j < sorted.length; j++) {
+          const gap = sorted[j].y - sorted[j-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[j-1].y -= shift;
+            sorted[j].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      sorted.forEach(it => {
+        it.y = Math.max(pad.top + 5, Math.min(pad.top + innerH - 5, it.y));
+      });
+      return sorted;
+    }
+
+    const leftLabels = data.map((d, i) => ({ y: scale(d.v1), i, d }));
+    const rightLabels = data.map((d, i) => ({ y: scale(d.v2), i, d }));
+    const rLeft = resolveCollisions(leftLabels, 13);
+    const rRight = resolveCollisions(rightLabels, 13);
+    const leftMap = {}; rLeft.forEach(it => { leftMap[it.i] = it.y; });
+    const rightMap = {}; rRight.forEach(it => { rightMap[it.i] = it.y; });
+
+    const groups = [];
+    const tip = document.getElementById("tip");
+
+    data.forEach((d, i) => {
+      const color = colorForChange(d);
+      const g = mkEl("g", {});
+
+      const ya = scale(d.v1), yb = scale(d.v2);
+      const lY = leftMap[i], rY = rightMap[i];
+
+      const line = mkEl("line", {
+        x1: xL, y1: ya, x2: xR, y2: yb,
+        stroke: color, "stroke-width": "1.5", opacity: "0.85"
+      });
+      g.appendChild(line);
+
+      g.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "3", fill: color }));
+      g.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "3", fill: color }));
+
+      if (Math.abs(lY - ya) > 2)
+        g.appendChild(mkEl("line", { x1: xL-3, y1: ya, x2: xL-6, y2: lY,
+          stroke: color, "stroke-width":"0.5", opacity:"0.4" }));
+      if (Math.abs(rY - yb) > 2)
+        g.appendChild(mkEl("line", { x1: xR+3, y1: yb, x2: xR+6, y2: rY,
+          stroke: color, "stroke-width":"0.5", opacity:"0.4" }));
+
+      const shortName = d.n.replace(", Rep.","").replace(", Arab Rep.","");
+      g.appendChild(mkText("text", {
+        x: xL - 8, y: lY + 4, "text-anchor": "end",
+        "font-size": "9", fill: color, "font-family": "ui-monospace, monospace"
+      }, `${shortName}  ${d.v1}%`));
+
+      const delta = (d.v2 - d.v1).toFixed(1);
+      const sign = d.v2 >= d.v1 ? "+" : "";
+      g.appendChild(mkText("text", {
+        x: xR + 8, y: rY + 4, "text-anchor": "start",
+        "font-size": "9", fill: color, "font-family": "ui-monospace, monospace"
+      }, `${d.v2}%  ${sign}${delta}`));
+
+      const hit = mkEl("line", {
+        x1: xL, y1: ya, x2: xR, y2: yb,
+        stroke: "transparent", "stroke-width": "10"
+      });
+      hit.style.cursor = "pointer";
+      hit.addEventListener("mouseover", e => {
+        tip.textContent = `${d.n}: ${d.v1}% (${d.yr1}) → ${d.v2}% (${d.yr2}), change: ${sign}${delta}pp`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+        groups.forEach((grp, j) => { grp.style.opacity = j === i ? "1" : "0.08"; });
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        tip.style.opacity = "0";
+        groups.forEach(grp => { grp.style.opacity = "1"; });
+      });
+      g.appendChild(hit);
+      groups.push(g);
+      svg.appendChild(g);
+    });
+
+    // Legend
+    const legendItems = [
+      { color: "#3D7A5A", label: "+15pp or more" },
+      { color: "#5B9E78", label: "+5 to +14pp" },
+      { color: "#C49A45", label: "-5 to +4pp" },
+      { color: "#C4715A", label: "-15 to -6pp" },
+      { color: "#B34B3B", label: "-16pp or more" },
+    ];
+    let lx = xL;
+    const ly = H - 8;
+    legendItems.forEach(item => {
+      svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 8, fill: item.color }));
+      svg.appendChild(mkText("text", {
+        x: lx + 13, y: ly - 1, "font-size": "9", fill: "#64748b",
+        "font-family": "ui-monospace, monospace"
+      }, item.label));
+      lx += 95;
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

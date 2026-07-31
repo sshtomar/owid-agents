@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      margin: 0; padding: 24px;
+      background: #fff; color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    svg { display: block; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #1e293b; color: #f8fafc;
+      font-size: 12px; padding: 6px 10px; border-radius: 4px;
+      white-space: nowrap; transition: opacity 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <h1>The COVID Cliff: International Tourism Arrivals</h1>
+  <p class="subtitle">Millions of arrivals per year, top 10 destination countries, 1995–2020</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — International tourism, number of arrivals (ST.INT.ARVL)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"France","pts":[{"y":1996,"v":148.26},{"y":1997,"v":157.55},{"y":2004,"v":190.28},{"y":2005,"v":185.83},{"y":2006,"v":193.88},{"y":2007,"v":193.32},{"y":2008,"v":193.57},{"y":2009,"v":192.37},{"y":2010,"v":189.83},{"y":2011,"v":196.59},{"y":2012,"v":197.52},{"y":2013,"v":204.41},{"y":2014,"v":206.6},{"y":2015,"v":203.3},{"y":2016,"v":203.04},{"y":2017,"v":207.27},{"y":2018,"v":212.0},{"y":2019,"v":217.88},{"y":2020,"v":117.11}]},{"n":"China","pts":[{"y":1995,"v":46.39},{"y":1996,"v":51.13},{"y":1997,"v":57.59},{"y":1998,"v":63.48},{"y":1999,"v":72.8},{"y":2000,"v":83.44},{"y":2001,"v":89.01},{"y":2002,"v":97.91},{"y":2003,"v":91.66},{"y":2004,"v":109.04},{"y":2005,"v":120.29},{"y":2006,"v":124.94},{"y":2007,"v":131.87},{"y":2008,"v":130.03},{"y":2009,"v":126.48},{"y":2010,"v":133.76},{"y":2011,"v":135.42},{"y":2012,"v":132.41},{"y":2013,"v":129.08},{"y":2014,"v":128.5},{"y":2015,"v":133.82},{"y":2016,"v":141.77},{"y":2017,"v":153.26},{"y":2018,"v":158.61},{"y":2019,"v":162.54},{"y":2020,"v":30.4}]},{"n":"Italy","pts":[{"y":1995,"v":55.71},{"y":1996,"v":59.8},{"y":1997,"v":58.0},{"y":1998,"v":58.5},{"y":1999,"v":59.52},{"y":2000,"v":62.7},{"y":2001,"v":60.96},{"y":2002,"v":63.56},{"y":2003,"v":63.03},{"y":2004,"v":58.48},{"y":2005,"v":59.23},{"y":2006,"v":66.35},{"y":2007,"v":70.27},{"y":2008,"v":70.72},{"y":2009,"v":71.69},{"y":2010,"v":73.22},{"y":2011,"v":75.87},{"y":2012,"v":76.29},{"y":2013,"v":76.76},{"y":2014,"v":77.69},{"y":2015,"v":81.07},{"y":2016,"v":84.92},{"y":2017,"v":89.93},{"y":2018,"v":93.23},{"y":2019,"v":95.4},{"y":2020,"v":38.42}]},{"n":"Hungary","pts":[{"y":1995,"v":39.24},{"y":1996,"v":39.83},{"y":1997,"v":37.31},{"y":1998,"v":33.62},{"y":1999,"v":28.8},{"y":2000,"v":31.14},{"y":2001,"v":30.68},{"y":2002,"v":31.74},{"y":2003,"v":31.41},{"y":2004,"v":33.93},{"y":2005,"v":36.17},{"y":2006,"v":38.32},{"y":2007,"v":39.38},{"y":2008,"v":39.55},{"y":2009,"v":40.62},{"y":2010,"v":39.9},{"y":2011,"v":41.3},{"y":2012,"v":43.56},{"y":2013,"v":43.61},{"y":2014,"v":45.98},{"y":2015,"v":48.34},{"y":2016,"v":52.89},{"y":2017,"v":54.96},{"y":2018,"v":57.67},{"y":2019,"v":61.4},{"y":2020,"v":31.64}]},{"n":"Croatia","pts":[{"y":1995,"v":16.1},{"y":1996,"v":19.09},{"y":1997,"v":23.66},{"y":1998,"v":25.5},{"y":1999,"v":29.21},{"y":2000,"v":37.23},{"y":2001,"v":40.13},{"y":2002,"v":41.74},{"y":2003,"v":42.86},{"y":2004,"v":44.97},{"y":2005,"v":45.76},{"y":2006,"v":47.73},{"y":2007,"v":52.27},{"y":2008,"v":51.34},{"y":2009,"v":47.57},{"y":2010,"v":49.01},{"y":2011,"v":49.97},{"y":2012,"v":47.19},{"y":2013,"v":48.34},{"y":2014,"v":51.17},{"y":2015,"v":55.86},{"y":2016,"v":57.59},{"y":2017,"v":59.24},{"y":2018,"v":57.67},{"y":2019,"v":60.02},{"y":2020,"v":21.61}]},{"n":"Hong Kong SAR, China","pts":[{"y":1995,"v":10.2},{"y":1996,"v":12.97},{"y":1997,"v":11.27},{"y":1998,"v":10.16},{"y":1999,"v":11.33},{"y":2000,"v":13.06},{"y":2001,"v":13.72},{"y":2002,"v":16.57},{"y":2003,"v":15.54},{"y":2004,"v":21.81},{"y":2005,"v":23.36},{"y":2006,"v":25.25},{"y":2007,"v":28.17},{"y":2008,"v":29.51},{"y":2009,"v":29.59},{"y":2010,"v":36.03},{"y":2011,"v":41.92},{"y":2012,"v":48.62},{"y":2013,"v":54.3},{"y":2014,"v":60.84},{"y":2015,"v":59.31},{"y":2016,"v":56.66},{"y":2017,"v":58.47},{"y":2018,"v":65.15},{"y":2019,"v":55.91},{"y":2020,"v":3.57}]},{"n":"Germany","pts":[{"y":1995,"v":14.85},{"y":1996,"v":15.21},{"y":1997,"v":15.84},{"y":1998,"v":16.51},{"y":1999,"v":17.12},{"y":2000,"v":18.98},{"y":2001,"v":17.86},{"y":2002,"v":17.97},{"y":2003,"v":18.4},{"y":2004,"v":20.14},{"y":2005,"v":21.5},{"y":2006,"v":23.57},{"y":2007,"v":24.42},{"y":2008,"v":24.88},{"y":2009,"v":24.22},{"y":2010,"v":26.88},{"y":2011,"v":28.37},{"y":2012,"v":30.41},{"y":2013,"v":31.55},{"y":2014,"v":33.0},{"y":2015,"v":34.97},{"y":2016,"v":35.55},{"y":2017,"v":37.45},{"y":2018,"v":38.88},{"y":2019,"v":39.56},{"y":2020,"v":12.45}]},{"n":"Greece","pts":[{"y":1995,"v":10.71},{"y":1996,"v":9.78},{"y":1997,"v":10.59},{"y":1998,"v":11.36},{"y":1999,"v":12.61},{"y":2000,"v":13.57},{"y":2001,"v":14.68},{"y":2002,"v":14.92},{"y":2003,"v":14.79},{"y":2004,"v":14.27},{"y":2005,"v":15.94},{"y":2006,"v":17.28},{"y":2013,"v":20.11},{"y":2014,"v":24.27},{"y":2015,"v":26.11},{"y":2016,"v":28.07},{"y":2017,"v":30.16},{"y":2018,"v":33.07},{"y":2019,"v":34.01},{"y":2020,"v":7.41}]},{"n":"Denmark","pts":[{"y":2003,"v":21.12},{"y":2004,"v":22.05},{"y":2005,"v":26.93},{"y":2006,"v":26.94},{"y":2007,"v":27.14},{"y":2008,"v":26.87},{"y":2009,"v":26.57},{"y":2010,"v":26.73},{"y":2011,"v":25.81},{"y":2012,"v":26.4},{"y":2013,"v":26.52},{"y":2014,"v":28.07},{"y":2015,"v":28.21},{"y":2016,"v":28.69},{"y":2017,"v":30.74},{"y":2018,"v":30.8},{"y":2019,"v":33.09},{"y":2020,"v":15.6}]},{"n":"Austria","pts":[{"y":1995,"v":17.17},{"y":1996,"v":17.09},{"y":1997,"v":16.65},{"y":1998,"v":17.35},{"y":1999,"v":17.47},{"y":2000,"v":17.98},{"y":2001,"v":18.18},{"y":2002,"v":18.61},{"y":2003,"v":19.08},{"y":2004,"v":19.37},{"y":2005,"v":19.95},{"y":2006,"v":20.27},{"y":2007,"v":20.77},{"y":2008,"v":21.93},{"y":2009,"v":21.36},{"y":2010,"v":22.0},{"y":2011,"v":23.01},{"y":2012,"v":24.15},{"y":2013,"v":24.81},{"y":2014,"v":25.29},{"y":2015,"v":26.73},{"y":2016,"v":28.12},{"y":2017,"v":29.46},{"y":2018,"v":30.82},{"y":2019,"v":31.88},{"y":2020,"v":15.09}]}];
+
+    const W = 820, H = 480;
+    const margin = { top: 30, right: 150, bottom: 36, left: 52 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+
+    const allYears = [...new Set(data.flatMap(d => d.pts.map(p => p.y)))].sort();
+    const yearMin = Math.min(...allYears);
+    const yearMax = Math.max(...allYears);
+    const allVals = data.flatMap(d => d.pts.map(p => p.v));
+    const valMax = Math.max(...allVals) * 1.05;
+
+    const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * innerW;
+    const yS = v => margin.top + (valMax - v) / valMax * innerH;
+
+    const COLORS = [
+      "#3B6EA8","#E05C3A","#5B9E78","#C49A45","#8B5EA6",
+      "#3D7A5A","#B34B3B","#6B8EC4","#C4715A","#7A8A3A"
+    ];
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width","100%");
+    svg.style.maxWidth = W + "px";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+    function mkText(tag, attrs, text) {
+      const el = mkEl(tag, attrs);
+      el.textContent = text;
+      return el;
+    }
+
+    // Grid lines
+    for (let v = 0; v <= 200; v += 50) {
+      svg.appendChild(mkEl("line", {
+        x1: margin.left, y1: yS(v), x2: margin.left + innerW, y2: yS(v),
+        stroke: "#e2e8f0", "stroke-width": "0.5"
+      }));
+      svg.appendChild(mkText("text", {
+        x: margin.left - 6, y: yS(v) + 4,
+        "text-anchor": "end", "font-size": "10", fill: "#94a3b8",
+        "font-family": "ui-monospace, monospace"
+      }, v + "M"));
+    }
+
+    // X axis ticks
+    const tickYears = [1995, 2000, 2005, 2010, 2015, 2019, 2020];
+    tickYears.forEach(yr => {
+      svg.appendChild(mkEl("line", {
+        x1: xS(yr), y1: margin.top + innerH, x2: xS(yr), y2: margin.top + innerH + 4,
+        stroke: "#cbd5e1", "stroke-width": "1"
+      }));
+      svg.appendChild(mkText("text", {
+        x: xS(yr), y: margin.top + innerH + 16,
+        "text-anchor": "middle", "font-size": "10", fill: "#94a3b8",
+        "font-family": "ui-monospace, monospace"
+      }, yr));
+    });
+
+    // COVID annotation
+    const x2020 = xS(2020);
+    svg.appendChild(mkEl("line", {
+      x1: x2020, y1: margin.top, x2: x2020, y2: margin.top + innerH,
+      stroke: "#E05C3A", "stroke-dasharray": "4,3", "stroke-width": "1", opacity: "0.5"
+    }));
+    svg.appendChild(mkText("text", {
+      x: x2020 - 5, y: margin.top + 12,
+      "text-anchor": "end", "font-size": "9", fill: "#E05C3A",
+      "font-family": "ui-monospace, monospace"
+    }, "COVID-19"));
+
+    // Lines and labels
+    const groups = [];
+    const labelPositions = data.map((series, i) => {
+      const lastPt = series.pts[series.pts.length - 1];
+      return { y: yS(lastPt.v), origY: yS(lastPt.v), i, name: series.n, val: lastPt.v };
+    });
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let j = 1; j < sorted.length; j++) {
+          const gap = sorted[j].y - sorted[j-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[j-1].y -= shift;
+            sorted[j].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const resolved = resolveCollisions(labelPositions, 13);
+    const labelMap = {};
+    resolved.forEach(item => { labelMap[item.i] = item.y; });
+
+    data.forEach((series, i) => {
+      const color = COLORS[i % COLORS.length];
+      const g = mkEl("g", {});
+
+      const pathD = series.pts.map((p, j) => `${j===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+      const line = mkEl("path", {
+        d: pathD, stroke: color, "stroke-width": "1.5", fill: "none",
+        "stroke-linejoin": "round", "stroke-linecap": "round"
+      });
+      g.appendChild(line);
+
+      // Endpoint dot
+      const lastPt = series.pts[series.pts.length - 1];
+      g.appendChild(mkEl("circle", {
+        cx: xS(lastPt.y), cy: yS(lastPt.v), r: "3", fill: color
+      }));
+
+      // Leader line if label moved
+      const labelY = labelMap[i];
+      const dotY = yS(lastPt.v);
+      if (Math.abs(labelY - dotY) > 2) {
+        g.appendChild(mkEl("line", {
+          x1: xS(lastPt.y) + 6, y1: dotY,
+          x2: xS(lastPt.y) + 10, y2: labelY,
+          stroke: color, "stroke-width": "0.5", opacity: "0.5"
+        }));
+      }
+
+      // Label
+      const shortName = series.n.replace("SAR, China","").replace(", Rep.","").trim();
+      const label = mkText("text", {
+        x: xS(lastPt.y) + 12, y: labelY + 4,
+        "font-size": "9", fill: color,
+        "font-family": "ui-monospace, monospace"
+      }, `${lastPt.v.toFixed(0)}M  ${shortName}`);
+      g.appendChild(label);
+
+      // Invisible hit area
+      const hit = mkEl("path", {
+        d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+      });
+      hit.style.cursor = "pointer";
+
+      const tip = document.getElementById("tip");
+      hit.addEventListener("mousemove", e => {
+        const svgRect = svg.getBoundingClientRect();
+        const mx = e.clientX - svgRect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+        const yearF = yearMin + ratio * (yearMax - yearMin);
+        // Find nearest data point
+        let nearest = series.pts[0];
+        let minDist = Infinity;
+        series.pts.forEach(p => {
+          const dist = Math.abs(p.y - yearF);
+          if (dist < minDist) { minDist = dist; nearest = p; }
+        });
+        tip.textContent = `${series.n}: ${nearest.v.toFixed(1)}M arrivals (${nearest.y})`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 24) + "px";
+
+        // Highlight
+        groups.forEach((grp, j) => {
+          grp.style.opacity = j === i ? "1" : "0.08";
+          if (j === i) grp.querySelector("path").setAttribute("stroke-width","2.5");
+        });
+      });
+      hit.addEventListener("mouseleave", () => {
+        tip.style.opacity = "0";
+        groups.forEach(grp => {
+          grp.style.opacity = "1";
+          grp.querySelector("path").setAttribute("stroke-width","1.5");
+        });
+      });
+
+      g.appendChild(hit);
+      groups.push(g);
+      svg.appendChild(g);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
