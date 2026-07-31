@@ -5858,6 +5858,87 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The COVID Cliff: International Tourism Arrivals",
+      "description": "Trend lines showing tourism arrivals (millions) for the top 10 destination countries from 1995 to 2020. The 2020 collapse due to COVID-19 is dramatic: Hong Kong lost 94% of visitors, Japan 87%, Greece 78%.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Hong Kong fell from 55.9M arrivals in 2019 to just 3.6M in 2020 (-94%)",
+        "France remained the world's top destination with 217.9M arrivals in 2019",
+        "China's arrivals rose 3.5x between 1995 and 2019, then collapsed to pre-2000 levels"
+      ],
+      "createdAt": "2026-07-31T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Progress in Universal Health Coverage, 2000\u20132023",
+      "description": "Slope chart comparing UHC Service Coverage Index scores in 2000 vs 2023 for 22 countries. Nepal made the largest jump (+40 points), while Jordan slightly declined. Cuba leads with a score of 86.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Nepal jumped from 18 to 58 \u2014 the largest gain in the set (+40 points)",
+        "Cuba leads with a UHC index of 86, up from 74 in 2000",
+        "Ethiopia remains lowest at 33, but has more than doubled from 13 in 2000"
+      ],
+      "createdAt": "2026-07-31T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Energy Use per Capita, 1990\u20132021",
+      "description": "Trend lines showing total primary energy consumption per person (kg oil equivalent) for 8 countries. China's per-capita energy use tripled while Canada's plateaued and Germany's fell. Bangladesh uses 1/25th of what Canada does.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China's energy use per person tripled from 773 to 2,624 kg oil equivalent (1990\u20132021)",
+        "Germany cut per-capita use from 4,422 to 3,467 despite economic growth",
+        "Bangladesh uses just 299 kg per person \u2014 about 4% of Canada's consumption"
+      ],
+      "createdAt": "2026-07-31T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Manufactures Exports: Rise and Retreat, 1990 vs 2022",
+      "description": "Slope chart showing manufactured goods as a share of merchandise exports in 1990 vs 2022 for 15 countries. China deepened its industrial base to 92.6%; Brazil deindustrialized to just 25.3%.",
+      "datasetIds": [
+        "wb--TX-VAL-MANF-ZS-UN"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "China rose to 92.6% manufactures share \u2014 highest in the set, up from 78.7%",
+        "Brazil fell from 51.8% to 25.3% \u2014 deindustrializing as commodity exports dominate",
+        "Jordan jumped from 50.8% to 75.7% (+24.9pp), reflecting industrial diversification"
+      ],
+      "createdAt": "2026-07-31T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Crude Death Rate, 1960\u20132024",
+      "description": "Trend lines showing crude deaths per 1,000 people for 8 countries. The counterintuitive finding: Japan's rate has nearly doubled due to population aging, while Ethiopia and India show dramatic declines as health systems improved.",
+      "datasetIds": [
+        "wb--SP-DYN-CDRT-IN"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan's crude death rate rose from 7.6 to 13.3 \u2014 population aging drives up the count even as individual health improves",
+        "Ethiopia fell from 23.9 to 5.9 deaths per 1,000, one of the steepest declines in the set",
+        "China's 1960 spike to 25.4 reflects the Great Famine; by 2024 it has stabilized around 7.8"
+      ],
+      "createdAt": "2026-07-31T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
   "lastUpdated": "2026-06-28T00:00:00.000Z"
