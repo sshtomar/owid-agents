@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourist Arrivals, 1995\u20132020",
+      "description": "Trend lines showing inbound tourist arrivals (millions) for China, Italy, Croatia, Hong Kong, Germany, Japan, and Korea from 1995 to 2020. COVID-19 triggered the sharpest collapse in recorded tourism history \u2014 Hong Kong lost 94% of visitors in a single year.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China grew from 46M arrivals in 1995 to 163M in 2019, then collapsed to 30M in 2020",
+        "Hong Kong crashed 94%: 65M (2018) to 3.6M (2020)",
+        "Japan's rise from 3M to 32M in 25 years reversed overnight with COVID"
+      ],
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Intentional Homicides: 2000 vs. 2022",
+      "description": "Slope chart comparing homicide rates (per 100,000 people) in 2000 and 2022 for 20 countries. El Salvador recorded the largest decline ever measured; Jamaica and Dominica moved sharply in the opposite direction.",
+      "datasetIds": [
+        "wb--VC-IHR-PSRC-P5"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "El Salvador: 59.7 \u2192 7.9 (the largest documented homicide rate decline)",
+        "Jamaica worsened from 34 to 53.1 per 100,000",
+        "Kazakhstan and Estonia both fell from ~10\u201315 to under 3 per 100,000"
+      ],
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Childhood Leukaemia: 5-Year Survival Rate by Country, 2021",
+      "description": "Sorted horizontal bar chart showing age-standardized 5-year net survival rates for children with lymphoid leukaemia across 40 countries. Finland achieves 93%; C. African Republic 19% \u2014 a 74-point gap driven by chemotherapy access and health system capacity.",
+      "datasetIds": [
+        "who--CANCERSURVIVAL_CHILDREN_LEUKAEMIA"
+      ],
+      "chartType": "bar",
+      "highlights": [
+        "Finland (93.2%) vs. C. African Republic (18.6%) \u2014 a 74pp gap",
+        "India at 60.5%: a third of children who would survive in high-income countries do not",
+        "China (78.9%) and Russia (78.8%) sit well above the global average of 62%"
+      ],
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Breast Cancer: 5-Year Survival Rate by Country, 2021",
+      "description": "Sorted horizontal bars showing age-standardized 5-year net breast cancer survival rates across 40 countries. Sweden leads at 92.5%; C. African Republic records 24.6% \u2014 a 68-point gap reflecting disparities in mammography access, early diagnosis, and treatment.",
+      "datasetIds": [
+        "who--CANCERSURVIVAL_BREASTCANCER"
+      ],
+      "chartType": "bar",
+      "highlights": [
+        "Sweden (92.5%) and Japan (91.7%) lead; C. African Republic (24.6%) and Lesotho (26.6%) trail",
+        "Iran at 54.2% and Syria at 61.4% reflect conflict-disrupted health systems",
+        "Brazil (90.3%) achieves near-Nordic survival \u2014 exceptional for a middle-income country"
+      ],
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Energy Use per Capita, 1990\u20132024",
+      "description": "Log-scale trend lines showing energy consumption per person (kg of oil equivalent) for 10 countries. Reveals a 56:1 gap between Iceland and Bangladesh, China's threefold rise, and Germany's 36% decline since 1990.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Iceland uses 15,997 kg per capita \u2014 56\u00d7 more than Bangladesh (288) \u2014 driven by geothermal industry and aluminum smelting",
+        "China tripled per-capita energy use from 773 (1990) to 2,851 (2023)",
+        "Germany fell 36% from 4,422 to 2,825 kg, Australia declined 6% \u2014 rich-world decoupling"
+      ],
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-02T00:00:00.000Z"
 }

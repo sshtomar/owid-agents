@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+</style>
+</head><body>
+<h1>Childhood Leukaemia: 5-Year Survival Rate by Country, 2021</h1>
+<p class="subtitle">Age-standardized 5-year net survival (%) for children diagnosed with lymphoid leukaemia. Finland achieves 93% survival; children in C. African Republic face just 19% — a 74-point gap driven by chemotherapy access and healthcare capacity.</p>
+<div id="chart" style="position:relative;"></div>
+<div id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — CANCERSURVIVAL_CHILDREN_LEUKAEMIA</p>
+<script>
+const data = [{"n":"C. African Rep.","v":18.6},{"n":"Somalia","v":18.8},{"n":"Guinea-Bissau","v":21.4},{"n":"Lesotho","v":21.6},{"n":"Guinea","v":21.8},{"n":"Burundi","v":22.4},{"n":"Haiti","v":22.5},{"n":"Eritrea","v":22.6},{"n":"Benin","v":23.1},{"n":"Burkina Faso","v":23.9},{"n":"D.R. Congo","v":24.4},{"n":"Mozambique","v":27.8},{"n":"Cote d'Ivoire","v":33.4},{"n":"Yemen","v":36.6},{"n":"Senegal","v":40.9},{"n":"Myanmar","v":45.8},{"n":"North Korea","v":52.1},{"n":"Botswana","v":58.0},{"n":"India","v":60.5},{"n":"Morocco","v":63.1},{"n":"Nicaragua","v":65.1},{"n":"Algeria","v":69.3},{"n":"Libya","v":70.2},{"n":"Jordan","v":74.5},{"n":"Panama","v":75.3},{"n":"Costa Rica","v":77.3},{"n":"Serbia","v":79.5},{"n":"Hungary","v":83.3},{"n":"Latvia","v":85.7},{"n":"Japan","v":88.2},{"n":"Belgium","v":90.6},{"n":"France","v":90.8},{"n":"Australia","v":91.0},{"n":"United States","v":91.2},{"n":"Netherlands","v":91.3},{"n":"Austria","v":91.9},{"n":"Denmark","v":92.2},{"n":"Canada","v":92.4},{"n":"United Kingdom","v":92.5},{"n":"Finland","v":93.2}];
+
+const n = data.length;
+const barH = 13, barGap = 3.5, step = barH + barGap;
+const W = 680, M = {top:36, right:50, bottom:28, left:128};
+const H = M.top + n * step + M.bottom;
+const xS = v => M.left + v / 100 * (W - M.left - M.right);
+
+function barColor(v) {
+  if (v < 35) return "#B34B3B";
+  if (v < 55) return "#C4715A";
+  if (v < 70) return "#C49A45";
+  if (v < 82) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+function mk(tag, a, t) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(a || {})) el.setAttribute(k, v);
+  if (t !== undefined) el.textContent = t;
+  return el;
+}
+
+const svg = mk("svg", {viewBox:`0 0 ${W} ${H}`, width:"100%", style:"display:block;max-width:680px"});
+document.getElementById("chart").appendChild(svg);
+const tip = document.getElementById("tip");
+
+// X axis grid
+[0,20,40,60,80,100].forEach(v => {
+  const x = xS(v);
+  svg.appendChild(mk("line", {x1:x, y1:M.top-8, x2:x, y2:H-M.bottom+4, stroke:"#E2E0D5", "stroke-width":"0.5"}));
+  svg.appendChild(mk("text", {x, y:M.top-14, "text-anchor":"middle", "font-size":"9", "font-family":"JetBrains Mono,monospace", fill:"#7A786F"}, v+"%"));
+  svg.appendChild(mk("text", {x, y:H-M.bottom+14, "text-anchor":"middle", "font-size":"9", "font-family":"JetBrains Mono,monospace", fill:"#7A786F"}, v+"%"));
+});
+
+// Bars (bottom = lowest value = bottom of chart; we go bottom up)
+data.forEach((d, i) => {
+  // i=0 is lowest value, draw at bottom of chart area
+  const y = H - M.bottom - (i + 1) * step + barGap / 2;
+  const bw = xS(d.v) - M.left;
+  const c = barColor(d.v);
+
+  // Bar background
+  const bgRect = mk("rect", {x:M.left, y, width:W-M.left-M.right, height:barH, fill:"#ECEAE3"});
+  // Value bar
+  const bar = mk("rect", {x:M.left, y, width:bw, height:barH, fill:c, rx:"1"});
+  // Country label
+  const label = mk("text", {x:M.left-6, y:y+barH*0.72, "text-anchor":"end", "font-size":"9", "font-family":"Inter,sans-serif", fill:"#2B2A27"}, d.n);
+  // Value label
+  const valLabel = mk("text", {x:xS(d.v)+4, y:y+barH*0.72, "text-anchor":"start", "font-size":"9", "font-family":"JetBrains Mono,monospace", fill:c, "font-weight":"500"}, d.v+"%");
+
+  [bgRect, bar].forEach(el => {
+    el.addEventListener("mouseenter", e => {
+      bar.setAttribute("opacity", "0.85");
+      tip.textContent = `${d.n}: ${d.v}% 5-year survival`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX+14)+"px";
+      tip.style.top = (e.clientY-24)+"px";
+    });
+    el.addEventListener("mousemove", e => { tip.style.left=(e.clientX+14)+"px"; tip.style.top=(e.clientY-24)+"px"; });
+    el.addEventListener("mouseleave", () => { bar.setAttribute("opacity","1"); tip.style.opacity="0"; });
+  });
+
+  svg.appendChild(bgRect); svg.appendChild(bar); svg.appendChild(label); svg.appendChild(valLabel);
+});
+
+// Baseline axis
+svg.appendChild(mk("line", {x1:M.left, y1:M.top-8, x2:M.left, y2:H-M.bottom+4, stroke:"#C2C0B5", "stroke-width":"0.8"}));
+
+// Legend
+const legend = [["< 35%","#B34B3B"],["35–55%","#C4715A"],["55–70%","#C49A45"],["70–82%","#8BAD72"],["> 82%","#3D7A5A"]];
+let lx = M.left;
+legend.forEach(([label, lc]) => {
+  svg.appendChild(mk("rect", {x:lx, y:H-M.bottom+22, width:9, height:9, fill:lc, rx:"1"}));
+  svg.appendChild(mk("text", {x:lx+12, y:H-M.bottom+30, "font-size":"8.5", "font-family":"Inter,sans-serif", fill:"#7A786F"}, label));
+  lx += 80;
+});
+</script>
+</body></html>
