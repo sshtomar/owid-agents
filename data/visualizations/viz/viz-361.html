@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+</style>
+</head><body>
+<h1>Energy Use per Capita, 1990–2024</h1>
+<p class="subtitle">Kg of oil equivalent per person, log scale. China tripled consumption since 1990; Germany fell 36%. Iceland consumes 56× more than Bangladesh — driven by geothermal industry and aluminum smelting.</p>
+<div id="chart" style="position:relative;"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank — EG.USE.PCAP.KG.OE (IEA)</p>
+<script>
+const data = [{"n":"Iceland","pts":[{"y":1990,"v":9058},{"y":1991,"v":8191},{"y":1992,"v":7917},{"y":1993,"v":8381},{"y":1994,"v":8446},{"y":1995,"v":8405},{"y":1996,"v":8991},{"y":1997,"v":8777},{"y":1998,"v":9292},{"y":1999,"v":10354},{"y":2000,"v":11405},{"y":2001,"v":10925},{"y":2002,"v":11168},{"y":2003,"v":11093},{"y":2004,"v":10893},{"y":2005,"v":10877},{"y":2006,"v":13184},{"y":2007,"v":15188},{"y":2008,"v":17341},{"y":2009,"v":17937},{"y":2010,"v":17025},{"y":2011,"v":18162},{"y":2012,"v":17634},{"y":2013,"v":18213},{"y":2014,"v":17947},{"y":2015,"v":16911},{"y":2016,"v":15701},{"y":2017,"v":16235},{"y":2018,"v":17347},{"y":2019,"v":16701},{"y":2020,"v":16084},{"y":2021,"v":15780},{"y":2022,"v":15807},{"y":2023,"v":15686},{"y":2024,"v":15997}]},{"n":"Bahrain","pts":[{"y":1990,"v":10576},{"y":1991,"v":10672},{"y":1992,"v":11505},{"y":1993,"v":11628},{"y":1994,"v":12069},{"y":1995,"v":11538},{"y":1996,"v":11566},{"y":1997,"v":12331},{"y":1998,"v":12558},{"y":1999,"v":12576},{"y":2000,"v":12833},{"y":2001,"v":12648},{"y":2002,"v":12215},{"y":2003,"v":11895},{"y":2004,"v":11271},{"y":2005,"v":11975},{"y":2006,"v":11582},{"y":2007,"v":11534},{"y":2008,"v":11594},{"y":2009,"v":10433},{"y":2010,"v":10318},{"y":2011,"v":10624},{"y":2012,"v":9997},{"y":2013,"v":11219},{"y":2014,"v":10257},{"y":2015,"v":10406},{"y":2016,"v":9879},{"y":2017,"v":9444},{"y":2018,"v":9534},{"y":2019,"v":10388},{"y":2020,"v":10834},{"y":2021,"v":10666},{"y":2022,"v":10178},{"y":2023,"v":10512}]},{"n":"Canada","pts":[{"y":1990,"v":7642},{"y":1991,"v":7529},{"y":1992,"v":7617},{"y":1993,"v":7783},{"y":1994,"v":7971},{"y":1995,"v":7995},{"y":1996,"v":8071},{"y":1997,"v":8069},{"y":1998,"v":7963},{"y":1999,"v":8118},{"y":2000,"v":8225},{"y":2001,"v":8017},{"y":2002,"v":7943},{"y":2003,"v":8303},{"y":2004,"v":8371},{"y":2005,"v":8370},{"y":2006,"v":8427},{"y":2007,"v":8356},{"y":2008,"v":8098},{"y":2009,"v":7696},{"y":2010,"v":7661},{"y":2011,"v":7716},{"y":2012,"v":7638},{"y":2013,"v":7669},{"y":2014,"v":7780},{"y":2015,"v":7690},{"y":2016,"v":7945},{"y":2017,"v":8175},{"y":2018,"v":8162},{"y":2019,"v":8126},{"y":2020,"v":7495},{"y":2021,"v":7525},{"y":2022,"v":7575},{"y":2023,"v":7342},{"y":2024,"v":7161}]},{"n":"Finland","pts":[{"y":1990,"v":5692},{"y":1991,"v":5743},{"y":1992,"v":5381},{"y":1993,"v":5617},{"y":1994,"v":5973},{"y":1995,"v":5662},{"y":1996,"v":6070},{"y":1997,"v":6277},{"y":1998,"v":6319},{"y":1999,"v":6284},{"y":2000,"v":6257},{"y":2001,"v":6406},{"y":2002,"v":6723},{"y":2003,"v":7072},{"y":2004,"v":7129},{"y":2005,"v":6556},{"y":2006,"v":7107},{"y":2007,"v":6969},{"y":2008,"v":6654},{"y":2009,"v":6255},{"y":2010,"v":6813},{"y":2011,"v":6523},{"y":2012,"v":6266},{"y":2013,"v":6138},{"y":2014,"v":6246},{"y":2015,"v":5922},{"y":2016,"v":6121},{"y":2017,"v":6070},{"y":2018,"v":6165},{"y":2019,"v":6025},{"y":2020,"v":5739},{"y":2021,"v":5997},{"y":2022,"v":5684},{"y":2023,"v":5867},{"y":2024,"v":5614}]},{"n":"Australia","pts":[{"y":1990,"v":5048},{"y":1991,"v":4925},{"y":1992,"v":4961},{"y":1993,"v":5171},{"y":1994,"v":5127},{"y":1995,"v":5138},{"y":1996,"v":5430},{"y":1997,"v":5498},{"y":1998,"v":5585},{"y":1999,"v":5645},{"y":2000,"v":5681},{"y":2001,"v":5486},{"y":2002,"v":5480},{"y":2003,"v":5616},{"y":2004,"v":5652},{"y":2005,"v":5624},{"y":2006,"v":5775},{"y":2007,"v":5854},{"y":2008,"v":5951},{"y":2009,"v":5844},{"y":2010,"v":5763},{"y":2011,"v":5699},{"y":2012,"v":5534},{"y":2013,"v":5533},{"y":2014,"v":5407},{"y":2015,"v":5319},{"y":2016,"v":5217},{"y":2017,"v":5162},{"y":2018,"v":5086},{"y":2019,"v":5232},{"y":2020,"v":5159},{"y":2021,"v":5006},{"y":2022,"v":4942},{"y":2023,"v":4928},{"y":2024,"v":4751}]},{"n":"Germany","pts":[{"y":1990,"v":4422},{"y":1991,"v":4303},{"y":1992,"v":4191},{"y":1993,"v":4123},{"y":1994,"v":4089},{"y":1995,"v":4120},{"y":1996,"v":4247},{"y":1997,"v":4204},{"y":1998,"v":4178},{"y":1999,"v":4080},{"y":2000,"v":4094},{"y":2001,"v":4210},{"y":2002,"v":4109},{"y":2003,"v":4096},{"y":2004,"v":4132},{"y":2005,"v":4110},{"y":2006,"v":4236},{"y":2007,"v":4024},{"y":2008,"v":4082},{"y":2009,"v":3822},{"y":2010,"v":4030},{"y":2011,"v":3892},{"y":2012,"v":3913},{"y":2013,"v":3986},{"y":2014,"v":3794},{"y":2015,"v":3781},{"y":2016,"v":3765},{"y":2017,"v":3763},{"y":2018,"v":3659},{"y":2019,"v":3571},{"y":2020,"v":3349},{"y":2021,"v":3467},{"y":2022,"v":3262},{"y":2023,"v":2928},{"y":2024,"v":2825}]},{"n":"China","pts":[{"y":1990,"v":773},{"y":1991,"v":741},{"y":1992,"v":757},{"y":1993,"v":793},{"y":1994,"v":821},{"y":1995,"v":873},{"y":1996,"v":885},{"y":1997,"v":876},{"y":1998,"v":872},{"y":1999,"v":881},{"y":2000,"v":898},{"y":2001,"v":922},{"y":2002,"v":976},{"y":2003,"v":1105},{"y":2004,"v":1249},{"y":2005,"v":1370},{"y":2006,"v":1490},{"y":2007,"v":1595},{"y":2008,"v":1630},{"y":2009,"v":1729},{"y":2010,"v":1900},{"y":2011,"v":2027},{"y":2012,"v":2085},{"y":2013,"v":2137},{"y":2014,"v":2178},{"y":2015,"v":2175},{"y":2016,"v":2149},{"y":2017,"v":2216},{"y":2018,"v":2311},{"y":2019,"v":2398},{"y":2020,"v":2466},{"y":2021,"v":2624},{"y":2022,"v":2676},{"y":2023,"v":2851}]},{"n":"Brazil","pts":[{"y":1990,"v":942},{"y":1991,"v":943},{"y":1992,"v":937},{"y":1993,"v":945},{"y":1994,"v":980},{"y":1995,"v":999},{"y":1996,"v":1036},{"y":1997,"v":1072},{"y":1998,"v":1082},{"y":1999,"v":1091},{"y":2000,"v":1081},{"y":2001,"v":1087},{"y":2002,"v":1103},{"y":2003,"v":1108},{"y":2004,"v":1157},{"y":2005,"v":1174},{"y":2006,"v":1202},{"y":2007,"v":1260},{"y":2008,"v":1317},{"y":2009,"v":1262},{"y":2010,"v":1384},{"y":2011,"v":1390},{"y":2012,"v":1433},{"y":2013,"v":1487},{"y":2014,"v":1522},{"y":2015,"v":1482},{"y":2016,"v":1415},{"y":2017,"v":1432},{"y":2018,"v":1403},{"y":2019,"v":1416},{"y":2020,"v":1379},{"y":2021,"v":1430},{"y":2022,"v":1433},{"y":2023,"v":1481},{"y":2024,"v":1512}]},{"n":"India","pts":[{"y":1990,"v":324},{"y":1991,"v":331},{"y":1992,"v":336},{"y":1993,"v":339},{"y":1994,"v":348},{"y":1995,"v":362},{"y":1996,"v":368},{"y":1997,"v":376},{"y":1998,"v":378},{"y":1999,"v":393},{"y":2000,"v":395},{"y":2001,"v":393},{"y":2002,"v":397},{"y":2003,"v":400},{"y":2004,"v":415},{"y":2005,"v":425},{"y":2006,"v":442},{"y":2007,"v":461},{"y":2008,"v":482},{"y":2009,"v":509},{"y":2010,"v":532},{"y":2011,"v":547},{"y":2012,"v":572},{"y":2013,"v":577},{"y":2014,"v":610},{"y":2015,"v":622},{"y":2016,"v":627},{"y":2017,"v":648},{"y":2018,"v":668},{"y":2019,"v":667},{"y":2020,"v":632},{"y":2021,"v":677},{"y":2022,"v":728},{"y":2023,"v":763}]},{"n":"Bangladesh","pts":[{"y":1990,"v":114},{"y":1991,"v":111},{"y":1992,"v":114},{"y":1993,"v":117},{"y":1994,"v":122},{"y":1995,"v":129},{"y":1996,"v":128},{"y":1997,"v":131},{"y":1998,"v":132},{"y":1999,"v":135},{"y":2000,"v":136},{"y":2001,"v":148},{"y":2002,"v":148},{"y":2003,"v":153},{"y":2004,"v":154},{"y":2005,"v":160},{"y":2006,"v":168},{"y":2007,"v":174},{"y":2008,"v":181},{"y":2009,"v":188},{"y":2010,"v":196},{"y":2011,"v":200},{"y":2012,"v":208},{"y":2013,"v":217},{"y":2014,"v":223},{"y":2015,"v":237},{"y":2016,"v":256},{"y":2017,"v":264},{"y":2018,"v":261},{"y":2019,"v":278},{"y":2020,"v":279},{"y":2021,"v":299},{"y":2022,"v":308},{"y":2023,"v":288}]}];
+
+const COLORS = {"Iceland":"#EA5E33","Bahrain":"#F29A44","Canada":"#C49A45","Finland":"#4E88B4","Australia":"#3D7A5A","Germany":"#5B9E78","China":"#9B6FB0","Brazil":"#C4715A","India":"#8BAD72","Bangladesh":"#7A786F"};
+
+const W = 800, H = 440;
+const M = {top:32, right:150, bottom:40, left:70};
+const yearMin = 1990, yearMax = 2024;
+const logMin = Math.log10(100), logMax = Math.log10(22000);
+const xS = y => M.left + (y - yearMin) / (yearMax - yearMin) * (W - M.left - M.right);
+const yS = v => M.top + (logMax - Math.log10(Math.max(v, 1))) / (logMax - logMin) * (H - M.top - M.bottom);
+
+function mk(tag, a, t) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(a || {})) el.setAttribute(k, v);
+  if (t !== undefined) el.textContent = t;
+  return el;
+}
+
+const svg = mk("svg", {viewBox:`0 0 ${W} ${H}`, width:"100%", style:"display:block;max-width:800px"});
+document.getElementById("chart").appendChild(svg);
+const tip = document.getElementById("tip");
+
+// Grid lines at log-scale values
+const gridVals = [100, 200, 500, 1000, 2000, 5000, 10000, 20000];
+gridVals.forEach(v => {
+  const y = yS(v);
+  if (y < M.top || y > H - M.bottom) return;
+  svg.appendChild(mk("line", {x1:M.left, y1:y, x2:W-M.right, y2:y, stroke:"#E2E0D5", "stroke-width":"0.5"}));
+  const label = v >= 1000 ? (v/1000)+"k" : v.toString();
+  svg.appendChild(mk("text", {x:M.left-5, y:y+4, "text-anchor":"end", "font-size":"9", "font-family":"JetBrains Mono,monospace", fill:"#7A786F"}, label));
+});
+
+// X-axis labels
+[1990,1995,2000,2005,2010,2015,2020,2024].forEach(y => {
+  svg.appendChild(mk("line", {x1:xS(y), y1:M.top, x2:xS(y), y2:H-M.bottom+4, stroke:"#E2E0D5", "stroke-width":"0.5"}));
+  svg.appendChild(mk("text", {x:xS(y), y:H-M.bottom+14, "text-anchor":"middle", "font-size":"9", "font-family":"JetBrains Mono,monospace", fill:"#7A786F"}, y));
+});
+
+// Y-axis label
+svg.appendChild(mk("text", {x:12, y:M.top+(H-M.top-M.bottom)/2, "text-anchor":"middle", "font-size":"9", "font-family":"JetBrains Mono,monospace", fill:"#7A786F", transform:`rotate(-90,12,${M.top+(H-M.top-M.bottom)/2})`}, "kg oil eq. (log)"));
+
+function resolveCollisions(items, minGap) {
+  const s = items.slice().sort((a,b) => a.y - b.y);
+  for (let p = 0; p < 40; p++) {
+    let moved = false;
+    for (let i = 1; i < s.length; i++) {
+      const gap = s[i].y - s[i-1].y;
+      if (gap < minGap) { const sh=(minGap-gap)/2; s[i-1].y-=sh; s[i].y+=sh; moved=true; }
+    }
+    if (!moved) break;
+  }
+  const tB=M.top+4, bB=H-M.bottom-4;
+  s.forEach(it => { it.y=Math.max(tB,Math.min(bB,it.y)); });
+  return s;
+}
+
+const groups = [];
+data.forEach(series => {
+  const color = COLORS[series.n] || '#999';
+  const pts = series.pts;
+  if (!pts.length) return;
+  const pathD = pts.map((p,i) => `${i===0?'M':'L'} ${xS(p.y)} ${yS(p.v)}`).join(' ');
+  const line = mk("path", {d:pathD, stroke:color, "stroke-width":"1.5", fill:"none", "stroke-linejoin":"round"});
+  const hit = mk("path", {d:pathD, stroke:"transparent", "stroke-width":"14", fill:"none", cursor:"pointer"});
+  const g = mk("g", {}); g.appendChild(line); g.appendChild(hit); svg.appendChild(g);
+  groups.push({g, line, hit, color, series});
+});
+
+// Endpoint labels
+const labelItems = groups.map(({color, series}) => {
+  const last = series.pts[series.pts.length-1];
+  const display = last.v >= 1000 ? Math.round(last.v/100)/10+"k" : last.v.toString();
+  return {series, color, origY:yS(last.v), y:yS(last.v), label:`${display}  ${series.n}`};
+});
+const resolved = resolveCollisions(labelItems, 11);
+resolved.forEach(item => {
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mk("line", {x1:W-M.right+4, y1:item.origY, x2:W-M.right+10, y2:item.y, stroke:item.color, "stroke-width":"0.5", opacity:"0.6"}));
+  }
+  svg.appendChild(mk("text", {x:W-M.right+14, y:item.y+4, "font-size":"9", "font-family":"Inter,sans-serif", fill:item.color, "font-weight":"500"}, item.label));
+});
+
+// Hover
+groups.forEach(({g, line, hit, color, series}) => {
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(h => { h.line.setAttribute("opacity", h.series.n===series.n?"1":"0.08"); h.line.setAttribute("stroke-width", h.series.n===series.n?"2.5":"1.5"); });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const yr = Math.round((mx - M.left) / (W - M.left - M.right) * (yearMax - yearMin) + yearMin);
+    const closest = series.pts.reduce((a,b) => Math.abs(b.y-yr) < Math.abs(a.y-yr) ? b : a);
+    tip.textContent = `${series.n}  ${closest.y}: ${closest.v.toLocaleString()} kg oil eq/capita`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top = (e.clientY-24)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(h => { h.line.setAttribute("opacity","1"); h.line.setAttribute("stroke-width","1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
