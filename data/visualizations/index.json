@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Central Government Debt Trajectories, 1990\u20132023",
+      "description": "Sparkline grid showing government debt (% of GDP) for 21 countries with long data series. Sorted by most recent value. Bahrain and El Salvador show steep recent rises; Jamaica reduced from 140%+ to ~98%; Korea climbed from 7% to 49%.",
+      "datasetIds": [
+        "wb--GC-DOD-TOTL-GD-ZS"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Bahrain surged from 7.7% (1990) to 111.6% \u2014 the steepest rise in the set",
+        "Jamaica cut debt from 139% to 98% over three decades",
+        "Australia more than tripled its debt-to-GDP ratio since 1990"
+      ],
+      "createdAt": "2026-08-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Inflation History: Consumer Prices, 1970\u20132024",
+      "description": "Trend lines for 10 countries showing annual CPI inflation (%). Values capped at 100% for readability. Contrasts the hyperinflation episodes of Israel (1980s), Bolivia (1982\u201386), and Brazil (1981\u201394) with the near-zero inflation of Japan and Germany.",
+      "datasetIds": [
+        "wb--FP-CPI-TOTL-ZG"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Bolivia, Israel, and Brazil all hit hyperinflation above 100% per year",
+        "Japan maintained near-zero or negative inflation from 1995\u20132021",
+        "Iran sustained 10\u201350% inflation consistently since the 1980s"
+      ],
+      "createdAt": "2026-08-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Urban Population Growth Rate, 1970\u20132023",
+      "description": "Trend lines for 10 countries showing annual urban population growth (%). Reveals countries at different stages of the urbanization transition: DR Congo and Ethiopia sustain 4%+, while China has fallen to 0.4% and Japan and Korea have turned negative.",
+      "datasetIds": [
+        "wb--SP-URB-GROW"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Bangladesh peaked at 12% urban growth in the 1970s, now at 2.7%",
+        "China's explosive 1984 peak (7.6%) has collapsed to near-zero",
+        "DR Congo and Ethiopia maintain steady 4%+ urban growth"
+      ],
+      "createdAt": "2026-08-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Physicians per 1,000 People: ~2000 vs. ~2020",
+      "description": "Slope chart comparing physician density across 16 countries from Europe to Sub-Saharan Africa. Every country gained physicians, but the gap between Cuba (9.3) and Chad (0.06) illustrates the persistent global inequality in healthcare workforce.",
+      "datasetIds": [
+        "wb--SH-MED-PHYS-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Cuba leads with 9.3 physicians per 1,000 \u2014 more than most of Europe",
+        "Korea and China more than doubled their physician density in 20 years",
+        "Chad (0.06) and Ethiopia (0.10) remain 150x below European levels"
+      ],
+      "createdAt": "2026-08-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Hydropower's Share of Electricity: 1990 vs. 2022",
+      "description": "Slope chart showing how hydroelectric share of electricity (%) changed between 1990 and 2022. Ghana fell from 100% to 35% as gas plants expanded; Brazil diversified from 93% to 63%; DR Congo and Albania remain near 100% hydro-dependent.",
+      "datasetIds": [
+        "wb--EG-ELC-HYRO-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Ghana: 100% \u2192 35% \u2014 largest hydro share decline, replaced by natural gas",
+        "DR Congo, Albania, Ethiopia remain above 95% hydro-powered",
+        "Ethiopia and Albania increased hydro share slightly as new dams came online"
+      ],
+      "createdAt": "2026-08-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-03T00:00:00.000Z"
 }
