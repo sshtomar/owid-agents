@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Breast Cancer 5-Year Survival Rates, 2021",
+      "description": "Horizontal bar chart showing the top 20 and bottom 20 countries by breast cancer 5-year survival rate. A 4x gap between Monaco (94%) and Central African Republic (25%) reveals stark healthcare inequality.",
+      "datasetIds": [
+        "who--CANCERSURVIVAL_BREASTCANCER"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Monaco, Sweden, Cyprus, and Japan lead with >91% survival",
+        "Central African Republic (24.6%) and Nigeria (27.7%) lag far behind",
+        "Sub-Saharan Africa has 8 of the 10 lowest-survival countries"
+      ],
+      "createdAt": "2026-08-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Adult Female Mortality Rate, 1960\u20132024",
+      "description": "Trend lines showing the dramatic decline in female adult mortality across 10 diverse countries over 64 years. South Korea achieved the greatest reduction, from 300 to 21 deaths per 1,000 adult women.",
+      "datasetIds": [
+        "wb--SP-DYN-AMRT-FE"
+      ],
+      "chartType": "line",
+      "highlights": [
+        "South Korea cut female mortality by 93% \u2014 from 300 to 21 per 1,000",
+        "China saw a 88% drop from 480 to 56 per 1,000",
+        "Gambia still at 194 per 1,000 in 2024 \u2014 9x South Korea's rate"
+      ],
+      "createdAt": "2026-08-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Effective Eye Care Coverage, 2023",
+      "description": "Horizontal bar chart showing the 20 countries with the lowest and 10 with the highest effective refractive error coverage. A 5x gap for a largely preventable condition.",
+      "datasetIds": [
+        "who--NCD_SENSORYFUNCTION_VISION_EREC"
+      ],
+      "chartType": "bar",
+      "highlights": [
+        "Niger (16.5%) and Burkina Faso (17.3%) have critically low coverage",
+        "Switzerland (86.5%) and South Korea (86.4%) lead globally",
+        "Global average is ~64%, masking wide regional disparities"
+      ],
+      "createdAt": "2026-08-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Overweight Children Under 5: ~2000 vs ~2019",
+      "description": "Slope chart comparing child overweight prevalence around 2000 and 2019 across 40 countries. Shows the nutrition transition \u2014 China, Jordan, and El Salvador saw the largest increases.",
+      "datasetIds": [
+        "wb--SH-STA-OWGH-ZS"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "China rose from 3.4% to 8.5% \u2014 a 5.1pp increase in under-5 overweight",
+        "Jordan (+4.7pp) and El Salvador (+4.4pp) also saw sharp rises",
+        "Georgia and Comoros made remarkable progress, falling by 12pp and 18pp"
+      ],
+      "createdAt": "2026-08-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Poverty at National Lines, 1987\u20132024",
+      "description": "Trend lines tracking poverty headcount ratios at national poverty thresholds for 8 countries. Chile halved poverty three times over; Belarus fell from 47% to 4% in 15 years.",
+      "datasetIds": [
+        "wb--SI-POV-NAHC"
+      ],
+      "chartType": "line",
+      "highlights": [
+        "Chile cut poverty from 45% (1987) to 7% (2022) \u2014 a 35-year sustained decline",
+        "Belarus dropped from 47% to 4% between 1999 and 2009",
+        "COVID-19 caused visible poverty spikes in 2020 across Ecuador, Colombia, and Costa Rica"
+      ],
+      "createdAt": "2026-08-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-04T00:00:00.000Z"
 }

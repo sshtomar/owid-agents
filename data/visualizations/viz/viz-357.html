@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Breast Cancer 5-Year Survival Rates, 2021</h1>
+<p class="subtitle">Percentage of women surviving at least 5 years after breast cancer diagnosis. Countries with higher incomes and stronger health systems show dramatically better outcomes — a 4× gap separates the best from the worst.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO GLOBOCAN / International Agency for Research on Cancer, 2021</p>
+<script>
+const data = [{"n":"Monaco","v":94.0,"g":"high"},{"n":"Sweden","v":92.5,"g":"high"},{"n":"Cyprus","v":91.8,"g":"high"},{"n":"Japan","v":91.7,"g":"high"},{"n":"Belgium","v":91.5,"g":"high"},{"n":"Finland","v":91.4,"g":"high"},{"n":"Denmark","v":91.0,"g":"high"},{"n":"Norway","v":91.0,"g":"high"},{"n":"United States","v":90.9,"g":"high"},{"n":"Australia","v":90.8,"g":"high"},{"n":"Andorra","v":90.7,"g":"high"},{"n":"Israel","v":90.4,"g":"high"},{"n":"Brazil","v":90.3,"g":"high"},{"n":"Portugal","v":90.1,"g":"high"},{"n":"Canada","v":89.3,"g":"high"},{"n":"Malta","v":89.3,"g":"high"},{"n":"Iceland","v":89.2,"g":"high"},{"n":"New Zealand","v":89.1,"g":"high"},{"n":"Switzerland","v":88.9,"g":"high"},{"n":"Netherlands","v":88.8,"g":"high"},{"n":"Comoros","v":37.6,"g":"low"},{"n":"Uganda","v":37.6,"g":"low"},{"n":"Eritrea","v":37.1,"g":"low"},{"n":"Cote d'Ivoire","v":36.8,"g":"low"},{"n":"Burkina Faso","v":36.2,"g":"low"},{"n":"Djibouti","v":36.0,"g":"low"},{"n":"Gambia","v":35.4,"g":"low"},{"n":"Liberia","v":35.1,"g":"low"},{"n":"Sierra Leone","v":33.7,"g":"low"},{"n":"Benin","v":33.3,"g":"low"},{"n":"D.R. Congo","v":32.3,"g":"low"},{"n":"Chad","v":32.1,"g":"low"},{"n":"Burundi","v":31.5,"g":"low"},{"n":"Guinea-Bissau","v":31.0,"g":"low"},{"n":"Guinea","v":30.7,"g":"low"},{"n":"Eswatini","v":30.6,"g":"low"},{"n":"Somalia","v":29.9,"g":"low"},{"n":"Nigeria","v":27.7,"g":"low"},{"n":"Lesotho","v":26.6,"g":"low"},{"n":"Central African Rep.","v":24.6,"g":"low"}];
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 24) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const W = 680, ROW = 16, GAP = 24;
+const BLOCK = 20; // rows per group
+const H = BLOCK * ROW * 2 + GAP + 48;
+const margin = { top: 40, right: 60, bottom: 20, left: 148 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const chartW = W - margin.left - margin.right;
+const minV = 20, maxV = 100;
+function xScale(v) { return margin.left + (v - minV) / (maxV - minV) * chartW; }
+
+// Color by survival rate
+function color(v) {
+  if (v >= 85) return "#3D7A5A";
+  if (v >= 75) return "#5B9E78";
+  if (v >= 60) return "#A6C4A2";
+  if (v >= 50) return "#C49A45";
+  if (v >= 40) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Grid lines
+[30, 40, 50, 60, 70, 80, 90].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top - 12,
+    x2: xScale(v), y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(v), y: margin.top - 16,
+    "text-anchor": "middle", "font-size": "9", fill: "#9A9890",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v + "%";
+});
+
+// Section labels
+svg.appendChild(mkEl("text", {
+  x: margin.left - 4, y: margin.top + ROW * 0.6,
+  "text-anchor": "end", "font-size": "9", fill: "#9A9890",
+  "font-family": "'JetBrains Mono', monospace", "font-weight": "500"
+})).textContent = "TOP 20";
+
+const lowLabelY = margin.top + BLOCK * ROW + GAP + ROW * 0.6;
+svg.appendChild(mkEl("text", {
+  x: margin.left - 4, y: lowLabelY,
+  "text-anchor": "end", "font-size": "9", fill: "#9A9890",
+  "font-family": "'JetBrains Mono', monospace", "font-weight": "500"
+})).textContent = "BOTTOM 20";
+
+// Gap indicator
+const gapY = margin.top + BLOCK * ROW + GAP / 2;
+const gapLine = mkEl("line", {
+  x1: margin.left, y1: gapY,
+  x2: W - margin.right, y2: gapY,
+  stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "4,3"
+});
+svg.appendChild(gapLine);
+
+svg.appendChild(mkEl("text", {
+  x: xScale(62), y: gapY - 2,
+  "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+  "font-family": "'JetBrains Mono', monospace"
+})).textContent = "· · · 154 other countries · · ·";
+
+// Bars
+data.forEach((d, i) => {
+  const isBottom = i >= BLOCK;
+  const rowIdx = isBottom ? i - BLOCK : i;
+  const y = margin.top + rowIdx * ROW + (isBottom ? BLOCK * ROW + GAP : 0);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Background hit area
+  const hit = mkEl("rect", {
+    x: margin.left - 148, y: y,
+    width: W, height: ROW,
+    fill: "transparent"
+  });
+  g.appendChild(hit);
+
+  // Bar
+  const barW = Math.max(1, xScale(d.v) - xScale(minV));
+  const bar = mkEl("rect", {
+    x: xScale(minV), y: y + 2,
+    width: barW, height: ROW - 5,
+    fill: color(d.v), rx: "1.5"
+  });
+  g.appendChild(bar);
+
+  // Country name label
+  const lbl = mkEl("text", {
+    x: margin.left - 6, y: y + ROW / 2 + 3.5,
+    "text-anchor": "end", "font-size": "10", fill: "#2B2A27"
+  });
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  // Value label
+  const valLbl = mkEl("text", {
+    x: xScale(d.v) + 4, y: y + ROW / 2 + 3.5,
+    "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  });
+  valLbl.textContent = d.v.toFixed(1) + "%";
+  g.appendChild(valLbl);
+
+  g.addEventListener("mouseenter", e => {
+    bar.setAttribute("opacity", "0.75");
+    showTip(`${d.n}: ${d.v.toFixed(1)}% 5-year survival`, e);
+  });
+  g.addEventListener("mousemove", e => showTip(`${d.n}: ${d.v.toFixed(1)}% 5-year survival`, e));
+  g.addEventListener("mouseleave", () => { bar.setAttribute("opacity", "1"); hideTip(); });
+
+  svg.appendChild(g);
+});
+
+// Legend
+const legendX = W - margin.right + 8, legendY = margin.top;
+const bands = [
+  { col: "#3D7A5A", label: "≥85%" },
+  { col: "#5B9E78", label: "75–85%" },
+  { col: "#A6C4A2", label: "60–75%" },
+  { col: "#C49A45", label: "50–60%" },
+  { col: "#C4715A", label: "40–50%" },
+  { col: "#B34B3B", label: "<40%" },
+];
+bands.forEach((b, i) => {
+  svg.appendChild(mkEl("rect", { x: legendX, y: legendY + i * 18, width: 10, height: 10, fill: b.col, rx: "1.5" }));
+  const t = mkEl("text", { x: legendX + 14, y: legendY + i * 18 + 8.5, "font-size": "9", fill: "#7A786F" });
+  t.textContent = b.label;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
