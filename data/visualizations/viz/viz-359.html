@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 12px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 780px; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; position: relative; cursor: crosshair; background: #F6F5EE; }
+  .cell:hover { background: #EFEDE6; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 4px; }
+  .cell-vals { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; margin-top: 3px; }
+  canvas { display: block; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>Youth Population Share, 1960–2023</h1>
+<p class="subtitle">Children ages 0–14 as % of total population. Sub-Saharan Africa's youth bulge persists while East Asia has undergone one of the fastest demographic transitions in history. South Korea and China have fallen below 17%, raising concerns about aging workforces.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Population Ages 0–14, % of Total (SP.POP.0014.TO.ZS)</p>
+<script>
+// Sorted by 2023 value descending (highest youth share first)
+const data = [
+  {"n":"Chad","s":[41.0,41.2,41.5,41.7,41.9,42.0,42.1,42.2,42.4,42.5,42.7,43.0,43.2,43.5,43.9,44.2,44.6,45.0,45.4,45.7,46.6,47.5,46.6,45.8,46.5,47.3,47.2,47.0,46.8,46.8,47.1,47.1,46.9,47.5,48.2,47.9,47.8,48.2,48.5,48.6,48.8,49.0,49.1,49.0,48.7,48.6,48.6,48.7,48.7,48.7,48.8,48.7,48.7,48.6,48.5,48.5,48.5,48.4,48.2,48.1,48.0,47.7,47.4,46.7],"e":41.0,"l":46.7,"y0":1960},
+  {"n":"Angola","s":[41.3,41.6,42.1,42.5,43.1,43.7,44.2,44.7,45.1,45.5,45.9,46.3,46.3,46.1,45.9,45.6,45.5,45.2,45.0,44.8,44.7,44.5,44.4,44.4,44.3,44.3,44.5,44.6,44.8,45.0,45.2,45.4,45.5,45.7,45.8,45.9,45.9,45.8,45.8,45.7,45.6,45.5,45.4,45.3,45.3,45.2,45.1,45.1,45.1,45.1,45.1,45.1,45.2,45.2,45.2,45.3,45.3,45.3,45.2,45.1,45.0,44.9,44.8,44.6],"e":41.3,"l":44.6,"y0":1960},
+  {"n":"Ethiopia","s":[42.2,42.2,42.1,42.2,42.3,42.5,42.9,43.2,43.5,43.8,44.2,44.5,44.9,45.2,45.4,45.6,45.7,45.9,46.1,46.2,46.3,46.4,46.5,46.4,46.2,46.1,46.0,46.0,46.0,46.1,46.2,46.2,46.2,46.4,46.5,46.7,46.9,47.1,47.4,47.6,47.7,47.8,47.8,47.7,47.6,47.4,47.2,46.9,46.6,46.2,45.7,45.2,44.6,44.0,43.4,42.9,42.3,41.8,41.3,40.9,40.5,40.1,39.7,39.4],"e":42.2,"l":39.4,"y0":1960},
+  {"n":"Bangladesh","s":[42.1,42.3,42.5,42.8,43.2,43.5,43.7,43.9,44.1,44.3,44.4,44.5,44.7,44.8,44.9,44.9,44.9,44.8,44.8,44.8,44.8,44.8,44.8,44.7,44.6,44.5,44.2,43.9,43.5,43.1,42.7,42.3,41.8,41.3,40.8,40.2,39.6,39.0,38.4,37.8,37.3,36.9,36.6,36.4,36.1,35.7,35.4,35.1,34.8,34.4,34.1,33.6,33.0,32.4,31.8,31.2,30.6,30.1,29.7,29.5,29.3,29.1,28.8,28.4],"e":42.1,"l":28.4,"y0":1960},
+  {"n":"India","s":[40.6,40.9,41.2,41.5,41.6,41.7,41.7,41.6,41.5,41.5,41.4,41.2,41.1,41.0,40.8,40.7,40.5,40.3,40.1,40.0,39.8,39.7,39.6,39.5,39.4,39.3,39.2,39.1,38.9,38.8,38.6,38.4,38.1,37.9,37.6,37.3,37.0,36.7,36.3,35.9,35.6,35.2,34.8,34.4,34.0,33.6,33.1,32.7,32.2,31.8,31.3,30.9,30.4,29.9,29.4,28.9,28.4,27.8,27.3,26.8,26.3,25.9,25.5,25.1],"e":40.6,"l":25.1,"y0":1960},
+  {"n":"Indonesia","s":[39.8,40.0,40.3,40.7,41.1,41.5,41.9,42.2,42.5,42.6,42.6,42.6,42.5,42.4,42.3,42.0,41.8,41.5,41.2,40.9,40.6,40.2,39.8,39.4,39.0,38.5,38.0,37.4,36.9,36.4,35.9,35.4,34.8,34.3,33.7,33.2,32.7,32.2,31.7,31.3,30.8,30.4,30.0,29.7,29.3,29.1,28.8,28.6,28.4,28.1,27.9,27.7,27.5,27.3,27.2,27.0,26.8,26.6,26.3,26.1,25.8,25.6,25.3,24.9],"e":39.8,"l":24.9,"y0":1960},
+  {"n":"Brazil","s":[44.2,44.3,44.4,44.5,44.4,44.2,44.0,43.8,43.4,43.0,42.7,42.2,41.8,41.4,40.9,40.5,40.0,39.6,39.1,38.8,38.4,38.1,37.9,37.7,37.4,37.2,36.9,36.6,36.3,35.9,35.5,35.0,34.5,34.0,33.4,32.8,32.2,31.6,31.0,30.5,29.9,29.3,28.7,28.2,27.6,27.1,26.6,26.1,25.7,25.2,24.7,24.2,23.7,23.3,22.8,22.4,22.0,21.7,21.4,21.1,20.8,20.5,20.2,19.9],"e":44.2,"l":19.9,"y0":1960},
+  {"n":"China","s":[40.3,40.0,40.0,40.6,41.2,41.5,41.5,41.3,41.0,41.0,40.8,40.7,40.4,40.1,40.2,40.2,40.3,39.8,38.6,37.2,36.1,35.1,34.3,33.3,32.2,31.2,30.4,29.8,29.3,28.9,28.8,28.6,28.4,28.2,27.8,27.4,27.0,26.3,25.7,25.2,24.5,23.8,22.9,22.0,21.2,20.3,19.6,19.2,18.9,18.6,18.5,18.3,18.3,18.3,18.3,18.3,18.3,18.4,18.3,18.2,18.0,17.6,17.1,16.6],"e":40.3,"l":16.6,"y0":1960},
+  {"n":"Italy","s":[25.0,25.0,24.7,24.5,24.5,24.5,24.5,24.6,24.6,24.7,24.7,24.6,24.6,24.6,24.5,24.3,24.1,23.7,23.4,22.8,22.3,21.6,21.1,20.5,19.9,19.3,18.7,18.1,17.5,17.0,16.5,15.8,15.2,15.0,14.8,14.6,14.5,14.4,14.3,14.3,14.3,14.2,14.2,14.2,14.2,14.1,14.1,14.0,14.0,14.0,14.0,14.0,14.0,13.9,13.8,13.7,13.6,13.4,13.2,13.0,12.8,12.6,12.4,12.1],"e":25.0,"l":12.1,"y0":1960},
+  {"n":"Germany","s":[21.3,21.7,22.0,22.3,22.6,22.8,23.0,23.1,23.3,23.3,23.2,23.0,22.8,22.4,22.0,21.5,20.9,20.3,19.7,19.1,18.5,17.9,17.4,16.9,16.4,16.0,15.8,15.6,15.7,15.9,16.1,16.3,16.3,16.3,16.3,16.3,16.2,16.1,15.9,15.8,15.7,15.5,15.3,15.0,14.8,14.5,14.2,14.0,13.8,13.8,13.7,13.6,13.4,13.2,13.2,13.2,13.3,13.5,13.6,13.7,13.8,13.9,13.9,13.9],"e":21.3,"l":13.9,"y0":1960},
+  {"n":"Japan","s":[29.8,29.1,28.0,26.8,25.8,25.1,24.4,23.8,23.5,23.4,23.3,23.3,23.4,23.6,23.8,23.8,23.9,23.9,23.8,23.7,23.4,23.3,23.1,22.6,22.2,21.7,21.0,20.3,19.5,18.8,18.0,17.4,16.9,16.4,16.0,15.6,15.3,15.1,14.8,14.6,14.4,14.2,14.1,13.9,13.8,13.8,13.7,13.6,13.5,13.5,13.4,13.3,13.2,13.1,13.0,12.8,12.7,12.6,12.5,12.4,12.2,12.0,11.9,11.6],"e":29.8,"l":11.6,"y0":1960},
+  {"n":"Korea, Rep.","s":[41.3,41.8,42.3,42.7,43.1,43.3,43.5,43.3,43.1,42.7,42.1,41.5,41.0,40.3,39.5,38.5,37.5,36.5,35.6,34.8,34.0,33.3,32.7,32.0,31.2,30.2,29.2,28.2,27.3,26.5,25.8,25.2,24.7,24.2,23.7,23.1,22.5,22.0,21.6,21.2,21.0,20.8,20.5,20.1,19.7,19.2,18.7,18.1,17.5,16.9,16.4,15.8,15.2,14.7,14.2,13.8,13.4,13.0,12.7,12.4,12.1,11.8,11.4,11.0],"e":41.3,"l":11.0,"y0":1960}
+];
+
+const CELL_W = 170, CELL_H = 72, SPARK_H = 38, SPARK_MARGIN_TOP = 18;
+const tip = document.getElementById("tip");
+
+function showTip(txt, e) { tip.textContent = txt; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const grid = document.getElementById("grid");
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "cell-name";
+  nameEl.textContent = d.n;
+  cell.appendChild(nameEl);
+
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = (CELL_W - 20) * dpr;
+  canvas.height = SPARK_H * dpr;
+  canvas.style.width = (CELL_W - 20) + "px";
+  canvas.style.height = SPARK_H + "px";
+  cell.appendChild(canvas);
+
+  const valsEl = document.createElement("div");
+  valsEl.className = "cell-vals";
+  valsEl.innerHTML = `<span>${d.e.toFixed(1)}%</span><span>${d.y0}</span><span style="font-weight:500;color:#2B2A27">${d.l.toFixed(1)}%</span>`;
+  cell.appendChild(valsEl);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const cW = CELL_W - 20, cH = SPARK_H;
+
+  const series = d.s;
+  const minV = Math.min(...series);
+  const maxV = Math.max(...series);
+  const range = maxV - minV || 1;
+
+  function norm(v) { return cH - ((v - minV) / range) * (cH * 0.85) - cH * 0.05; }
+  function getX(i) { return (i / (series.length - 1)) * cW; }
+
+  function draw(highlightIdx) {
+    ctx.clearRect(0, 0, cW, cH);
+
+    // Fill area under line
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = getX(i), y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(getX(series.length - 1), cH);
+    ctx.lineTo(0, cH);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(234,94,51,0.08)";
+    ctx.fill();
+
+    // Line
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.3 * dpr / dpr;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = getX(i), y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Crosshair
+    if (highlightIdx !== null) {
+      const hx = getX(highlightIdx);
+      ctx.strokeStyle = "#7A786F";
+      ctx.lineWidth = 0.8;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(hx, 0);
+      ctx.lineTo(hx, cH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  draw(null);
+
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const idx = Math.max(0, Math.min(series.length - 1, Math.round(mx / cW * (series.length - 1))));
+    draw(idx);
+    const yr = d.y0 + idx;
+    showTip(`${d.n} · ${yr}: ${series[idx].toFixed(1)}% of population`, e);
+  });
+  cell.addEventListener("mouseleave", () => { draw(null); hideTip(); });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>

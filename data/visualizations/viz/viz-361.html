@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart { position: relative; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>Decline in Open Defecation, 2000–2022</h1>
+<p class="subtitle">% of population practicing open defecation. Cambodia and India made the most dramatic gains — Cambodia from 88% to 11%, India from 73% to 12% — driven by national sanitation campaigns. Chad barely moved at 63%, and Benin remains above 49%.</p>
+<div id="chart"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — People Practicing Open Defecation (SH.STA.ODFC.ZS) · WHO/UNICEF JMP</p>
+<script>
+// {n: name, a: 2000 value, b: 2022 value}
+const data = [
+  {"n":"Cambodia","a":87.51,"b":11.27},
+  {"n":"Burkina Faso","a":74.12,"b":33.2},
+  {"n":"India","a":73.15,"b":11.66},
+  {"n":"Ethiopia","a":71.87,"b":20.64},
+  {"n":"Chad","a":71.37,"b":62.61},
+  {"n":"Benin","a":68.15,"b":48.7},
+  {"n":"Cabo Verde","a":50.97,"b":7.01},
+  {"n":"Haiti","a":37.07,"b":17.73},
+  {"n":"Guinea-Bissau","a":35.93,"b":7.86},
+  {"n":"Bolivia","a":33.36,"b":8.21},
+  {"n":"Indonesia","a":32.37,"b":4.39},
+  {"n":"Ghana","a":20.31,"b":17.97},
+  {"n":"Bangladesh","a":15.69,"b":0}
+];
+
+const W = 680, H = 640;
+const pad = {left: 140, right: 140, top: 50, bottom: 30};
+const plotH = H - pad.top - pad.bottom;
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+const maxV = 95, minV = 0;
+function yS(v) { return pad.top + (maxV - v) / (maxV - minV) * plotH; }
+
+function colorFor(d) {
+  const dec = d.a - d.b;
+  if (dec > 60) return "#3D7A5A";
+  if (dec > 40) return "#5B9E78";
+  if (dec > 20) return "#8BAD72";
+  if (dec > 10) return "#C49A45";
+  return "#C4715A";
+}
+
+function resolveCollisions(items, minGap, lo, hi) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) item.y = Math.max(lo, Math.min(hi, item.y));
+  return sorted;
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent = txt; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  const yy = yS(v);
+  svg.appendChild(mkEl("line", { x1: leftX - 6, y1: yy, x2: rightX + 6, y2: yy, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = svg.appendChild(mkEl("text", { x: 0, y: yy + 3.5, "text-anchor": "start", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = v + "%";
+});
+
+// Column headers
+const hdr1 = svg.appendChild(mkEl("text", { x: leftX, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace" }));
+hdr1.textContent = "2000";
+const hdr2 = svg.appendChild(mkEl("text", { x: rightX, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace" }));
+hdr2.textContent = "2022";
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: leftX, y1: pad.top - 8, x2: leftX, y2: pad.top + plotH + 4, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: rightX, y1: pad.top - 8, x2: rightX, y2: pad.top + plotH + 4, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+// Build label arrays for collision resolution
+const leftLabels = data.map(d => ({ y: yS(d.a), d }));
+const rightLabels = data.map(d => ({ y: yS(d.b), d }));
+
+const resolvedLeft = resolveCollisions(leftLabels, 13, pad.top, pad.top + plotH);
+const resolvedRight = resolveCollisions(rightLabels, 13, pad.top, pad.top + plotH);
+
+const leftMap = new Map(resolvedLeft.map(item => [item.d.n, item.y]));
+const rightMap = new Map(resolvedRight.map(item => [item.d.n, item.y]));
+
+const rowEls = [];
+data.forEach(d => {
+  const col = colorFor(d);
+  const y1 = yS(d.a), y2 = yS(d.b);
+  const g = mkEl("g", {});
+  svg.appendChild(g);
+
+  const line = mkEl("line", { x1: leftX, y1, x2: rightX, y2, stroke: col, "stroke-width": "1.4", opacity: "1" });
+  g.appendChild(line);
+  g.appendChild(mkEl("circle", { cx: leftX, cy: y1, r: "3", fill: col }));
+  g.appendChild(mkEl("circle", { cx: rightX, cy: y2, r: "3", fill: col }));
+
+  const hit = mkEl("line", { x1: leftX, y1, x2: rightX, y2, stroke: "transparent", "stroke-width": "14" });
+  g.appendChild(hit);
+  rowEls.push({ g, line, d, col });
+
+  hit.addEventListener("mouseenter", e => {
+    rowEls.forEach(r => {
+      r.line.setAttribute("opacity", r.d.n === d.n ? "1" : "0.08");
+      r.line.setAttribute("stroke-width", r.d.n === d.n ? "2.5" : "1.4");
+    });
+    const dec = d.a - d.b;
+    showTip(`${d.n}: ${d.a.toFixed(1)}% → ${d.b.toFixed(1)}% (−${dec.toFixed(1)} pp)`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    rowEls.forEach(r => { r.line.setAttribute("opacity", "1"); r.line.setAttribute("stroke-width", "1.4"); });
+    hideTip();
+  });
+});
+
+// Left labels
+data.forEach(d => {
+  const col = colorFor(d);
+  const adjY = leftMap.get(d.n);
+  const origY = yS(d.a);
+  if (Math.abs(adjY - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: leftX - 2, y1: origY, x2: leftX - 5, y2: adjY, stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const lbl = svg.appendChild(mkEl("text", { x: leftX - 8, y: adjY + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9.5", "font-family": "Inter, sans-serif" }));
+  lbl.textContent = `${d.n}  ${d.a.toFixed(1)}%`;
+});
+
+// Right labels
+data.forEach(d => {
+  const col = colorFor(d);
+  const adjY = rightMap.get(d.n);
+  const origY = yS(d.b);
+  if (Math.abs(adjY - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: rightX + 2, y1: origY, x2: rightX + 5, y2: adjY, stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const lbl = svg.appendChild(mkEl("text", { x: rightX + 8, y: adjY + 3.5, fill: "#2B2A27", "font-size": "9.5", "font-family": "Inter, sans-serif" }));
+  lbl.textContent = `${d.b.toFixed(1)}%  ${d.n}`;
+});
+
+// Legend
+const legendY = H - 14;
+const legendItems = [
+  { col: "#3D7A5A", label: ">60pp drop" },
+  { col: "#5B9E78", label: "40–60pp" },
+  { col: "#8BAD72", label: "20–40pp" },
+  { col: "#C49A45", label: "10–20pp" },
+  { col: "#C4715A", label: "<10pp" }
+];
+legendItems.forEach((item, i) => {
+  const lx = 20 + i * 120;
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 7, width: 18, height: 3, fill: item.col }));
+  const lbl = svg.appendChild(mkEl("text", { x: lx + 22, y: legendY + 0.5, fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = item.label;
+});
+
+</script>
+</body></html>

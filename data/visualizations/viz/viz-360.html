@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart { position: relative; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>HIV Incidence Rate, 1990–2024</h1>
+<p class="subtitle">New HIV infections per 1,000 uninfected people ages 15–49. Eswatini and Botswana peaked above 50 per 1,000 in the mid-1990s — meaning 5% of uninfected adults became infected each year. Sustained prevention and treatment programs have since driven dramatic declines across sub-Saharan Africa.</p>
+<div id="chart"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Incidence of HIV, Ages 15–49 (SH.HIV.INCD.ZS) · UNAIDS</p>
+<script>
+const data = [
+  {"n":"Eswatini","col":"#EA5E33","pts":[{"y":1990,"v":6.8},{"y":1991,"v":12.4},{"y":1992,"v":20},{"y":1993,"v":29.4},{"y":1994,"v":39.3},{"y":1995,"v":46.2},{"y":1996,"v":49.5},{"y":1997,"v":50.4},{"y":1998,"v":48.5},{"y":1999,"v":47},{"y":2000,"v":44.1},{"y":2001,"v":41.4},{"y":2002,"v":39},{"y":2003,"v":37.5},{"y":2004,"v":36.5},{"y":2005,"v":34.1},{"y":2006,"v":33.6},{"y":2007,"v":32.7},{"y":2008,"v":32.1},{"y":2009,"v":31.1},{"y":2010,"v":29},{"y":2011,"v":29.1},{"y":2012,"v":28.6},{"y":2013,"v":28.2},{"y":2014,"v":26.4},{"y":2015,"v":21.9},{"y":2016,"v":17.4},{"y":2017,"v":14.6},{"y":2018,"v":14.1},{"y":2019,"v":12.7},{"y":2020,"v":10.2},{"y":2021,"v":10.1},{"y":2022,"v":7.9},{"y":2023,"v":8.1},{"y":2024,"v":7.5}]},
+  {"n":"Botswana","col":"#F29A44","pts":[{"y":1990,"v":27.9},{"y":1991,"v":35.6},{"y":1992,"v":42.1},{"y":1993,"v":47.1},{"y":1994,"v":50.1},{"y":1995,"v":49.7},{"y":1996,"v":47.3},{"y":1997,"v":43},{"y":1998,"v":38.6},{"y":1999,"v":34.4},{"y":2000,"v":30.7},{"y":2001,"v":27.5},{"y":2002,"v":24.4},{"y":2003,"v":22.2},{"y":2004,"v":19.9},{"y":2005,"v":17.7},{"y":2006,"v":16},{"y":2007,"v":15.2},{"y":2008,"v":14.2},{"y":2009,"v":13.5},{"y":2010,"v":12.9},{"y":2011,"v":13},{"y":2012,"v":12.2},{"y":2013,"v":11.2},{"y":2014,"v":10.6},{"y":2015,"v":10},{"y":2016,"v":9.1},{"y":2017,"v":8.1},{"y":2018,"v":7.1},{"y":2019,"v":6.1},{"y":2020,"v":5.5},{"y":2021,"v":4.4},{"y":2022,"v":3.6},{"y":2023,"v":3.3},{"y":2024,"v":3.1}]},
+  {"n":"Kenya","col":"#C49A45","pts":[{"y":1990,"v":17.7},{"y":1991,"v":19.5},{"y":1992,"v":19.7},{"y":1993,"v":18.4},{"y":1994,"v":15.6},{"y":1995,"v":12.8},{"y":1996,"v":10.7},{"y":1997,"v":9},{"y":1998,"v":7.9},{"y":1999,"v":6.9},{"y":2000,"v":6},{"y":2001,"v":5.4},{"y":2002,"v":4.9},{"y":2003,"v":4.5},{"y":2004,"v":4.1},{"y":2005,"v":3.8},{"y":2006,"v":3.6},{"y":2007,"v":3.3},{"y":2008,"v":3.1},{"y":2009,"v":2.8},{"y":2010,"v":2.6},{"y":2011,"v":2.3},{"y":2012,"v":2},{"y":2013,"v":1.8},{"y":2014,"v":1.6},{"y":2015,"v":1.4},{"y":2016,"v":1.1},{"y":2017,"v":0.96},{"y":2018,"v":0.83},{"y":2019,"v":0.79},{"y":2020,"v":0.74},{"y":2021,"v":0.69},{"y":2022,"v":0.66},{"y":2023,"v":0.56},{"y":2024,"v":0.53}]},
+  {"n":"Cote d'Ivoire","col":"#8BAD72","pts":[{"y":1990,"v":12.7},{"y":1991,"v":13.6},{"y":1992,"v":13.4},{"y":1993,"v":12.5},{"y":1994,"v":11.5},{"y":1995,"v":10.1},{"y":1996,"v":8.9},{"y":1997,"v":7.6},{"y":1998,"v":6.7},{"y":1999,"v":6.2},{"y":2000,"v":5.2},{"y":2001,"v":4.6},{"y":2002,"v":4.1},{"y":2003,"v":3.5},{"y":2004,"v":3.3},{"y":2005,"v":2.9},{"y":2006,"v":2.6},{"y":2007,"v":2.4},{"y":2008,"v":1.9},{"y":2009,"v":1.8},{"y":2010,"v":1.6},{"y":2011,"v":1.4},{"y":2012,"v":1.3},{"y":2013,"v":1.2},{"y":2014,"v":0.99},{"y":2015,"v":1},{"y":2016,"v":0.99},{"y":2017,"v":0.83},{"y":2018,"v":0.74},{"y":2019,"v":0.64},{"y":2020,"v":0.6},{"y":2021,"v":0.58},{"y":2022,"v":0.51},{"y":2023,"v":0.47},{"y":2024,"v":0.41}]},
+  {"n":"Central African Republic","col":"#C4715A","pts":[{"y":1990,"v":11.8},{"y":1991,"v":12.7},{"y":1992,"v":12.5},{"y":1993,"v":12.7},{"y":1994,"v":12.5},{"y":1995,"v":11.8},{"y":1996,"v":10.2},{"y":1997,"v":9.4},{"y":1998,"v":8.6},{"y":1999,"v":7.7},{"y":2000,"v":6.8},{"y":2001,"v":6.4},{"y":2002,"v":5.7},{"y":2003,"v":5.3},{"y":2004,"v":5.1},{"y":2005,"v":4.7},{"y":2006,"v":4.4},{"y":2007,"v":4.2},{"y":2008,"v":3.8},{"y":2009,"v":3.6},{"y":2010,"v":3.4},{"y":2011,"v":3.2},{"y":2012,"v":3.1},{"y":2013,"v":3},{"y":2014,"v":2.7},{"y":2015,"v":2.6},{"y":2016,"v":2.2},{"y":2017,"v":2},{"y":2018,"v":1.8},{"y":2019,"v":1.6},{"y":2020,"v":1.5},{"y":2021,"v":1.4},{"y":2022,"v":1.2},{"y":2023,"v":0.97},{"y":2024,"v":0.95}]},
+  {"n":"Cameroon","col":"#A6C4A2","pts":[{"y":1990,"v":3.2},{"y":1991,"v":4.1},{"y":1992,"v":5.2},{"y":1993,"v":6.3},{"y":1994,"v":7.5},{"y":1995,"v":8.2},{"y":1996,"v":8.9},{"y":1997,"v":9},{"y":1998,"v":9},{"y":1999,"v":8.5},{"y":2000,"v":7.9},{"y":2001,"v":7.1},{"y":2002,"v":6.4},{"y":2003,"v":5.8},{"y":2004,"v":5.2},{"y":2005,"v":4.7},{"y":2006,"v":4.4},{"y":2007,"v":4.1},{"y":2008,"v":3.8},{"y":2009,"v":3.4},{"y":2010,"v":3},{"y":2011,"v":2.8},{"y":2012,"v":2.4},{"y":2013,"v":2.2},{"y":2014,"v":2},{"y":2015,"v":1.8},{"y":2016,"v":1.7},{"y":2017,"v":1.5},{"y":2018,"v":1.4},{"y":2019,"v":1.3},{"y":2020,"v":1.2},{"y":2021,"v":1},{"y":2022,"v":0.81},{"y":2023,"v":0.74},{"y":2024,"v":0.7}]},
+  {"n":"Ethiopia","col":"#3D7A5A","pts":[{"y":1990,"v":6.3},{"y":1991,"v":6.5},{"y":1992,"v":6},{"y":1993,"v":5.3},{"y":1994,"v":4.3},{"y":1995,"v":3.6},{"y":1996,"v":2.9},{"y":1997,"v":2.4},{"y":1998,"v":2.1},{"y":1999,"v":1.8},{"y":2000,"v":1.5},{"y":2001,"v":1.3},{"y":2002,"v":1.2},{"y":2003,"v":1},{"y":2004,"v":0.88},{"y":2005,"v":0.79},{"y":2006,"v":0.7},{"y":2007,"v":0.64},{"y":2008,"v":0.59},{"y":2009,"v":0.52},{"y":2010,"v":0.47},{"y":2011,"v":0.42},{"y":2012,"v":0.38},{"y":2013,"v":0.33},{"y":2014,"v":0.29},{"y":2015,"v":0.24},{"y":2016,"v":0.25},{"y":2017,"v":0.22},{"y":2018,"v":0.21},{"y":2019,"v":0.19},{"y":2020,"v":0.16},{"y":2021,"v":0.19},{"y":2022,"v":0.14},{"y":2023,"v":0.13},{"y":2024,"v":0.12}]},
+  {"n":"Haiti","col":"#7A786F","pts":[{"y":1990,"v":4.5},{"y":1991,"v":4.2},{"y":1992,"v":3.7},{"y":1993,"v":3.4},{"y":1994,"v":3},{"y":1995,"v":2.9},{"y":1996,"v":2.6},{"y":1997,"v":2.4},{"y":1998,"v":2.3},{"y":1999,"v":2.2},{"y":2000,"v":2.2},{"y":2001,"v":2.1},{"y":2002,"v":2},{"y":2003,"v":1.8},{"y":2004,"v":1.7},{"y":2005,"v":1.6},{"y":2006,"v":1.5},{"y":2007,"v":1.4},{"y":2008,"v":1.4},{"y":2009,"v":1.3},{"y":2010,"v":1.3},{"y":2011,"v":1.3},{"y":2012,"v":1.2},{"y":2013,"v":1.1},{"y":2014,"v":1.1},{"y":2015,"v":1.1},{"y":2016,"v":1.1},{"y":2017,"v":1.2},{"y":2018,"v":1},{"y":2019,"v":1.1},{"y":2020,"v":0.95},{"y":2021,"v":0.87},{"y":2022,"v":0.86},{"y":2023,"v":0.77},{"y":2024,"v":0.7}]},
+  {"n":"Sub-Saharan Africa","col":"#2B2A27","pts":[{"y":1990,"v":6.554},{"y":1991,"v":7.068},{"y":1992,"v":7.322},{"y":1993,"v":7.349},{"y":1994,"v":7.205},{"y":1995,"v":6.895},{"y":1996,"v":6.659},{"y":1997,"v":6.381},{"y":1998,"v":6.043},{"y":1999,"v":5.659},{"y":2000,"v":5.285},{"y":2001,"v":4.903},{"y":2002,"v":4.558},{"y":2003,"v":4.251},{"y":2004,"v":4.003},{"y":2005,"v":3.76},{"y":2006,"v":3.561},{"y":2007,"v":3.36},{"y":2008,"v":3.184},{"y":2009,"v":3.015},{"y":2010,"v":2.88},{"y":2011,"v":2.709},{"y":2012,"v":2.552},{"y":2013,"v":2.382},{"y":2014,"v":2.203},{"y":2015,"v":2.05},{"y":2016,"v":1.889},{"y":2017,"v":1.699},{"y":2018,"v":1.561},{"y":2019,"v":1.439},{"y":2020,"v":1.289},{"y":2021,"v":1.193},{"y":2022,"v":1.057},{"y":2023,"v":0.976},{"y":2024,"v":0.876}]}
+];
+
+const W = 820, H = 480;
+const margin = {top: 30, right: 170, bottom: 40, left: 55};
+const plotW = W - margin.left - margin.right;
+const plotH = H - margin.top - margin.bottom;
+
+const yearMin = 1990, yearMax = 2024;
+const valMax = 55, valMin = 0;
+
+function xS(yr) { return margin.left + (yr - yearMin) / (yearMax - yearMin) * plotW; }
+function yS(v) { return margin.top + (valMax - v) / (valMax - valMin) * plotH; }
+
+function resolveCollisions(items, minGap, lo, hi) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) item.y = Math.max(lo, Math.min(hi, item.y));
+  return sorted;
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent = txt; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// Grid lines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  const yy = yS(v);
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yy, x2: margin.left + plotW, y2: yy, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = svg.appendChild(mkEl("text", { x: margin.left - 6, y: yy + 3.5, "text-anchor": "end", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = v;
+});
+
+// X axis
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  const xx = xS(yr);
+  svg.appendChild(mkEl("line", { x1: xx, y1: margin.top + plotH, x2: xx, y2: margin.top + plotH + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  const lbl = svg.appendChild(mkEl("text", { x: xx, y: margin.top + plotH + 14, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = yr;
+});
+
+// Y axis label
+const axLbl = svg.appendChild(mkEl("text", { x: margin.left - 40, y: margin.top + plotH/2, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace", transform: `rotate(-90, ${margin.left - 40}, ${margin.top + plotH/2})` }));
+axLbl.textContent = "per 1,000 uninfected (ages 15–49)";
+
+// Annotation: peak period
+const annX1 = xS(1993), annX2 = xS(1998);
+svg.appendChild(mkEl("rect", { x: annX1, y: margin.top, width: annX2 - annX1, height: plotH, fill: "#EA5E33", opacity: "0.04" }));
+
+// Draw lines
+const groups = [];
+data.forEach(series => {
+  const pts = series.pts;
+  const lastPt = pts[pts.length - 1];
+  const col = series.col;
+
+  const g = mkEl("g", {});
+  svg.appendChild(g);
+
+  let d = "";
+  pts.forEach((p, i) => {
+    d += (i === 0 ? "M" : "L") + ` ${xS(p.y)} ${yS(p.v)}`;
+  });
+
+  const isRegion = series.n === "Sub-Saharan Africa";
+  const path = mkEl("path", { d, stroke: col, "stroke-width": isRegion ? "2" : "1.4", fill: "none", "stroke-linejoin": "round", "stroke-dasharray": isRegion ? "5,3" : "none" });
+  g.appendChild(path);
+
+  const hit = mkEl("path", { d, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hit);
+
+  groups.push({ g, path, series, col, lastY: yS(lastPt.v), lastV: lastPt.v, lastYr: lastPt.y, isRegion });
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gr => {
+      gr.path.setAttribute("opacity", gr === groups.find(x=>x.g===g) ? "1" : "0.08");
+    });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / plotW));
+    const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const match = pts.find(p => p.y === yr) || pts.reduce((a, b) => Math.abs(b.y - yr) < Math.abs(a.y - yr) ? b : a);
+    showTip(`${series.n} · ${match.y}: ${match.v.toFixed(2)} per 1,000`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gr => gr.path.setAttribute("opacity", "1"));
+    hideTip();
+  });
+});
+
+// Endpoint labels
+const labelItems = groups.map(g => ({ y: g.lastY, ref: g }));
+const resolved = resolveCollisions(labelItems, 11, margin.top + 2, margin.top + plotH - 2);
+
+resolved.forEach(item => {
+  const g = item.ref;
+  const lx = margin.left + plotW + 6;
+  const origY = g.lastY;
+  const adjY = item.y;
+
+  if (Math.abs(adjY - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: lx - 4, y1: origY, x2: lx + 2, y2: adjY, stroke: g.col, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+
+  svg.appendChild(mkEl("circle", { cx: lx - 6, cy: origY, r: "2.5", fill: g.col }));
+
+  const lbl = svg.appendChild(mkEl("text", { x: lx, y: adjY + 3.5, fill: "#2B2A27", "font-size": "9", "font-family": "Inter, sans-serif", "font-weight": "500" }));
+  lbl.textContent = `${g.lastV.toFixed(2)}  ${g.series.n}`;
+});
+
+</script>
+</body></html>
