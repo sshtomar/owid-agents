@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  #chart { position: relative; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>Nuclear Power's Share of Electricity, 1990 vs 2022</h1>
+<p class="subtitle">% of electricity from nuclear sources. Germany shut down all its plants; Japan idled most after Fukushima (2011). France remains the world's most nuclear-dependent grid. Czechia expanded its share while others retreated. China grew from essentially zero.</p>
+<div id="chart"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Electricity Production from Nuclear Sources (EG.ELC.NUCL.ZS)</p>
+<script>
+// {n: name, a: 1990 value, b: 2022 value}
+const data = [
+  {"n":"France","a":74.65,"b":62.22},
+  {"n":"Belgium","a":60.24,"b":45.73},
+  {"n":"Korea, Rep.","a":48.44,"b":28.17},
+  {"n":"Hungary","a":48.29,"b":44.17},
+  {"n":"Finland","a":35.34,"b":35.1},
+  {"n":"Bulgaria","a":34.8,"b":32.6},
+  {"n":"Germany","a":27.72,"b":6.0},
+  {"n":"Japan","a":23.23,"b":5.51},
+  {"n":"Czechia","a":20.12,"b":36.56},
+  {"n":"Canada","a":15.11,"b":13.25},
+  {"n":"Argentina","a":14.27,"b":5.48},
+  {"n":"China","a":0,"b":4.67}
+];
+
+const W = 680, H = 580;
+const pad = {left: 130, right: 140, top: 50, bottom: 30};
+const plotH = H - pad.top - pad.bottom;
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const maxV = Math.ceil(Math.max(...allVals) / 5) * 5 + 5; // round up to nearest 5 + buffer
+const minV = 0;
+
+function yS(v) { return pad.top + (maxV - v) / (maxV - minV) * plotH; }
+
+function colorFor(d) {
+  const change = d.b - d.a;
+  if (change > 10) return "#3D7A5A";
+  if (change > 2) return "#8BAD72";
+  if (change > -5) return "#C49A45";
+  if (change > -15) return "#C4715A";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap, lo, hi) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) item.y = Math.max(lo, Math.min(hi, item.y));
+  return sorted;
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent = txt; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// Y-axis grid lines
+const gridTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80];
+gridTicks.forEach(v => {
+  if (v > maxV) return;
+  const yy = yS(v);
+  svg.appendChild(mkEl("line", { x1: leftX - 4, y1: yy, x2: rightX + 4, y2: yy, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = svg.appendChild(mkEl("text", { x: leftX - 120, y: yy + 3.5, "text-anchor": "start", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = v + "%";
+});
+
+// Column headers
+const hdr1 = svg.appendChild(mkEl("text", { x: leftX, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace" }));
+hdr1.textContent = "1990";
+const hdr2 = svg.appendChild(mkEl("text", { x: rightX, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace" }));
+hdr2.textContent = "2022";
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: leftX, y1: pad.top - 8, x2: leftX, y2: pad.top + plotH + 4, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: rightX, y1: pad.top - 8, x2: rightX, y2: pad.top + plotH + 4, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+// Build label arrays for collision resolution
+const leftLabels = data.map(d => ({ y: yS(d.a), d }));
+const rightLabels = data.map(d => ({ y: yS(d.b), d }));
+
+const resolvedLeft = resolveCollisions(leftLabels, 13, pad.top, pad.top + plotH);
+const resolvedRight = resolveCollisions(rightLabels, 13, pad.top, pad.top + plotH);
+
+const leftMap = new Map(resolvedLeft.map(item => [item.d.n, item.y]));
+const rightMap = new Map(resolvedRight.map(item => [item.d.n, item.y]));
+
+// Draw connecting lines
+const rowEls = [];
+data.forEach(d => {
+  const col = colorFor(d);
+  const y1 = yS(d.a), y2 = yS(d.b);
+  const g = mkEl("g", {});
+  svg.appendChild(g);
+
+  // Visible line
+  const line = mkEl("line", { x1: leftX, y1, x2: rightX, y2, stroke: col, "stroke-width": "1.4", opacity: "1" });
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: leftX, cy: y1, r: "3", fill: col }));
+  g.appendChild(mkEl("circle", { cx: rightX, cy: y2, r: "3", fill: col }));
+
+  // Hit area
+  const hit = mkEl("line", { x1: leftX, y1, x2: rightX, y2, stroke: "transparent", "stroke-width": "14" });
+  g.appendChild(hit);
+
+  rowEls.push({ g, line, d, col });
+
+  hit.addEventListener("mouseenter", e => {
+    rowEls.forEach(r => { r.line.setAttribute("opacity", r.d.n === d.n ? "1" : "0.08"); r.line.setAttribute("stroke-width", r.d.n === d.n ? "2.5" : "1.4"); });
+    const change = d.b - d.a;
+    const sign = change >= 0 ? "+" : "";
+    showTip(`${d.n}: ${d.a.toFixed(1)}% → ${d.b.toFixed(1)}% (${sign}${change.toFixed(1)} pp)`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    rowEls.forEach(r => { r.line.setAttribute("opacity", "1"); r.line.setAttribute("stroke-width", "1.4"); });
+    hideTip();
+  });
+});
+
+// Left labels
+data.forEach(d => {
+  const col = colorFor(d);
+  const adjY = leftMap.get(d.n);
+  const origY = yS(d.a);
+  if (Math.abs(adjY - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: leftX - 2, y1: origY, x2: leftX - 5, y2: adjY, stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const lbl = svg.appendChild(mkEl("text", { x: leftX - 8, y: adjY + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9.5", "font-family": "Inter, sans-serif" }));
+  lbl.textContent = `${d.n}  ${d.a.toFixed(1)}%`;
+});
+
+// Right labels
+data.forEach(d => {
+  const col = colorFor(d);
+  const adjY = rightMap.get(d.n);
+  const origY = yS(d.b);
+  if (Math.abs(adjY - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: rightX + 2, y1: origY, x2: rightX + 5, y2: adjY, stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const lbl = svg.appendChild(mkEl("text", { x: rightX + 8, y: adjY + 3.5, fill: "#2B2A27", "font-size": "9.5", "font-family": "Inter, sans-serif" }));
+  lbl.textContent = `${d.b.toFixed(1)}%  ${d.n}`;
+});
+
+// Legend
+const legendY = H - 14;
+const legendItems = [
+  { col: "#3D7A5A", label: "Growing" },
+  { col: "#C49A45", label: "Stable" },
+  { col: "#B34B3B", label: "Declining" }
+];
+legendItems.forEach((item, i) => {
+  const lx = 30 + i * 110;
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 7, width: 18, height: 3, fill: item.col }));
+  const lbl = svg.appendChild(mkEl("text", { x: lx + 22, y: legendY + 0.5, fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = item.label;
+});
+
+</script>
+</body></html>

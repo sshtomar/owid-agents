@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend { display: flex; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #7A786F; font-family: 'JetBrains Mono', monospace; }
+  .leg-swatch { width: 20px; height: 2px; }
+  #chart { position: relative; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>Intentional Homicide Rate, 1990–2023</h1>
+<p class="subtitle">Homicides per 100,000 people (log scale). Latin America and the Caribbean stand in stark contrast to East Asia and Western Europe. Colombia fell from 86 homicides in 1991 to 25 in 2023; El Salvador plunged from a world peak of 138 in 1995 to 8 by 2022. Ecuador surged from 6 to 46 in the 2020s as cartel violence escalated.</p>
+<div class="legend">
+  <div class="leg-item"><div class="leg-swatch" style="background:#EA5E33"></div>&gt; 40 / 100k</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#F29A44"></div>20–40</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#C49A45"></div>5–20</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#A6C4A2"></div>&lt; 5</div>
+</div>
+<div id="chart"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Intentional Homicides (VC.IHR.PSRC.P5) · UNODC</p>
+<script>
+const data = [{"n":"Jamaica","pts":[{"y":1990,"v":22.86},{"y":1991,"v":23.57},{"y":1992,"v":26.07},{"y":1993,"v":26.82},{"y":1994,"v":27.96},{"y":1995,"v":31.2},{"y":1996,"v":36.64},{"y":1997,"v":40.74},{"y":1998,"v":33.43},{"y":1999,"v":32.98},{"y":2000,"v":34.01},{"y":2001,"v":43.4},{"y":2002,"v":39.57},{"y":2003,"v":36.7},{"y":2004,"v":55.05},{"y":2005,"v":62.3},{"y":2006,"v":49.61},{"y":2007,"v":58.37},{"y":2008,"v":59.4},{"y":2009,"v":61.49},{"y":2010,"v":52.65},{"y":2011,"v":41.04},{"y":2012,"v":39.75},{"y":2013,"v":43.18},{"y":2014,"v":35.97},{"y":2015,"v":43.14},{"y":2016,"v":48.19},{"y":2017,"v":58.49},{"y":2018,"v":45.71},{"y":2019,"v":47.46},{"y":2020,"v":47.09},{"y":2021,"v":51.94},{"y":2022,"v":53.11},{"y":2023,"v":49.44}]},{"n":"Ecuador","pts":[{"y":1990,"v":8.52},{"y":1991,"v":10.77},{"y":1992,"v":8.55},{"y":1993,"v":8.3},{"y":1994,"v":10.02},{"y":1995,"v":11.84},{"y":1996,"v":12.38},{"y":1997,"v":10.94},{"y":1998,"v":13.41},{"y":1999,"v":13.49},{"y":2000,"v":14.45},{"y":2001,"v":12.84},{"y":2002,"v":14.51},{"y":2007,"v":15.86},{"y":2008,"v":17.89},{"y":2009,"v":17.71},{"y":2010,"v":17.4},{"y":2011,"v":15.29},{"y":2012,"v":12.34},{"y":2013,"v":10.91},{"y":2014,"v":8.17},{"y":2015,"v":6.46},{"y":2016,"v":5.81},{"y":2017,"v":5.79},{"y":2018,"v":5.83},{"y":2019,"v":6.85},{"y":2020,"v":7.82},{"y":2021,"v":14.12},{"y":2022,"v":27.41},{"y":2023,"v":45.72}]},{"n":"Honduras","pts":[{"y":1990,"v":9.95},{"y":1991,"v":13.74},{"y":1992,"v":18.12},{"y":1993,"v":23.1},{"y":1994,"v":30.16},{"y":1995,"v":26.73},{"y":1999,"v":40.04},{"y":2000,"v":48.28},{"y":2001,"v":51.61},{"y":2002,"v":52.21},{"y":2003,"v":57.21},{"y":2004,"v":49.86},{"y":2005,"v":42.95},{"y":2006,"v":40.72},{"y":2007,"v":45.8},{"y":2008,"v":55.6},{"y":2009,"v":64.47},{"y":2010,"v":74.54},{"y":2011,"v":83.18},{"y":2012,"v":82.29},{"y":2013,"v":72.35},{"y":2014,"v":65.0},{"y":2015,"v":55.73},{"y":2016,"v":54.72},{"y":2017,"v":40.3},{"y":2018,"v":37.98},{"y":2019,"v":41.01},{"y":2020,"v":35.7},{"y":2021,"v":38.2},{"y":2022,"v":34.97},{"y":2023,"v":31.44}]},{"n":"Colombia","pts":[{"y":1990,"v":75.0},{"y":1991,"v":85.88},{"y":1992,"v":83.48},{"y":1993,"v":82.58},{"y":1994,"v":77.09},{"y":1995,"v":62.34},{"y":1996,"v":64.04},{"y":1997,"v":62.5},{"y":1998,"v":61.09},{"y":1999,"v":63.33},{"y":2000,"v":67.89},{"y":2001,"v":70.11},{"y":2002,"v":70.4},{"y":2003,"v":57.46},{"y":2004,"v":48.65},{"y":2005,"v":42.99},{"y":2006,"v":40.94},{"y":2007,"v":39.78},{"y":2008,"v":36.88},{"y":2009,"v":35.73},{"y":2010,"v":34.52},{"y":2011,"v":35.63},{"y":2012,"v":35.96},{"y":2013,"v":33.42},{"y":2014,"v":28.65},{"y":2015,"v":27.22},{"y":2016,"v":26.14},{"y":2017,"v":25.55},{"y":2018,"v":23.82},{"y":2019,"v":23.4},{"y":2020,"v":22.64},{"y":2021,"v":25.58},{"y":2022,"v":24.95},{"y":2023,"v":24.91}]},{"n":"Brazil","pts":[{"y":1990,"v":19.65},{"y":1991,"v":18.55},{"y":1992,"v":16.83},{"y":1993,"v":17.87},{"y":1994,"v":18.74},{"y":1995,"v":21.02},{"y":1996,"v":23.69},{"y":1997,"v":24.3},{"y":1998,"v":24.8},{"y":1999,"v":25.0},{"y":2000,"v":26.07},{"y":2001,"v":27.2},{"y":2002,"v":27.85},{"y":2003,"v":28.27},{"y":2004,"v":26.49},{"y":2005,"v":25.77},{"y":2006,"v":26.34},{"y":2007,"v":25.31},{"y":2008,"v":26.34},{"y":2009,"v":26.79},{"y":2010,"v":26.99},{"y":2011,"v":26.75},{"y":2012,"v":28.64},{"y":2013,"v":28.64},{"y":2014,"v":29.85},{"y":2015,"v":28.85},{"y":2016,"v":30.12},{"y":2017,"v":31.16},{"y":2018,"v":27.16},{"y":2019,"v":21.24},{"y":2020,"v":21.81},{"y":2021,"v":20.5},{"y":2022,"v":20.08},{"y":2023,"v":19.28}]},{"n":"El Salvador","pts":[{"y":1994,"v":134.28},{"y":1995,"v":138.44},{"y":1996,"v":117.0},{"y":1997,"v":112.46},{"y":1998,"v":94.95},{"y":1999,"v":65.02},{"y":2000,"v":59.75},{"y":2001,"v":60.15},{"y":2002,"v":47.36},{"y":2003,"v":55.95},{"y":2004,"v":64.9},{"y":2005,"v":64.64},{"y":2006,"v":65.42},{"y":2007,"v":58.19},{"y":2008,"v":52.73},{"y":2009,"v":72.45},{"y":2010,"v":65.7},{"y":2011,"v":71.77},{"y":2012,"v":42.43},{"y":2013,"v":40.94},{"y":2014,"v":63.62},{"y":2015,"v":107.64},{"y":2016,"v":85.09},{"y":2017,"v":63.76},{"y":2018,"v":53.8},{"y":2019,"v":38.54},{"y":2020,"v":21.51},{"y":2021,"v":17.34},{"y":2022,"v":7.9}]},{"n":"India","pts":[{"y":1990,"v":5.11},{"y":1991,"v":5.5},{"y":1992,"v":5.5},{"y":1993,"v":5.2},{"y":1994,"v":5.04},{"y":1995,"v":4.83},{"y":1996,"v":4.79},{"y":1997,"v":4.75},{"y":1998,"v":4.84},{"y":1999,"v":4.6},{"y":2000,"v":4.55},{"y":2001,"v":4.31},{"y":2002,"v":4.17},{"y":2003,"v":3.97},{"y":2004,"v":4.09},{"y":2005,"v":3.91},{"y":2006,"v":3.83},{"y":2007,"v":3.81},{"y":2008,"v":3.81},{"y":2009,"v":3.74},{"y":2010,"v":3.74},{"y":2011,"v":3.78},{"y":2012,"v":3.71},{"y":2013,"v":3.54},{"y":2014,"v":3.61},{"y":2015,"v":3.34},{"y":2016,"v":3.15},{"y":2017,"v":3.08},{"y":2018,"v":3.03},{"y":2019,"v":2.95},{"y":2020,"v":2.94},{"y":2021,"v":2.92},{"y":2022,"v":2.82}]},{"n":"Canada","pts":[{"y":1990,"v":2.36},{"y":1991,"v":2.68},{"y":1992,"v":2.57},{"y":1993,"v":2.17},{"y":1994,"v":2.04},{"y":1995,"v":1.99},{"y":1996,"v":2.13},{"y":1997,"v":1.95},{"y":1998,"v":1.84},{"y":1999,"v":1.76},{"y":2000,"v":1.77},{"y":2001,"v":1.77},{"y":2002,"v":1.85},{"y":2003,"v":1.72},{"y":2004,"v":1.95},{"y":2005,"v":2.05},{"y":2006,"v":1.86},{"y":2007,"v":1.8},{"y":2008,"v":1.84},{"y":2009,"v":1.8},{"y":2010,"v":1.63},{"y":2011,"v":1.76},{"y":2012,"v":1.57},{"y":2013,"v":1.44},{"y":2014,"v":1.47},{"y":2015,"v":1.7},{"y":2016,"v":1.69},{"y":2017,"v":1.81},{"y":2018,"v":1.78},{"y":2019,"v":1.82},{"y":2020,"v":2.0},{"y":2021,"v":2.08},{"y":2022,"v":2.27},{"y":2023,"v":1.98}]},{"n":"Estonia","pts":[{"y":1990,"v":7.51},{"y":1991,"v":7.6},{"y":1992,"v":14.09},{"y":1993,"v":18.75},{"y":1994,"v":20.46},{"y":1995,"v":16.93},{"y":1996,"v":14.92},{"y":1997,"v":12.52},{"y":1998,"v":13.89},{"y":1999,"v":11.19},{"y":2000,"v":10.24},{"y":2001,"v":9.87},{"y":2002,"v":10.29},{"y":2007,"v":7.16},{"y":2008,"v":6.43},{"y":2009,"v":5.25},{"y":2010,"v":5.26},{"y":2011,"v":4.9},{"y":2012,"v":4.76},{"y":2013,"v":3.95},{"y":2014,"v":3.12},{"y":2015,"v":3.42},{"y":2016,"v":2.51},{"y":2017,"v":2.2},{"y":2018,"v":2.12},{"y":2019,"v":1.96},{"y":2020,"v":3.16},{"y":2021,"v":1.95},{"y":2022,"v":1.48},{"y":2023,"v":1.54}]},{"n":"Germany","pts":[{"y":1990,"v":1.17},{"y":1991,"v":1.4},{"y":1992,"v":1.43},{"y":1993,"v":1.65},{"y":1994,"v":2.38},{"y":1995,"v":2.48},{"y":1996,"v":2.34},{"y":1997,"v":2.18},{"y":1998,"v":1.95},{"y":1999,"v":1.62},{"y":2000,"v":1.67},{"y":2001,"v":1.44},{"y":2002,"v":1.43},{"y":2003,"v":1.34},{"y":2004,"v":1.35},{"y":2005,"v":1.27},{"y":2006,"v":1.21},{"y":2007,"v":1.09},{"y":2008,"v":1.02},{"y":2009,"v":0.99},{"y":2010,"v":0.98},{"y":2011,"v":0.91},{"y":2012,"v":0.81},{"y":2013,"v":0.84},{"y":2014,"v":0.88},{"y":2015,"v":0.83},{"y":2016,"v":1.16},{"y":2017,"v":0.98},{"y":2018,"v":0.95},{"y":2019,"v":0.75},{"y":2020,"v":0.94},{"y":2021,"v":0.83},{"y":2022,"v":0.82},{"y":2023,"v":0.91}]},{"n":"Japan","pts":[{"y":1990,"v":0.55},{"y":1991,"v":0.52},{"y":1992,"v":0.54},{"y":1993,"v":0.57},{"y":1994,"v":0.6},{"y":1995,"v":0.58},{"y":1996,"v":0.52},{"y":1997,"v":0.56},{"y":1998,"v":0.61},{"y":1999,"v":0.58},{"y":2000,"v":0.53},{"y":2001,"v":0.55},{"y":2002,"v":0.52},{"y":2003,"v":0.55},{"y":2004,"v":0.55},{"y":2005,"v":0.5},{"y":2006,"v":0.48},{"y":2007,"v":0.45},{"y":2008,"v":0.51},{"y":2009,"v":0.39},{"y":2010,"v":0.36},{"y":2011,"v":0.35},{"y":2012,"v":0.34},{"y":2013,"v":0.29},{"y":2014,"v":0.31},{"y":2015,"v":0.29},{"y":2016,"v":0.28},{"y":2017,"v":0.24},{"y":2018,"v":0.26},{"y":2019,"v":0.25},{"y":2020,"v":0.25},{"y":2021,"v":0.23},{"y":2022,"v":0.23},{"y":2023,"v":0.23}]},{"n":"Korea, Rep.","pts":[{"y":1990,"v":0.47},{"y":1991,"v":0.49},{"y":1992,"v":0.54},{"y":1993,"v":0.68},{"y":1994,"v":0.5},{"y":1995,"v":0.5},{"y":1996,"v":0.54},{"y":1997,"v":0.6},{"y":1998,"v":0.82},{"y":1999,"v":0.83},{"y":2000,"v":0.79},{"y":2001,"v":0.87},{"y":2002,"v":0.78},{"y":2003,"v":0.81},{"y":2004,"v":0.88},{"y":2005,"v":0.86},{"y":2006,"v":0.87},{"y":2007,"v":0.89},{"y":2008,"v":0.89},{"y":2009,"v":1.1},{"y":2010,"v":0.99},{"y":2011,"v":0.82},{"y":2012,"v":0.88},{"y":2013,"v":0.7},{"y":2014,"v":0.75},{"y":2015,"v":0.74},{"y":2016,"v":0.69},{"y":2017,"v":0.58},{"y":2018,"v":0.6},{"y":2019,"v":0.57},{"y":2020,"v":0.59},{"y":2021,"v":0.47},{"y":2022,"v":0.5},{"y":2023,"v":0.48}]}];
+
+const W = 820, H = 460;
+const margin = {top: 30, right: 155, bottom: 40, left: 55};
+const plotW = W - margin.left - margin.right;
+const plotH = H - margin.top - margin.bottom;
+
+const yearMin = 1990, yearMax = 2023;
+const logMin = Math.log10(0.15), logMax = Math.log10(200);
+
+function xS(yr) { return margin.left + (yr - yearMin) / (yearMax - yearMin) * plotW; }
+function yS(v) { return margin.top + (logMax - Math.log10(Math.max(v, 0.15))) / (logMax - logMin) * plotH; }
+
+function colorFor(recentV) {
+  if (recentV > 40) return "#EA5E33";
+  if (recentV > 20) return "#F29A44";
+  if (recentV > 5)  return "#C49A45";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap, lo, hi) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp within visible range
+  for (const item of sorted) {
+    item.y = Math.max(lo, Math.min(hi, item.y));
+  }
+  return sorted;
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent = txt; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// Grid lines at log-round values
+const gridVals = [0.2, 0.5, 1, 2, 5, 10, 20, 50, 100];
+gridVals.forEach(v => {
+  const yy = yS(v);
+  if (yy < margin.top || yy > margin.top + plotH) return;
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yy, x2: margin.left + plotW, y2: yy, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = svg.appendChild(mkEl("text", { x: margin.left - 6, y: yy + 3.5, "text-anchor": "end", fill: "#9A9890", "font-size": "8", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = v < 1 ? v.toFixed(1) : v;
+});
+
+// X axis ticks
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2023].forEach(yr => {
+  const xx = xS(yr);
+  svg.appendChild(mkEl("line", { x1: xx, y1: margin.top + plotH, x2: xx, y2: margin.top + plotH + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  const lbl = svg.appendChild(mkEl("text", { x: xx, y: margin.top + plotH + 14, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" }));
+  lbl.textContent = yr;
+});
+
+// Axis label
+const axLbl = svg.appendChild(mkEl("text", { x: margin.left - 38, y: margin.top + plotH/2, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace", transform: `rotate(-90, ${margin.left - 38}, ${margin.top + plotH/2})` }));
+axLbl.textContent = "per 100,000 (log scale)";
+
+// Draw lines
+const groups = [];
+data.forEach(series => {
+  const pts = series.pts;
+  const lastPt = pts[pts.length - 1];
+  const col = colorFor(lastPt.v);
+
+  const g = mkEl("g", {});
+  svg.appendChild(g);
+
+  // Visible line
+  let d = "";
+  pts.forEach((p, i) => {
+    const px = xS(p.y), py = yS(p.v);
+    d += (i === 0 ? "M" : "L") + ` ${px} ${py}`;
+  });
+  const path = mkEl("path", { d, stroke: col, "stroke-width": "1.4", fill: "none", "stroke-linejoin": "round", opacity: "1" });
+  g.appendChild(path);
+
+  // Invisible hit area
+  const hit = mkEl("path", { d, stroke: "transparent", "stroke-width": "12", fill: "none", style: "cursor:crosshair" });
+  g.appendChild(hit);
+
+  groups.push({ g, path, series, col, lastY: yS(lastPt.v), lastV: lastPt.v, lastYr: lastPt.y });
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gr => {
+      gr.path.setAttribute("opacity", gr === groups.find(x=>x.g===g) ? "1" : "0.08");
+      gr.path.setAttribute("stroke-width", gr === groups.find(x=>x.g===g) ? "2.5" : "1.4");
+    });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / plotW));
+    const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const match = pts.find(p => p.y === yr) || pts.reduce((a, b) => Math.abs(b.y - yr) < Math.abs(a.y - yr) ? b : a);
+    showTip(`${series.n} · ${match.y}: ${match.v.toFixed(1)} per 100k`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gr => { gr.path.setAttribute("opacity", "1"); gr.path.setAttribute("stroke-width", "1.4"); });
+    hideTip();
+  });
+});
+
+// Endpoint labels
+const labelItems = groups.map(g => ({ y: g.lastY, ref: g }));
+const resolved = resolveCollisions(labelItems, 11, margin.top + 2, margin.top + plotH - 2);
+
+resolved.forEach(item => {
+  const g = item.ref;
+  const lx = margin.left + plotW + 6;
+  const origY = g.lastY;
+  const adjY = item.y;
+
+  // Leader line if label moved
+  if (Math.abs(adjY - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: lx - 4, y1: origY, x2: lx + 2, y2: adjY, stroke: g.col, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+
+  const dot = mkEl("circle", { cx: lx - 6, cy: origY, r: "2.5", fill: g.col });
+  svg.appendChild(dot);
+
+  const lbl = svg.appendChild(mkEl("text", { x: lx, y: adjY + 3.5, fill: "#2B2A27", "font-size": "9", "font-family": "Inter, sans-serif", "font-weight": "500" }));
+  lbl.textContent = `${g.lastV.toFixed(1)}  ${g.series.n}`;
+});
+
+</script>
+</body></html>
