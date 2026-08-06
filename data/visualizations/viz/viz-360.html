@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 16px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0;
+      background: #0f172a; color: #fff; font-size: 12px;
+      padding: 6px 10px; border-radius: 4px;
+      transition: opacity 0.1s; white-space: nowrap; z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>The Energy Transition — Fossil Fuel Share of Electricity</h1>
+  <p class="subtitle">Share of electricity produced from oil, gas, and coal (%), 2000 vs 2022</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Electricity Production from Fossil Fuels (EG.ELC.FOSL.ZS)</p>
+  <div id="tip"></div>
+  <script>
+    // Data exported from catalog: wb--EG-ELC-FOSL-ZS (2000 vs 2022)
+    const data = [{"n":"Chad","a":100.0,"b":98.1},{"n":"Eritrea","a":99.5,"b":97.2},{"n":"Iran, Islamic Rep.","a":97.0,"b":93.9},{"n":"Jamaica","a":97.7,"b":87.9},{"n":"Israel","a":99.9,"b":91.3},{"n":"Ireland","a":93.8,"b":59.4},{"n":"Cambodia","a":99.8,"b":35.2},{"n":"Australia","a":91.5,"b":69.1},{"n":"Greece","a":91.2,"b":57.0},{"n":"Estonia","a":99.8,"b":67.0},{"n":"Czechia","a":77.6,"b":49.3},{"n":"Denmark","a":82.9,"b":16.4},{"n":"Kenya","a":53.0,"b":12.2},{"n":"Eswatini","a":31.9,"b":2.7}];
+
+    // Sort by 2000 value descending
+    data.sort((x,y) => y.a - x.a);
+
+    const colorForChange = d => {
+      const drop = d.a - d.b;
+      if (drop > 55) return "#3D7A5A";
+      if (drop > 35) return "#5B9E78";
+      if (drop > 20) return "#C49A45";
+      if (drop > 10) return "#F29A44";
+      return "#C93A1E";
+    };
+
+    const W = 680, H = 520;
+    const pad = {left: 120, right: 130, top: 50, bottom: 24};
+    const innerH = H - pad.top - pad.bottom;
+
+    const minV = 0, maxV = 105;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * innerH;
+    const leftX = pad.left;
+    const rightX = W - pad.right;
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:680px;display:block;"});
+
+    // Axes
+    svg.appendChild(mkEl("line", {x1: leftX, y1: pad.top - 10, x2: leftX, y2: pad.top + innerH, stroke: "#CBD5E1", "stroke-width": "1.5"}));
+    svg.appendChild(mkEl("line", {x1: rightX, y1: pad.top - 10, x2: rightX, y2: pad.top + innerH, stroke: "#CBD5E1", "stroke-width": "1.5"}));
+
+    // Year headers
+    const h2000 = mkEl("text", {x: leftX, y: pad.top - 14, "text-anchor": "middle", "font-size": "12", fill: "#64748b", "font-family": "monospace", "font-weight": "600"});
+    h2000.textContent = "2000";
+    svg.appendChild(h2000);
+
+    const h2022 = mkEl("text", {x: rightX, y: pad.top - 14, "text-anchor": "middle", "font-size": "12", fill: "#64748b", "font-family": "monospace", "font-weight": "600"});
+    h2022.textContent = "2022";
+    svg.appendChild(h2022);
+
+    const tip = document.getElementById("tip");
+    const rows = [];
+
+    // Resolve left and right label collisions independently
+    const leftItems = data.map(d => ({y: scale(d.a), n: d.n}));
+    const rightItems = data.map(d => ({y: scale(d.b), n: d.n}));
+    const resolvedLeft = resolveCollisions(leftItems, 14);
+    const resolvedRight = resolveCollisions(rightItems, 14);
+
+    data.forEach((d, i) => {
+      const color = colorForChange(d);
+      const ya = scale(d.a);
+      const yb = scale(d.b);
+      const g = mkEl("g", {});
+
+      // Connecting line
+      const line = mkEl("line", {x1: leftX, y1: ya, x2: rightX, y2: yb, stroke: color, "stroke-width": "1.6", opacity: "0.9"});
+      g.appendChild(line);
+
+      // Invisible hit area
+      const hit = mkEl("line", {x1: leftX, y1: ya, x2: rightX, y2: yb, stroke: "transparent", "stroke-width": "14", style: "cursor:pointer"});
+      g.appendChild(hit);
+
+      // Dots
+      g.appendChild(mkEl("circle", {cx: leftX, cy: ya, r: "3.5", fill: color}));
+      g.appendChild(mkEl("circle", {cx: rightX, cy: yb, r: "3.5", fill: color}));
+
+      // Left label (resolved)
+      const leftEntry = resolvedLeft.find(r => r.n === d.n);
+      const leftY = leftEntry ? Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, leftEntry.y)) : ya;
+      if (Math.abs(leftY - ya) > 3) {
+        g.appendChild(mkEl("line", {x1: leftX - 2, y1: ya, x2: leftX - 14, y2: leftY, stroke: color, "stroke-width": "0.6", opacity: "0.4"}));
+      }
+      const leftLbl = mkEl("text", {x: leftX - 8, y: leftY + 4, "text-anchor": "end", "font-size": "10", fill: "#334155", "font-family": "monospace"});
+      leftLbl.textContent = `${d.n}  ${d.a}%`;
+      g.appendChild(leftLbl);
+
+      // Right label (resolved)
+      const rightEntry = resolvedRight.find(r => r.n === d.n);
+      const rightY = rightEntry ? Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, rightEntry.y)) : yb;
+      if (Math.abs(rightY - yb) > 3) {
+        g.appendChild(mkEl("line", {x1: rightX + 2, y1: yb, x2: rightX + 14, y2: rightY, stroke: color, "stroke-width": "0.6", opacity: "0.4"}));
+      }
+      const rightLbl = mkEl("text", {x: rightX + 8, y: rightY + 4, "text-anchor": "start", "font-size": "10", fill: color, "font-family": "monospace", "font-weight": "600"});
+      rightLbl.textContent = `${d.b}%  ${d.n}`;
+      g.appendChild(rightLbl);
+
+      svg.appendChild(g);
+      rows.push({g, line, hit, d, color, leftLbl, rightLbl});
+    });
+
+    // Legend
+    const legendY = H - 8;
+    const legendItems = [
+      {color: "#3D7A5A", label: "↓ >55pp decline"},
+      {color: "#5B9E78", label: "↓ 35–55pp"},
+      {color: "#C49A45", label: "↓ 20–35pp"},
+      {color: "#F29A44", label: "↓ 10–20pp"},
+      {color: "#C93A1E", label: "↓ <10pp"},
+    ];
+    let lx = pad.left;
+    legendItems.forEach(item => {
+      svg.appendChild(mkEl("rect", {x: lx, y: legendY - 9, width: 10, height: 10, fill: item.color, rx: "2"}));
+      const t = mkEl("text", {x: lx + 14, y: legendY, "font-size": "9.5", fill: "#64748b", "font-family": "monospace"});
+      t.textContent = item.label;
+      svg.appendChild(t);
+      lx += 110;
+    });
+
+    rows.forEach(({line, hit, d, color, leftLbl, rightLbl}, idx) => {
+      hit.addEventListener("mouseenter", e => {
+        rows.forEach(({line: l, leftLbl: ll, rightLbl: rl}, j) => {
+          l.setAttribute("opacity", j === idx ? "1" : "0.08");
+          l.setAttribute("stroke-width", j === idx ? "3" : "1.6");
+          ll.setAttribute("opacity", j === idx ? "1" : "0.2");
+          rl.setAttribute("opacity", j === idx ? "1" : "0.2");
+        });
+        const change = (d.b - d.a).toFixed(1);
+        tip.textContent = `${d.n}: ${d.a}% (2000) → ${d.b}% (2022)  ${change > 0 ? "+" : ""}${change}pp`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        rows.forEach(({line: l, leftLbl: ll, rightLbl: rl}) => {
+          l.setAttribute("opacity", "0.9");
+          l.setAttribute("stroke-width", "1.6");
+          ll.setAttribute("opacity", "1");
+          rl.setAttribute("opacity", "1");
+        });
+        tip.style.opacity = "0";
+      });
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

@@ -5858,7 +5858,80 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Global Scale-Up of HIV Treatment",
+      "description": "Antiretroviral therapy coverage (% of people living with HIV) from 2000 to 2024 across 10 countries in Africa, Asia, and the Americas \u2014 showing how ART access rose from near zero to 80\u201395% within two decades.",
+      "datasetIds": [
+        "wb--SH-HIV-ARTC-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "generatedCode": "",
+      "highlights": [
+        "Botswana and Eswatini reached 94-95% ART coverage by 2024, up from 0% in 2000",
+        "Cambodia, Burundi, and Kenya all crossed 85% coverage despite very different health systems",
+        "Haiti and Ecuador achieved 80%+ coverage through sustained PEPFAR and global health investment"
+      ],
+      "createdAt": "2026-08-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "International Tourism Arrivals \u2014 The COVID Collapse",
+      "description": "Annual international tourist arrivals (millions) for 10 top destinations from 1995 to 2020, showing decades of growth followed by a historic 2020 collapse due to COVID-19 travel restrictions.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "generatedCode": "",
+      "highlights": [
+        "France and China saw arrivals collapse by 46% and 81% respectively in 2020",
+        "Japan and Korea experienced 87% and 86% declines \u2014 the sharpest drops among major destinations",
+        "Croatia, a smaller destination, still registered 60M arrivals in 2019 before the COVID crash"
+      ],
+      "createdAt": "2026-08-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "The Demographic Transition in Population Growth",
+      "description": "Annual population growth rates (%) from 1961 to 2024 for 7 countries, illustrating the global shift from high fertility and rapid growth toward stabilization and even decline.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "generatedCode": "",
+      "highlights": [
+        "Japan and Germany both have negative population growth rates, while Ethiopia remains above 2.5% annually",
+        "China's growth rate fell from 2.75% in the late 1960s to -0.12% by 2024 \u2014 a dramatic one-child policy legacy",
+        "India's growth rate has halved since 1961, now below 1% for the first time in modern history"
+      ],
+      "createdAt": "2026-08-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "The Energy Transition \u2014 Fossil Fuel Share of Electricity",
+      "description": "Slope chart comparing the share of electricity produced from fossil fuels in 2000 vs 2022 for 14 countries, revealing which nations have shifted toward renewables and which remain largely fossil-dependent.",
+      "datasetIds": [
+        "wb--EG-ELC-FOSL-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "generatedCode": "",
+      "highlights": [
+        "Denmark cut fossil fuel electricity from 83% to 16% in two decades, driven by massive wind expansion",
+        "Cambodia dropped from 100% to 35% through rapid solar and hydropower growth",
+        "Kenya fell from 53% to 12%, already benefiting from geothermal and wind power",
+        "Chad and Eritrea remain above 97% fossil fuel reliance with virtually no transition"
+      ],
+      "createdAt": "2026-08-06T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-06T00:00:00.000Z"
 }
