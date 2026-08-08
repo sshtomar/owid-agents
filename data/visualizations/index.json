@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Aging Squeeze: Old-Age Dependency Ratios, 1960\u20132024",
+      "description": "Trend lines for 9 countries showing how many elderly people (65+) exist per 100 working-age adults. Japan rose from 8.9% to 50.7% \u2014 the most dramatic aging trajectory of any major economy. South Korea is on a similar path.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan's ratio sextupled from 8.9% (1960) to 50.7% (2024) \u2014 one retiree per two workers",
+        "South Korea jumped from 5.6% to 27.5% and is still accelerating",
+        "Ethiopia remained flat near 5% throughout \u2014 Africa's youth dividend persists"
+      ],
+      "createdAt": "2026-08-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Population Growth in Free-Fall \u2014 Most of the World is Slowing",
+      "description": "Annual population growth rates (%) for 9 countries and regions, 1961\u20132024. Sub-Saharan Africa and Ethiopia remain near 2.5%, while Japan, South Korea, and China have crossed into negative or near-zero territory.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan and South Korea crossed into negative growth by 2020, China by 2023",
+        "Sub-Saharan Africa has stayed near 2.5% for six decades, bucking the global trend",
+        "Brazil fell from 3.0% in 1961 to 0.4% in 2024 \u2014 a demographic revolution"
+      ],
+      "createdAt": "2026-08-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Shrinking Farmland: Arable Land per Person, 1961\u20132023",
+      "description": "Hectares of arable land per person for 7 countries and regions. The global average halved from 0.36 to 0.17 ha as population growth outpaces agricultural land expansion. Egypt and Bangladesh are below 0.05 ha \u2014 roughly the size of half a tennis court.",
+      "datasetIds": [
+        "wb--AG-LND-ARBL-HA-PC"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "World average fell from 0.36 ha/person (1961) to 0.17 ha/person (2023) \u2014 a 52% drop",
+        "India declined from 0.35 to 0.11 ha despite expanding irrigation and crop yields",
+        "Egypt dropped from 0.09 to 0.027 ha as the Nile delta population tripled"
+      ],
+      "createdAt": "2026-08-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Mean Total Cholesterol by Country, ~2011",
+      "description": "Horizontal bar chart of age-standardized mean total cholesterol (mmol/L) for 33 countries. Central European countries cluster near or above the 5.0 mmol/L WHO guideline; West African nations show markedly lower average levels.",
+      "datasetIds": [
+        "who--NCD_CHOL_MEANTOTALCHOL_A"
+      ],
+      "chartType": "bar-chart",
+      "highlights": [
+        "Germany, Austria, Thailand, and Slovenia lead at ~5.1 mmol/L, above the WHO threshold",
+        "West African countries (Sierra Leone, Zambia, Uganda) average under 3.9 mmol/L",
+        "The divergence between high-income and low-income countries spans 1.4 mmol/L"
+      ],
+      "createdAt": "2026-08-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Raised Fasting Blood Glucose Prevalence, ~2006",
+      "description": "Share of adults with fasting blood glucose \u2265 7.0 mmol/L (age-standardized %) for 33 countries. Fiji leads at 14.5%, followed by Pacific island states and Middle Eastern countries. UK and Nigeria show the lowest rates in this sample.",
+      "datasetIds": [
+        "who--NCD_GLUC_04"
+      ],
+      "chartType": "bar-chart",
+      "highlights": [
+        "Fiji (14.5%), Solomon Islands (11.7%), and Bahamas (11.4%) have the highest diabetes-level blood glucose",
+        "Middle Eastern and Central Asian countries dominate the top tier, linked to rising obesity",
+        "European countries (UK 4.9%, France 5.7%) show far lower prevalence than Pacific island states"
+      ],
+      "createdAt": "2026-08-08T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-08T00:00:00.000Z"
 }

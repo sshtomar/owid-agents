@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Shrinking Farmland: Arable Land per Person, 1961–2023</h1>
+<p class="subtitle">Hectares of arable land available per person. The global average has halved since 1961 as population growth outpaces land conversion. Egypt and Bangladesh now have under 0.05 ha per person — roughly half a tennis court.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Arable Land (Hectares per Person) (AG.LND.ARBL.HA.PC)</p>
+<script>
+const data = [{"n":"Canada","pts":[{"y":1961,"v":2.004},{"y":1966,"v":1.907},{"y":1971,"v":1.756},{"y":1976,"v":1.671},{"y":1981,"v":1.635},{"y":1986,"v":1.593},{"y":1991,"v":1.474},{"y":1996,"v":1.387},{"y":2001,"v":1.32},{"y":2006,"v":1.206},{"y":2011,"v":1.086},{"y":2016,"v":1.067},{"y":2021,"v":1.001},{"y":2023,"v":0.953}]},{"n":"Sub-Saharan Africa","pts":[{"y":1961,"v":0.549},{"y":1966,"v":0.503},{"y":1971,"v":0.456},{"y":1976,"v":0.405},{"y":1981,"v":0.356},{"y":1986,"v":0.324},{"y":1991,"v":0.298},{"y":1996,"v":0.273},{"y":2001,"v":0.248},{"y":2006,"v":0.231},{"y":2011,"v":0.221},{"y":2016,"v":0.218},{"y":2021,"v":0.198},{"y":2023,"v":0.19}]},{"n":"World","pts":[{"y":1961,"v":0.359},{"y":1966,"v":0.328},{"y":1971,"v":0.299},{"y":1976,"v":0.274},{"y":1981,"v":0.257},{"y":1986,"v":0.244},{"y":1991,"v":0.223},{"y":1996,"v":0.232},{"y":2001,"v":0.216},{"y":2006,"v":0.203},{"y":2011,"v":0.192},{"y":2016,"v":0.184},{"y":2021,"v":0.175},{"y":2023,"v":0.172}]},{"n":"India","pts":[{"y":1961,"v":0.349},{"y":1966,"v":0.317},{"y":1971,"v":0.286},{"y":1976,"v":0.259},{"y":1981,"v":0.232},{"y":1986,"v":0.207},{"y":1991,"v":0.185},{"y":1996,"v":0.164},{"y":2001,"v":0.149},{"y":2006,"v":0.135},{"y":2011,"v":0.124},{"y":2016,"v":0.116},{"y":2021,"v":0.109},{"y":2023,"v":0.107}]},{"n":"China","pts":[{"y":1961,"v":0.155},{"y":1966,"v":0.138},{"y":1971,"v":0.118},{"y":1976,"v":0.104},{"y":1981,"v":0.097},{"y":1986,"v":0.113},{"y":1991,"v":0.109},{"y":1996,"v":0.098},{"y":2001,"v":0.094},{"y":2006,"v":0.092},{"y":2011,"v":0.088},{"y":2016,"v":0.082},{"y":2021,"v":0.077},{"y":2023,"v":0.077}]},{"n":"Bangladesh","pts":[{"y":1961,"v":0.161},{"y":1966,"v":0.143},{"y":1971,"v":0.126},{"y":1976,"v":0.114},{"y":1981,"v":0.101},{"y":1986,"v":0.089},{"y":1991,"v":0.082},{"y":1996,"v":0.067},{"y":2001,"v":0.061},{"y":2006,"v":0.055},{"y":2011,"v":0.051},{"y":2016,"v":0.048},{"y":2021,"v":0.047},{"y":2023,"v":0.046}]},{"n":"Egypt","pts":[{"y":1961,"v":0.091},{"y":1966,"v":0.085},{"y":1971,"v":0.077},{"y":1976,"v":0.065},{"y":1981,"v":0.051},{"y":1986,"v":0.044},{"y":1991,"v":0.038},{"y":1996,"v":0.04},{"y":2001,"v":0.038},{"y":2006,"v":0.031},{"y":2011,"v":0.031},{"y":2016,"v":0.027},{"y":2021,"v":0.028},{"y":2023,"v":0.027}]}];
+
+const COLORS = ["#EA5E33","#F29A44","#A6C4A2","#C49A45","#5B9E78","#8BAD72","#C2C0B5"];
+
+const W = 720, H = 420;
+const margin = {top: 30, right: 155, bottom: 30, left: 48};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const yearMin = 1961, yearMax = 2023;
+const valMin = 0, valMax = 2.1;
+const xS = y => margin.left + (y - yearMin)/(yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v)/(valMax - valMin) * (H - margin.top - margin.bottom);
+
+[0,0.5,1.0,1.5,2.0].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(v),x2:W-margin.right,y2:yS(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:margin.left-4,y:yS(v)+4,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},v.toFixed(1)));
+});
+
+[1965,1975,1985,1995,2005,2015,2023].forEach(y => {
+  svg.appendChild(mkEl("text",{x:xS(y),y:H-margin.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},y));
+});
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent=txt; tip.style.opacity="1"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity="0"; }
+
+const labelData = [];
+
+data.forEach((series, si) => {
+  const color = COLORS[si % COLORS.length];
+  const g = mkEl("g",{});
+
+  const pathD = series.pts.map((p,i) => `${i===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  g.appendChild(mkEl("path",{d:pathD,stroke:color,"stroke-width":"1.8",fill:"none","stroke-linejoin":"round"}));
+
+  const hitPath = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none",cursor:"pointer"});
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0,Math.min(1,(mx - margin.left)/(W - margin.left - margin.right)));
+    const idx = Math.round(ratio*(series.pts.length-1));
+    const p = series.pts[idx];
+    showTip(`${series.n} (${p.y}): ${p.v} ha/person`,e);
+    svg.querySelectorAll(".series-g").forEach(gg=>gg.style.opacity="0.12");
+    g.style.opacity="1";
+    g.querySelector("path:not([stroke=transparent])")?.setAttribute("stroke-width","3");
+  });
+  hitPath.addEventListener("mouseleave",()=>{
+    hideTip();
+    svg.querySelectorAll(".series-g").forEach(gg=>{gg.style.opacity="1";gg.querySelector("path:not([stroke=transparent])")?.setAttribute("stroke-width","1.8");});
+  });
+  g.appendChild(hitPath);
+  g.setAttribute("class","series-g");
+  svg.appendChild(g);
+
+  const lastPt = series.pts[series.pts.length-1];
+  labelData.push({n: series.n, v: lastPt.v, color, y: yS(lastPt.v)});
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b)=>a.y-b.y);
+  for (let pass=0;pass<30;pass++) {
+    let moved=false;
+    for (let i=1;i<sorted.length;i++) {
+      const gap=sorted[i].y-sorted[i-1].y;
+      if (gap<minGap){const sh=(minGap-gap)/2;sorted[i-1].y-=sh;sorted[i].y+=sh;moved=true;}
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolved = resolveCollisions(labelData.map(l=>({...l})),13);
+resolved.forEach(l=>{
+  const cy = Math.max(margin.top+6,Math.min(H-margin.bottom-2,l.y));
+  const origY = yS(l.v);
+  if (Math.abs(cy-origY)>3) {
+    svg.appendChild(mkEl("line",{x1:xS(yearMax)+3,y1:origY,x2:xS(yearMax)+8,y2:cy,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  }
+  svg.appendChild(mkEl("text",{x:xS(yearMax)+10,y:cy+3.5,"font-size":"9","fill":l.color,"font-weight":"500"},`${l.v} ha  ${l.n}`));
+});
+</script>
+</body></html>
