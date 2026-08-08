@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Population Growth in Free-Fall — Most of the World is Slowing</h1>
+<p class="subtitle">Annual population growth rate (%). While Sub-Saharan Africa remains at ~2.5%, Japan, South Korea, and Germany have crossed into negative territory. India and Brazil have halved their rates since 1980.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Population Growth (SP.POP.GROW)</p>
+<script>
+const data = [{"n":"Sub-Saharan Africa","pts":[{"y":1961,"v":2.4},{"y":1966,"v":2.56},{"y":1971,"v":2.69},{"y":1976,"v":2.82},{"y":1981,"v":2.99},{"y":1986,"v":2.89},{"y":1991,"v":2.71},{"y":1996,"v":2.68},{"y":2001,"v":2.67},{"y":2006,"v":2.73},{"y":2011,"v":2.74},{"y":2016,"v":2.65},{"y":2021,"v":2.53},{"y":2024,"v":2.44}]},{"n":"Ethiopia","pts":[{"y":1961,"v":2.45},{"y":1966,"v":2.33},{"y":1971,"v":2.42},{"y":1976,"v":2.55},{"y":1981,"v":2.73},{"y":1986,"v":2.92},{"y":1991,"v":3.0},{"y":1996,"v":2.97},{"y":2001,"v":2.79},{"y":2006,"v":2.77},{"y":2011,"v":2.8},{"y":2016,"v":2.7},{"y":2021,"v":2.61},{"y":2024,"v":2.58}]},{"n":"India","pts":[{"y":1961,"v":2.4},{"y":1966,"v":2.14},{"y":1971,"v":2.22},{"y":1976,"v":2.35},{"y":1981,"v":2.35},{"y":1986,"v":2.31},{"y":1991,"v":2.17},{"y":1996,"v":2.0},{"y":2001,"v":1.87},{"y":2006,"v":1.56},{"y":2011,"v":1.42},{"y":2016,"v":1.19},{"y":2021,"v":0.82},{"y":2024,"v":0.89}]},{"n":"Brazil","pts":[{"y":1961,"v":3.02},{"y":1966,"v":2.73},{"y":1971,"v":2.45},{"y":1976,"v":2.38},{"y":1981,"v":2.33},{"y":1986,"v":2.06},{"y":1991,"v":1.72},{"y":1996,"v":1.51},{"y":2001,"v":1.3},{"y":2006,"v":1.06},{"y":2011,"v":0.81},{"y":2016,"v":0.76},{"y":2021,"v":0.43},{"y":2024,"v":0.41}]},{"n":"Indonesia","pts":[{"y":1961,"v":2.79},{"y":1966,"v":2.35},{"y":1971,"v":2.36},{"y":1976,"v":2.52},{"y":1981,"v":2.15},{"y":1986,"v":2.0},{"y":1991,"v":1.88},{"y":1996,"v":1.53},{"y":2001,"v":1.28},{"y":2006,"v":1.27},{"y":2011,"v":1.24},{"y":2016,"v":1.14},{"y":2021,"v":0.94},{"y":2024,"v":0.81}]},{"n":"World","pts":[{"y":1961,"v":1.36},{"y":1966,"v":2.09},{"y":1971,"v":2.1},{"y":1976,"v":1.8},{"y":1981,"v":1.77},{"y":1986,"v":1.78},{"y":1991,"v":1.67},{"y":1996,"v":1.49},{"y":2001,"v":1.34},{"y":2006,"v":1.27},{"y":2011,"v":1.22},{"y":2016,"v":1.16},{"y":2021,"v":0.83},{"y":2024,"v":0.96}]},{"n":"Germany","pts":[{"y":1961,"v":0.77},{"y":1966,"v":0.83},{"y":1971,"v":0.18},{"y":1976,"v":-0.43},{"y":1981,"v":0.15},{"y":1986,"v":0.05},{"y":1991,"v":0.73},{"y":1996,"v":0.29},{"y":2001,"v":0.17},{"y":2006,"v":-0.11},{"y":2011,"v":-1.85},{"y":2016,"v":0.81},{"y":2021,"v":0.04},{"y":2024,"v":0.27}]},{"n":"Japan","pts":[{"y":1961,"v":0.9},{"y":1966,"v":0.91},{"y":1971,"v":2.19},{"y":1976,"v":1.07},{"y":1981,"v":0.73},{"y":1986,"v":0.53},{"y":1991,"v":0.39},{"y":1996,"v":0.23},{"y":2001,"v":0.24},{"y":2006,"v":0.06},{"y":2011,"v":-0.19},{"y":2016,"v":-0.05},{"y":2021,"v":-0.46},{"y":2024,"v":-0.44}]},{"n":"South Korea","pts":[{"y":1961,"v":2.97},{"y":1966,"v":2.51},{"y":1971,"v":1.97},{"y":1976,"v":1.6},{"y":1981,"v":1.56},{"y":1986,"v":0.99},{"y":1991,"v":0.99},{"y":1996,"v":0.95},{"y":2001,"v":0.77},{"y":2006,"v":0.53},{"y":2011,"v":0.77},{"y":2016,"v":0.4},{"y":2021,"v":-0.13},{"y":2024,"v":0.07}]}];
+
+const COLORS = ["#EA5E33","#F29A44","#C49A45","#8BAD72","#5B9E78","#A6C4A2","#C2C0B5","#3D7A5A","#B5A48C"];
+
+const W = 720, H = 420;
+const margin = {top: 30, right: 150, bottom: 30, left: 48};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const yearMin = 1961, yearMax = 2024;
+const valMin = -2, valMax = 3.5;
+const xS = y => margin.left + (y - yearMin)/(yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v)/(valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Zero line
+svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(0),x2:W-margin.right,y2:yS(0),stroke:"#C2C0B5","stroke-width":"1","stroke-dasharray":"4,3"}));
+svg.appendChild(mkEl("text",{x:margin.left-4,y:yS(0)+4,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},"0%"));
+
+// Grid lines
+[-1,1,2,3].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(v),x2:W-margin.right,y2:yS(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:margin.left-4,y:yS(v)+4,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},v+"%"));
+});
+
+// X axis labels
+[1965,1975,1985,1995,2005,2015,2024].forEach(y => {
+  svg.appendChild(mkEl("text",{x:xS(y),y:H-margin.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},y));
+});
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent=txt; tip.style.opacity="1"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; }
+function hideTip() { tip.style.opacity="0"; }
+
+const labelData = [];
+
+data.forEach((series, si) => {
+  const color = COLORS[si % COLORS.length];
+  const g = mkEl("g",{});
+
+  const pathD = series.pts.map((p,i) => `${i===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  g.appendChild(mkEl("path",{d:pathD,stroke:color,"stroke-width":"1.8",fill:"none","stroke-linejoin":"round"}));
+
+  const hitPath = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none",cursor:"pointer"});
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0,Math.min(1,(mx - margin.left)/(W - margin.left - margin.right)));
+    const idx = Math.round(ratio*(series.pts.length-1));
+    const p = series.pts[idx];
+    showTip(`${series.n} (${p.y}): ${p.v}%`,e);
+    svg.querySelectorAll(".series-g").forEach(gg=>gg.style.opacity="0.12");
+    g.style.opacity="1";
+    g.querySelector("path:not([stroke=transparent])")?.setAttribute("stroke-width","3");
+  });
+  hitPath.addEventListener("mouseleave",()=>{
+    hideTip();
+    svg.querySelectorAll(".series-g").forEach(gg=>{gg.style.opacity="1";gg.querySelector("path:not([stroke=transparent])")?.setAttribute("stroke-width","1.8");});
+  });
+  g.appendChild(hitPath);
+  g.setAttribute("class","series-g");
+  svg.appendChild(g);
+
+  const lastPt = series.pts[series.pts.length-1];
+  labelData.push({n: series.n, v: lastPt.v, color, y: yS(lastPt.v)});
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b)=>a.y-b.y);
+  for (let pass=0;pass<30;pass++) {
+    let moved=false;
+    for (let i=1;i<sorted.length;i++) {
+      const gap=sorted[i].y-sorted[i-1].y;
+      if (gap<minGap){const sh=(minGap-gap)/2;sorted[i-1].y-=sh;sorted[i].y+=sh;moved=true;}
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolved = resolveCollisions(labelData.map(l=>({...l})),13);
+resolved.forEach(l=>{
+  const cy = Math.max(margin.top+6,Math.min(H-margin.bottom-2,l.y));
+  const origY = yS(l.v);
+  if (Math.abs(cy-origY)>3) {
+    svg.appendChild(mkEl("line",{x1:xS(yearMax)+3,y1:origY,x2:xS(yearMax)+8,y2:cy,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  }
+  svg.appendChild(mkEl("text",{x:xS(yearMax)+10,y:cy+3.5,"font-size":"9","fill":l.color,"font-weight":"500"},`${l.v}%  ${l.n}`));
+});
+</script>
+</body></html>
