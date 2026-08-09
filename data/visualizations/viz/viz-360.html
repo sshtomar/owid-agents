@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+body{font-family:'Inter',sans-serif;margin:0;padding:32px 40px;background:#F6F5EE;color:#2B2A27;}
+h1{font-size:15px;font-weight:600;letter-spacing:-0.3px;margin:0 0 4px;}
+.subtitle{font-size:11px;color:#7A786F;margin:0 0 24px;max-width:520px;line-height:1.5;}
+.source{font-family:'JetBrains Mono',monospace;font-size:9px;color:#7A786F;margin-top:20px;letter-spacing:0.3px;text-transform:uppercase;}
+.tooltip{position:fixed;pointer-events:none;background:#2B2A27;color:#F6F5EE;font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:2px;white-space:nowrap;opacity:0;transition:opacity 0.1s;z-index:10;}
+</style></head><body>
+<h1>Son Preference Declining: Sex Ratio at Birth, 1960&ndash;2024</h1>
+<p class="subtitle">Male births per female birth. The biological norm is ~1.05. Higher values indicate son-selective practices. South Korea normalized by the 2000s; China and Azerbaijan still remain well above the natural ratio.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank &mdash; Sex Ratio at Birth (SP.POP.BRTH.MF)</p>
+<script>
+const data = [{"n":"China","pts":[{"y":1960,"v":1.061},{"y":1965,"v":1.062},{"y":1970,"v":1.064},{"y":1975,"v":1.066},{"y":1980,"v":1.071},{"y":1985,"v":1.086},{"y":1990,"v":1.118},{"y":1995,"v":1.152},{"y":2000,"v":1.172},{"y":2004,"v":1.178},{"y":2005,"v":1.178},{"y":2010,"v":1.171},{"y":2015,"v":1.15},{"y":2020,"v":1.112},{"y":2024,"v":1.103}]},{"n":"Azerbaijan","pts":[{"y":1960,"v":1.064},{"y":1970,"v":1.064},{"y":1980,"v":1.064},{"y":1990,"v":1.067},{"y":1995,"v":1.101},{"y":2000,"v":1.153},{"y":2004,"v":1.168},{"y":2010,"v":1.165},{"y":2015,"v":1.146},{"y":2020,"v":1.13},{"y":2024,"v":1.113}]},{"n":"Armenia","pts":[{"y":1960,"v":1.064},{"y":1970,"v":1.064},{"y":1980,"v":1.064},{"y":1990,"v":1.059},{"y":1995,"v":1.113},{"y":2000,"v":1.173},{"y":2005,"v":1.163},{"y":2010,"v":1.146},{"y":2015,"v":1.124},{"y":2020,"v":1.1},{"y":2024,"v":1.083}]},{"n":"South Korea","pts":[{"y":1960,"v":1.062},{"y":1970,"v":1.061},{"y":1980,"v":1.061},{"y":1985,"v":1.097},{"y":1990,"v":1.157},{"y":1995,"v":1.132},{"y":2000,"v":1.1},{"y":2005,"v":1.078},{"y":2010,"v":1.066},{"y":2015,"v":1.053},{"y":2020,"v":1.057},{"y":2024,"v":1.059}]},{"n":"India","pts":[{"y":1960,"v":1.052},{"y":1970,"v":1.055},{"y":1980,"v":1.067},{"y":1990,"v":1.069},{"y":1995,"v":1.089},{"y":2000,"v":1.095},{"y":2005,"v":1.094},{"y":2010,"v":1.096},{"y":2015,"v":1.09},{"y":2020,"v":1.079},{"y":2024,"v":1.071}]},{"n":"Albania","pts":[{"y":1960,"v":1.059},{"y":1970,"v":1.060},{"y":1980,"v":1.086},{"y":1990,"v":1.080},{"y":1995,"v":1.078},{"y":2000,"v":1.103},{"y":2005,"v":1.129},{"y":2010,"v":1.112},{"y":2015,"v":1.091},{"y":2020,"v":1.078},{"y":2024,"v":1.068}]},{"n":"Japan","pts":[{"y":1960,"v":1.056},{"y":1970,"v":1.071},{"y":1980,"v":1.060},{"y":1990,"v":1.055},{"y":2000,"v":1.058},{"y":2010,"v":1.057},{"y":2020,"v":1.051},{"y":2024,"v":1.051}]},{"n":"Georgia","pts":[{"y":1960,"v":1.063},{"y":1970,"v":1.063},{"y":1980,"v":1.069},{"y":1990,"v":1.084},{"y":1995,"v":1.101},{"y":2000,"v":1.108},{"y":2005,"v":1.101},{"y":2010,"v":1.082},{"y":2015,"v":1.075},{"y":2020,"v":1.069},{"y":2024,"v":1.066}]}];
+
+const COLORS = ["#EA5E33","#F29A44","#C4715A","#3D7A5A","#7A9EC9","#8BAD72","#9A9890","#C49A45"];
+
+const W = 800, H = 460;
+const margin = {top:40, right:140, bottom:36, left:60};
+const yearMin = 1960, yearMax = 2024;
+const valMin = 1.00, valMax = 1.22;
+
+function mkEl(tag,attrs){
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth=W+"px";
+svg.style.cursor="crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const xScale = y => margin.left + (y-yearMin)/(yearMax-yearMin)*(W-margin.left-margin.right);
+const yScale = v => margin.top + (valMax-v)/(valMax-valMin)*(H-margin.top-margin.bottom);
+
+// Grid lines
+[1.00,1.02,1.04,1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.20].forEach(v=>{
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yScale(v),x2:W-margin.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const t=mkEl("text",{x:margin.left-6,y:yScale(v)+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"});
+  t.textContent=v.toFixed(2);
+  svg.appendChild(t);
+});
+
+// X axis ticks
+[1960,1970,1980,1990,2000,2010,2020,2024].forEach(y=>{
+  const x=xScale(y);
+  svg.appendChild(mkEl("line",{x1:x,y1:H-margin.bottom,x2:x,y2:H-margin.bottom+4,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  const t=mkEl("text",{x,y:H-margin.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"});
+  t.textContent=y;
+  svg.appendChild(t);
+});
+
+// Biological norm reference line at 1.05
+const normY = yScale(1.05);
+svg.appendChild(mkEl("line",{x1:margin.left,y1:normY,x2:W-margin.right,y2:normY,stroke:"#C2C0B5","stroke-dasharray":"4,3","stroke-width":"1"}));
+const normLabel=mkEl("text",{x:W-margin.right+4,y:normY+3,"font-family":"JetBrains Mono, monospace","font-size":"8","fill":"#9A9890"});
+normLabel.textContent="1.05 norm";
+svg.appendChild(normLabel);
+
+// Highlight zone above norm
+svg.appendChild(mkEl("rect",{x:margin.left,y:margin.top,width:W-margin.left-margin.right,height:normY-margin.top,fill:"#EA5E33",opacity:"0.04"}));
+
+const series = data.map((d,i)=>({name:d.n, pts:d.pts.map(p=>({year:p.y,value:p.v})), color:COLORS[i]}));
+const groups = [];
+const tip = document.getElementById("tip");
+
+function resolveCollisions(items,minGap){
+  const sorted=items.slice().sort((a,b)=>a.y-b.y);
+  for(let pass=0;pass<40;pass++){
+    let moved=false;
+    for(let i=1;i<sorted.length;i++){
+      const gap=sorted[i].y-sorted[i-1].y;
+      if(gap<minGap){const shift=(minGap-gap)/2;sorted[i-1].y-=shift;sorted[i].y+=shift;moved=true;}
+    }
+    if(!moved) break;
+  }
+  for(const item of sorted) item.y=Math.max(margin.top+5,Math.min(H-margin.bottom-2,item.y));
+  return sorted;
+}
+
+series.forEach((s,si)=>{
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  const pts=s.pts;
+  if(pts.length<2) return;
+  const pathD=pts.map((p,i)=>`${i===0?"M":"L"} ${xScale(p.year)} ${yScale(p.value)}`).join(" ");
+  const line=mkEl("path",{d:pathD,stroke:s.color,"stroke-width":"1.5",fill:"none","stroke-linejoin":"round","stroke-linecap":"round"});
+  g.appendChild(line);
+  const hit=mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"14",fill:"none"});
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove",e=>{
+    const rect=svg.getBoundingClientRect();
+    const mx=e.clientX-rect.left;
+    const ratio=Math.max(0,Math.min(1,(mx-margin.left)/(W-margin.left-margin.right)));
+    const yr=yearMin+Math.round(ratio*(yearMax-yearMin));
+    const closest=pts.reduce((best,p)=>Math.abs(p.year-yr)<Math.abs(best.year-yr)?p:best,pts[0]);
+    tip.textContent=`${s.name}: ${closest.value.toFixed(3)} male per female (${closest.year})`;
+    tip.style.opacity="1";
+    tip.style.left=(e.clientX+12)+"px";
+    tip.style.top=(e.clientY-20)+"px";
+    groups.forEach((gg,gi)=>{gg.style.opacity=gi===si?"1":"0.1";});
+    line.setAttribute("stroke-width","2.5");
+  });
+  hit.addEventListener("mouseleave",()=>{
+    tip.style.opacity="0";
+    groups.forEach(gg=>{gg.style.opacity="1";});
+    line.setAttribute("stroke-width","1.5");
+  });
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+const labelItems=series.map(s=>{
+  const last=s.pts[s.pts.length-1];
+  return {y:yScale(last.value),name:s.name,value:last.value,color:s.color};
+});
+const resolved=resolveCollisions(labelItems.map(i=>({...i})),13);
+resolved.forEach((item,i)=>{
+  const origY=yScale(labelItems[i].value);
+  const labelX=W-margin.right+6;
+  if(Math.abs(item.y-origY)>2){
+    svg.appendChild(mkEl("line",{x1:W-margin.right,y1:origY,x2:labelX-2,y2:item.y,stroke:item.color,opacity:"0.4","stroke-width":"0.7"}));
+  }
+  const t=mkEl("text",{x:labelX,y:item.y+3.5,"font-family":"JetBrains Mono, monospace","font-size":"9","fill":item.color,"font-weight":"500"});
+  t.textContent=`${item.value.toFixed(3)} ${item.name}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
