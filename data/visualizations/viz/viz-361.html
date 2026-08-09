@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+body{font-family:'Inter',sans-serif;margin:0;padding:32px 40px;background:#F6F5EE;color:#2B2A27;}
+h1{font-size:15px;font-weight:600;letter-spacing:-0.3px;margin:0 0 4px;}
+.subtitle{font-size:11px;color:#7A786F;margin:0 0 24px;max-width:520px;line-height:1.5;}
+.source{font-family:'JetBrains Mono',monospace;font-size:9px;color:#7A786F;margin-top:20px;letter-spacing:0.3px;text-transform:uppercase;}
+.tooltip{position:fixed;pointer-events:none;background:#2B2A27;color:#F6F5EE;font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:2px;white-space:nowrap;opacity:0;transition:opacity 0.1s;z-index:10;}
+</style></head><body>
+<h1>The Early Education Expansion: Preprimary Enrollment, 1999 vs. 2019</h1>
+<p class="subtitle">Gross preprimary school enrollment rate (%). Most countries expanded early childhood education significantly over two decades. Sub-Saharan Africa still lags far behind, while Iran and Georgia tripled their rates.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank &mdash; School Enrollment, Preprimary (% Gross) (SE.PRE.ENRR)</p>
+<script>
+const data = [{"n":"Burkina Faso","s":1.8,"e":5.5},{"n":"Djibouti","s":0.4,"e":9.2},{"n":"Jordan","s":26.9,"e":28.8},{"n":"Ethiopia","s":1.5,"e":35.0},{"n":"Cameroon","s":10.9,"e":35.6},{"n":"Bhutan","s":0.9,"e":35.7},{"n":"Kazakhstan","s":15.0,"e":62.5},{"n":"Kenya","s":40.8,"e":65.1},{"n":"Iran","s":15.0,"e":74.3},{"n":"Albania","s":42.3,"e":75.8},{"n":"Bolivia","s":47.5,"e":77.3},{"n":"Finland","s":47.3,"e":87.3},{"n":"China","s":44.9,"e":89.1},{"n":"Georgia","s":41.1,"e":93.4},{"n":"Costa Rica","s":45.9,"e":95.6},{"n":"Ghana","s":45.7,"e":117.0}];
+
+const W = 700, H = 560;
+const pad = {left:110, right:120, top:45, bottom:20};
+const minV = 0, maxV = 125;
+const scale = v => pad.top + (maxV-v)/(maxV-minV)*(H-pad.top-pad.bottom);
+const xLeft = pad.left, xRight = W-pad.right;
+
+function mkEl(tag,attrs){
+  const el=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth=W+"px";
+document.getElementById("chart").appendChild(svg);
+
+[0,25,50,75,100].forEach(v=>{
+  svg.appendChild(mkEl("line",{x1:xLeft,y1:scale(v),x2:xRight,y2:scale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+});
+
+const hdr1=mkEl("text",{x:xLeft,y:pad.top-18,"font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F","text-anchor":"middle"});
+hdr1.textContent="1999";
+svg.appendChild(hdr1);
+const hdr2=mkEl("text",{x:xRight,y:pad.top-18,"font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F","text-anchor":"middle"});
+hdr2.textContent="2019";
+svg.appendChild(hdr2);
+
+svg.appendChild(mkEl("line",{x1:xLeft,y1:pad.top-10,x2:xLeft,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"1"}));
+svg.appendChild(mkEl("line",{x1:xRight,y1:pad.top-10,x2:xRight,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"1"}));
+
+function colorFor(change){
+  if(change>60) return "#EA5E33";
+  if(change>40) return "#F29A44";
+  if(change>25) return "#C49A45";
+  if(change>15) return "#8BAD72";
+  if(change>5)  return "#5B9E78";
+  return "#3D7A5A";
+}
+
+function resolveCollisions(items,minGap){
+  const sorted=items.slice().sort((a,b)=>a.y-b.y);
+  for(let pass=0;pass<40;pass++){
+    let moved=false;
+    for(let i=1;i<sorted.length;i++){
+      const gap=sorted[i].y-sorted[i-1].y;
+      if(gap<minGap){const shift=(minGap-gap)/2;sorted[i-1].y-=shift;sorted[i].y+=shift;moved=true;}
+    }
+    if(!moved) break;
+  }
+  for(const item of sorted) item.y=Math.max(pad.top+5,Math.min(H-pad.bottom-3,item.y));
+  return sorted;
+}
+
+const tip=document.getElementById("tip");
+const rowGroups=[];
+
+data.forEach((d,di)=>{
+  const ya=scale(d.s), yb=scale(d.e);
+  const color=colorFor(d.e-d.s);
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+
+  const line=mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:color,"stroke-width":"1.4","stroke-linecap":"round"});
+  g.appendChild(line);
+  g.appendChild(mkEl("circle",{cx:xLeft,cy:ya,r:"3",fill:color}));
+  g.appendChild(mkEl("circle",{cx:xRight,cy:yb,r:"3",fill:color}));
+
+  const hit=mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:"transparent","stroke-width":"14"});
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseenter",e=>{
+    tip.textContent=`${d.n}: ${d.s.toFixed(1)}% → ${d.e.toFixed(1)}% (+${(d.e-d.s).toFixed(1)} pts)`;
+    tip.style.opacity="1";
+    rowGroups.forEach((gg,gi)=>{gg.style.opacity=gi===di?"1":"0.1";});
+    line.setAttribute("stroke-width","2.5");
+  });
+  hit.addEventListener("mousemove",e=>{
+    tip.style.left=(e.clientX+12)+"px";
+    tip.style.top=(e.clientY-20)+"px";
+  });
+  hit.addEventListener("mouseleave",()=>{
+    tip.style.opacity="0";
+    rowGroups.forEach(gg=>{gg.style.opacity="1";});
+    line.setAttribute("stroke-width","1.4");
+  });
+
+  svg.appendChild(g);
+  rowGroups.push(g);
+});
+
+// Left labels
+const leftItems=data.map(d=>({y:scale(d.s),name:d.n,val:d.s,color:colorFor(d.e-d.s)}));
+const resolvedL=resolveCollisions(leftItems.map(i=>({...i})),13);
+resolvedL.forEach((item,i)=>{
+  const origY=scale(leftItems[i].val);
+  if(Math.abs(item.y-origY)>2){
+    svg.appendChild(mkEl("line",{x1:xLeft,y1:origY,x2:xLeft-2,y2:item.y,stroke:item.color,opacity:"0.4","stroke-width":"0.7"}));
+  }
+  const t=mkEl("text",{x:xLeft-6,y:item.y+3.5,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":item.color});
+  t.textContent=`${item.name}  ${item.val.toFixed(0)}%`;
+  svg.appendChild(t);
+});
+
+// Right labels
+const rightItems=data.map(d=>({y:scale(d.e),name:d.n,val:d.e,color:colorFor(d.e-d.s)}));
+const resolvedR=resolveCollisions(rightItems.map(i=>({...i})),13);
+resolvedR.forEach((item,i)=>{
+  const origY=scale(rightItems[i].val);
+  if(Math.abs(item.y-origY)>2){
+    svg.appendChild(mkEl("line",{x1:xRight,y1:origY,x2:xRight+2,y2:item.y,stroke:item.color,opacity:"0.4","stroke-width":"0.7"}));
+  }
+  const t=mkEl("text",{x:xRight+6,y:item.y+3.5,"text-anchor":"start","font-family":"JetBrains Mono, monospace","font-size":"9","fill":item.color});
+  t.textContent=`${item.val.toFixed(0)}%  ${item.name}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
