@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Use Per Capita, 1990–2024</h1>
+<p class="subtitle">Total primary energy consumption per person (kg of oil equivalent). Iceland's geothermal abundance puts it in a category of its own. Germany and France have meaningfully reduced consumption since 1990, while China has nearly quadrupled its per-capita energy use.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EG.USE.PCAP.KG.OE</p>
+<script>
+// n = name, s = values, y0 = start year (step=1)
+const data = [{"n":"Iceland","s":[9058,8191,7917,8381,8446,8405,8991,8777,9292,10354,11405,10925,11168,11093,10893,10877,13184,15188,17341,17937,17025,18162,17634,18213,17947,16911,15701,16235,17347,16701,16084,15780,15807,15686,15997],"y0":1990},{"n":"Canada","s":[7642,7529,7617,7783,7971,7995,8071,8069,7963,8118,8225,8017,7943,8303,8371,8370,8427,8356,8098,7696,7661,7716,7638,7669,7780,7690,7945,8175,8162,8126,7495,7525,7575,7342,7161],"y0":1990},{"n":"Australia","s":[5048,4925,4961,5171,5127,5138,5430,5498,5585,5645,5681,5486,5480,5616,5652,5624,5775,5854,5951,5844,5763,5699,5534,5533,5407,5319,5217,5162,5086,5232,5159,5006,4942,4928,4751],"y0":1990},{"n":"Korea","s":[2088,2260,2546,2825,2969,3234,3461,3675,3374,3666,3952,3923,4093,4138,4255,4325,4338,4488,4513,4558,4920,5115,5123,5108,5137,5239,5391,5468,5532,5335,5196,5514,5412,5337,5439],"y0":1990},{"n":"Germany","s":[4422,4303,4191,4123,4089,4120,4247,4204,4178,4080,4094,4210,4109,4096,4132,4110,4236,4024,4082,3822,4030,3892,3913,3986,3794,3781,3765,3763,3659,3571,3349,3467,3262,2928,2825],"y0":1990},{"n":"France","s":[3840,4039,3949,3997,3831,3976,4187,4044,4147,4118,4130,4240,4220,4297,4327,4314,4214,4142,4138,3938,4040,3951,3929,3926,3756,3799,3718,3705,3669,3606,3228,3470,3100,3136,3185],"y0":1990},{"n":"China","s":[773,741,757,793,821,873,885,876,872,881,898,922,976,1105,1249,1370,1490,1595,1630,1729,1900,2027,2085,2137,2178,2175,2149,2216,2311,2398,2466,2624,2676,2851,2851],"y0":1990},{"n":"Brazil","s":[942,943,937,945,980,999,1036,1072,1082,1091,1081,1087,1103,1108,1157,1174,1202,1260,1317,1262,1384,1390,1433,1487,1522,1482,1415,1432,1403,1416,1379,1430,1433,1481,1512],"y0":1990},{"n":"Indonesia","s":[461,477,490,534,524,575,587,595,568,587,586,591,606,597,635,637,644,629,633,675,674,670,686,701,710,704,724,761,832,851,856,902,959,982,982],"y0":1990},{"n":"India","s":[324,331,336,339,348,362,368,376,378,393,395,393,397,400,415,425,442,461,482,509,532,547,572,577,610,622,627,648,668,667,632,677,728,763,763],"y0":1990}];
+
+const W = 800, H = 500;
+const margin = { top: 40, right: 140, bottom: 40, left: 70 };
+const yearMin = 1990, yearMax = 2024;
+const valMin = 0, valMax = 20000;
+
+// Color by 2024 value
+const palette = ["#EA5E33","#E57040","#F29A44","#F5B45A","#F5C86E","#D4C07A","#A6C4A2","#8BB89E","#6FAA8A","#4D9070"];
+const val2024 = data.map(d => d.s[d.s.length - 1]);
+const sorted2024 = [...val2024].sort((a, b) => b - a);
+function colorFor(d) {
+  const v = d.s[d.s.length - 1];
+  const rank = sorted2024.indexOf(v);
+  return palette[Math.min(rank, palette.length - 1)];
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[0, 5000, 10000, 15000, 20000].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  });
+  lbl.textContent = v === 0 ? "0" : (v / 1000) + "k";
+  svg.appendChild(lbl);
+});
+
+// X axis labels
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const lbl = mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 14,
+    "text-anchor": "middle", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+// Y axis label
+const axlbl = mkEl("text", {
+  x: margin.left - 54, y: margin.top - 14,
+  fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "9"
+});
+axlbl.textContent = "kg oil equiv./person";
+svg.appendChild(axlbl);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const yMin = margin.top + 6, yMax = H - margin.bottom - 4;
+  sorted.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 22) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const labelItems = data.map(d => ({
+  name: d.n,
+  val: d.s[d.s.length - 1],
+  y: yScale(d.s[d.s.length - 1])
+}));
+const resolved = resolveCollisions(labelItems, 12);
+const labelMap = {};
+resolved.forEach(item => { labelMap[item.name] = item.y; });
+
+const groups = [];
+data.forEach(d => {
+  const color = colorFor(d);
+  const g = mkEl("g", {});
+
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i, value: v }));
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`
+  ).join(" ");
+
+  const line = mkEl("path", {
+    d: pathD, stroke: color,
+    "stroke-width": "1.5", fill: "none",
+    "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  const labelY = labelMap[d.n];
+  const endX = xScale(d.y0 + d.s.length - 1);
+  const endY = yScale(d.s[d.s.length - 1]);
+
+  if (Math.abs(labelY - endY) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: endX + 2, y1: endY,
+      x2: endX + 6, y2: labelY,
+      stroke: color, "stroke-width": "0.6", opacity: "0.5"
+    }));
+  }
+
+  const lbl = mkEl("text", {
+    x: endX + 8, y: labelY + 3.5,
+    fill: color, "font-size": "9", "font-weight": "500"
+  });
+  const lastVal = d.s[d.s.length - 1];
+  lbl.textContent = `${lastVal >= 1000 ? Math.round(lastVal / 100) / 10 + "k" : lastVal}  ${d.n}`;
+  g.appendChild(lbl);
+
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent",
+    "stroke-width": "12", fill: "none", cursor: "pointer"
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const svgScale = W / rect.width;
+    const svgX = mx * svgScale;
+    const ratio = (svgX - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.round(ratio * (d.s.length - 1));
+    const clampedIdx = Math.max(0, Math.min(d.s.length - 1, idx));
+    const year = d.y0 + clampedIdx;
+    const val = d.s[clampedIdx];
+    showTip(`${d.n} (${year}): ${val.toLocaleString()} kg oil equiv./person`, e);
+    groups.forEach(([og, ol]) => {
+      if (og !== g) { og.style.opacity = "0.1"; }
+      else { ol.setAttribute("stroke-width", "2.5"); }
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    groups.forEach(([og, ol]) => {
+      og.style.opacity = "1";
+      ol.setAttribute("stroke-width", "1.5");
+    });
+  });
+  g.appendChild(hit);
+  groups.push([g, line]);
+  svg.appendChild(g);
+});
+</script>
+</body></html>
