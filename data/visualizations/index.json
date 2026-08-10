@@ -5858,7 +5858,72 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Old-Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing how many people aged 65+ exist per 100 working-age people (15\u201364) across 10 countries. Japan has rocketed from 9% in 1960 to 51% in 2024 \u2014 the highest in the world. Korea and China are accelerating fast, while sub-Saharan Africa ratios have barely moved.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan: 9% in 1960 \u2192 51% in 2024 \u2014 more than 50 elderly per 100 workers",
+        "Korea accelerating from 6% (1960) to 27% (2024), trajectory steeper than Japan was at this stage",
+        "Chad held near 4\u20137% for 64 years \u2014 a structurally young population"
+      ],
+      "createdAt": "2026-08-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Anemia Among Women of Reproductive Age: 2000 vs. 2023",
+      "description": "Slope chart comparing anemia prevalence (% of women ages 15\u201349) between 2000 and 2023 for the 17 most-affected countries. Most West African nations have improved but remain very high. India \u2014 with the world's largest female population \u2014 has seen prevalence rise.",
+      "datasetIds": [
+        "wb--SH-ANM-ALLW-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "India: prevalence rose from 50% to 54% \u2014 most populous country moving in the wrong direction",
+        "Afghanistan worsened from 32% to 45% (+13pp) over the period",
+        "Gambia, Chad, Congo D.R. each improved by 10\u201315pp \u2014 significant but still above 40%"
+      ],
+      "createdAt": "2026-08-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Energy Use Per Capita, 1990\u20132024",
+      "description": "Trend lines showing total primary energy consumption per person (kg of oil equivalent) for 10 countries. Iceland's geothermal endowment keeps it in a class of its own. Germany and France have cut consumption by ~30% since 1990; China has nearly quadrupled its per-capita energy use.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Iceland: 16,000 kg oil equiv./person \u2014 10x the global average, driven by geothermal electricity",
+        "Germany reduced from 4,422 to 2,825 kg (-36%) via efficiency and renewables",
+        "China quadrupled from 773 to 2,851 kg \u2014 surpassing France and Germany"
+      ],
+      "createdAt": "2026-08-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Antiretroviral Therapy Coverage, 2000\u20132024",
+      "description": "Trend lines showing the share of HIV-positive people receiving antiretroviral treatment by world region. One of the fastest healthcare scale-ups in history: Eastern and Southern Africa went from 0.2% coverage in 2000 to 84% in 2024, driven by PEPFAR and the Global Fund.",
+      "datasetIds": [
+        "wb--SH-HIV-ARTC-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Eastern & Southern Africa: 0.2% (2000) \u2192 84% (2024) \u2014 420-fold increase in 24 years",
+        "Sub-Saharan Africa overall reached 83% coverage; Western & Central Africa at 77%",
+        "Arab World lags at 49% \u2014 significant access gap versus sub-Saharan Africa"
+      ],
+      "createdAt": "2026-08-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-10T00:00:00.000Z"
 }
