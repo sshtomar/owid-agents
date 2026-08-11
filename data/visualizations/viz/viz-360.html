@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style>
+</head><body>
+<h1>Premature NCD Deaths: Who's Winning and Who Isn't</h1>
+<p class="subtitle">Probability (%) of dying between ages 30 and 70 from cardiovascular disease, cancer, diabetes, or chronic respiratory disease — 2000 vs 2021. Kazakhstan, Bahrain, and Azerbaijan cut their risk nearly in half; Kiribati and Eswatini made no progress.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Mortality from CVD, Cancer, Diabetes or CRD between ages 30 and 70</p>
+<script>
+const data = [{"n":"Fiji","a":44.0,"b":37.9},{"n":"Kiribati","a":43.8,"b":44.1},{"n":"Afghanistan","a":43.2,"b":32.7},{"n":"Kazakhstan","a":39.4,"b":21.2},{"n":"Congo, Rep.","a":36.5,"b":21.2},{"n":"Central Afr. Rep.","a":36.2,"b":30.8},{"n":"Haiti","a":34.8,"b":31.6},{"n":"Azerbaijan","a":34.5,"b":17.4},{"n":"Burundi","a":34.1,"b":24.8},{"n":"Eritrea","a":33.8,"b":27.3},{"n":"Belarus","a":33.7,"b":23.8},{"n":"Guinea-Bissau","a":33.0,"b":25.3},{"n":"Guyana","a":32.1,"b":25.4},{"n":"Angola","a":30.5,"b":24.7},{"n":"Eswatini","a":30.2,"b":32.3},{"n":"Bahrain","a":29.8,"b":14.8},{"n":"Hungary","a":29.1,"b":21.7},{"n":"Bulgaria","a":28.5,"b":25.6},{"n":"Egypt","a":28.2,"b":26.0},{"n":"Cambodia","a":28.1,"b":22.6},{"n":"Equatorial Guinea","a":27.9,"b":20.3},{"n":"Iraq","a":27.6,"b":22.7},{"n":"Armenia","a":27.5,"b":20.6},{"n":"Estonia","a":27.1,"b":15.5},{"n":"Congo, Dem. Rep.","a":26.8,"b":25.1},{"n":"Comoros","a":26.3,"b":20.2},{"n":"Cameroon","a":26.2,"b":24.3},{"n":"Burkina Faso","a":26.0,"b":23.4},{"n":"Georgia","a":26.0,"b":22.1},{"n":"Indonesia","a":25.9,"b":21.9}];
+
+const W = 680, H = 620;
+const pad = { left: 140, right: 150, top: 44, bottom: 20 };
+const axisX1 = pad.left, axisX2 = W - pad.right;
+const innerH = H - pad.top - pad.bottom;
+
+const minV = 10, maxV = 48;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * innerH;
+
+function resolveCollisions(items, minGap) {
+  const s = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 50; pass++) {
+    let moved = false;
+    for (let i = 1; i < s.length; i++) {
+      const gap = s[i].y - s[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        s[i-1].y -= shift;
+        s[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of s) {
+    item.y = Math.max(pad.top + 3, Math.min(H - pad.bottom - 3, item.y));
+  }
+  return s;
+}
+
+function colorForChange(change) {
+  // Negative = improvement (decline in mortality)
+  if (change < -15) return "#3D7A5A";
+  if (change < -10) return "#5B9E78";
+  if (change < -5) return "#8BAD72";
+  if (change < 0) return "#C49A45";
+  return "#EA5E33";
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid lines
+[15, 20, 25, 30, 35, 40, 45].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: axisX1, y1: scale(v), x2: axisX2, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: axisX1 - 6, y: scale(v) + 3,
+    "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F",
+    "text-anchor": "end"
+  })).textContent = v + "%";
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: axisX1, y1: pad.top, x2: axisX1, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+svg.appendChild(mkEl("line", { x1: axisX2, y1: pad.top, x2: axisX2, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+
+// Column headers
+[["2000", axisX1], ["2021", axisX2]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 10, "font-family": "JetBrains Mono", "font-size": "10", fill: "#7A786F", "text-anchor": "middle"
+  })).textContent = label;
+});
+
+// Prepare collision-resolved labels
+const leftItems = data.map(d => ({ d, y: scale(d.a) }));
+const rightItems = data.map(d => ({ d, y: scale(d.b) }));
+const resolvedLeft = resolveCollisions(leftItems, 11);
+const resolvedRight = resolveCollisions(rightItems, 11);
+const leftMap = Object.fromEntries(resolvedLeft.map(i => [i.d.n, i.y]));
+const rightMap = Object.fromEntries(resolvedRight.map(i => [i.d.n, i.y]));
+
+const groups = [];
+data.forEach(d => {
+  const y1 = scale(d.a), y2 = scale(d.b);
+  const change = d.b - d.a;
+  const color = colorForChange(change);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // leader lines
+  const lY = leftMap[d.n];
+  if (Math.abs(lY - y1) > 2) {
+    g.appendChild(mkEl("line", { x1: axisX1 - 2, y1, x2: axisX1 - 2, y2: lY, stroke: "#D0CEC5", "stroke-width": "0.5" }));
+  }
+  const rY = rightMap[d.n];
+  if (Math.abs(rY - y2) > 2) {
+    g.appendChild(mkEl("line", { x1: axisX2 + 2, y1: y2, x2: axisX2 + 2, y2: rY, stroke: "#D0CEC5", "stroke-width": "0.5" }));
+  }
+
+  const line = mkEl("line", { x1: axisX1, y1, x2: axisX2, y2, stroke: color, "stroke-width": "1.5" });
+  g.appendChild(line);
+  g.appendChild(mkEl("circle", { cx: axisX1, cy: y1, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: axisX2, cy: y2, r: "2.5", fill: color }));
+
+  // hit area
+  const hit = mkEl("line", { x1: axisX1, y1, x2: axisX2, y2, stroke: "transparent", "stroke-width": "12" });
+  g.appendChild(hit);
+
+  // Labels
+  const lbl = mkEl("text", {
+    x: axisX1 - 8, y: lY + 3.5,
+    "font-family": "Inter", "font-size": "9", fill: "#2B2A27", "text-anchor": "end", "font-weight": "500"
+  });
+  lbl.textContent = `${d.a.toFixed(1)}  ${d.n}`;
+  g.appendChild(lbl);
+
+  const rbl = mkEl("text", {
+    x: axisX2 + 8, y: rY + 3.5,
+    "font-family": "Inter", "font-size": "9", fill: "#2B2A27", "font-weight": "500"
+  });
+  rbl.textContent = `${d.b.toFixed(1)}  ${d.n}`;
+  g.appendChild(rbl);
+
+  svg.appendChild(g);
+  groups.push({ g, line });
+
+  const tip = document.getElementById('tip');
+  hit.addEventListener('mouseenter', () => {
+    groups.forEach(({g: gg}) => { if (gg !== g) gg.style.opacity = '0.12'; });
+    line.setAttribute("stroke-width", "2.5");
+    const sign = change >= 0 ? '+' : '';
+    tip.textContent = `${d.n}: ${d.a.toFixed(1)}% → ${d.b.toFixed(1)}% (${sign}${change.toFixed(1)})`;
+    tip.style.opacity = '1';
+  });
+  hit.addEventListener('mousemove', e => {
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top = (e.clientY - 20) + 'px';
+  });
+  hit.addEventListener('mouseleave', () => {
+    groups.forEach(({g: gg}) => { gg.style.opacity = '1'; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = '0';
+  });
+});
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "Fell >15pp" },
+  { color: "#5B9E78", label: "Fell 10–15pp" },
+  { color: "#8BAD72", label: "Fell 5–10pp" },
+  { color: "#C49A45", label: "Fell 0–5pp" },
+  { color: "#EA5E33", label: "Worsened" },
+];
+let lx = pad.left;
+const ly = H - 4;
+legendItems.forEach(({ color, label }) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 8, height: 8, fill: color }));
+  const lt = mkEl("text", { x: lx + 11, y: ly + 0.5, "font-family": "Inter", "font-size": "8", fill: "#7A786F" });
+  lt.textContent = label;
+  svg.appendChild(lt);
+  lx += 82;
+});
+</script>
+</body></html>

@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Great Urbanization: Countries That Left the Countryside Behind",
+      "description": "Sparkline grid showing rural population as a share of total for 30 countries with the largest absolute decline, 1960-2024. Gabon dropped from 87% to 8% rural; China from 80% to 34%.",
+      "datasetIds": [
+        "wb--SP-RUR-TOTL-ZS"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Gabon urbanized fastest: from 87% rural in 1960 to just 8% in 2024",
+        "China moved 600 million people to cities over 60 years",
+        "Jordan dropped from 57% to 7% rural, driven by rapid capital growth"
+      ],
+      "createdAt": "2026-08-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Homicide Rates: Latin America's Persistent Crisis",
+      "description": "Slope chart comparing intentional homicides per 100,000 people around 2000 vs. most recent year for the 25 countries with the highest current rates.",
+      "datasetIds": [
+        "wb--VC-IHR-PSRC-P5"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "Jamaica now leads the world at 49 homicides per 100,000 people",
+        "Ecuador's rate tripled from 14 to 46 \u2014 the largest rise in the dataset",
+        "Colombia cut its rate from 68 to 25 \u2014 one of the world's biggest improvements"
+      ],
+      "createdAt": "2026-08-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "The Gender Labor Gap: From Arab World to North America",
+      "description": "Trend lines showing female labor force participation as a percentage of male rate across 8 world regions, 1990-2024. The Arab World remains below 31% while North America approaches 84%.",
+      "datasetIds": [
+        "wb--SL-TLF-CACT-FM-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Arab World has barely moved in 35 years: 27% in 1990, 30% in 2024",
+        "Latin America improved most dramatically: from 53% to 69% parity",
+        "Sub-Saharan Africa has always had near-equal labor force participation"
+      ],
+      "createdAt": "2026-08-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Premature NCD Deaths: Who's Winning and Who Isn't",
+      "description": "Slope chart showing probability of dying between ages 30-70 from cardiovascular disease, cancer, diabetes, or chronic respiratory disease \u2014 2000 vs 2021 for countries with highest 2000 rates.",
+      "datasetIds": [
+        "wb--SH-DYN-NCOM-ZS"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "Kazakhstan cut premature NCD mortality from 39% to 21% \u2014 an 18 percentage point drop",
+        "Azerbaijan and Bahrain reduced risk by over 15 percentage points each",
+        "Kiribati and Eswatini made essentially no progress over 21 years"
+      ],
+      "createdAt": "2026-08-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "HIV's Arc: From Catastrophe to Near-Control in Sub-Saharan Africa",
+      "description": "Trend lines for 8 countries with the highest peak HIV incidence rates, showing new infections per 1,000 uninfected people ages 15-49 from 1990 to 2024.",
+      "datasetIds": [
+        "wb--SH-HIV-INCD-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Botswana and Eswatini peaked at 50 new infections per 1,000 people per year in the mid-1990s",
+        "Kenya's rate fell 97%, from 20 new infections per 1,000 in 1992 to 0.53 in 2024",
+        "Ethiopia reduced HIV incidence from 6.5 to 0.12 \u2014 a 98% decline"
+      ],
+      "createdAt": "2026-08-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-11T00:00:00.000Z"
 }

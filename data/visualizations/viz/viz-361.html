@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style>
+</head><body>
+<h1>HIV's Arc: From Catastrophe to Near-Control in Sub-Saharan Africa</h1>
+<p class="subtitle">New HIV infections per 1,000 uninfected people ages 15–49, 1990–2024. Botswana and Eswatini once saw 50 new infections per 1,000 people per year — among the highest rates ever recorded. Prevention and treatment have driven dramatic declines across the region.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Incidence of HIV (per 1,000 Uninfected Population Ages 15–49)</p>
+<script>
+const data = [{"n":"Eswatini","pts":[{"y":1990,"v":6.8},{"y":1991,"v":12.4},{"y":1992,"v":20},{"y":1993,"v":29.4},{"y":1994,"v":39.3},{"y":1995,"v":46.2},{"y":1996,"v":49.5},{"y":1997,"v":50.4},{"y":1998,"v":48.5},{"y":1999,"v":47},{"y":2000,"v":44.1},{"y":2001,"v":41.4},{"y":2002,"v":39},{"y":2003,"v":37.5},{"y":2004,"v":36.5},{"y":2005,"v":34.1},{"y":2006,"v":33.6},{"y":2007,"v":32.7},{"y":2008,"v":32.1},{"y":2009,"v":31.1},{"y":2010,"v":29},{"y":2011,"v":29.1},{"y":2012,"v":28.6},{"y":2013,"v":28.2},{"y":2014,"v":26.4},{"y":2015,"v":21.9},{"y":2016,"v":17.4},{"y":2017,"v":14.6},{"y":2018,"v":14.1},{"y":2019,"v":12.7},{"y":2020,"v":10.2},{"y":2021,"v":10.1},{"y":2022,"v":7.9},{"y":2023,"v":8.1},{"y":2024,"v":7.5}]},{"n":"Botswana","pts":[{"y":1990,"v":27.9},{"y":1991,"v":35.6},{"y":1992,"v":42.1},{"y":1993,"v":47.1},{"y":1994,"v":50.1},{"y":1995,"v":49.7},{"y":1996,"v":47.3},{"y":1997,"v":43},{"y":1998,"v":38.6},{"y":1999,"v":34.4},{"y":2000,"v":30.7},{"y":2001,"v":27.5},{"y":2002,"v":24.4},{"y":2003,"v":22.2},{"y":2004,"v":19.9},{"y":2005,"v":17.7},{"y":2006,"v":16},{"y":2007,"v":15.2},{"y":2008,"v":14.2},{"y":2009,"v":13.5},{"y":2010,"v":12.9},{"y":2011,"v":13},{"y":2012,"v":12.2},{"y":2013,"v":11.2},{"y":2014,"v":10.6},{"y":2015,"v":10},{"y":2016,"v":9.1},{"y":2017,"v":8.1},{"y":2018,"v":7.1},{"y":2019,"v":6.1},{"y":2020,"v":5.5},{"y":2021,"v":4.4},{"y":2022,"v":3.6},{"y":2023,"v":3.3},{"y":2024,"v":3.1}]},{"n":"Kenya","pts":[{"y":1990,"v":17.7},{"y":1991,"v":19.5},{"y":1992,"v":19.7},{"y":1993,"v":18.4},{"y":1994,"v":15.6},{"y":1995,"v":12.8},{"y":1996,"v":10.7},{"y":1997,"v":9},{"y":1998,"v":7.9},{"y":1999,"v":6.9},{"y":2000,"v":6},{"y":2001,"v":5.4},{"y":2002,"v":4.9},{"y":2003,"v":4.5},{"y":2004,"v":4.1},{"y":2005,"v":3.8},{"y":2006,"v":3.6},{"y":2007,"v":3.3},{"y":2008,"v":3.1},{"y":2009,"v":2.8},{"y":2010,"v":2.6},{"y":2011,"v":2.3},{"y":2012,"v":2},{"y":2013,"v":1.8},{"y":2014,"v":1.6},{"y":2015,"v":1.4},{"y":2016,"v":1.1},{"y":2017,"v":0.96},{"y":2018,"v":0.83},{"y":2019,"v":0.79},{"y":2020,"v":0.74},{"y":2021,"v":0.69},{"y":2022,"v":0.66},{"y":2023,"v":0.56},{"y":2024,"v":0.53}]},{"n":"Cote d'Ivoire","pts":[{"y":1990,"v":12.7},{"y":1991,"v":13.6},{"y":1992,"v":13.4},{"y":1993,"v":12.5},{"y":1994,"v":11.5},{"y":1995,"v":10.1},{"y":1996,"v":8.9},{"y":1997,"v":7.6},{"y":1998,"v":6.7},{"y":1999,"v":6.2},{"y":2000,"v":5.2},{"y":2001,"v":4.6},{"y":2002,"v":4.1},{"y":2003,"v":3.5},{"y":2004,"v":3.3},{"y":2005,"v":2.9},{"y":2006,"v":2.6},{"y":2007,"v":2.4},{"y":2008,"v":1.9},{"y":2009,"v":1.8},{"y":2010,"v":1.6},{"y":2011,"v":1.4},{"y":2012,"v":1.3},{"y":2013,"v":1.2},{"y":2014,"v":0.99},{"y":2015,"v":1},{"y":2016,"v":0.99},{"y":2017,"v":0.83},{"y":2018,"v":0.74},{"y":2019,"v":0.64},{"y":2020,"v":0.6},{"y":2021,"v":0.58},{"y":2022,"v":0.51},{"y":2023,"v":0.47},{"y":2024,"v":0.41}]},{"n":"Central Afr. Rep.","pts":[{"y":1990,"v":11.8},{"y":1991,"v":12.7},{"y":1992,"v":12.5},{"y":1993,"v":12.7},{"y":1994,"v":12.5},{"y":1995,"v":11.8},{"y":1996,"v":10.2},{"y":1997,"v":9.4},{"y":1998,"v":8.6},{"y":1999,"v":7.7},{"y":2000,"v":6.8},{"y":2001,"v":6.4},{"y":2002,"v":5.7},{"y":2003,"v":5.3},{"y":2004,"v":5.1},{"y":2005,"v":4.7},{"y":2006,"v":4.4},{"y":2007,"v":4.2},{"y":2008,"v":3.8},{"y":2009,"v":3.6},{"y":2010,"v":3.4},{"y":2011,"v":3.2},{"y":2012,"v":3.1},{"y":2013,"v":3},{"y":2014,"v":2.7},{"y":2015,"v":2.6},{"y":2016,"v":2.2},{"y":2017,"v":2},{"y":2018,"v":1.8},{"y":2019,"v":1.6},{"y":2020,"v":1.5},{"y":2021,"v":1.4},{"y":2022,"v":1.2},{"y":2023,"v":0.97},{"y":2024,"v":0.95}]},{"n":"Cameroon","pts":[{"y":1990,"v":3.2},{"y":1991,"v":4.1},{"y":1992,"v":5.2},{"y":1993,"v":6.3},{"y":1994,"v":7.5},{"y":1995,"v":8.2},{"y":1996,"v":8.9},{"y":1997,"v":9},{"y":1998,"v":9},{"y":1999,"v":8.5},{"y":2000,"v":7.9},{"y":2001,"v":7.1},{"y":2002,"v":6.4},{"y":2003,"v":5.8},{"y":2004,"v":5.2},{"y":2005,"v":4.7},{"y":2006,"v":4.4},{"y":2007,"v":4.1},{"y":2008,"v":3.8},{"y":2009,"v":3.4},{"y":2010,"v":3},{"y":2011,"v":2.8},{"y":2012,"v":2.4},{"y":2013,"v":2.2},{"y":2014,"v":2},{"y":2015,"v":1.8},{"y":2016,"v":1.7},{"y":2017,"v":1.5},{"y":2018,"v":1.4},{"y":2019,"v":1.3},{"y":2020,"v":1.2},{"y":2021,"v":1},{"y":2022,"v":0.81},{"y":2023,"v":0.74},{"y":2024,"v":0.7}]},{"n":"Ethiopia","pts":[{"y":1990,"v":6.3},{"y":1991,"v":6.5},{"y":1992,"v":6},{"y":1993,"v":5.3},{"y":1994,"v":4.3},{"y":1995,"v":3.6},{"y":1996,"v":2.9},{"y":1997,"v":2.4},{"y":1998,"v":2.1},{"y":1999,"v":1.8},{"y":2000,"v":1.5},{"y":2001,"v":1.3},{"y":2002,"v":1.2},{"y":2003,"v":1},{"y":2004,"v":0.88},{"y":2005,"v":0.79},{"y":2006,"v":0.7},{"y":2007,"v":0.64},{"y":2008,"v":0.59},{"y":2009,"v":0.52},{"y":2010,"v":0.47},{"y":2011,"v":0.42},{"y":2012,"v":0.38},{"y":2013,"v":0.33},{"y":2014,"v":0.29},{"y":2015,"v":0.24},{"y":2016,"v":0.25},{"y":2017,"v":0.22},{"y":2018,"v":0.21},{"y":2019,"v":0.19},{"y":2020,"v":0.16},{"y":2021,"v":0.19},{"y":2022,"v":0.14},{"y":2023,"v":0.13},{"y":2024,"v":0.12}]},{"n":"Burundi","pts":[{"y":1990,"v":9.3},{"y":1991,"v":8},{"y":1992,"v":6.9},{"y":1993,"v":3.9},{"y":1994,"v":7.7},{"y":1995,"v":1.6},{"y":1996,"v":3.4},{"y":1997,"v":3.2},{"y":1998,"v":2.6},{"y":1999,"v":1.9},{"y":2000,"v":1.6},{"y":2001,"v":1.5},{"y":2002,"v":1.2},{"y":2003,"v":1.2},{"y":2004,"v":1},{"y":2005,"v":0.87},{"y":2006,"v":0.88},{"y":2007,"v":0.8},{"y":2008,"v":0.8},{"y":2009,"v":0.58},{"y":2010,"v":0.72},{"y":2011,"v":0.57},{"y":2012,"v":0.53},{"y":2013,"v":0.47},{"y":2014,"v":0.46},{"y":2015,"v":0.44},{"y":2016,"v":0.35},{"y":2017,"v":0.29},{"y":2018,"v":0.22},{"y":2019,"v":0.21},{"y":2020,"v":0.18},{"y":2021,"v":0.17},{"y":2022,"v":0.15},{"y":2023,"v":0.13},{"y":2024,"v":0.14}]}];
+
+const COLORS = ["#EA5E33","#B34B3B","#F29A44","#C49A45","#8BAD72","#5B9E78","#3D7A5A","#A6C4A2"];
+
+const W = 720, H = 460;
+const margin = { top: 36, right: 155, bottom: 32, left: 52 };
+const yearMin = 1990, yearMax = 2024;
+const valMin = 0, valMax = 55;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid
+[10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3,
+    "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F", "text-anchor": "end"
+  })).textContent = v;
+});
+
+// Y-axis label
+const yLabel = mkEl("text", {
+  x: 12, y: margin.top + (H - margin.top - margin.bottom) / 2,
+  "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F",
+  transform: `rotate(-90, 12, ${margin.top + (H - margin.top - margin.bottom) / 2})`,
+  "text-anchor": "middle"
+});
+yLabel.textContent = "per 1,000 uninfected";
+svg.appendChild(yLabel);
+
+// X ticks
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 12,
+    "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F", "text-anchor": "middle"
+  })).textContent = y;
+});
+
+function resolveCollisions(items, minGap) {
+  const s = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < s.length; i++) {
+      const gap = s[i].y - s[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        s[i-1].y -= shift;
+        s[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of s) {
+    item.y = Math.max(margin.top + 4, Math.min(H - margin.bottom - 4, item.y));
+  }
+  return s;
+}
+
+const endLabels = data.map((d, i) => {
+  const last = d.pts[d.pts.length - 1];
+  return { n: d.n, y: yScale(last.v), color: COLORS[i], v: last.v };
+});
+const resolved = resolveCollisions(endLabels, 12);
+const labelMap = Object.fromEntries(resolved.map(i => [i.n, i.y]));
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = COLORS[i];
+  const pts = d.pts;
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const pathD = pts.map((p, j) => `${j === 0 ? 'M' : 'L'} ${xScale(p.y)} ${yScale(p.v)}`).join(' ');
+  const line = mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.6", fill: "none", "stroke-linejoin": "round"
+  });
+  g.appendChild(line);
+
+  const last = pts[pts.length - 1];
+  g.appendChild(mkEl("circle", { cx: xScale(last.y), cy: yScale(last.v), r: "3", fill: color }));
+
+  const labelY = labelMap[d.n];
+  const dotY = yScale(last.v);
+  if (Math.abs(labelY - dotY) > 4) {
+    g.appendChild(mkEl("line", {
+      x1: xScale(last.y) + 4, y1: dotY,
+      x2: xScale(last.y) + 8, y2: labelY,
+      stroke: "#C2C0B5", "stroke-width": "0.6"
+    }));
+  }
+
+  const lbl = mkEl("text", {
+    x: xScale(last.y) + 10, y: labelY + 3.5,
+    "font-family": "Inter", "font-size": "9", fill: color, "font-weight": "600"
+  });
+  lbl.textContent = `${last.v.toFixed(2)}  ${d.n}`;
+  g.appendChild(lbl);
+
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, d, pts });
+
+  const tip = document.getElementById('tip');
+  hit.addEventListener('mouseenter', () => {
+    groups.forEach(({g: gg}) => { if (gg !== g) gg.style.opacity = '0.1'; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener('mousemove', e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const clamped = Math.max(0, Math.min(1, ratio));
+    const yearApprox = yearMin + clamped * (yearMax - yearMin);
+    const closest = pts.reduce((best, p) => Math.abs(p.y - yearApprox) < Math.abs(best.y - yearApprox) ? p : best, pts[0]);
+    tip.textContent = `${d.n} · ${closest.y}: ${closest.v} per 1,000`;
+    tip.style.opacity = '1';
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top = (e.clientY - 20) + 'px';
+  });
+  hit.addEventListener('mouseleave', () => {
+    groups.forEach(({g: gg}) => { gg.style.opacity = '1'; });
+    line.setAttribute("stroke-width", "1.6");
+    tip.style.opacity = '0';
+  });
+});
+</script>
+</body></html>

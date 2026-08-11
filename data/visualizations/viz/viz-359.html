@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style>
+</head><body>
+<h1>The Gender Labor Gap: From Arab World to North America</h1>
+<p class="subtitle">Female labor force participation as a % of male rate, by world region, 1990–2024. 100 = full parity. The Arab World remains below 31%; Latin America has converged from 53% to 69%; Sub-Saharan Africa has always been near-equal.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Ratio of Female to Male Labor Force Participation Rate (ILO estimate)</p>
+<script>
+const data = [{"n":"Arab World","pts":[{"y":1990,"v":26.6},{"y":1992,"v":27.3},{"y":1994,"v":27.6},{"y":1996,"v":27.6},{"y":1998,"v":27.5},{"y":2000,"v":28.3},{"y":2002,"v":27.9},{"y":2004,"v":28.4},{"y":2006,"v":29.0},{"y":2008,"v":29.5},{"y":2010,"v":30.0},{"y":2012,"v":30.2},{"y":2014,"v":30.8},{"y":2016,"v":31.6},{"y":2018,"v":29.6},{"y":2020,"v":29.1},{"y":2022,"v":29.0},{"y":2024,"v":30.3}]},{"n":"South Asia","pts":[{"y":1990,"v":35.6},{"y":1992,"v":35.7},{"y":1994,"v":36.1},{"y":1996,"v":37.4},{"y":1998,"v":38.9},{"y":2000,"v":40.1},{"y":2002,"v":40.6},{"y":2004,"v":41.2},{"y":2006,"v":40.3},{"y":2008,"v":38.4},{"y":2010,"v":36.8},{"y":2012,"v":35.2},{"y":2014,"v":35.1},{"y":2016,"v":35.4},{"y":2018,"v":36.3},{"y":2020,"v":36.5},{"y":2022,"v":40.4},{"y":2024,"v":42.6}]},{"n":"Latin America","pts":[{"y":1990,"v":52.7},{"y":1992,"v":53.8},{"y":1994,"v":55.8},{"y":1996,"v":57.5},{"y":1998,"v":59.2},{"y":2000,"v":60.3},{"y":2002,"v":62.2},{"y":2004,"v":63.8},{"y":2006,"v":65.0},{"y":2008,"v":65.4},{"y":2010,"v":66.0},{"y":2012,"v":66.2},{"y":2014,"v":66.2},{"y":2016,"v":67.2},{"y":2018,"v":68.4},{"y":2020,"v":67.5},{"y":2022,"v":68.9},{"y":2024,"v":69.2}]},{"n":"World","pts":[{"y":1990,"v":66.9},{"y":1992,"v":66.9},{"y":1994,"v":67.1},{"y":1996,"v":67.3},{"y":1998,"v":67.6},{"y":2000,"v":67.9},{"y":2002,"v":68.0},{"y":2004,"v":68.0},{"y":2006,"v":68.0},{"y":2008,"v":67.8},{"y":2010,"v":67.6},{"y":2012,"v":67.5},{"y":2014,"v":67.5},{"y":2016,"v":67.7},{"y":2018,"v":68.0},{"y":2020,"v":67.8},{"y":2022,"v":68.7},{"y":2024,"v":69.6}]},{"n":"Europe & C. Asia","pts":[{"y":1990,"v":69.4},{"y":1992,"v":70.0},{"y":1994,"v":70.3},{"y":1996,"v":70.9},{"y":1998,"v":71.4},{"y":2000,"v":72.6},{"y":2002,"v":73.7},{"y":2004,"v":74.2},{"y":2006,"v":75.0},{"y":2008,"v":75.0},{"y":2010,"v":75.7},{"y":2012,"v":76.2},{"y":2014,"v":76.3},{"y":2016,"v":76.4},{"y":2018,"v":76.5},{"y":2020,"v":76.8},{"y":2022,"v":77.6},{"y":2024,"v":78.2}]},{"n":"North America","pts":[{"y":1990,"v":74.7},{"y":1992,"v":75.6},{"y":1994,"v":77.5},{"y":1996,"v":78.2},{"y":1998,"v":79.1},{"y":2000,"v":79.6},{"y":2002,"v":80.2},{"y":2004,"v":80.6},{"y":2006,"v":80.8},{"y":2008,"v":81.6},{"y":2010,"v":82.5},{"y":2012,"v":82.2},{"y":2014,"v":82.2},{"y":2016,"v":82.1},{"y":2018,"v":82.7},{"y":2020,"v":83.0},{"y":2022,"v":83.5},{"y":2024,"v":84.4}]},{"n":"East Asia & Pacific","pts":[{"y":1990,"v":80.5},{"y":1992,"v":80.2},{"y":1994,"v":79.9},{"y":1996,"v":79.8},{"y":1998,"v":79.7},{"y":2000,"v":79.5},{"y":2002,"v":78.8},{"y":2004,"v":78.3},{"y":2006,"v":78.1},{"y":2008,"v":78.1},{"y":2010,"v":77.9},{"y":2012,"v":78.1},{"y":2014,"v":78.4},{"y":2016,"v":78.8},{"y":2018,"v":79.4},{"y":2020,"v":79.4},{"y":2022,"v":80.2},{"y":2024,"v":80.6}]},{"n":"Sub-Saharan Africa","pts":[{"y":1990,"v":83.3},{"y":1992,"v":83.7},{"y":1994,"v":84.2},{"y":1996,"v":84.3},{"y":1998,"v":84.4},{"y":2000,"v":84.9},{"y":2002,"v":85.3},{"y":2004,"v":85.7},{"y":2006,"v":85.9},{"y":2008,"v":85.9},{"y":2010,"v":85.7},{"y":2012,"v":85.4},{"y":2014,"v":85.3},{"y":2016,"v":84.8},{"y":2018,"v":84.3},{"y":2020,"v":83.6},{"y":2022,"v":83.9},{"y":2024,"v":86.9}]}];
+
+const COLORS = ["#B34B3B","#C4715A","#F29A44","#C49A45","#3D7A5A","#EA5E33","#8BAD72","#5B9E78"];
+
+const W = 700, H = 440;
+const margin = { top: 36, right: 150, bottom: 32, left: 52 };
+
+const yearMin = 1990, yearMax = 2024;
+const valMin = 20, valMax = 100;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Parity reference line
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: yScale(100), x2: W - margin.right, y2: yScale(100),
+  stroke: "#C2C0B5", "stroke-dasharray": "4,3", "stroke-width": "0.8"
+}));
+const parityLabel = mkEl("text", {
+  x: W - margin.right + 6, y: yScale(100) + 3,
+  "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F"
+});
+parityLabel.textContent = "Parity";
+svg.appendChild(parityLabel);
+
+// Grid lines
+[30, 40, 50, 60, 70, 80, 90].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3,
+    "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F",
+    "text-anchor": "end"
+  })).textContent = v + "%";
+});
+
+// X axis ticks
+[1990, 2000, 2010, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 12,
+    "font-family": "JetBrains Mono", "font-size": "8", fill: "#7A786F",
+    "text-anchor": "middle"
+  })).textContent = y;
+});
+
+// Resolve endpoint label collisions
+function resolveCollisions(items, minGap) {
+  const s = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < s.length; i++) {
+      const gap = s[i].y - s[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        s[i-1].y -= shift;
+        s[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return s;
+}
+
+const endLabels = data.map((d, i) => {
+  const last = d.pts[d.pts.length - 1];
+  return { n: d.n, y: yScale(last.v), origY: yScale(last.v), color: COLORS[i], lastV: last.v };
+});
+const resolved = resolveCollisions(endLabels, 12);
+const labelMap = Object.fromEntries(resolved.map(item => [item.n, item.y]));
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = COLORS[i];
+  const pts = d.pts;
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Path
+  const pathD = pts.map((p, j) => `${j === 0 ? 'M' : 'L'} ${xScale(p.y)} ${yScale(p.v)}`).join(' ');
+  const line = mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.6", fill: "none", "stroke-linejoin": "round"
+  });
+  g.appendChild(line);
+
+  // Endpoint dot
+  const last = pts[pts.length - 1];
+  g.appendChild(mkEl("circle", { cx: xScale(last.y), cy: yScale(last.v), r: "3", fill: color }));
+
+  // Leader line to resolved label
+  const labelY = labelMap[d.n];
+  const dotY = yScale(last.v);
+  if (Math.abs(labelY - dotY) > 4) {
+    g.appendChild(mkEl("line", {
+      x1: xScale(last.y) + 4, y1: dotY,
+      x2: xScale(last.y) + 8, y2: labelY,
+      stroke: "#C2C0B5", "stroke-width": "0.6"
+    }));
+  }
+
+  // Label
+  const lbl = mkEl("text", {
+    x: xScale(last.y) + 10, y: labelY + 3.5,
+    "font-family": "Inter", "font-size": "9", fill: color, "font-weight": "600"
+  });
+  lbl.textContent = `${last.v.toFixed(0)}  ${d.n}`;
+  g.appendChild(lbl);
+
+  // Invisible hit path
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, d, color, pts });
+
+  const tip = document.getElementById('tip');
+  hit.addEventListener('mouseenter', () => {
+    groups.forEach(({g: gg}) => { if (gg !== g) gg.style.opacity = '0.1'; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener('mousemove', e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const clamped = Math.max(0, Math.min(1, ratio));
+    const yearApprox = yearMin + clamped * (yearMax - yearMin);
+    const closest = pts.reduce((best, p) => Math.abs(p.y - yearApprox) < Math.abs(best.y - yearApprox) ? p : best, pts[0]);
+    tip.textContent = `${d.n} · ${closest.y}: ${closest.v.toFixed(1)}%`;
+    tip.style.opacity = '1';
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top = (e.clientY - 20) + 'px';
+  });
+  hit.addEventListener('mouseleave', () => {
+    groups.forEach(({g: gg}) => { gg.style.opacity = '1'; });
+    line.setAttribute("stroke-width", "1.6");
+    tip.style.opacity = '0';
+  });
+});
+</script>
+</body></html>
