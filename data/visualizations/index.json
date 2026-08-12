@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourism Arrivals, 1995\u20132020",
+      "description": "Trend lines showing annual visitor arrivals (millions) for nine major destinations. Captures the decades-long growth in global tourism and its sudden collapse in 2020 due to COVID-19 border closures.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Italy received 95M visitors in 2019 \u2014 cut to 38M in 2020 (-60%)",
+        "Japan grew from 3M arrivals in 1995 to 32M in 2019, then crashed to 4M",
+        "Greece lost 78% of arrivals in 2020; Croatia lost 64%"
+      ],
+      "createdAt": "2026-08-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Anemia Among Non-Pregnant Women, 2000 vs 2022",
+      "description": "Slope chart comparing prevalence of anemia (% of women ages 15\u201349) across 17 countries. Sub-Saharan Africa still carries the heaviest burden; Afghanistan and India worsened while Guatemala made the largest improvement.",
+      "datasetIds": [
+        "wb--SH-ANM-NPRG-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Gabon still has 60% anemia prevalence in 2022 \u2014 among the world's highest",
+        "India worsened from 50% to 53% despite economic growth",
+        "Afghanistan jumped from 30% to 46%; Guatemala fell from 21% to 9%"
+      ],
+      "createdAt": "2026-08-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Natural Resources Rents as a Share of GDP, 1990\u20132021",
+      "description": "Trend lines showing income from oil, gas, coal, minerals, and forests as a percentage of GDP for nine countries. Resource-dependent economies follow global commodity cycles while diversified economies stay flat.",
+      "datasetIds": [
+        "wb--NY-GDP-TOTL-RT-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Iraq peaked above 65% of GDP in natural resource rents during mid-2000s oil prices",
+        "Angola fluctuated between 13% and 59% tracking oil markets",
+        "Canada and Australia stayed below 6% despite being major resource exporters"
+      ],
+      "createdAt": "2026-08-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Out-of-Pocket Health Spending, 2000 vs 2022",
+      "description": "Slope chart showing the share of health expenditure paid directly by patients in 19 countries. High out-of-pocket costs expose households to financial catastrophe from illness; many low-income countries have made little progress.",
+      "datasetIds": [
+        "wb--SH-XPD-OOPC-CH-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Armenia and Bangladesh both exceeded 78% out-of-pocket in 2022 \u2014 up from ~62% in 2000",
+        "Cote d'Ivoire improved dramatically from 75% to 33%; Burundi from 61% to 25%",
+        "Denmark and Ireland maintain below 14% through public health systems"
+      ],
+      "createdAt": "2026-08-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Cereal Yield, 1961\u20132022",
+      "description": "Trend lines showing kilograms of cereal harvested per hectare across 9 countries over six decades. The Green Revolution transformed food security \u2014 China's yield grew 5\u00d7 and even Ethiopia doubled output, yet a massive gap with high-input farming nations persists.",
+      "datasetIds": [
+        "wb--AG-YLD-CREL-KG"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Germany and France reached over 7,000 kg/ha in 2022 \u2014 nearly 3\u00d7 India's yield",
+        "China grew from 1,193 kg/ha in 1961 to 6,381 in 2022 (5.3\u00d7)",
+        "Ethiopia doubled yield since 1961 but remains at 2,691 kg/ha, limited by smallholder farming"
+      ],
+      "createdAt": "2026-08-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-12T00:00:00.000Z"
 }

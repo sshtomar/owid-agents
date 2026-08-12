@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Out-of-Pocket Health Spending, 2000 vs 2022</h1>
+<p class="subtitle">Share of current health expenditure paid directly by patients (%). When this share is high, households face financial catastrophe from unexpected illness. Many low-income countries have made little progress.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Out-of-Pocket Expenditure (% of Current Health Expenditure) (SH.XPD.OOPC.CH.ZS)</p>
+<script>
+const data = [{"n":"Armenia","a":62.0,"b":79.1},{"n":"Bangladesh","a":61.8,"b":78.3},{"n":"Cameroon","a":78.5,"b":67.8},{"n":"Equatorial Guinea","a":52.2,"b":66.7},{"n":"Azerbaijan","a":68.6,"b":66.3},{"n":"Guinea-Bissau","a":60.7,"b":66.3},{"n":"Cambodia","a":68.8,"b":61.0},{"n":"Guatemala","a":59.0,"b":60.2},{"n":"Comoros","a":79.7,"b":43.5},{"n":"Cote d'Ivoire","a":75.3,"b":32.5},{"n":"Ecuador","a":61.9,"b":30.7},{"n":"Burundi","a":61.1,"b":25.2},{"n":"Cyprus","a":55.9,"b":18.0},{"n":"Gabon","a":53.2,"b":17.9},{"n":"Colombia","a":13.7,"b":14.4},{"n":"Czechia","a":10.2,"b":14.3},{"n":"Iceland","a":18.0,"b":13.7},{"n":"Denmark","a":15.4,"b":13.2},{"n":"Ireland","a":12.1,"b":11.6}];
+
+const W = 700, H = 600;
+const pad = { left: 145, right: 155, top: 50, bottom: 20 };
+const minV = 0, maxV = 85;
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+}
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 5)  return "#B34B3B";
+  if (change > 0)  return "#C4715A";
+  if (change > -15) return "#C49A45";
+  if (change > -30) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 50; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) { const sh = (minGap - gap) / 2; sorted[i-1].y -= sh; sorted[i].y += sh; moved = true; }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:${W}px;display:block;` });
+document.getElementById("chart").appendChild(svg);
+
+const xL = pad.left, xR = W - pad.right;
+
+svg.appendChild(mkEl("text", { x: xL, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace" }, "2000"));
+svg.appendChild(mkEl("text", { x: xR, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace" }, "2022"));
+
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 10, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 10, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+// WHO catastrophic spending threshold ~40%
+const refY40 = scale(40);
+svg.appendChild(mkEl("rect", { x: xL, y: refY40, width: xR - xL, height: scale(0) - refY40, fill: "#EA5E33", opacity: "0.05" }));
+svg.appendChild(mkEl("line", { x1: xL, y1: refY40, x2: xR, y2: refY40, stroke: "#EA5E33", "stroke-dasharray": "4,3", "stroke-width": "0.7" }));
+svg.appendChild(mkEl("text", { x: xL + 4, y: refY40 - 3, fill: "#EA5E33", "font-size": "8", "font-family": "JetBrains Mono, monospace", opacity: "0.8" }, "40% — catastrophic risk zone"));
+
+// legend
+const legendItems = [
+  { color: "#B34B3B", label: "Worsened" },
+  { color: "#C49A45", label: "Stable (±15pp)" },
+  { color: "#8BAD72", label: "Improved 15–30pp" },
+  { color: "#3D7A5A", label: "Improved >30pp" },
+];
+legendItems.forEach((li, i) => {
+  const lx = xL + i * 128;
+  svg.appendChild(mkEl("rect", { x: lx, y: 8, width: 8, height: 8, fill: li.color, rx: "1" }));
+  svg.appendChild(mkEl("text", { x: lx + 11, y: 16, fill: "#7A786F", "font-size": "8.5", "font-family": "Inter, sans-serif" }, li.label));
+});
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+const leftItems = data.map(d => ({ n: d.n, y: scale(d.a), origY: scale(d.a), color: colorForChange(d), d }));
+const rightItems = data.map(d => ({ n: d.n, y: scale(d.b), origY: scale(d.b), color: colorForChange(d), d }));
+const resolvedL = resolveCollisions(leftItems.map(x => ({...x})), 12);
+const resolvedR = resolveCollisions(rightItems.map(x => ({...x})), 12);
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const g = mkEl("g");
+  svg.appendChild(g);
+
+  const line = mkEl("line", { x1: xL, y1: scale(d.a), x2: xR, y2: scale(d.b), stroke: color, "stroke-width": "1.4", opacity: "0.85" });
+  g.appendChild(line);
+  g.appendChild(mkEl("circle", { cx: xL, cy: scale(d.a), r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: scale(d.b), r: "3", fill: color }));
+
+  const hit = mkEl("line", { x1: xL, y1: scale(d.a), x2: xR, y2: scale(d.b), stroke: "transparent", "stroke-width": "14", style: "cursor:pointer;" });
+  g.appendChild(hit);
+  groups.push({ g, line, d, color });
+
+  hit.addEventListener("mousemove", e => {
+    const dir = d.b > d.a ? "+" : "";
+    tip.textContent = `${d.n}  2000: ${d.a}%  →  2022: ${d.b}%  (${dir}${(d.b - d.a).toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    groups.forEach(({ line: l }) => l.setAttribute("opacity", "0.08"));
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "2.4");
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(({ line: l }) => { l.setAttribute("opacity", "0.85"); l.setAttribute("stroke-width", "1.4"); });
+  });
+});
+
+function shortName(n) {
+  return n.replace("Equatorial Guinea","Eq. Guinea").replace("Guinea-Bissau","Guinea-Bissau").replace("Cote d'Ivoire","C. d'Ivoire");
+}
+
+resolvedL.forEach(item => {
+  const d = item.d;
+  const origY = scale(d.a);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 3, y1: origY, x2: xL - 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", { x: xL - 8, y: item.y + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9", "font-weight": "500" }, `${shortName(d.n)}  ${d.a}%`));
+});
+
+resolvedR.forEach(item => {
+  const d = item.d;
+  const origY = scale(d.b);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 3, y1: origY, x2: xR + 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", { x: xR + 8, y: item.y + 3.5, fill: "#2B2A27", "font-size": "9", "font-weight": "500" }, `${d.b}%  ${shortName(d.n)}`));
+});
+</script>
+</body></html>
