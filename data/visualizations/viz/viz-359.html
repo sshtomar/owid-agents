@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+  .legend { display: flex; gap: 18px; margin-bottom: 12px; font-size: 10px; color: #7A786F; align-items: center; }
+  .legend-swatch { width: 22px; height: 3px; display: inline-block; border-radius: 1px; }
+</style></head><body>
+<h1>Income Share of the Richest 10%, Early 2000s vs. Recent</h1>
+<p class="subtitle">Each line connects a country's income concentration around 2000–2006 (left) to its most recent survey (right). Most Latin American countries have narrowed the gap; a few have widened it.</p>
+<div class="legend">
+  <span><span class="legend-swatch" style="background:#B34B3B;"></span> Increased (+)</span>
+  <span><span class="legend-swatch" style="background:#A6C4A2;"></span> Decreased (–)</span>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SI.DST.10TH.10 &nbsp;|&nbsp; Comparing earliest available year (1999–2006) to latest (2018–2024)</p>
+<script>
+const data = [{"n":"Brazil","a":44.1,"y":2006,"b":39.3,"by":2024},{"n":"Honduras","a":44,"y":2006,"b":32.3,"by":2024},{"n":"Bolivia","a":43.6,"y":2006,"b":30.6,"by":2024},{"n":"Colombia","a":43.2,"y":2005,"b":42.7,"by":2024},{"n":"Guatemala","a":43,"y":2006,"b":34.1,"by":2023},{"n":"Dominican Republic","a":41.2,"y":2006,"b":29.5,"by":2024},{"n":"Ecuador","a":41.1,"y":2006,"b":33.4,"by":2024},{"n":"Angola","a":40.2,"y":2000,"b":39.6,"by":2018},{"n":"Costa Rica","a":38.3,"y":2006,"b":34.2,"by":2024},{"n":"Chile","a":38.2,"y":2006,"b":34.3,"by":2024},{"n":"Kenya","a":36.8,"y":2005,"b":30.9,"by":2022},{"n":"Jamaica","a":35.7,"y":2004,"b":29.6,"by":2021},{"n":"El Salvador","a":35.6,"y":2006,"b":29.7,"by":2023},{"n":"Iran, Islamic Rep.","a":34,"y":2006,"b":28.2,"by":2023},{"n":"Argentina","a":33.8,"y":2006,"b":31.2,"by":2024},{"n":"Cameroon","a":33.6,"y":2001,"b":31.1,"by":2021},{"n":"Congo, Dem. Rep.","a":32.3,"y":2004,"b":35.7,"by":2020},{"n":"Bhutan","a":32.2,"y":2003,"b":22.7,"by":2022},{"n":"Benin","a":31.1,"y":2003,"b":27.2,"by":2021},{"n":"Ghana","a":31.7,"y":2005,"b":31.2,"by":2022},{"n":"Bulgaria","a":23.6,"y":2003,"b":31.1,"by":2023}];
+
+const W = 680, H = 580;
+const pad = { left: 130, right: 140, top: 40, bottom: 20 };
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = Math.min(...allVals) - 2;
+const maxV = Math.max(...allVals) + 2;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const colorFor = d => {
+  const ch = d.b - d.a;
+  if (ch > 3)  return "#B34B3B";
+  if (ch > 0)  return "#C4715A";
+  if (ch > -5) return "#A6C4A2";
+  return "#5B9E78";
+};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const xL = pad.left, xR = W - pad.right;
+
+// Vertical axes
+[xL, xR].forEach(x => {
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "1"
+  }));
+});
+
+// Grid tick values
+[22, 26, 30, 34, 38, 42].forEach(v => {
+  [xL, xR].forEach(x => {
+    const dir = x === xL ? -1 : 1;
+    svg.appendChild(mkEl("line", {
+      x1: x, y1: scale(v), x2: x + dir * 4, y2: scale(v),
+      stroke: "#C2C0B5", "stroke-width": "0.8"
+    }));
+    svg.appendChild(mkEl("text", {
+      x: x + dir * 7, y: scale(v) + 3.5,
+      "text-anchor": x === xL ? "end" : "start",
+      fill: "#9A9890", "font-size": "8.5",
+      "font-family": "JetBrains Mono, monospace"
+    })).textContent = v + "%";
+  });
+});
+
+// Column headers
+const earlyYrs = [...new Set(data.map(d => d.y))];
+const lateYrs  = [...new Set(data.map(d => d.by))];
+const earlyLabel = "~2000–2006";
+const lateLabel  = "~2018–2024";
+
+svg.appendChild(mkEl("text", {
+  x: xL, y: pad.top - 14, "text-anchor": "middle",
+  fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace"
+})).textContent = earlyLabel;
+svg.appendChild(mkEl("text", {
+  x: xR, y: pad.top - 14, "text-anchor": "middle",
+  fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace"
+})).textContent = lateLabel;
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 26) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const rows = [];
+data.forEach(d => {
+  const color = colorFor(d);
+  const yA = scale(d.a), yB = scale(d.b);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: color, "stroke-width": "1.5" });
+  const hit  = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "10" });
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  rows.push({ g, line, d, color });
+});
+
+// Left labels
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.a), origY: scale(d.a) }));
+const resolvedL = resolveCollisions(leftLabels, 11);
+resolvedL.forEach(lbl => {
+  const origLbl = leftLabels.find(l => l.n === lbl.n);
+  const d = data.find(x => x.n === lbl.n);
+  const color = colorFor(d);
+  if (Math.abs(lbl.y - origLbl.origY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xL - 2, y1: origLbl.origY, x2: xL - 8, y2: lbl.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xL - 10, y: lbl.y + 3.5, "text-anchor": "end",
+    fill: color, "font-size": "9", "font-weight": "500"
+  })).textContent = lbl.n;
+});
+
+// Right labels
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b), origY: scale(d.b) }));
+const resolvedR = resolveCollisions(rightLabels, 11);
+resolvedR.forEach(lbl => {
+  const origLbl = rightLabels.find(l => l.n === lbl.n);
+  const d = data.find(x => x.n === lbl.n);
+  const color = colorFor(d);
+  const ch = d.b - d.a;
+  if (Math.abs(lbl.y - origLbl.origY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xR + 2, y1: origLbl.origY, x2: xR + 8, y2: lbl.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xR + 10, y: lbl.y + 3.5, "text-anchor": "start",
+    fill: color, "font-size": "9", "font-weight": "500"
+  })).textContent = `${lbl.n}  ${ch > 0 ? "+" : ""}${ch.toFixed(1)}`;
+});
+
+rows.forEach(({ g, line, d, color }) => {
+  const hit = g.lastChild;
+  hit.addEventListener("mouseenter", e => {
+    rows.forEach(r => { r.g.style.opacity = r.d.n === d.n ? "1" : "0.1"; });
+    const ch = d.b - d.a;
+    showTip(`${d.n}: ${d.a}% (${d.y}) → ${d.b}% (${d.by})  [${ch > 0 ? "+" : ""}${ch.toFixed(1)}pp]`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    rows.forEach(r => { r.g.style.opacity = "1"; });
+    hideTip();
+  });
+});
+</script>
+</body></html>

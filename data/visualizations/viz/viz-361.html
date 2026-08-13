@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+</style></head><body>
+<h1>Electricity from Hydropower, Top Countries</h1>
+<p class="subtitle">Share of electricity production from hydroelectric sources (latest available year, 2021–2024). Bhutan and DR Congo generate essentially all their electricity from rivers; a dozen more exceed 60%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EG.ELC.HYRO.ZS &nbsp;|&nbsp; Latest available year shown per country</p>
+<script>
+const data = [{"n":"Bhutan","v":100.0,"y":2021},{"n":"Congo, Dem. Rep.","v":99.5,"y":2023},{"n":"Albania","v":96.7,"y":2023},{"n":"Ethiopia","v":96.5,"y":2023},{"n":"Central African Republic","v":96.2,"y":2021},{"n":"Guinea","v":87.4,"y":2021},{"n":"Andorra","v":75.9,"y":2021},{"n":"Georgia","v":75.5,"y":2023},{"n":"Cameroon","v":74.7,"y":2023},{"n":"Greenland","v":74.5,"y":2021},{"n":"Ecuador","v":71.7,"y":2023},{"n":"Angola","v":71.5,"y":2023},{"n":"Iceland","v":68.2,"y":2024},{"n":"Costa Rica","v":66.6,"y":2024},{"n":"Austria","v":59.9,"y":2024},{"n":"Burundi","v":59.6,"y":2021},{"n":"Colombia","v":58.3,"y":2024},{"n":"Brazil","v":56.1,"y":2024},{"n":"Canada","v":55.4,"y":2024},{"n":"Eswatini","v":53.9,"y":2023}];
+
+// Sort by value descending
+data.sort((a, b) => b.v - a.v);
+
+const W = 680, H = 560;
+const mar = { top: 20, right: 70, bottom: 30, left: 130 };
+const barH = 18, gap = 6;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(v) {
+  if (v >= 90) return "#3D7A5A";
+  if (v >= 70) return "#5B9E78";
+  if (v >= 50) return "#8BAD72";
+  return "#C49A45";
+}
+
+const totalH = mar.top + data.length * (barH + gap) + mar.bottom;
+const xS = v => mar.left + v / 100 * (W - mar.left - mar.right);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${totalH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[25, 50, 75, 100].forEach(v => {
+  const x = xS(v);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mar.top, x2: x, y2: totalH - mar.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: x, y: totalH - mar.bottom + 14, "text-anchor": "middle",
+    fill: "#9A9890", "font-size": "9", "font-family": "JetBrains Mono, monospace"
+  })).textContent = v + "%";
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 26) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const bars = [];
+data.forEach((d, i) => {
+  const y = mar.top + i * (barH + gap);
+  const color = colorFor(d.v);
+  const bw = xS(d.v) - mar.left;
+
+  const bar = mkEl("rect", {
+    x: mar.left, y: y, width: bw, height: barH,
+    fill: color, rx: "2"
+  });
+  svg.appendChild(bar);
+
+  svg.appendChild(mkEl("text", {
+    x: mar.left - 6, y: y + barH / 2 + 4,
+    "text-anchor": "end", fill: "#2B2A27",
+    "font-size": "10.5", "font-weight": "500"
+  })).textContent = d.n;
+
+  svg.appendChild(mkEl("text", {
+    x: xS(d.v) + 5, y: y + barH / 2 + 4,
+    fill: "#7A786F", "font-size": "9.5",
+    "font-family": "JetBrains Mono, monospace"
+  })).textContent = d.v.toFixed(1) + "%";
+
+  const hit = mkEl("rect", {
+    x: mar.left - 130, y: y, width: W, height: barH,
+    fill: "transparent"
+  });
+  svg.appendChild(hit);
+  bars.push({ bar, hit, d, color });
+});
+
+bars.forEach(({ bar, hit, d }) => {
+  hit.addEventListener("mouseenter", e => {
+    bars.forEach(b => { b.bar.setAttribute("opacity", b.d.n === d.n ? "1" : "0.25"); });
+    showTip(`${d.n}: ${d.v.toFixed(1)}% hydro (${d.y})`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    bars.forEach(b => { b.bar.setAttribute("opacity", "1"); });
+    hideTip();
+  });
+});
+</script>
+</body></html>

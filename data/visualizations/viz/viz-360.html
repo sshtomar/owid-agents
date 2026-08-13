@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.12s; z-index: 10; }
+</style></head><body>
+<h1>Protected Areas as Share of Territory, 2024</h1>
+<p class="subtitle">Terrestrial and marine protected areas as a percentage of total national territory. Bhutan leads globally at over 50%; many countries protect less than 5% of their land and sea.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — ER.PTD.TOTL.ZS &nbsp;|&nbsp; Data: 2024</p>
+<script>
+const data = [{"n":"Bhutan","v":51.6,"y":2024},{"n":"Germany","v":40.1,"y":2024},{"n":"Armenia","v":38.9,"y":2024},{"n":"Chile","v":37.9,"y":2024},{"n":"France","v":36.8,"y":2024},{"n":"Bulgaria","v":35.6,"y":2024},{"n":"Australia","v":33.5,"y":2024},{"n":"Congo, Rep.","v":33.3,"y":2024},{"n":"Cambodia","v":31.8,"y":2024},{"n":"Bolivia","v":30.9,"y":2024},{"n":"Austria","v":29.6,"y":2024},{"n":"Brazil","v":29.4,"y":2024},{"n":"Botswana","v":29.1,"y":2024},{"n":"Costa Rica","v":28.2,"y":2024},{"n":"Belize","v":26.8,"y":2024},{"n":"Colombia","v":26.4,"y":2024},{"n":"Guinea","v":26.2,"y":2024},{"n":"Gabon","v":24.5,"y":2024},{"n":"Croatia","v":24.1,"y":2024},{"n":"Benin","v":23.5,"y":2024}];
+
+const W = 680, H = 520;
+const mar = { top: 20, right: 80, bottom: 30, left: 106 };
+const barH = 18, gap = 7;
+
+const maxV = 55;
+const xS = v => mar.left + v / maxV * (W - mar.left - mar.right);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(v) {
+  if (v >= 40) return "#3D7A5A";
+  if (v >= 30) return "#5B9E78";
+  if (v >= 20) return "#8BAD72";
+  return "#C49A45";
+}
+
+const totalH = mar.top + data.length * (barH + gap) + mar.bottom;
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${totalH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[10, 20, 30, 40, 50].forEach(v => {
+  const x = xS(v);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mar.top, x2: x, y2: totalH - mar.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: x, y: totalH - mar.bottom + 14, "text-anchor": "middle",
+    fill: "#9A9890", "font-size": "9", "font-family": "JetBrains Mono, monospace"
+  })).textContent = v + "%";
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 26) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const bars = [];
+data.forEach((d, i) => {
+  const y = mar.top + i * (barH + gap);
+  const color = colorFor(d.v);
+  const bw = xS(d.v) - mar.left;
+
+  const bar = mkEl("rect", {
+    x: mar.left, y: y, width: bw, height: barH,
+    fill: color, rx: "2"
+  });
+  svg.appendChild(bar);
+
+  // Country label (left)
+  svg.appendChild(mkEl("text", {
+    x: mar.left - 6, y: y + barH / 2 + 4,
+    "text-anchor": "end", fill: "#2B2A27",
+    "font-size": "10.5", "font-weight": "500"
+  })).textContent = d.n;
+
+  // Value label (right of bar)
+  svg.appendChild(mkEl("text", {
+    x: xS(d.v) + 5, y: y + barH / 2 + 4,
+    fill: "#7A786F", "font-size": "9.5",
+    "font-family": "JetBrains Mono, monospace"
+  })).textContent = d.v.toFixed(1) + "%";
+
+  // Hit area
+  const hit = mkEl("rect", {
+    x: mar.left - 100, y: y, width: W, height: barH,
+    fill: "transparent"
+  });
+  svg.appendChild(hit);
+  bars.push({ bar, hit, d, color });
+});
+
+bars.forEach(({ bar, hit, d, color }) => {
+  hit.addEventListener("mouseenter", e => {
+    bars.forEach(b => { b.bar.setAttribute("opacity", b.d.n === d.n ? "1" : "0.25"); });
+    showTip(`${d.n}: ${d.v.toFixed(1)}% of territory protected (2024)`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    bars.forEach(b => { b.bar.setAttribute("opacity", "1"); });
+    hideTip();
+  });
+});
+</script>
+</body></html>

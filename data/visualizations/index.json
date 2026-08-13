@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Population Growth Rate, 1970\u20132024",
+      "description": "Trend lines showing annual population growth (%) for eight major economies, revealing the global demographic transition from growth to shrinkage.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan and South Korea have crossed into negative population growth",
+        "China turned negative in 2022, within a decade of policy reversal",
+        "Ethiopia continues growing at 2.6% annually"
+      ],
+      "createdAt": "2026-08-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Youth Literacy Rate, 1975\u20132024",
+      "description": "Trend lines for countries starting with low youth literacy (ages 15-24), showing dramatic gains across South Asia and sub-Saharan Africa.",
+      "datasetIds": [
+        "wb--SE-ADT-1524-LT-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Iran rose from 57% to 99% in under 50 years",
+        "India nearly doubled from 54% to 97% since 1981",
+        "Even conflict-affected Afghanistan improved from 30% to 63%"
+      ],
+      "createdAt": "2026-08-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Income Share of the Richest 10%",
+      "description": "Slope chart comparing the top decile's income share from the early 2000s to the most recent survey, showing which countries reduced and which increased concentration.",
+      "datasetIds": [
+        "wb--SI-DST-10TH-10"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Bolivia fell 14 percentage points, the largest improvement",
+        "Honduras and Dominican Republic both dropped over 11 points",
+        "Bulgaria and Congo DR bucked the trend with increases"
+      ],
+      "createdAt": "2026-08-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Terrestrial and Marine Protected Areas, 2024",
+      "description": "Top 20 countries by share of territory under formal protection (land + sea), highlighting wide variation in conservation ambition.",
+      "datasetIds": [
+        "wb--ER-PTD-TOTL-ZS"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Bhutan leads at 51.6%, reflecting Buddhist conservation philosophy",
+        "Germany at 40% is driven by the EU Natura 2000 network",
+        "Most countries remain well below the 30x30 conservation target"
+      ],
+      "createdAt": "2026-08-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Electricity Production from Hydropower, Top Countries",
+      "description": "Countries generating the highest share of electricity from hydroelectric sources, showing where rivers provide the backbone of national power grids.",
+      "datasetIds": [
+        "wb--EG-ELC-HYRO-ZS"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Bhutan and Paraguay generate essentially 100% of electricity from hydro",
+        "DR Congo, Ethiopia and Albania each exceed 96%",
+        "Norway at 88.6% is the European leader in hydro generation"
+      ],
+      "createdAt": "2026-08-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-13T00:00:00.000Z"
 }
