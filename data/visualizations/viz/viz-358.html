@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Human Capital Index, 2010 vs. 2020</h1>
+<p class="subtitle">The World Bank's Human Capital Index (0–1) measures the productivity a child born today can expect to achieve by age 18, given the country's education and health outcomes. Singapore, Hong Kong, and Japan lead. Sub-Saharan Africa lags but most countries improved.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Human Capital Index (HD.HCI.OVRL)</p>
+<script>
+// Data exported from notebook — 30 countries: top 10, middle 10, bottom 10 by 2020 HCI
+const data = [{"n":"Singapore","a":0.847,"b":0.879},{"n":"Hong Kong SAR, China","a":0.781,"b":0.813},{"n":"Japan","a":0.816,"b":0.805},{"n":"Korea, Rep.","a":0.825,"b":0.799},{"n":"Canada","a":0.774,"b":0.798},{"n":"Finland","a":0.817,"b":0.796},{"n":"Macao SAR, China","a":0.648,"b":0.796},{"n":"Sweden","a":0.762,"b":0.795},{"n":"Ireland","a":0.766,"b":0.793},{"n":"Netherlands","a":0.797,"b":0.79},{"n":"Qatar","a":0.591,"b":0.638},{"n":"Albania","a":0.544,"b":0.634},{"n":"Montenegro","a":0.585,"b":0.633},{"n":"Seychelles","a":0.575,"b":0.633},{"n":"Ukraine","a":0.633,"b":0.631},{"n":"Costa Rica","a":0.598,"b":0.629},{"n":"Kazakhstan","a":0.594,"b":0.629},{"n":"Mauritius","a":0.6,"b":0.622},{"n":"Bulgaria","a":0.637,"b":0.614},{"n":"Mexico","a":0.589,"b":0.613},{"n":"Benin","a":0.366,"b":0.4},{"n":"Lesotho","a":0.341,"b":0.4},{"n":"Cameroon","a":0.38,"b":0.397},{"n":"Madagascar","a":0.389,"b":0.392},{"n":"Burundi","a":0.343,"b":0.386},{"n":"Burkina Faso","a":0.32,"b":0.384},{"n":"Uganda","a":0.344,"b":0.384},{"n":"Cote d'Ivoire","a":0.304,"b":0.38},{"n":"Eswatini","a":0.311,"b":0.373},{"n":"Chad","a":0.286,"b":0.3}];
+
+const W = 700, H = 660;
+const pad = {left: 150, right: 155, top: 50, bottom: 30};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 0.25, maxV = 0.9;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+["2010","2020"].forEach((label,i) => {
+  const x = i === 0 ? xLeft : xRight;
+  const t = mkEl("text",{x,y:32,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F"});
+  t.textContent = label;
+  svg.appendChild(t);
+});
+
+// Grid lines
+[0.3,0.4,0.5,0.6,0.7,0.8,0.9].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:xLeft,y1:scale(v),x2:xRight,y2:scale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const t = mkEl("text",{x:xLeft-8,y:scale(v)+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"7.5","fill":"#C2C0B5"});
+  t.textContent = v.toFixed(1);
+  svg.appendChild(t);
+});
+
+function colorForHCI(v) {
+  if (v >= 0.75) return "#3D7A5A";
+  if (v >= 0.65) return "#5B9E78";
+  if (v >= 0.55) return "#8BAD72";
+  if (v >= 0.45) return "#C49A45";
+  if (v >= 0.38) return "#C4715A";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const topBound = pad.top + 6;
+const botBound = H - pad.bottom - 4;
+
+const leftLabels = data.map((d,i) => ({y: scale(d.a), rawY: scale(d.a), idx: i, d}));
+const rightLabels = data.map((d,i) => ({y: scale(d.b), rawY: scale(d.b), idx: i, d}));
+
+resolveCollisions(leftLabels, 12).forEach(item => { item.y = Math.max(topBound, Math.min(botBound, item.y)); });
+resolveCollisions(rightLabels, 12).forEach(item => { item.y = Math.max(topBound, Math.min(botBound, item.y)); });
+
+// Draw lines (back to front)
+const groups = [];
+data.forEach((d, i) => {
+  const color = colorForHCI(d.b);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g",{});
+  g.style.cursor = "pointer";
+  const line = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:color,"stroke-width":"1.5"});
+  const hit = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:"transparent","stroke-width":"10"});
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({g, line, d, color, i});
+});
+
+// Left labels
+const leftMap = {};
+resolveCollisions(leftLabels.map(x => ({...x})), 12).forEach(item => { leftMap[item.idx] = Math.max(topBound, Math.min(botBound, item.y)); });
+data.forEach((d, i) => {
+  const ly = leftMap[i] ?? scale(d.a);
+  const rawY = scale(d.a);
+  const color = colorForHCI(d.b);
+  const lbl = d.n.length > 16 ? d.n.slice(0,14) + '…' : d.n;
+  const t = mkEl("text",{x:xLeft-5,y:ly+3,"text-anchor":"end","font-size":"8.5","fill":color});
+  t.textContent = `${lbl}  ${d.a.toFixed(2)}`;
+  svg.appendChild(t);
+  if (Math.abs(rawY - ly) > 5) {
+    svg.appendChild(mkEl("line",{x1:xLeft-2,y1:rawY,x2:xLeft-4,y2:ly,stroke:color,"stroke-width":"0.4","opacity":"0.4"}));
+  }
+});
+
+// Right labels
+const rightMap = {};
+resolveCollisions(rightLabels.map(x => ({...x})), 12).forEach(item => { rightMap[item.idx] = Math.max(topBound, Math.min(botBound, item.y)); });
+data.forEach((d, i) => {
+  const ry = rightMap[i] ?? scale(d.b);
+  const rawY = scale(d.b);
+  const color = colorForHCI(d.b);
+  const lbl = d.n.length > 16 ? d.n.slice(0,14) + '…' : d.n;
+  const t = mkEl("text",{x:xRight+5,y:ry+3,"text-anchor":"start","font-size":"8.5","fill":color});
+  t.textContent = `${d.b.toFixed(2)}  ${lbl}`;
+  svg.appendChild(t);
+  if (Math.abs(rawY - ry) > 5) {
+    svg.appendChild(mkEl("line",{x1:xRight+2,y1:rawY,x2:xRight+4,y2:ry,stroke:color,"stroke-width":"0.4","opacity":"0.4"}));
+  }
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+groups.forEach(({g, line, d, color}) => {
+  g.addEventListener("mouseenter", e => {
+    groups.forEach(o => { o.g.style.opacity="0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width","3");
+    const change = ((d.b - d.a) * 100).toFixed(1);
+    const sign = d.b >= d.a ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a.toFixed(3)} → ${d.b.toFixed(3)} (${sign}${change}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    groups.forEach(o => { o.g.style.opacity="1"; o.line.setAttribute("stroke-width","1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

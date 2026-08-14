@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Terrestrial Protected Areas — Top 25 Countries, 2024</h1>
+<p class="subtitle">Share of total land area designated as protected (national parks, nature reserves, wilderness areas). Bhutan leads with more than half its land protected. Germany and Croatia demonstrate that rich countries can also be leaders in conservation.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Terrestrial protected areas (% of total land area) (ER.LND.PTLD.ZS)</p>
+<script>
+// Data exported from notebook — top 25 countries by protected land %, 2024
+const data = [{"n":"Bhutan","v":51.6,"y":2024},{"n":"Bulgaria","v":44.3,"y":2024},{"n":"Hong Kong SAR, China","v":42,"y":2024},{"n":"Greenland","v":41.9,"y":2024},{"n":"Brunei Darussalam","v":39.9,"y":2024},{"n":"Cambodia","v":39.8,"y":2024},{"n":"Germany","v":39.3,"y":2024},{"n":"Armenia","v":38.9,"y":2024},{"n":"Cyprus","v":38.6,"y":2024},{"n":"Croatia","v":38.4,"y":2024},{"n":"Guinea","v":37.6,"y":2024},{"n":"Belize","v":37.3,"y":2024},{"n":"Congo, Rep.","v":36.8,"y":2024},{"n":"Greece","v":35,"y":2024},{"n":"Bahamas, The","v":34.6,"y":2024},{"n":"Comoros","v":33.7,"y":2024},{"n":"Bolivia","v":30.9,"y":2024},{"n":"Brazil","v":30.6,"y":2024},{"n":"Benin","v":29.7,"y":2024},{"n":"Austria","v":29.6,"y":2024},{"n":"Japan","v":29.5,"y":2024},{"n":"Botswana","v":29.1,"y":2024},{"n":"France","v":28.6,"y":2024},{"n":"Israel","v":27.6,"y":2024},{"n":"Andorra","v":27.3,"y":2024}];
+
+const W = 680, H = 580;
+const margin = {top: 20, right: 60, bottom: 20, left: 155};
+const barH = 15;
+const barGap = 7;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+const totalH = margin.top + data.length * (barH + barGap) + margin.bottom;
+svg.setAttribute("viewBox",`0 0 ${W} ${totalH}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = 55;
+const barWidth = x => (x / maxV) * (W - margin.left - margin.right);
+
+function colorForPct(v) {
+  if (v >= 45) return "#3D7A5A";
+  if (v >= 38) return "#5B9E78";
+  if (v >= 32) return "#8BAD72";
+  if (v >= 28) return "#C49A45";
+  return "#A6C4A2";
+}
+
+// X axis tick labels
+[0,10,20,30,40,50].forEach(v => {
+  const x = margin.left + barWidth(v);
+  svg.appendChild(mkEl("line",{x1:x,y1:margin.top-4,x2:x,y2:totalH-margin.bottom,stroke:"#E2E0D5","stroke-width":"0.5"}));
+});
+
+const tip = document.getElementById("tip");
+const barGroups = [];
+
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const bw = barWidth(d.v);
+  const color = colorForPct(d.v);
+
+  const g = mkEl("g",{});
+  g.style.cursor = "pointer";
+
+  // Country label
+  const lbl = d.n.length > 22 ? d.n.slice(0,20)+'…' : d.n;
+  const nameEl = mkEl("text",{x:margin.left-6,y:y+barH*0.72,"text-anchor":"end","font-size":"9","fill":"#2B2A27"});
+  nameEl.textContent = lbl;
+  g.appendChild(nameEl);
+
+  // Bar
+  const rect = mkEl("rect",{x:margin.left,y,width:bw,height:barH,fill:color,rx:"1"});
+  g.appendChild(rect);
+
+  // Value label
+  const valEl = mkEl("text",{x:margin.left+bw+4,y:y+barH*0.72,"font-size":"8.5","fill":color,"font-family":"JetBrains Mono, monospace"});
+  valEl.textContent = d.v.toFixed(1) + "%";
+  g.appendChild(valEl);
+
+  svg.appendChild(g);
+  barGroups.push({g, rect, nameEl, d});
+
+  // Hover
+  g.addEventListener("mouseenter", e => {
+    barGroups.forEach(o => { o.g.style.opacity="0.2"; });
+    g.style.opacity = "1";
+    rect.setAttribute("fill","#EA5E33");
+    tip.textContent = `${d.n}: ${d.v.toFixed(1)}% protected`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    barGroups.forEach(o => { o.g.style.opacity="1"; });
+    rect.setAttribute("fill", color);
+    tip.style.opacity = "0";
+  });
+});
+
+// X axis labels at top
+[0,10,20,30,40,50].forEach(v => {
+  const x = margin.left + barWidth(v);
+  const t = mkEl("text",{x,y:margin.top-6,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"7.5","fill":"#7A786F"});
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+</script>
+</body></html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Use per Capita, 1990 vs. 2018</h1>
+<p class="subtitle">Kilograms of oil equivalent consumed per person. Industrialized nations have improved efficiency or plateaued, while South Korea and China surged as heavy industry expanded. Bangladesh and India show how much room for growth low-income countries still have.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Energy use (kg of oil equivalent per capita) (EG.USE.PCAP.KG.OE)</p>
+<script>
+// Data exported from notebook — 12 countries, 1990 vs 2018
+const data = [{"n":"Iceland","a":9058,"b":17347},{"n":"Canada","a":7642,"b":8162},{"n":"Australia","a":5048,"b":5086},{"n":"Korea, Rep.","a":2088,"b":5532},{"n":"Germany","a":4422,"b":3659},{"n":"France","a":3840,"b":3669},{"n":"Japan","a":3538,"b":3343},{"n":"China","a":773,"b":2311},{"n":"Brazil","a":942,"b":1403},{"n":"Egypt, Arab Rep.","a":576,"b":871},{"n":"India","a":324,"b":668},{"n":"Bangladesh","a":114,"b":261}];
+
+const W = 700, H = 640;
+const pad = {left: 140, right: 145, top: 50, bottom: 30};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Scale: 0 to 18000 kg oe
+const minV = 0, maxV = 18000;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+["1990","2018"].forEach((label, i) => {
+  const x = i === 0 ? xLeft : xRight;
+  const t = mkEl("text",{x,y:32,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F"});
+  t.textContent = label;
+  svg.appendChild(t);
+});
+
+// Grid lines
+[0,3000,6000,9000,12000,15000,18000].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:xLeft,y1:scale(v),x2:xRight,y2:scale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const label = v >= 1000 ? (v/1000).toFixed(0)+"k" : v;
+  svg.appendChild(mkEl("text",{x:xLeft-8,y:scale(v)+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"7.5","fill":"#C2C0B5"})).textContent = label;
+});
+
+// Y axis label
+const mid = pad.top + (H - pad.top - pad.bottom)/2;
+const yl = mkEl("text",{x:10,y:mid,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"7.5","fill":"#7A786F",transform:`rotate(-90,10,${mid})`});
+yl.textContent = "KG OIL EQUIVALENT / PERSON";
+svg.appendChild(yl);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 50; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Color: increasing = warm, decreasing = cool
+function colorForChange(d) {
+  const pct = (d.b - d.a) / d.a;
+  if (pct > 1.0) return "#EA5E33";
+  if (pct > 0.4) return "#F29A44";
+  if (pct > 0.1) return "#C49A45";
+  if (pct > -0.05) return "#8BAD72";
+  return "#5B9E78";
+}
+
+const topBound = pad.top + 6;
+const botBound = H - pad.bottom - 4;
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g",{});
+  g.style.cursor = "pointer";
+  const line = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:color,"stroke-width":"1.6"});
+  const hit = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:"transparent","stroke-width":"10"});
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({g, line, d, color});
+});
+
+// Endpoint dots
+data.forEach(d => {
+  const color = colorForChange(d);
+  svg.appendChild(mkEl("circle",{cx:xLeft,cy:scale(d.a),r:"2.5",fill:color}));
+  svg.appendChild(mkEl("circle",{cx:xRight,cy:scale(d.b),r:"2.5",fill:color}));
+});
+
+// Left labels (1990 values)
+const leftItems = data.map((d,i) => ({y:scale(d.a), rawY:scale(d.a), idx:i, d}));
+const resolvedLeft = resolveCollisions(leftItems.map(x=>({...x})), 12);
+const leftMap = {};
+resolvedLeft.forEach(item => { leftMap[item.idx] = Math.max(topBound, Math.min(botBound, item.y)); });
+
+data.forEach((d,i) => {
+  const ly = leftMap[i] ?? scale(d.a);
+  const rawY = scale(d.a);
+  const color = colorForChange(d);
+  const aFmt = d.a >= 1000 ? (d.a/1000).toFixed(1)+"k" : d.a;
+  const lbl = d.n.length > 16 ? d.n.slice(0,14)+'…' : d.n;
+  const t = mkEl("text",{x:xLeft-5,y:ly+3,"text-anchor":"end","font-size":"8.5","fill":color});
+  t.textContent = `${lbl}  ${aFmt}`;
+  svg.appendChild(t);
+  if (Math.abs(rawY - ly) > 5)
+    svg.appendChild(mkEl("line",{x1:xLeft-2,y1:rawY,x2:xLeft-4,y2:ly,stroke:color,"stroke-width":"0.4","opacity":"0.4"}));
+});
+
+// Right labels (2018 values)
+const rightItems = data.map((d,i) => ({y:scale(d.b), rawY:scale(d.b), idx:i, d}));
+const resolvedRight = resolveCollisions(rightItems.map(x=>({...x})), 12);
+const rightMap = {};
+resolvedRight.forEach(item => { rightMap[item.idx] = Math.max(topBound, Math.min(botBound, item.y)); });
+
+data.forEach((d,i) => {
+  const ry = rightMap[i] ?? scale(d.b);
+  const rawY = scale(d.b);
+  const color = colorForChange(d);
+  const bFmt = d.b >= 1000 ? (d.b/1000).toFixed(1)+"k" : d.b;
+  const lbl = d.n.length > 16 ? d.n.slice(0,14)+'…' : d.n;
+  const t = mkEl("text",{x:xRight+5,y:ry+3,"text-anchor":"start","font-size":"8.5","fill":color});
+  t.textContent = `${bFmt}  ${lbl}`;
+  svg.appendChild(t);
+  if (Math.abs(rawY - ry) > 5)
+    svg.appendChild(mkEl("line",{x1:xRight+2,y1:rawY,x2:xRight+4,y2:ry,stroke:color,"stroke-width":"0.4","opacity":"0.4"}));
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+groups.forEach(({g, line, d, color}) => {
+  g.addEventListener("mouseenter", e => {
+    groups.forEach(o => { o.g.style.opacity="0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width","3");
+    const pct = ((d.b - d.a) / d.a * 100).toFixed(0);
+    const sign = d.b >= d.a ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a.toLocaleString()} → ${d.b.toLocaleString()} kgoe (${sign}${pct}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    groups.forEach(o => { o.g.style.opacity="1"; o.line.setAttribute("stroke-width","1.6"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
