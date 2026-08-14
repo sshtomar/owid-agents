@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Old-Age Dependency Ratio, 1960–2020</h1>
+<p class="subtitle">Elderly dependents (age 65+) per 100 working-age people (age 15–64). Japan has the world's most extreme aging burden. South Korea is on a steeper trajectory than Japan was at the same point in time. India, Indonesia, and Ethiopia remain young.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Age dependency ratio, old (SP.POP.DPND.OL)</p>
+<script>
+// Data exported from notebook — 11 countries, 1960–2020 (step 5)
+const data = [{"n":"Japan","s":[8.9,9.2,10.1,11.6,13.4,15.2,17.4,21,25.6,30.7,36.4,44.7,49.1],"y0":1960,"step":5},{"n":"Italy","s":[14.5,15.5,17.2,19.1,20.5,19.5,21.8,24.9,27,29.6,31.2,34.3,36.6],"y0":1960,"step":5},{"n":"Germany","s":[17.1,19.3,21.6,23.3,23.7,20.9,21.5,22.5,24.2,28.3,31.3,32,33.9],"y0":1960,"step":5},{"n":"Greece","s":[10.9,13.1,16.4,18.6,20,19.7,20.4,23.1,25.4,27.5,28.9,32.7,35.3],"y0":1960,"step":5},{"n":"France","s":[18.6,19.4,20.6,21.5,21.9,19.6,21.2,23.1,24.6,25.3,25.9,30,33.6],"y0":1960,"step":5},{"n":"Korea, Rep.","s":[5.6,6.1,6.2,6.2,6.2,6.5,7.1,8.1,9.9,12.5,15.1,17.7,22],"y0":1960,"step":5},{"n":"China","s":[7.1,6.6,6.7,7.1,7.4,7.6,8.1,9.1,10.3,11,11.9,14,18.2],"y0":1960,"step":5},{"n":"Brazil","s":[4.7,5.1,5.4,5.8,6.1,6.3,6.8,7.4,7.9,8.6,9.7,11.4,13.8],"y0":1960,"step":5},{"n":"India","s":[5.9,6.5,6.7,6.9,7,7,7,7.2,7.3,7.6,7.8,8.3,9.5],"y0":1960,"step":5},{"n":"Indonesia","s":[4.2,5,5.7,6.3,6.6,6.6,6.7,7.2,7.8,8.5,8.9,9.1,9.8],"y0":1960,"step":5},{"n":"Ethiopia","s":[5.1,5,5.3,5.4,5.5,5.3,5.4,5.3,5.3,5.3,5.3,5.4,5.4],"y0":1960,"step":5}];
+
+// Color by aging severity (by 2020 value)
+function colorForRatio(v) {
+  if (v >= 35) return "#EA5E33";
+  if (v >= 25) return "#F29A44";
+  if (v >= 18) return "#C49A45";
+  if (v >= 12) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+const W = 820, H = 480;
+const margin = {top: 30, right: 130, bottom: 38, left: 52};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const startYear = 1960, endYear = 2020;
+const nPts = data[0].s.length; // 13
+const step = 5;
+
+const valMin = 0, valMax = 55;
+const xScale = idx => margin.left + idx / (nPts-1) * (W - margin.left - margin.right);
+const xScaleYear = y => xScale((y - startYear) / step);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid
+[0,10,20,30,40,50].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yScale(v),x2:W-margin.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:margin.left-5,y:yScale(v)+3.5,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"8","fill":"#7A786F"})).textContent = v;
+});
+
+// X axis
+[1960,1970,1980,1990,2000,2010,2020].forEach(y => {
+  const x = xScaleYear(y);
+  svg.appendChild(mkEl("text",{x,y:H-margin.bottom+14,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"8","fill":"#7A786F"})).textContent = y;
+  svg.appendChild(mkEl("line",{x1:x,y1:H-margin.bottom,x2:x,y2:H-margin.bottom+4,stroke:"#C2C0B5","stroke-width":"0.5"}));
+});
+
+// Y label
+const yLabel = mkEl("text",{x:11,y:margin.top+(H-margin.top-margin.bottom)/2,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"8","fill":"#7A786F",transform:`rotate(-90,11,${margin.top+(H-margin.top-margin.bottom)/2})`});
+yLabel.textContent = "ELDERLY PER 100 WORKERS";
+svg.appendChild(yLabel);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const topBound = margin.top + 6;
+const botBound = H - margin.bottom - 2;
+
+const groups = [];
+data.forEach((d, i) => {
+  const lastVal = d.s[d.s.length-1];
+  const color = colorForRatio(lastVal);
+  const g = mkEl("g",{});
+  g.style.cursor = "pointer";
+  let pathD = d.s.map((v,j) => v !== null ? `${j===0||d.s[j-1]===null?'M':'L'}${xScale(j)} ${yScale(v)}` : null).filter(Boolean).join(" ");
+  const line = mkEl("path",{d:pathD,stroke:color,"stroke-width":"1.8",fill:"none","stroke-linejoin":"round","stroke-linecap":"round"});
+  const hit = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none"});
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({g, line, d, color, lastVal});
+});
+
+// Endpoint labels with collision resolution
+const labelItems = data.map((d,i) => ({y: yScale(d.s[d.s.length-1]), rawY: yScale(d.s[d.s.length-1]), idx: i, d}));
+const resolved = resolveCollisions(labelItems.map(x => ({...x})), 12);
+const labelMap = {};
+resolved.forEach(item => { labelMap[item.idx] = Math.max(topBound, Math.min(botBound, item.y)); });
+
+data.forEach((d, i) => {
+  const lastVal = d.s[d.s.length-1];
+  const color = colorForRatio(lastVal);
+  const ly = labelMap[i] ?? yScale(lastVal);
+  const rawY = yScale(lastVal);
+  const lx = W - margin.right + 6;
+  const t = mkEl("text",{x:lx,y:ly+3.5,"font-size":"9","fill":color,"font-weight":"500"});
+  t.textContent = d.n;
+  svg.appendChild(t);
+  if (Math.abs(rawY - ly) > 5) {
+    svg.appendChild(mkEl("line",{x1:W-margin.right,y1:rawY,x2:lx-2,y2:ly,stroke:color,"stroke-width":"0.4","opacity":"0.4"}));
+  }
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({g, line, d, color}) => {
+  g.addEventListener("mousemove", e => {
+    groups.forEach(o => { o.line.setAttribute("stroke-width","1.8"); o.g.style.opacity="0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width","3");
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(d.s.length-1, Math.round(ratio * (d.s.length-1))));
+    const year = startYear + idx * step;
+    const val = d.s[idx];
+    if (val !== null) {
+      tip.textContent = `${d.n} (${year}): ${val.toFixed(1)} elderly per 100 workers`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - 20) + "px";
+    }
+  });
+  g.addEventListener("mouseleave", () => {
+    groups.forEach(o => { o.line.setAttribute("stroke-width","1.8"); o.g.style.opacity="1"; });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
