@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Intensity of GDP, 2021–2022</h1>
+<p class="subtitle">Megajoules of primary energy consumed per dollar of GDP (2021 PPP). Lower values mean more economic output per unit of energy. Service-led economies are most efficient; fossil-fuel producers and heavy-industry nations consume the most energy per dollar earned.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Energy intensity level of primary energy (MJ per $2021 PPP GDP)</p>
+<script>
+// Top-8 most intensive + major economies + bottom-5 most efficient (most recent year 2018-2022)
+const data = [{"n":"Congo, Dem. Rep.","v":12.51,"y":2021},{"n":"Iceland","v":11.93,"y":2022},{"n":"Curacao","v":10.39,"y":2021},{"n":"Iran, Islamic Rep.","v":9.32,"y":2021},{"n":"Bahrain","v":9.23,"y":2021},{"n":"Bhutan","v":9.04,"y":2022},{"n":"Burundi","v":7.4,"y":2022},{"n":"Guinea-Bissau","v":6.95,"y":2022},{"n":"China","v":6.3,"y":2021},{"n":"India","v":4.21,"y":2021},{"n":"Brazil","v":3.87,"y":2022},{"n":"Argentina","v":3.29,"y":2022},{"n":"Japan","v":3.15,"y":2022},{"n":"Indonesia","v":3.04,"y":2021},{"n":"France","v":2.83,"y":2022},{"n":"Germany","v":2.47,"y":2022},{"n":"Andorra","v":1.81,"y":2022},{"n":"Bermuda","v":1.51,"y":2022},{"n":"Cuba","v":1.35,"y":2021},{"n":"Hong Kong","v":1.17,"y":2021},{"n":"Ireland","v":0.97,"y":2022}];
+
+const W = 680, H = 560;
+const pad = { top: 24, right: 80, bottom: 24, left: 150 };
+const innerW = W - pad.left - pad.right;
+const barH = 18, barGap = 5;
+const chartH = data.length * (barH + barGap) + pad.top + pad.bottom;
+
+function colorForVal(v) {
+  const ratio = v / 12.51; // 0 = most efficient, 1 = most intensive
+  if (ratio > 0.75) return "#EA5E33";
+  if (ratio > 0.5) return "#F29A44";
+  if (ratio > 0.3) return "#F5D38A";
+  if (ratio > 0.15) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+const maxV = 13;
+function xScale(v) { return pad.left + v / maxV * innerW; }
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${chartH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: chartH, fill: "#F6F5EE" }));
+
+// Grid lines
+[3, 6, 9, 12].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: pad.top - 8, x2: x, y2: chartH - pad.bottom + 4, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x, y: pad.top - 10, "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890", "text-anchor": "middle" });
+  t.textContent = v;
+  svg.appendChild(t);
+});
+const xLabel = mkEl("text", { x: pad.left + innerW / 2, y: chartH - 4, "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890", "text-anchor": "middle" });
+xLabel.textContent = "MJ per $2021 PPP GDP";
+svg.appendChild(xLabel);
+
+// Baseline
+svg.appendChild(mkEl("line", { x1: pad.left, y1: pad.top - 8, x2: pad.left, y2: chartH - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + barGap);
+  const col = colorForVal(d.v);
+  const barW = xScale(d.v) - pad.left;
+
+  // Country label
+  const label = mkEl("text", { x: pad.left - 6, y: y + barH / 2 + 3.5, "font-size": "9", fill: "#2B2A27", "text-anchor": "end" });
+  label.textContent = d.n;
+  svg.appendChild(label);
+
+  // Bar
+  const bar = mkEl("rect", { x: pad.left, y, width: barW, height: barH, fill: col, rx: "2" });
+  bar.style.cursor = "pointer";
+  bar.addEventListener("mouseenter", e => { bar.setAttribute("opacity", "0.75"); showTip(`${d.n} (${d.y}): ${d.v} MJ/$ GDP`, e); });
+  bar.addEventListener("mousemove", e => showTip(`${d.n} (${d.y}): ${d.v} MJ/$ GDP`, e));
+  bar.addEventListener("mouseleave", () => { bar.setAttribute("opacity", "1"); hideTip(); });
+  svg.appendChild(bar);
+
+  // Value label
+  const vx = xScale(d.v) + 4;
+  const val = mkEl("text", { x: vx, y: y + barH / 2 + 3.5, "font-family": "JetBrains Mono, monospace", "font-size": "8.5", fill: "#7A786F" });
+  val.textContent = d.v;
+  svg.appendChild(val);
+});
+
+// Legend
+const legend = [
+  { col: "#EA5E33", label: ">9.4 MJ (very high)" },
+  { col: "#F29A44", label: "6.3–9.4" },
+  { col: "#F5D38A", label: "3.8–6.3" },
+  { col: "#8BAD72", label: "1.9–3.8" },
+  { col: "#3D7A5A", label: "<1.9 MJ (efficient)" },
+];
+legend.forEach((l, i) => {
+  const lx = pad.left + i * 118;
+  svg.appendChild(mkEl("rect", { x: lx, y: chartH - pad.bottom + 10, width: 8, height: 8, fill: l.col, rx: "1" }));
+  const lt = mkEl("text", { x: lx + 11, y: chartH - pad.bottom + 17.5, "font-size": "8", fill: "#7A786F" });
+  lt.textContent = l.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>
