@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Early Childhood Education Expands Globally, 1970–2020</h1>
+<p class="subtitle">Gross pre-primary school enrollment rate (% of pre-primary age group). East Asia &amp; Pacific surged from under 5% to over 83% in five decades. Sub-Saharan Africa remains far behind at 28%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — School Enrollment, Preprimary (SE.PRE.ENRR)</p>
+<script>
+const data = [
+  {"n":"East Asia & Pacific","s":[4.8,5.0,5.3,8.0,14.0,10.8,10.5,12.0,14.8,14.8,15.8,17.0,19.0,21.2,22.5,24.0,23.8,23.1,23.5,24.4,25.2,25.6,26.7,27.7,29.1,40.2,43.3,43.3,43.5,40.9,40.8,41.5,42.6,44.9,47.4,49.5,52.0,54.6,59.3,66.0,69.8,72.6,74.8,77.8,79.8,82.6,83.2,83.2],"y0":1973},
+  {"n":"Latin America & Caribbean","s":[8.6,8.9,9.4,9.8,10.4,11.4,12.9,14.3,15.3,16.9,18.0,20.3,23.2,25.4,28.0,29.8,32.1,39.0,39.5,39.9,43.4,41.8,44.0,45.7,46.5,48.4,49.9,50.9,52.4,53.8,55.2,56.1,56.6,57.7,58.9,61.2,63.5,65.1,67.4,68.5,74.1,76.3,76.8,70.7,72.5,73.2,74.5,75.7,76.1,76.4,75.6],"y0":1970},
+  {"n":"South Asia","s":[7.1,7.2,7.4,7.5,7.9,8.3,8.7,9.2,9.5,9.9,10.4,10.9,11.0,11.7,12.0,12.4,13.1,13.5,14.0,13.7,13.2,13.3,13.0,12.9,13.5,13.6,13.4,9.7,12.7,14.7,16.9,18.5,19.3,20.9,23.5,26.5,30.4,33.5,36.5,38.5,41.7,45.2,47.2,50.0,51.7,54.2,56.7,60.3,61.1,63.0,62.0],"y0":1970},
+  {"n":"Europe & Central Asia","s":[53.7,53.8,54.4,55.5,56.9,58.3,59.3,60.0,60.8,61.0,61.7,60.4,61.1,61.7,62.4,63.2,63.8,64.5,64.9,65.1,65.8,65.2,64.0,62.5,59.6,59.4,59.8,59.7,59.5,57.7,58.3,59.4,60.6,62.8,63.1,65.1,66.4,67.6,69.2,69.9,71.0,72.2,72.9,72.4,73.1,73.9,74.9,74.9,75.8,76.7,78.3],"y0":1970},
+  {"n":"World","s":[15.9,15.6,15.4,15.4,15.6,16.2,18.0,21.0,19.8,20.0,21.0,22.5,22.9,23.8,24.8,25.8,27.2,28.4,29.0,28.8,28.7,28.7,28.9,29.1,28.9,29.4,30.0,28.3,31.4,32.1,33.0,33.7,33.6,34.5,35.7,37.6,39.6,41.0,42.6,44.2,46.2,49.0,52.0,53.9,54.0,56.0,57.6,59.2,60.1,60.8,60.9],"y0":1970},
+  {"n":"Sub-Saharan Africa","s":[14.2,14.3,14.4,14.5,14.6,14.9,15.1,15.2,15.1,14.9,14.8,14.7,14.6,14.8,15.1,15.3,15.4,15.4,15.4,15.4,15.4,15.2,15.3,15.6,15.1,15.3,13.3,14.5,15.0,16.4,17.8,19.2,19.8,21.3,19.9,19.7,21.0,21.1,23.0,26.3,28.8,23.7,25.5,26.7,27.2,27.1,27.4,28.1],"y0":1973}
+];
+
+const COLORS = {
+  "East Asia & Pacific": "#EA5E33",
+  "Latin America & Caribbean": "#F29A44",
+  "South Asia": "#C49A45",
+  "Europe & Central Asia": "#5B9E78",
+  "World": "#9A9890",
+  "Sub-Saharan Africa": "#C4715A"
+};
+
+const W = 760, H = 440;
+const margin = { top: 30, right: 160, bottom: 36, left: 46 };
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const yearMin = 1970, yearMax = 2020;
+const valMin = 0, valMax = 100;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines + Y labels
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "font-size": "9", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "text-anchor": "end"
+  })).textContent = v + "%";
+});
+
+// X axis
+[1970, 1980, 1990, 2000, 2010, 2020].forEach(y => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: H - margin.bottom,
+    x2: xScale(y), y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 14,
+    "font-size": "9", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "text-anchor": "middle"
+  })).textContent = y;
+});
+
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: H - margin.bottom,
+  x2: W - margin.right, y2: H - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "0.5"
+}));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const allGroups = [];
+
+// Endpoint labels
+const labelItems = data.map(series => {
+  const endYear = series.y0 + series.s.length - 1;
+  const lastVal = series.s[series.s.length - 1];
+  return { n: series.n, y: yScale(lastVal), origY: yScale(lastVal), val: lastVal, endYear };
+});
+const resolved = resolveCollisions(labelItems, 13);
+
+// Draw lines
+data.forEach(series => {
+  const color = COLORS[series.n] || "#888";
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i, value: v }))
+    .filter(p => p.year >= yearMin && p.year <= yearMax);
+
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`
+  ).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", {
+    d: pathD, stroke: color,
+    "stroke-width": series.n === "World" ? "1" : "1.8",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round",
+    "stroke-dasharray": series.n === "World" ? "4,3" : "none"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent",
+    "stroke-width": "12", fill: "none"
+  });
+  g.appendChild(hit);
+
+  const lastPt = pts[pts.length - 1];
+  g.appendChild(mkEl("circle", {
+    cx: xScale(lastPt.year), cy: yScale(lastPt.value),
+    r: "3", fill: color
+  }));
+
+  svg.appendChild(g);
+  allGroups.push({ g, line, series, pts, color });
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yi = Math.round(ratio * (pts.length - 1));
+    const pt = pts[yi];
+    tip.textContent = `${series.n} (${pt.year}): ${pt.value.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+    allGroups.forEach(o => {
+      o.line.setAttribute("opacity", o.series.n === series.n ? "1" : "0.08");
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    allGroups.forEach(o => o.line.setAttribute("opacity", "1"));
+  });
+});
+
+// Endpoint labels
+resolved.forEach(item => {
+  const series = data.find(s => s.n === item.n);
+  const color = COLORS[item.n] || "#888";
+  const lastPt = { year: series.y0 + series.s.length - 1, value: series.s[series.s.length - 1] };
+  const lx = xScale(Math.min(lastPt.year, yearMax));
+
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: lx + 6, y1: item.origY,
+      x2: lx + 10, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+
+  const shortName = item.n.replace("& Pacific", "& Pac.").replace("& Caribbean", "& Car.");
+  const txt = mkEl("text", {
+    x: lx + 13, y: item.y + 3.5,
+    "font-size": "9.5", fill: color,
+    "font-family": "Inter, sans-serif", "font-weight": "500"
+  });
+  txt.textContent = `${item.val.toFixed(0)}%  ${shortName}`;
+  svg.appendChild(txt);
+});
+</script>
+</body></html>

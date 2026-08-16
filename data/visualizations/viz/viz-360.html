@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 18px; height: 4px; border-radius: 2px; }
+</style></head><body>
+<h1>Nuclear's Diverging Fortunes: Electricity from Nuclear Sources, 2000–2022</h1>
+<p class="subtitle">Share of electricity generated from nuclear power (%). Germany and Japan sharply reduced nuclear after policy choices and Fukushima. Meanwhile Czechia, Hungary, and Belarus expanded their nuclear share.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A"></div> Significant increase</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C49A45"></div> Modest change</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#B34B3B"></div> Major decline</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Electricity Production from Nuclear Sources (EG.ELC.NUCL.ZS)</p>
+<script>
+const data = [
+  {"n":"France","y":2000,"a":76.9,"b":62.2},
+  {"n":"Belgium","y":2000,"a":57.3,"b":45.7},
+  {"n":"Bulgaria","y":2000,"a":44.4,"b":32.6},
+  {"n":"Armenia","y":2000,"a":33.7,"b":31.0},
+  {"n":"South Korea","y":2000,"a":37.7,"b":28.2},
+  {"n":"Germany","y":2000,"a":29.4,"b":6.0},
+  {"n":"Japan","y":2000,"a":30.2,"b":5.5},
+  {"n":"Hungary","y":2000,"a":40.3,"b":44.2},
+  {"n":"Czechia","y":2000,"a":18.5,"b":36.6},
+  {"n":"Finland","y":2000,"a":32.1,"b":35.1},
+  {"n":"Belarus","y":2000,"a":0.0,"b":17.3},
+  {"n":"Canada","y":2000,"a":12.0,"b":13.2},
+  {"n":"Argentina","y":2000,"a":6.9,"b":5.5},
+  {"n":"China","y":2000,"a":1.2,"b":4.7},
+  {"n":"India","y":2000,"a":3.0,"b":2.5},
+  {"n":"Brazil","y":2000,"a":1.7,"b":2.1}
+];
+
+// Sort by 2022 value
+data.sort((a, b) => b.b - a.b);
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 10) return "#3D7A5A";
+  if (change > 0) return "#5B9E78";
+  if (change > -10) return "#C49A45";
+  if (change > -20) return "#C4715A";
+  return "#B34B3B";
+}
+
+const W = 620, H = 540;
+const pad = { left: 100, right: 115, top: 50, bottom: 20 };
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const minV = 0, maxV = 85;
+const chartH = H - pad.top - pad.bottom;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * chartH;
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+// Column headers
+[["2000", leftX], ["2022", rightX]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 20,
+    "font-size": "10", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "text-anchor": "middle", "font-weight": "500"
+  })).textContent = label;
+});
+
+// Y axis ticks
+[0, 10, 20, 30, 40, 50, 60, 70, 80].forEach(v => {
+  const y = scale(v);
+  svg.appendChild(mkEl("line", { x1: leftX - 4, y1: y, x2: leftX, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", {
+    x: leftX - 7, y: y + 3.5,
+    "font-size": "8", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "text-anchor": "end"
+  })).textContent = v + "%";
+  svg.appendChild(mkEl("line", { x1: rightX, y1: y, x2: rightX + 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const allLines = [];
+
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.a), origY: scale(d.a), val: d.a }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b), origY: scale(d.b), val: d.b }));
+const leftResolved = resolveCollisions(leftLabels, 11);
+const rightResolved = resolveCollisions(rightLabels, 11);
+const leftMap = Object.fromEntries(leftResolved.map(i => [i.n, i]));
+const rightMap = Object.fromEntries(rightResolved.map(i => [i.n, i]));
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+
+  const g = mkEl("g", {});
+  const line = mkEl("line", {
+    x1: leftX, y1: ya, x2: rightX, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+  g.appendChild(mkEl("circle", { cx: leftX, cy: ya, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: rightX, cy: yb, r: "2.5", fill: color }));
+
+  const hit = mkEl("line", {
+    x1: leftX, y1: ya, x2: rightX, y2: yb,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  allLines.push({ line, d, color });
+
+  const pctChange = d.a > 0 ? (d.b - d.a) / d.a * 100 : null;
+  const changeStr = pctChange !== null ? ` (${pctChange > 0 ? "+" : ""}${pctChange.toFixed(0)}%)` : " (new)";
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}%${changeStr}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+    allLines.forEach(o => o.line.setAttribute("opacity", o.d.n === d.n ? "1" : "0.08"));
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    allLines.forEach(o => o.line.setAttribute("opacity", "1"));
+  });
+});
+
+// Left labels
+leftResolved.forEach(item => {
+  const d = data.find(x => x.n === item.n);
+  const color = colorForChange(d);
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: leftX - 5, y1: item.origY, x2: leftX - 9, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: leftX - 12, y: item.y + 3.5,
+    "font-size": "9", fill: color,
+    "font-family": "Inter, sans-serif", "font-weight": "500",
+    "text-anchor": "end"
+  });
+  txt.textContent = `${item.n}  ${item.val}%`;
+  svg.appendChild(txt);
+});
+
+// Right labels
+rightResolved.forEach(item => {
+  const d = data.find(x => x.n === item.n);
+  const color = colorForChange(d);
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: rightX + 5, y1: item.origY, x2: rightX + 9, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: rightX + 12, y: item.y + 3.5,
+    "font-size": "9", fill: color,
+    "font-family": "Inter, sans-serif", "font-weight": "500"
+  });
+  txt.textContent = `${item.val}%  ${item.n}`;
+  svg.appendChild(txt);
+});
+</script>
+</body></html>
