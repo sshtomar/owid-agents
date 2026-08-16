@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Aging World: Old-Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing how the ratio of elderly people (65+) to working-age population has evolved across 8 countries. Japan's ratio nearly sextupled from 8.9 to 50.7, while India and Brazil remain relatively young.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan's old-age dependency surged from 8.9 (1960) to 50.7 (2024) \u2014 more than one retiree per two workers",
+        "South Korea accelerated rapidly after 2010, now at 27.5",
+        "India and Brazil remain well below 20, with aging still decades away"
+      ],
+      "createdAt": "2026-08-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Doing More with Less: Energy Intensity Improvement, 2000\u20132022",
+      "description": "Slope chart showing how much primary energy countries consume per dollar of GDP. Most countries improved efficiency significantly; Ireland and Azerbaijan cut their intensity by ~69%.",
+      "datasetIds": [
+        "wb--EG-EGY-PRIM-PP-KD"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Ireland reduced energy intensity by 69%, driven by GDP growth from tech sector expansion",
+        "Azerbaijan cut intensity by 69% as its economy diversified beyond Soviet-era heavy industry",
+        "Brazil barely improved at -1%, highlighting structural inefficiencies in its energy mix"
+      ],
+      "createdAt": "2026-08-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Early Childhood Education Expands Globally, 1970\u20132020",
+      "description": "Trend lines showing preprimary school enrollment by world region. East Asia & Pacific surged from 5% to 83% in five decades; Sub-Saharan Africa lags at 28%.",
+      "datasetIds": [
+        "wb--SE-PRE-ENRR"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "East Asia & Pacific rose from 4.8% (1973) to 83.2% (2020) \u2014 the fastest expansion of any region",
+        "South Asia grew from 7% to 62%, largely driven by India and Bangladesh",
+        "Sub-Saharan Africa remains at 28%, far behind every other region"
+      ],
+      "createdAt": "2026-08-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Nuclear's Diverging Fortunes: Electricity from Nuclear Sources, 2000\u20132022",
+      "description": "Slope chart showing changes in nuclear electricity share. Germany and Japan dramatically reduced nuclear. France remains the world leader. Czechia, Hungary, and Belarus expanded.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Germany phased out most nuclear: from 29% (2000) to 6% (2022), fully exiting in 2023",
+        "Japan fell from 30% to 5.5% after the 2011 Fukushima disaster",
+        "Czechia grew from 18% to 37%; Belarus launched its first nuclear plant, reaching 17%"
+      ],
+      "createdAt": "2026-08-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Gross National Savings Rates, 1990\u20132023",
+      "description": "Sparkline grid of savings as a share of GDP for 25 countries. East Asian economies lead; Latin American countries and Greece have fallen to low rates that constrain investment.",
+      "datasetIds": [
+        "wb--NY-GNS-ICTR-ZS"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "China's savings rate held above 42% in 2023, peaking at 51% in 2008",
+        "Greece collapsed from 22% (1990) to 9% (2023) following its debt crisis",
+        "Bangladesh rose steadily from 23% to 35%, funding its manufacturing boom"
+      ],
+      "createdAt": "2026-08-16T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-16T00:00:00.000Z"
 }

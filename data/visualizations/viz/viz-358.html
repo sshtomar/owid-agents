@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #7A786F; }
+  .legend-swatch { width: 18px; height: 4px; border-radius: 2px; }
+</style></head><body>
+<h1>Doing More with Less: Energy Intensity Improvement, 2000–2022</h1>
+<p class="subtitle">Megajoules of primary energy consumed per dollar of GDP (2021 PPP). Falling values mean greater energy efficiency — more economic output from the same energy. Most countries have improved significantly over two decades.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A"></div> &gt;50% improvement</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#5B9E78"></div> 30–50%</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C49A45"></div> 10–30%</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C4715A"></div> &lt;10% or worsened</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Energy Intensity of Primary Energy (EG.EGY.PRIM.PP.KD)</p>
+<script>
+const data = [
+  {"n":"Ireland","y":2000,"a":3.12,"b":0.97},
+  {"n":"Azerbaijan","y":2000,"a":14.06,"b":4.4},
+  {"n":"Albania","y":2000,"a":4.03,"b":2.06},
+  {"n":"Estonia","y":2000,"a":7.94,"b":4.12},
+  {"n":"Bulgaria","y":2000,"a":9.05,"b":4.72},
+  {"n":"Israel","y":2000,"a":3.97,"b":2.3},
+  {"n":"Czechia","y":2000,"a":6.72,"b":3.98},
+  {"n":"Germany","y":2000,"a":3.97,"b":2.47},
+  {"n":"France","y":2000,"a":4.33,"b":2.83},
+  {"n":"South Korea","y":2000,"a":7.23,"b":5.11},
+  {"n":"Japan","y":2000,"a":4.7,"b":3.15},
+  {"n":"Finland","y":2000,"a":6.57,"b":4.82},
+  {"n":"Australia","y":2000,"a":6.0,"b":4.12},
+  {"n":"Canada","y":2000,"a":8.27,"b":6.44},
+  {"n":"Italy","y":2000,"a":2.92,"b":2.3},
+  {"n":"Brazil","y":2000,"a":3.89,"b":3.87}
+];
+
+// Sort by improvement (biggest first)
+data.sort((a, b) => ((a.b - a.a) / a.a) - ((b.b - b.a) / b.a));
+
+function colorForChange(pctChange) {
+  if (pctChange < -50) return "#3D7A5A";
+  if (pctChange < -30) return "#5B9E78";
+  if (pctChange < -10) return "#C49A45";
+  return "#C4715A";
+}
+
+const W = 620, H = 520;
+const pad = { left: 110, right: 120, top: 50, bottom: 20 };
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "default";
+document.getElementById("chart").appendChild(svg);
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = Math.ceil(Math.max(...allVals) * 1.05);
+const chartH = H - pad.top - pad.bottom;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * chartH;
+
+const leftX = pad.left;
+const rightX = W - pad.right;
+
+// Column headers
+[["2000", leftX], ["2022", rightX]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 20,
+    "font-size": "10", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "text-anchor": "middle", "font-weight": "500"
+  })).textContent = label;
+});
+
+// Axis ticks
+[0, 2, 4, 6, 8, 10, 12, 14].forEach(v => {
+  if (v > maxV) return;
+  const y = scale(v);
+  svg.appendChild(mkEl("line", {
+    x1: leftX - 4, y1: y, x2: leftX, y2: y,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: leftX - 7, y: y + 3.5,
+    "font-size": "8", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "text-anchor": "end"
+  })).textContent = v;
+  svg.appendChild(mkEl("line", {
+    x1: rightX, y1: y, x2: rightX + 4, y2: y,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+// MJ/$ label
+const unitLabel = mkEl("text", {
+  x: leftX - 32, y: pad.top + chartH / 2,
+  "font-size": "8", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace",
+  "text-anchor": "middle",
+  transform: `rotate(-90, ${leftX - 32}, ${pad.top + chartH / 2})`
+});
+unitLabel.textContent = "MJ per $ GDP";
+svg.appendChild(unitLabel);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const allGroups = [];
+
+// Compute label positions
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.a), origY: scale(d.a), val: d.a }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b), origY: scale(d.b), val: d.b }));
+const leftResolved = resolveCollisions(leftLabels, 12);
+const rightResolved = resolveCollisions(rightLabels, 12);
+
+const leftMap = Object.fromEntries(leftResolved.map(i => [i.n, i]));
+const rightMap = Object.fromEntries(rightResolved.map(i => [i.n, i]));
+
+// Draw connecting lines and hit areas
+data.forEach(d => {
+  const pct = (d.b - d.a) / d.a * 100;
+  const color = colorForChange(pct);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", {
+    x1: leftX, y1: ya, x2: rightX, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+
+  // Endpoint circles
+  g.appendChild(mkEl("circle", { cx: leftX, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: rightX, cy: yb, r: "3", fill: color }));
+
+  // Wide invisible hit area
+  const hit = mkEl("line", {
+    x1: leftX, y1: ya, x2: rightX, y2: yb,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  allGroups.push({ g, line, d, color, ya, yb });
+
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${d.a} → ${d.b} MJ/$ (${pct > 0 ? "+" : ""}${pct.toFixed(0)}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+    allGroups.forEach(o => {
+      o.line.setAttribute("opacity", o.d.n === d.n ? "1" : "0.08");
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    allGroups.forEach(o => o.line.setAttribute("opacity", "1"));
+  });
+});
+
+// Left labels
+leftResolved.forEach(item => {
+  const d = data.find(x => x.n === item.n);
+  const pct = (d.b - d.a) / d.a * 100;
+  const color = colorForChange(pct);
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: leftX - 6, y1: item.origY, x2: leftX - 10, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: leftX - 13, y: item.y + 3.5,
+    "font-size": "9", fill: color,
+    "font-family": "Inter, sans-serif", "font-weight": "500",
+    "text-anchor": "end"
+  });
+  txt.textContent = `${item.n}  ${item.val}`;
+  svg.appendChild(txt);
+});
+
+// Right labels
+rightResolved.forEach(item => {
+  const d = data.find(x => x.n === item.n);
+  const pct = (d.b - d.a) / d.a * 100;
+  const color = colorForChange(pct);
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: rightX + 6, y1: item.origY, x2: rightX + 10, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: rightX + 13, y: item.y + 3.5,
+    "font-size": "9", fill: color,
+    "font-family": "Inter, sans-serif", "font-weight": "500"
+  });
+  txt.textContent = `${item.val}  ${item.n}`;
+  svg.appendChild(txt);
+});
+</script>
+</body></html>
