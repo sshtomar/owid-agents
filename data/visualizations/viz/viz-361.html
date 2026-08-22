@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Fossil Fuel Share of Energy Consumption, 1990 → 2014</h1>
+<p class="subtitle">% of total energy from fossil fuels. Iceland slashed its share by 17 points (geothermal and hydro). Estonia dropped 24 points after Soviet industrial collapse. China surged as coal-powered growth accelerated. Japan climbed after shutting nuclear plants post-Fukushima.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Fossil Fuel Energy Consumption, % of Total (EG.USE.COMM.FO.ZS)</p>
+<script>
+const data = [
+  {"n":"Iceland","a":28.2,"b":10.9},{"n":"Estonia","a":40.0,"b":15.7},
+  {"n":"Finland","a":55.5,"b":42.0},{"n":"France","a":58.2,"b":45.0},
+  {"n":"Brazil","a":51.1,"b":58.8},{"n":"Colombia","a":66.3,"b":62.4},
+  {"n":"Austria","a":79.1,"b":65.0},{"n":"Canada","a":73.5,"b":74.3},
+  {"n":"Germany","a":86.8,"b":79.4},{"n":"China","a":75.1,"b":89.6},
+  {"n":"Australia","a":94.2,"b":92.1},{"n":"Cuba","a":66.5,"b":94.6},
+  {"n":"Japan","a":84.9,"b":95.1},{"n":"Iran","a":98.9,"b":99.9}
+];
+
+const W = 700, H = 540;
+const pad = { left: 110, right: 120, top: 44, bottom: 20 };
+
+const minV = 0, maxV = 105;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(d) {
+  const change = d.b - d.a;
+  if (change > 15) return "#EA5E33";
+  if (change > 5) return "#F29A44";
+  if (change > -5) return "#C49A45";
+  if (change > -15) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+function monoTxt(x, y, txt, anchor) {
+  const t = mkEl("text", { x, y, fill: "#7A786F", "text-anchor": anchor, "font-family": "JetBrains Mono, monospace", "font-size": "10" });
+  t.textContent = txt;
+  return t;
+}
+svg.appendChild(monoTxt(xLeft, pad.top - 18, "1990", "middle"));
+svg.appendChild(monoTxt(xRight, pad.top - 18, "2014", "middle"));
+
+// Grid lines
+[20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.4"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 60, y: scale(v) + 3.5, "text-anchor": "end",
+    fill: "#9A9890", "font-family": "JetBrains Mono, monospace", "font-size": "8.5"
+  })).textContent = v + "%";
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  }
+  return sorted;
+}
+
+const leftLabels = resolveCollisions(data.map(d => ({ n: d.n, y: scale(d.a) })), 12);
+const rightLabels = resolveCollisions(data.map(d => ({ n: d.n, y: scale(d.b) })), 12);
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+data.forEach(d => {
+  const col = colorFor(d);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: col, "stroke-width": "1.6"
+  });
+  g.appendChild(line);
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: col, stroke: "#F6F5EE", "stroke-width": "1" }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: col, stroke: "#F6F5EE", "stroke-width": "1" }));
+
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "14"
+  });
+  g.appendChild(hit);
+
+  const leftInfo = leftLabels.find(l => l.n === d.n);
+  const rightInfo = rightLabels.find(l => l.n === d.n);
+  const lyA = leftInfo ? leftInfo.y : ya;
+  const lyB = rightInfo ? rightInfo.y : yb;
+
+  if (Math.abs(lyA - ya) > 2) {
+    g.appendChild(mkEl("line", { x1: xLeft - 3, y1: ya, x2: xLeft - 38, y2: lyA, stroke: col, "stroke-width": "0.4", opacity: "0.5" }));
+  }
+  if (Math.abs(lyB - yb) > 2) {
+    g.appendChild(mkEl("line", { x1: xRight + 3, y1: yb, x2: xRight + 38, y2: lyB, stroke: col, "stroke-width": "0.4", opacity: "0.5" }));
+  }
+
+  const ltxt = mkEl("text", { x: xLeft - 7, y: lyA + 3.5, "text-anchor": "end", fill: col, "font-size": "9.5", "font-weight": "500" });
+  ltxt.textContent = `${d.n}  ${d.a}%`;
+  g.appendChild(ltxt);
+
+  const rtxt = mkEl("text", { x: xRight + 7, y: lyB + 3.5, "text-anchor": "start", fill: col, "font-size": "9.5", "font-weight": "500" });
+  const chg = d.b - d.a;
+  rtxt.textContent = `${d.b}%  ${d.n}  (${chg >= 0 ? "+" : ""}${chg.toFixed(1)})`;
+  g.appendChild(rtxt);
+
+  groups.push({ g, line, ltxt, rtxt, col });
+  svg.appendChild(g);
+
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach(({ line: l, ltxt: lt, rtxt: rt }) => { l.style.opacity = "0.1"; lt.style.opacity = "0.1"; rt.style.opacity = "0.1"; });
+    line.style.opacity = "1"; ltxt.style.opacity = "1"; rtxt.style.opacity = "1";
+    const chg = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% (1990) → ${d.b}% (2014)  ${chg >= 0 ? "+" : ""}${chg.toFixed(1)} pp`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(({ line: l, ltxt: lt, rtxt: rt }) => { l.style.opacity = "1"; lt.style.opacity = "1"; rt.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+});
+
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top - 10, x2: xLeft, y2: H - pad.bottom + 10, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top - 10, x2: xRight, y2: H - pad.bottom + 10, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+</script>
+</body></html>
