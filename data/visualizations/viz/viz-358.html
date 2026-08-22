@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Nuclear Share of Electricity Generation, 2023–2024</h1>
+<p class="subtitle">France leads with nearly two-thirds of its electricity from nuclear reactors. Central and Eastern Europe depend heavily on Soviet-era plants, while new reactors push South Korea past 30%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Electricity Production from Nuclear Sources (EG.ELC.NUCL.ZS)</p>
+<script>
+const data = [
+  {"n":"France","v":66.8,"y":2024},{"n":"Hungary","v":42.2,"y":2024},
+  {"n":"Belgium","v":40.5,"y":2024},{"n":"Czechia","v":40.2,"y":2024},
+  {"n":"Bulgaria","v":40.2,"y":2023},{"n":"Finland","v":39.2,"y":2024},
+  {"n":"South Korea","v":31.1,"y":2024},{"n":"Armenia","v":30.8,"y":2023},
+  {"n":"Belarus","v":28.3,"y":2023},{"n":"Canada","v":13.9,"y":2024},
+  {"n":"Japan","v":9.5,"y":2024},{"n":"Argentina","v":7.3,"y":2024},
+  {"n":"China","v":4.6,"y":2023},{"n":"India","v":2.4,"y":2023},
+  {"n":"Brazil","v":2.1,"y":2024},{"n":"Iran","v":1.6,"y":2023},
+  {"n":"Germany","v":1.4,"y":2023}
+];
+
+const W = 680, H = 520;
+const margin = { top: 20, right: 80, bottom: 30, left: 120 };
+const barH = 22, barGap = 7;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(v) {
+  if (v >= 50) return "#EA5E33";
+  if (v >= 35) return "#F29A44";
+  if (v >= 20) return "#C49A45";
+  if (v >= 10) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+const maxVal = 70;
+const xScale = v => margin.left + (v / maxVal) * (W - margin.left - margin.right);
+
+// Vertical grid lines
+[20, 40, 60].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top - 6,
+    x2: xScale(v), y2: margin.top + data.length * (barH + barGap) - barGap + 6,
+    stroke: "#E2E0D5", "stroke-width": "0.6"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(v), y: margin.top - 9,
+    "text-anchor": "middle", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  })).textContent = v + "%";
+});
+
+const tip = document.getElementById("tip");
+const bars = [];
+
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const col = colorFor(d.v);
+  const barW = xScale(d.v) - margin.left;
+
+  // Background row
+  const bg = mkEl("rect", {
+    x: margin.left, y: y,
+    width: W - margin.left - margin.right,
+    height: barH, fill: "#EAE9E2", rx: "1"
+  });
+  svg.appendChild(bg);
+
+  // Bar
+  const bar = mkEl("rect", {
+    x: margin.left, y: y,
+    width: barW, height: barH,
+    fill: col, rx: "1"
+  });
+  bar.style.cursor = "pointer";
+
+  // Country label
+  const label = mkEl("text", {
+    x: margin.left - 8, y: y + barH / 2 + 4,
+    "text-anchor": "end", fill: "#2B2A27",
+    "font-size": "10.5", "font-weight": "500"
+  });
+  label.textContent = d.n;
+
+  // Value label
+  const valLabel = mkEl("text", {
+    x: xScale(d.v) + 6, y: y + barH / 2 + 4,
+    fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  });
+  valLabel.textContent = d.v.toFixed(1) + "%";
+
+  svg.appendChild(bar);
+  svg.appendChild(label);
+  svg.appendChild(valLabel);
+  bars.push({ bar, label, valLabel, col, d });
+
+  const hoverEl = mkEl("rect", {
+    x: margin.left, y: y,
+    width: W - margin.left - margin.right,
+    height: barH, fill: "transparent"
+  });
+  hoverEl.style.cursor = "pointer";
+  hoverEl.addEventListener("mouseenter", () => {
+    bars.forEach(b => { b.bar.style.opacity = "0.2"; b.label.style.opacity = "0.3"; b.valLabel.style.opacity = "0.3"; });
+    bar.style.opacity = "1"; label.style.opacity = "1"; valLabel.style.opacity = "1";
+  });
+  hoverEl.addEventListener("mouseleave", () => {
+    bars.forEach(b => { b.bar.style.opacity = "1"; b.label.style.opacity = "1"; b.valLabel.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+  hoverEl.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n} (${d.y}): ${d.v}% of electricity from nuclear`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  svg.appendChild(hoverEl);
+});
+
+// Zero axis
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: margin.top - 6,
+  x2: margin.left, y2: margin.top + data.length * (barH + barGap) - barGap + 6,
+  stroke: "#C2C0B5", "stroke-width": "0.8"
+}));
+</script>
+</body></html>

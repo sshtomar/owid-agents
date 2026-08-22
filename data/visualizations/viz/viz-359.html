@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Patent Applications by Residents, 1985–2021</h1>
+<p class="subtitle">China went from 4,000 patent applications in 1985 to 1.4 million in 2021 — more than all other countries combined. Japan once led the world; South Korea has grown rapidly from a standing start.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Patent Applications, Residents (IP.PAT.RESD)</p>
+<script>
+const data = [
+  {"n":"China","pts":[{"y":1985,"v":4065},{"y":1990,"v":5832},{"y":1995,"v":10011},{"y":2000,"v":25346},{"y":2005,"v":93485},{"y":2010,"v":293066},{"y":2015,"v":968252},{"y":2020,"v":1344817},{"y":2021,"v":1426644}],"col":"#EA5E33"},
+  {"n":"Japan","pts":[{"y":1985,"v":274373},{"y":1990,"v":333230},{"y":1995,"v":334612},{"y":2000,"v":387364},{"y":2005,"v":367960},{"y":2010,"v":290081},{"y":2015,"v":258839},{"y":2020,"v":227348},{"y":2021,"v":222452}],"col":"#F29A44"},
+  {"n":"South Korea","pts":[{"y":1985,"v":2702},{"y":1990,"v":9082},{"y":1995,"v":59228},{"y":2000,"v":72831},{"y":2005,"v":122188},{"y":2010,"v":131805},{"y":2015,"v":167275},{"y":2020,"v":180477},{"y":2021,"v":186245}],"col":"#8BAD72"},
+  {"n":"Germany","pts":[{"y":1985,"v":32202},{"y":1990,"v":30724},{"y":1995,"v":38103},{"y":2000,"v":51736},{"y":2005,"v":48367},{"y":2010,"v":47047},{"y":2015,"v":47384},{"y":2020,"v":42260},{"y":2021,"v":39822}],"col":"#A6C4A2"},
+  {"n":"France","pts":[{"y":1985,"v":12050},{"y":1990,"v":12378},{"y":1995,"v":12419},{"y":2000,"v":13870},{"y":2005,"v":14327},{"y":2010,"v":14748},{"y":2015,"v":14306},{"y":2020,"v":12771},{"y":2021,"v":13386}],"col":"#C49A45"},
+  {"n":"India","pts":[{"y":1985,"v":982},{"y":1990,"v":1147},{"y":1995,"v":1545},{"y":2000,"v":2206},{"y":2005,"v":4721},{"y":2010,"v":8853},{"y":2015,"v":12579},{"y":2020,"v":23141},{"y":2021,"v":26267}],"col":"#5B9E78"},
+  {"n":"Brazil","pts":[{"y":1985,"v":1954},{"y":1990,"v":2389},{"y":1995,"v":2707},{"y":2000,"v":3179},{"y":2005,"v":4054},{"y":2010,"v":4228},{"y":2015,"v":4641},{"y":2020,"v":5280},{"y":2021,"v":4666}],"col":"#C2C0B5"}
+];
+
+const W = 780, H = 480;
+const margin = { top: 36, right: 130, bottom: 36, left: 74 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 1985, yearMax = 2021;
+const valMin = 0, valMax = 1500000;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+
+// Square-root scale to show both China and smaller countries
+function yScale(v) {
+  const sqrtMax = Math.sqrt(valMax);
+  return margin.top + (sqrtMax - Math.sqrt(v)) / sqrtMax * (H - margin.top - margin.bottom);
+}
+
+// Grid lines (sqrt scale)
+const gridVals = [0, 10000, 50000, 100000, 250000, 500000, 1000000, 1500000];
+gridVals.forEach(v => {
+  const y = yScale(v);
+  if (y < margin.top || y > H - margin.bottom) return;
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: y,
+    x2: W - margin.right, y2: y,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const label = v >= 1000000 ? (v/1000000).toFixed(1) + "M" : v >= 1000 ? (v/1000).toFixed(0) + "K" : v.toString();
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: y + 3.5,
+    "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  })).textContent = label;
+});
+
+// X axis ticks
+[1985, 1990, 1995, 2000, 2005, 2010, 2015, 2021].forEach(y => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: yScale(0),
+    x2: xScale(y), y2: yScale(0) + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.7"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: yScale(0) + 14,
+    "text-anchor": "middle", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  })).textContent = y;
+});
+
+// Axis label
+svg.appendChild(mkEl("text", {
+  x: margin.left - 52, y: margin.top - 16,
+  fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "9",
+  "text-anchor": "start"
+})).textContent = "PATENT APPLICATIONS (SQRT SCALE)";
+
+// Resolve label collisions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const groups = [];
+
+const labelItems = data.map(series => {
+  const last = series.pts[series.pts.length - 1];
+  return { n: series.n, y: yScale(last.v), v: last.v, col: series.col };
+});
+const resolved = resolveCollisions(labelItems, 12);
+
+data.forEach((series) => {
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const points = series.pts.map(p => ({ x: xScale(p.y), y: yScale(p.v), year: p.y, val: p.v }));
+  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+
+  const line = mkEl("path", {
+    d: pathD, stroke: series.col, "stroke-width": "2",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none"
+  });
+  g.appendChild(hit);
+
+  const endP = points[points.length - 1];
+  g.appendChild(mkEl("circle", {
+    cx: endP.x, cy: endP.y, r: "3.5",
+    fill: series.col, stroke: "#F6F5EE", "stroke-width": "1.2"
+  }));
+
+  groups.push({ g, line, col: series.col, series });
+  svg.appendChild(g);
+
+  const last = series.pts[series.pts.length - 1];
+  const labelInfo = resolved.find(l => l.n === series.n);
+  const labelY = labelInfo ? labelInfo.y : yScale(last.v);
+  const labelX = W - margin.right + 8;
+
+  if (Math.abs(labelY - yScale(last.v)) > 3) {
+    g.appendChild(mkEl("line", {
+      x1: endP.x + 3, y1: endP.y,
+      x2: labelX - 2, y2: labelY,
+      stroke: series.col, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+
+  const valStr = last.v >= 1000000 ? (last.v/1000000).toFixed(2) + "M" : last.v >= 1000 ? Math.round(last.v/1000) + "K" : last.v.toString();
+  const txt = mkEl("text", {
+    x: labelX, y: labelY + 3.5,
+    fill: series.col, "font-size": "9.5", "font-weight": "500"
+  });
+  txt.textContent = `${valStr}  ${series.n}`;
+  g.appendChild(txt);
+
+  const tip = document.getElementById("tip");
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const approxYear = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const nearest = series.pts.reduce((best, p) =>
+      Math.abs(p.y - approxYear) < Math.abs(best.y - approxYear) ? p : best
+    );
+    const dispVal = nearest.v >= 1000000 ? (nearest.v/1000000).toFixed(3) + "M" : nearest.v >= 1000 ? (nearest.v/1000).toFixed(1) + "K" : nearest.v;
+    tip.textContent = `${series.n}  ${nearest.y}: ${dispVal} patent applications`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach(({ line: l }) => { l.style.opacity = "0.12"; l.setAttribute("stroke-width", "0.8"); });
+    line.style.opacity = "1"; line.setAttribute("stroke-width", "2.8");
+  });
+  hit.addEventListener("mouseleave", () => {
+    document.getElementById("tip").style.opacity = "0";
+    groups.forEach(({ line: l }) => { l.style.opacity = "1"; l.setAttribute("stroke-width", "2"); });
+  });
+});
+</script>
+</body></html>

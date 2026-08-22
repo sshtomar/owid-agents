@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Global Aging Crisis: Old-Age Dependency Ratios, 1960\u20132024",
+      "description": "Trend lines showing how the ratio of elderly (65+) to working-age adults has evolved across 10 countries since 1960. Japan leads at 50.7, with South Korea rising faster than any nation in history.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan has crossed 50 \u2014 half a working-age adult for every retiree",
+        "South Korea rose from 5.6 in 1960 to 27.5 in 2024, still accelerating",
+        "Kenya's ratio barely moved, illustrating the vast demographic divide"
+      ],
+      "createdAt": "2026-08-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Nuclear Share of Electricity Generation, 2023\u20132024",
+      "description": "Horizontal bar chart ranking countries by the share of electricity produced from nuclear reactors. France leads with nearly two-thirds; Central and Eastern Europe cluster around 40%.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "France generates 66.8% of its electricity from nuclear \u2014 the world's highest share",
+        "Hungary, Belgium, Czechia, Bulgaria, and Finland all exceed 39%",
+        "Germany retains only 1.4% as residual after its 2023 phase-out"
+      ],
+      "createdAt": "2026-08-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Patent Applications by Residents, 1985\u20132021",
+      "description": "Trend lines on a square-root scale showing how resident patent filings evolved across 7 countries. China's exponential growth transformed the global innovation landscape.",
+      "datasetIds": [
+        "wb--IP-PAT-RESD"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "China went from 4,065 applications in 1985 to 1.43 million in 2021 \u2014 a 350x increase",
+        "Japan filed fewer patents in 2021 than in 2000, ceding global leadership",
+        "India surpassed 26,000 in 2021 and is the next notable riser"
+      ],
+      "createdAt": "2026-08-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Foreign-Born Population: How Countries Changed, 1990 \u2192 2020",
+      "description": "Slope chart comparing international migrant stock as a share of population in 1990 and 2020 for 18 countries. Gulf labour markets and European openness drove divergent trajectories.",
+      "datasetIds": [
+        "wb--SM-POP-TOTL-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Bahrain surged from 34% to 53% as it became a major labour import hub",
+        "Iceland transformed from 3.8% to 17.8% \u2014 a historically rapid shift",
+        "Israel fell from 35.7% to 23.5% as the post-Soviet immigration wave naturalised"
+      ],
+      "createdAt": "2026-08-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Fossil Fuel Share of Energy Consumption, 1990 \u2192 2014",
+      "description": "Slope chart showing how 14 countries changed their reliance on fossil fuels over 24 years. Divergent paths: some slashed dependence while others deepened it.",
+      "datasetIds": [
+        "wb--EG-USE-COMM-FO-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Estonia dropped 24 points as Soviet industry collapsed and Baltic renewables grew",
+        "Iceland fell 17 points deeper into geothermal and hydro",
+        "Japan climbed 10 points after shutting nuclear plants post-Fukushima; China rose 15 points"
+      ],
+      "createdAt": "2026-08-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-22T00:00:00.000Z"
 }

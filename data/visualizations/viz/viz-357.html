@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Global Aging Crisis: Old-Age Dependency Ratios, 1960–2024</h1>
+<p class="subtitle">Elderly dependants (65+) per 100 working-age adults (15–64). Japan has crossed 50 — half a working-age person for every retiree. South Korea is rising faster than any nation in history.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Age Dependency Ratio, Old (SP.POP.DPND.OL)</p>
+<script>
+const data = [{"n":"Japan","pts":[{"y":1960,"v":8.9},{"y":1965,"v":9.2},{"y":1970,"v":10.1},{"y":1975,"v":11.6},{"y":1980,"v":13.4},{"y":1985,"v":15.2},{"y":1990,"v":17.4},{"y":1995,"v":21.0},{"y":2000,"v":25.6},{"y":2005,"v":30.7},{"y":2010,"v":36.4},{"y":2015,"v":44.7},{"y":2020,"v":49.1},{"y":2024,"v":50.7}]},{"n":"Italy","pts":[{"y":1960,"v":14.5},{"y":1965,"v":15.5},{"y":1970,"v":17.2},{"y":1975,"v":19.1},{"y":1980,"v":20.5},{"y":1985,"v":19.5},{"y":1990,"v":21.8},{"y":1995,"v":24.9},{"y":2000,"v":27.0},{"y":2005,"v":29.6},{"y":2010,"v":31.2},{"y":2015,"v":34.3},{"y":2020,"v":36.6},{"y":2024,"v":38.8}]},{"n":"Germany","pts":[{"y":1960,"v":17.1},{"y":1965,"v":19.3},{"y":1970,"v":21.6},{"y":1975,"v":23.3},{"y":1980,"v":23.7},{"y":1985,"v":20.9},{"y":1990,"v":21.5},{"y":1995,"v":22.5},{"y":2000,"v":24.2},{"y":2005,"v":28.3},{"y":2010,"v":31.3},{"y":2015,"v":32.0},{"y":2020,"v":33.9},{"y":2024,"v":36.9}]},{"n":"France","pts":[{"y":1960,"v":18.6},{"y":1965,"v":19.4},{"y":1970,"v":20.6},{"y":1975,"v":21.5},{"y":1980,"v":21.9},{"y":1985,"v":19.6},{"y":1990,"v":21.2},{"y":1995,"v":23.1},{"y":2000,"v":24.6},{"y":2005,"v":25.3},{"y":2010,"v":25.9},{"y":2015,"v":30.0},{"y":2020,"v":33.6},{"y":2024,"v":36.1}]},{"n":"South Korea","pts":[{"y":1960,"v":5.6},{"y":1965,"v":6.1},{"y":1970,"v":6.2},{"y":1975,"v":6.2},{"y":1980,"v":6.2},{"y":1985,"v":6.5},{"y":1990,"v":7.1},{"y":1995,"v":8.1},{"y":2000,"v":9.9},{"y":2005,"v":12.5},{"y":2010,"v":15.1},{"y":2015,"v":17.7},{"y":2020,"v":22.0},{"y":2024,"v":27.5}]},{"n":"Canada","pts":[{"y":1960,"v":13.0},{"y":1965,"v":13.0},{"y":1970,"v":12.8},{"y":1975,"v":12.9},{"y":1980,"v":13.8},{"y":1985,"v":14.9},{"y":1990,"v":16.5},{"y":1995,"v":17.7},{"y":2000,"v":18.4},{"y":2005,"v":18.8},{"y":2010,"v":20.4},{"y":2015,"v":23.6},{"y":2020,"v":27.2},{"y":2024,"v":30.4}]},{"n":"China","pts":[{"y":1960,"v":7.1},{"y":1965,"v":6.6},{"y":1970,"v":6.7},{"y":1975,"v":7.1},{"y":1980,"v":7.4},{"y":1985,"v":7.6},{"y":1990,"v":8.1},{"y":1995,"v":9.1},{"y":2000,"v":10.3},{"y":2005,"v":11.0},{"y":2010,"v":11.9},{"y":2015,"v":14.0},{"y":2020,"v":18.2},{"y":2024,"v":21.2}]},{"n":"Brazil","pts":[{"y":1960,"v":4.7},{"y":1965,"v":5.1},{"y":1970,"v":5.4},{"y":1975,"v":5.8},{"y":1980,"v":6.1},{"y":1985,"v":6.3},{"y":1990,"v":6.8},{"y":1995,"v":7.4},{"y":2000,"v":7.9},{"y":2005,"v":8.6},{"y":2010,"v":9.7},{"y":2015,"v":11.4},{"y":2020,"v":13.8},{"y":2024,"v":15.9}]},{"n":"India","pts":[{"y":1960,"v":5.9},{"y":1965,"v":6.5},{"y":1970,"v":6.7},{"y":1975,"v":6.9},{"y":1980,"v":7.0},{"y":1985,"v":7.0},{"y":1990,"v":7.0},{"y":1995,"v":7.2},{"y":2000,"v":7.3},{"y":2005,"v":7.6},{"y":2010,"v":7.8},{"y":2015,"v":8.3},{"y":2020,"v":9.5},{"y":2024,"v":10.5}]},{"n":"Kenya","pts":[{"y":1960,"v":6.7},{"y":1965,"v":5.5},{"y":1970,"v":4.9},{"y":1975,"v":4.5},{"y":1980,"v":4.5},{"y":1985,"v":4.4},{"y":1990,"v":4.4},{"y":1995,"v":4.4},{"y":2000,"v":4.3},{"y":2005,"v":4.1},{"y":2010,"v":3.9},{"y":2015,"v":4.4},{"y":2020,"v":4.8},{"y":2024,"v":4.9}]}];
+
+const W = 780, H = 480;
+const margin = { top: 36, right: 130, bottom: 36, left: 52 };
+
+function colorFor(v2024) {
+  if (v2024 >= 40) return "#EA5E33";
+  if (v2024 >= 30) return "#F29A44";
+  if (v2024 >= 20) return "#C49A45";
+  if (v2024 >= 12) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 1960, yearMax = 2024;
+const valMin = 0, valMax = 55;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  })).textContent = v;
+});
+
+// X axis ticks
+[1960, 1970, 1980, 1990, 2000, 2010, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: yScale(0),
+    x2: xScale(y), y2: yScale(0) + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.7"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: yScale(0) + 14,
+    "text-anchor": "middle", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  })).textContent = y;
+});
+
+// Axis label
+const axisLabel = mkEl("text", {
+  x: margin.left - 36, y: margin.top - 16,
+  fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "9",
+  "text-anchor": "start"
+});
+axisLabel.textContent = "ELDERLY PER 100 WORKING-AGE ADULTS";
+svg.appendChild(axisLabel);
+
+// Resolve label collisions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to SVG bounds
+  for (const item of sorted) {
+    item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const groups = [];
+
+// Build endpoint label positions first
+const labelItems = data.map(series => {
+  const last = series.pts[series.pts.length - 1];
+  const col = colorFor(last.v);
+  return { n: series.n, y: yScale(last.v), anchorY: yScale(last.v), v: last.v, col };
+});
+const resolved = resolveCollisions(labelItems, 12);
+
+// Draw lines
+data.forEach((series, si) => {
+  const last = series.pts[series.pts.length - 1];
+  const col = colorFor(last.v);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const points = series.pts.map(p => ({ x: xScale(p.y), y: yScale(p.v), year: p.y, val: p.v }));
+  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+
+  const line = mkEl("path", {
+    d: pathD, stroke: col, "stroke-width": "1.8",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  // Invisible hit path
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "14",
+    fill: "none"
+  });
+  g.appendChild(hit);
+
+  // End dot
+  const endP = points[points.length - 1];
+  g.appendChild(mkEl("circle", {
+    cx: endP.x, cy: endP.y, r: "3",
+    fill: col, stroke: "#F6F5EE", "stroke-width": "1"
+  }));
+
+  groups.push({ g, line, col, series });
+  svg.appendChild(g);
+
+  // Label
+  const labelInfo = resolved.find(l => l.n === series.n);
+  const labelY = labelInfo ? labelInfo.y : yScale(last.v);
+  const labelX = W - margin.right + 8;
+
+  // Leader line if label moved
+  if (Math.abs(labelY - yScale(last.v)) > 3) {
+    g.appendChild(mkEl("line", {
+      x1: endP.x + 3, y1: endP.y,
+      x2: labelX - 2, y2: labelY,
+      stroke: col, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+
+  const txt = mkEl("text", {
+    x: labelX, y: labelY + 3.5,
+    fill: col, "font-size": "9.5", "font-weight": "500"
+  });
+  txt.textContent = `${last.v.toFixed(1)}  ${series.n}`;
+  g.appendChild(txt);
+
+  // Hover
+  const tip = document.getElementById("tip");
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const approxYear = Math.round(yearMin + ratio * (yearMax - yearMin));
+    // Find nearest pt
+    const nearest = series.pts.reduce((best, p) =>
+      Math.abs(p.y - approxYear) < Math.abs(best.y - approxYear) ? p : best
+    );
+    tip.textContent = `${series.n}  ${nearest.y}: ${nearest.v.toFixed(1)} elderly per 100 workers`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+
+    groups.forEach(({ line: l, col: c }) => {
+      l.setAttribute("stroke-width", "0.8");
+      l.setAttribute("stroke", c);
+      l.style.opacity = "0.15";
+    });
+    line.setAttribute("stroke-width", "2.8");
+    line.style.opacity = "1";
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(({ line: l, col: c }) => {
+      l.setAttribute("stroke-width", "1.8");
+      l.setAttribute("stroke", c);
+      l.style.opacity = "1";
+    });
+  });
+});
+</script>
+</body></html>

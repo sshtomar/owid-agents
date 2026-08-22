@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Foreign-Born Population: How Countries Changed, 1990 → 2020</h1>
+<p class="subtitle">Share of population born abroad (%). Gulf states swelled with migrant labour. European nations like Iceland and Ireland transformed from homogeneous to diverse. Israel and Estonia declined as emigrants left.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — International Migrant Stock, % of Population (SM.POP.TOTL.ZS)</p>
+<script>
+const data = [
+  {"n":"Bahrain","a":34.4,"b":53.0},{"n":"Jordan","a":31.2,"b":45.5},
+  {"n":"Australia","a":23.3,"b":29.5},{"n":"Israel","a":35.7,"b":23.5},
+  {"n":"Canada","a":15.3,"b":21.8},{"n":"Austria","a":8.3,"b":20.0},
+  {"n":"Ireland","a":6.5,"b":19.1},{"n":"Germany","a":8.7,"b":18.0},
+  {"n":"Gabon","a":13.0,"b":17.9},{"n":"Iceland","a":3.8,"b":17.8},
+  {"n":"Belgium","a":9.5,"b":17.7},{"n":"Belize","a":16.6,"b":15.9},
+  {"n":"Estonia","a":24.3,"b":15.0},{"n":"France","a":10.3,"b":13.1},
+  {"n":"Greece","a":6.0,"b":12.5},{"n":"Denmark","a":4.6,"b":12.3},
+  {"n":"Djibouti","a":21.1,"b":10.8}
+];
+
+const W = 700, H = 560;
+const pad = { left: 130, right: 130, top: 44, bottom: 20 };
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = 58;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(d) {
+  const change = d.b - d.a;
+  if (change > 15) return "#EA5E33";
+  if (change > 8) return "#F29A44";
+  if (change > 2) return "#C49A45";
+  if (change > -2) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+function monoTxt(x, y, content, anchor) {
+  const t = mkEl("text", {
+    x, y, fill: "#7A786F", "text-anchor": anchor,
+    "font-family": "JetBrains Mono, monospace", "font-size": "10"
+  });
+  t.textContent = content;
+  return t;
+}
+
+svg.appendChild(monoTxt(xLeft, pad.top - 16, "1990", "middle"));
+svg.appendChild(monoTxt(xRight, pad.top - 16, "2020", "middle"));
+
+// Grid lines
+[10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.4"
+  }));
+});
+
+// Resolve collisions on both sides
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  }
+  return sorted;
+}
+
+const leftLabels = resolveCollisions(data.map(d => ({ n: d.n, y: scale(d.a), orig: scale(d.a) })), 13);
+const rightLabels = resolveCollisions(data.map(d => ({ n: d.n, y: scale(d.b), orig: scale(d.b) })), 13);
+
+const groups = [];
+const tip = document.getElementById("tip");
+
+data.forEach(d => {
+  const col = colorFor(d);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Connecting line
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: col, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: ya, r: "3.5", fill: col, stroke: "#F6F5EE", "stroke-width": "1" }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: yb, r: "3.5", fill: col, stroke: "#F6F5EE", "stroke-width": "1" }));
+
+  // Invisible hit area
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "14"
+  });
+  g.appendChild(hit);
+
+  // Labels (resolved positions)
+  const leftInfo = leftLabels.find(l => l.n === d.n);
+  const rightInfo = rightLabels.find(l => l.n === d.n);
+  const lyA = leftInfo ? leftInfo.y : ya;
+  const lyB = rightInfo ? rightInfo.y : yb;
+
+  // Leader lines if moved
+  if (Math.abs(lyA - ya) > 3) {
+    g.appendChild(mkEl("line", { x1: xLeft - 3, y1: ya, x2: xLeft - 40, y2: lyA, stroke: col, "stroke-width": "0.4", opacity: "0.5" }));
+  }
+  if (Math.abs(lyB - yb) > 3) {
+    g.appendChild(mkEl("line", { x1: xRight + 3, y1: yb, x2: xRight + 40, y2: lyB, stroke: col, "stroke-width": "0.4", opacity: "0.5" }));
+  }
+
+  // Left label
+  const ltxt = mkEl("text", { x: xLeft - 8, y: lyA + 3.5, "text-anchor": "end", fill: col, "font-size": "9.5", "font-weight": "500" });
+  ltxt.textContent = `${d.n}  ${d.a}%`;
+  g.appendChild(ltxt);
+
+  // Right label
+  const rtxt = mkEl("text", { x: xRight + 8, y: lyB + 3.5, "text-anchor": "start", fill: col, "font-size": "9.5", "font-weight": "500" });
+  const change = d.b - d.a;
+  const sign = change >= 0 ? "+" : "";
+  rtxt.textContent = `${d.b}%  ${d.n}  (${sign}${change.toFixed(1)})`;
+  g.appendChild(rtxt);
+
+  groups.push({ g, line, ltxt, rtxt, col });
+  svg.appendChild(g);
+
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach(({ line: l, ltxt: lt, rtxt: rt }) => {
+      l.style.opacity = "0.1"; lt.style.opacity = "0.1"; rt.style.opacity = "0.1";
+    });
+    line.style.opacity = "1"; ltxt.style.opacity = "1"; rtxt.style.opacity = "1";
+    const change = d.b - d.a;
+    const sign = change >= 0 ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a}% (1990) → ${d.b}% (2020)  ${sign}${change.toFixed(1)} pp`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(({ line: l, ltxt: lt, rtxt: rt }) => {
+      l.style.opacity = "1"; lt.style.opacity = "1"; rt.style.opacity = "1";
+    });
+    tip.style.opacity = "0";
+  });
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top - 10, x2: xLeft, y2: H - pad.bottom + 10, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top - 10, x2: xRight, y2: H - pad.bottom + 10, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+</script>
+</body></html>
