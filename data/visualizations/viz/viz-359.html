@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; max-width: 760px; }
+  .cell { padding: 14px 12px 10px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; box-sizing: border-box; }
+  .cell:hover { background: #F0EEE6; }
+  .cell-name { font-size: 9px; font-weight: 600; color: #2B2A27; margin-bottom: 4px; font-family: 'Inter', sans-serif; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 4px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #7A786F; }
+  canvas { display: block; width: 100%; height: 44px; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Poverty at $3.00/Day: Country Trajectories since 2000</h1>
+<p class="subtitle">Share of population below $3/day (2021 PPP). East and South Asia made extraordinary gains; Sub-Saharan Africa largely stagnated. China erased $3-a-day poverty almost entirely.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Poverty headcount ratio at $3.00 a day (2021 PPP), SI.POV.DDAY</p>
+<script>
+const data = [
+  {"n":"China","pts":[{"y":2002,"v":47.8},{"y":2005,"v":32.9},{"y":2008,"v":26.1},{"y":2010,"v":20.6},{"y":2011,"v":15.3},{"y":2012,"v":12.9},{"y":2013,"v":6},{"y":2014,"v":4.6},{"y":2015,"v":2.9},{"y":2016,"v":2.1},{"y":2017,"v":1.6},{"y":2018,"v":0.7},{"y":2019,"v":0},{"y":2020,"v":0},{"y":2021,"v":0},{"y":2022,"v":0}],"first":47.8,"last":0},
+  {"n":"Indonesia","pts":[{"y":2000,"v":65.7},{"y":2001,"v":62.3},{"y":2002,"v":46.8},{"y":2003,"v":45.5},{"y":2004,"v":45.4},{"y":2005,"v":41.1},{"y":2006,"v":46.8},{"y":2007,"v":41.1},{"y":2008,"v":38},{"y":2009,"v":37.9},{"y":2010,"v":34.1},{"y":2011,"v":31.2},{"y":2012,"v":26.6},{"y":2013,"v":27.2},{"y":2014,"v":25.7},{"y":2015,"v":21.6},{"y":2016,"v":18},{"y":2017,"v":14.8},{"y":2018,"v":12.5},{"y":2019,"v":10.9},{"y":2020,"v":9.8},{"y":2021,"v":8.6},{"y":2022,"v":7.9},{"y":2023,"v":6.7},{"y":2024,"v":5.4}],"first":65.7,"last":5.4},
+  {"n":"Bangladesh","pts":[{"y":2000,"v":41.4},{"y":2005,"v":32.3},{"y":2010,"v":25.1},{"y":2016,"v":19.5},{"y":2022,"v":5.9}],"first":41.4,"last":5.9},
+  {"n":"India","pts":[{"y":2004,"v":46.4},{"y":2009,"v":34.6},{"y":2011,"v":27.1},{"y":2022,"v":5.3}],"first":46.4,"last":5.3},
+  {"n":"Bolivia","pts":[{"y":2000,"v":28.3},{"y":2001,"v":22.3},{"y":2002,"v":23.9},{"y":2004,"v":13.2},{"y":2005,"v":18.7},{"y":2006,"v":15.9},{"y":2007,"v":12.1},{"y":2008,"v":10.6},{"y":2009,"v":10},{"y":2011,"v":6.9},{"y":2012,"v":7.9},{"y":2013,"v":6.8},{"y":2014,"v":5.6},{"y":2015,"v":6.2},{"y":2016,"v":7.2},{"y":2017,"v":6.4},{"y":2018,"v":4.7},{"y":2019,"v":3.1},{"y":2020,"v":4.2},{"y":2021,"v":3.1},{"y":2022,"v":3.3},{"y":2023,"v":2.8},{"y":2024,"v":2.1}],"first":28.3,"last":2.1},
+  {"n":"Brazil","pts":[{"y":2001,"v":17.5},{"y":2002,"v":16.2},{"y":2003,"v":17.1},{"y":2004,"v":15.3},{"y":2005,"v":13.7},{"y":2006,"v":11.4},{"y":2007,"v":10.8},{"y":2008,"v":9.1},{"y":2009,"v":8.4},{"y":2011,"v":7.1},{"y":2012,"v":6.4},{"y":2013,"v":5.4},{"y":2014,"v":4.8},{"y":2015,"v":5.4},{"y":2016,"v":6.5},{"y":2017,"v":7},{"y":2018,"v":6.9},{"y":2019,"v":7},{"y":2020,"v":2.8},{"y":2021,"v":7.5},{"y":2022,"v":4.9},{"y":2023,"v":3.8},{"y":2024,"v":3}],"first":17.5,"last":3},
+  {"n":"Ghana","pts":[{"y":2005,"v":60.9},{"y":2012,"v":41.8},{"y":2016,"v":39}],"first":60.9,"last":39},
+  {"n":"Ethiopia","pts":[{"y":2004,"v":41.3},{"y":2010,"v":37.4},{"y":2015,"v":33},{"y":2021,"v":38.6}],"first":41.3,"last":38.6},
+  {"n":"Kenya","pts":[{"y":2005,"v":44.6},{"y":2015,"v":37.7},{"y":2020,"v":44.4},{"y":2021,"v":46.4},{"y":2022,"v":45.5}],"first":44.6,"last":45.5},
+  {"n":"Congo, Dem. Rep.","pts":[{"y":2004,"v":94.9},{"y":2012,"v":78.9},{"y":2020,"v":85.3}],"first":94.9,"last":85.3}
+];
+
+const tip = document.getElementById("tip");
+const grid = document.getElementById("grid");
+
+// Color by last value: low = green, high = red
+function colorForRate(v) {
+  if (v < 5) return "#3D7A5A";
+  if (v < 15) return "#5B9E78";
+  if (v < 30) return "#C49A45";
+  if (v < 60) return "#C4715A";
+  return "#B34B3B";
+}
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.innerHTML = `<div class="cell-name">${d.n}</div>`;
+
+  const cv = document.createElement("canvas");
+  const cw = 120, ch = 44;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = cw * dpr;
+  cv.height = ch * dpr;
+  cv.style.width = cw + "px";
+  cv.style.height = ch + "px";
+  cell.appendChild(cv);
+
+  const vals = document.createElement("div");
+  vals.className = "cell-vals";
+  const firstYear = d.pts[0].y;
+  const lastYear = d.pts[d.pts.length - 1].y;
+  const pctChange = d.last - d.first;
+  const sign = pctChange <= 0 ? "" : "+";
+  vals.innerHTML = `<span>${d.pts[0].y}: ${d.first}%</span><span>${d.pts[d.pts.length-1].y}: ${d.last}%</span>`;
+  cell.appendChild(vals);
+
+  grid.appendChild(cell);
+
+  const ctx = cv.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const serMin = 0;
+  const serMax = Math.max(...d.pts.map(p => p.v)) * 1.05;
+  function norm(v) { return ch - (v - serMin) / (serMax - serMin) * ch; }
+
+  const col = colorForRate(d.last);
+
+  // Fill area
+  ctx.beginPath();
+  d.pts.forEach((p, i) => {
+    const x = (i / (d.pts.length - 1)) * cw;
+    const y = norm(p.v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(cw, ch); ctx.lineTo(0, ch); ctx.closePath();
+  ctx.fillStyle = col + "20";
+  ctx.fill();
+
+  // Line
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  d.pts.forEach((p, i) => {
+    const x = (i / Math.max(1, d.pts.length - 1)) * cw;
+    const y = norm(p.v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Hover
+  let crosshairX = null;
+  cell.addEventListener("mousemove", e => {
+    const rect = cv.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = mx / cw;
+    const idx = Math.max(0, Math.min(d.pts.length - 1, Math.round(ratio * (d.pts.length - 1))));
+    const pt = d.pts[idx];
+
+    // Redraw with crosshair
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.beginPath();
+    d.pts.forEach((p, i) => {
+      const x = (i / Math.max(1,d.pts.length-1)) * cw;
+      const y = norm(p.v);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.lineTo(cw,ch); ctx.lineTo(0,ch); ctx.closePath();
+    ctx.fillStyle = col+"20"; ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.lineJoin = "round";
+    ctx.beginPath();
+    d.pts.forEach((p,i)=>{
+      const x=(i/Math.max(1,d.pts.length-1))*cw, y=norm(p.v);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    // Crosshair
+    const cx2 = (idx / Math.max(1, d.pts.length-1)) * cw;
+    ctx.strokeStyle = "#2B2A27"; ctx.lineWidth = 0.5; ctx.setLineDash([2,2]);
+    ctx.beginPath(); ctx.moveTo(cx2, 0); ctx.lineTo(cx2, ch); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(cx2, norm(pt.v), 3, 0, Math.PI*2); ctx.fill();
+
+    tip.textContent = `${d.n} (${pt.y}): ${pt.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  cell.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    // Redraw clean
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.beginPath();
+    d.pts.forEach((p,i)=>{const x=(i/Math.max(1,d.pts.length-1))*cw,y=norm(p.v);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.lineTo(cw,ch); ctx.lineTo(0,ch); ctx.closePath();
+    ctx.fillStyle=col+"20"; ctx.fill();
+    ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.lineJoin="round";
+    ctx.beginPath();
+    d.pts.forEach((p,i)=>{const x=(i/Math.max(1,d.pts.length-1))*cw,y=norm(p.v);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke();
+  });
+});
+</script>
+</body></html>

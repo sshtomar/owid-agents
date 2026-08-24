@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Deaths from Non-Communicable Diseases: 2000 vs. 2019</h1>
+<p class="subtitle">Share of deaths from NCDs (heart disease, cancer, diabetes, stroke). The global epidemiological transition is visible: nearly every country moved toward a higher NCD share as infectious disease mortality fell — but the gap between rich and poor nations remains vast.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Cause of death, by non-communicable diseases (% of total), SH.DTH.NCOM.ZS</p>
+<script>
+const data = [{"n":"Bulgaria","a":92.8,"b":95.4},{"n":"Albania","a":84.0,"b":93.7},{"n":"Finland","a":85.6,"b":93.5},{"n":"Germany","a":91.9,"b":91.0},{"n":"Ireland","a":85.3,"b":90.8},{"n":"China","a":81.7,"b":90.2},{"n":"Egypt","a":71.0,"b":86.0},{"n":"Indonesia","a":61.4,"b":77.9},{"n":"Colombia","a":58.8,"b":75.7},{"n":"Brazil","a":68.3,"b":74.5},{"n":"Bangladesh","a":42.5,"b":70.9},{"n":"Bolivia","a":52.4,"b":68.3},{"n":"India","a":38.2,"b":67.8},{"n":"Iraq","a":55.2,"b":67.1},{"n":"Ghana","a":29.7,"b":47.3},{"n":"Kenya","a":14.2,"b":42.5},{"n":"Ethiopia","a":19.0,"b":40.3},{"n":"Burkina Faso","a":21.0,"b":36.1},{"n":"Chad","a":17.9,"b":24.0}];
+
+const W = 700, H = 660;
+const pad = { left: 120, right: 148, top: 50, bottom: 24 };
+const plotH = H - pad.top - pad.bottom;
+
+const minV = 0, maxV = 100;
+function scale(v) { return pad.top + (maxV - v) / (maxV - minV) * plotH; }
+
+const xL = pad.left, xR = W - pad.right;
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:${W}px;display:block;cursor:crosshair;` });
+document.getElementById("chart").appendChild(svg);
+
+// Grid
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: (xL + xR) / 2 - 2, y: scale(v) - 3, "text-anchor": "middle", "font-size": "8", "font-family": "JetBrains Mono, monospace", fill: "#9A9890" });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// Column headers
+["2000","2019"].forEach((lbl, i) => {
+  const x = i === 0 ? xL : xR;
+  const t = mkEl("text", { x, y: pad.top - 14, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F" });
+  t.textContent = lbl;
+  svg.appendChild(t);
+});
+
+function colorForNCD(b) {
+  if (b >= 85) return "#3D7A5A";
+  if (b >= 70) return "#5B9E78";
+  if (b >= 55) return "#8BAD72";
+  if (b >= 40) return "#C49A45";
+  if (b >= 25) return "#C4715A";
+  return "#B34B3B";
+}
+
+const rows = [];
+data.forEach(d => {
+  const ya = scale(d.a), yb = scale(d.b);
+  const col = colorForNCD(d.b);
+  const change = d.b - d.a;
+  const g = mkEl("g");
+  const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: col, "stroke-width": "1.5" });
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12", style: "cursor:pointer;" });
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  svg.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "3", fill: col }));
+  svg.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "3", fill: col }));
+  rows.push({ g, line, hit, d, ya, yb, col, change });
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(item => {
+    item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, item.y));
+  });
+  return sorted;
+}
+
+// Left labels
+const resolvedL = resolveCollisions(rows.map(r => ({ y: r.ya, ref: r })), 13);
+resolvedL.forEach(({ y, ref }) => {
+  const col = ref.col;
+  if (Math.abs(y - ref.ya) > 3)
+    svg.appendChild(mkEl("line", { x1: xL - 3, y1: ref.ya, x2: xL - 8, y2: y, stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+  const lbl = mkEl("text", { x: xL - 10, y: y + 3.5, "text-anchor": "end", "font-size": "9", "font-family": "Inter, sans-serif", fill: col });
+  lbl.textContent = `${ref.d.n}  ${ref.d.a}%`;
+  svg.appendChild(lbl);
+});
+
+// Right labels
+const resolvedR = resolveCollisions(rows.map(r => ({ y: r.yb, ref: r })), 13);
+resolvedR.forEach(({ y, ref }) => {
+  const col = ref.col;
+  if (Math.abs(y - ref.yb) > 3)
+    svg.appendChild(mkEl("line", { x1: xR + 3, y1: ref.yb, x2: xR + 8, y2: y, stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+  const lbl = mkEl("text", { x: xR + 10, y: y + 3.5, "text-anchor": "start", "font-size": "9", "font-family": "Inter, sans-serif", fill: col });
+  lbl.textContent = `${ref.d.b}%  ${ref.d.n}`;
+  svg.appendChild(lbl);
+});
+
+// Legend
+const legendData = [
+  { col: "#3D7A5A", label: "≥85% NCD" },
+  { col: "#8BAD72", label: "55–85%" },
+  { col: "#C49A45", label: "40–55%" },
+  { col: "#B34B3B", label: "<25%" },
+];
+legendData.forEach((li, i) => {
+  const lx = xL + i * 118;
+  const ly = H - 8;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 7, width: 8, height: 8, fill: li.col, rx: "1" }));
+  const t = mkEl("text", { x: lx + 11, y: ly, "font-size": "8", "font-family": "Inter, sans-serif", fill: "#7A786F" });
+  t.textContent = li.label;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+rows.forEach(r => {
+  r.hit.addEventListener("mouseenter", () => {
+    rows.forEach(r2 => r2.line.setAttribute("opacity", r2 === r ? "1" : "0.1"));
+    r.line.setAttribute("stroke-width", "2.5");
+  });
+  r.hit.addEventListener("mousemove", e => {
+    const sign = r.change >= 0 ? "+" : "";
+    tip.textContent = `${r.d.n}: ${r.d.a}% → ${r.d.b}% (${sign}${r.change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  r.hit.addEventListener("mouseleave", () => {
+    rows.forEach(r2 => { r2.line.setAttribute("opacity", "1"); r2.line.setAttribute("stroke-width", "1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

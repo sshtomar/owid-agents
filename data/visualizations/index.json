@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Energy Use per Capita, 1990-2022",
+      "description": "Trend lines showing total energy consumption per person (kg of oil equivalent) for 11 countries. Reveals the 25x gap between Canada and Bangladesh, and China's dramatic 3.5x rise over three decades.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Canada uses ~7,500 koe per person \u2014 25x more than Bangladesh (~300)",
+        "China tripled from 773 to 2,677 koe between 1990 and 2022",
+        "Germany and France declined by 25% as energy efficiency improved"
+      ],
+      "createdAt": "2026-08-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Renewable Share of Total Final Energy: 1990 vs. 2020",
+      "description": "Slope chart comparing renewable energy as a share of total final energy (including heat and transport) in 1990 versus 2020. Shows a striking bifurcation: European countries rapidly scaled renewables while many developing nations' renewable share fell as fossil fuels powered economic expansion.",
+      "datasetIds": [
+        "wb--EG-FEC-RNEW-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Estonia grew from 3.5% to 40.4%; Denmark from 7% to 40% \u2014 the fastest European transitions",
+        "Bangladesh fell from 72% to 27% \u2014 fossil fuels replaced biomass as income rose",
+        "Ghana dropped from 81% to 40%; Indonesia from 59% to 22%"
+      ],
+      "createdAt": "2026-08-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Poverty at $3/Day: Country Trajectories since 2000",
+      "description": "Sparkline grid showing the share of the population below $3/day (2021 PPP) since 2000. East and South Asia achieved extraordinary gains; Sub-Saharan Africa largely stagnated.",
+      "datasetIds": [
+        "wb--SI-POV-DDAY"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "China eliminated $3/day poverty almost entirely (47.8% in 2002 to 0% by 2019)",
+        "Indonesia fell from 65.7% to 5.4%; Bangladesh from 41% to 5.9%",
+        "D.R. Congo remains at 85%; Kenya has barely moved since 2005"
+      ],
+      "createdAt": "2026-08-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Deaths from Non-Communicable Diseases: 2000 vs. 2019",
+      "description": "Slope chart showing the epidemiological transition: the share of deaths from NCDs (heart disease, cancer, diabetes) in 2000 versus 2019. All countries moved higher, but the gap between rich and poor remains vast.",
+      "datasetIds": [
+        "wb--SH-DTH-NCOM-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Bangladesh jumped from 43% to 71% NCD share \u2014 one of the fastest transitions",
+        "Bulgaria and Finland are above 93% NCD; Chad remains at just 24%",
+        "India rose from 38% to 68% as infectious disease burden fell sharply"
+      ],
+      "createdAt": "2026-08-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Youth Population Share (Ages 0-14), 1960-2024",
+      "description": "Trend lines showing the share of the population aged 0-14 over 64 years. Sub-Saharan Africa maintains \u2014 and in some cases grew \u2014 its youth bulge, while East Asia and Europe aged at unprecedented speed.",
+      "datasetIds": [
+        "wb--SP-POP-0014-TO-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "South Korea dropped from 41% to 11% in 60 years \u2014 fastest demographic transition ever",
+        "Chad's youth share grew from 41% to 46%, sustaining a youth bulge",
+        "China fell sharply after the one-child policy, then leveled at ~18%"
+      ],
+      "createdAt": "2026-08-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-24T00:00:00.000Z"
 }
