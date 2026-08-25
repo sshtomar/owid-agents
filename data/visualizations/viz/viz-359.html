@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Tuberculosis Treatment Coverage, Early 2000s vs. 2019–2024</h1>
+<p class="subtitle">Share of estimated TB patients who received treatment. Indonesia gained 57 percentage points — the largest improvement among high-burden countries. Russia was already at 100%. Botswana regressed sharply.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — Tuberculosis treatment coverage (TB_1)</p>
+<script>
+// Data from notebook — TB treatment coverage (%)
+const data = [{"n":"Indonesia","a":11,"b":68,"ya":2001,"yb":2022},{"n":"Philippines","a":28,"b":75,"ya":2003,"yb":2024},{"n":"Ethiopia","a":30,"b":73,"ya":2001,"yb":2023},{"n":"Uganda","a":62,"b":100,"ya":2002,"yb":2022},{"n":"S. Africa","a":42,"b":79,"ya":2000,"yb":2023},{"n":"Sri Lanka","a":29,"b":64,"ya":2000,"yb":2022},{"n":"China","a":33,"b":67,"ya":2000,"yb":2022},{"n":"Cuba","a":50,"b":84,"ya":2001,"yb":2021},{"n":"Bolivia","a":33,"b":66,"ya":2004,"yb":2024},{"n":"Nepal","a":29,"b":60,"ya":2001,"yb":2024},{"n":"Peru","a":45,"b":75,"ya":2002,"yb":2019},{"n":"Cambodia","a":34,"b":61,"ya":2004,"yb":2020},{"n":"India","a":33,"b":59,"ya":2000,"yb":2020},{"n":"Haiti","a":28,"b":54,"ya":2003,"yb":2024},{"n":"Sudan","a":49,"b":72,"ya":2002,"yb":2022},{"n":"Vietnam","a":39,"b":58,"ya":2000,"yb":2024},{"n":"Azerbaijan","a":35,"b":53,"ya":2000,"yb":2021},{"n":"Angola","a":44,"b":61,"ya":2002,"yb":2024},{"n":"Uzbekistan","a":41,"b":57,"ya":2000,"yb":2020},{"n":"Russia","a":100,"b":100,"ya":2000,"yb":2024},{"n":"Kazakhstan","a":99,"b":95,"ya":2003,"yb":2023},{"n":"Brazil","a":92,"b":86,"ya":2005,"yb":2022},{"n":"Zimbabwe","a":71,"b":60,"ya":2000,"yb":2024},{"n":"Botswana","a":68,"b":38,"ya":2004,"yb":2020}];
+
+const W = 660, H = 620;
+const pad = { left: 110, right: 120, top: 48, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const minV = 0, maxV = 104;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+function colorForChange(d) {
+  const ch = d.b - d.a;
+  if (ch > 40) return "#3D7A5A";
+  if (ch > 25) return "#5B9E78";
+  if (ch > 10) return "#8BAD72";
+  if (ch > 0)  return "#C49A45";
+  if (ch > -15) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Column headers
+svg.appendChild(mkEl("text", { x: xLeft, y: pad.top - 20, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" }, "EARLY 2000s"));
+svg.appendChild(mkEl("text", { x: xRight, y: pad.top - 20, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" }, "2019–2024"));
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top, x2: xLeft, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top, x2: xRight, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const allRows = [];
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+
+  const line = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: color, "stroke-width": "1.5", opacity: "0.85" });
+  svg.appendChild(line);
+
+  const dotA = mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color });
+  const dotB = mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color });
+  svg.appendChild(dotA);
+  svg.appendChild(dotB);
+
+  // Invisible wide hit area
+  const hit = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+  hit.addEventListener("mouseenter", e => {
+    allRows.forEach(([l, dA, dB]) => { l.style.opacity = "0.08"; dA.style.opacity = "0.08"; dB.style.opacity = "0.08"; });
+    line.style.opacity = "1"; line.setAttribute("stroke-width", "2.5");
+    dotA.style.opacity = "1"; dotB.style.opacity = "1";
+    const change = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% (${d.ya}) → ${d.b}% (${d.yb})  ${change > 0 ? "+" : ""}${change}pp`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 22) + "px"; });
+  hit.addEventListener("mouseleave", () => {
+    allRows.forEach(([l, dA, dB]) => { l.style.opacity = "0.85"; l.setAttribute("stroke-width", "1.5"); dA.style.opacity = "1"; dB.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+  svg.appendChild(hit);
+  allRows.push([line, dotA, dotB]);
+});
+
+// Left labels (before values)
+const leftItems = data.map(d => ({ y: scale(d.a), origY: scale(d.a), d }));
+const leftResolved = resolveCollisions(leftItems, 13);
+leftResolved.forEach(item => {
+  const color = colorForChange(item.d);
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xLeft - 2, y1: item.origY, x2: xLeft - 6, y2: item.y, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 7, y: item.y + 3.5, "text-anchor": "end",
+    "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: color
+  }, `${item.d.n}  ${item.d.a}%`));
+});
+
+// Right labels (after values)
+const rightItems = data.map(d => ({ y: scale(d.b), origY: scale(d.b), d }));
+const rightResolved = resolveCollisions(rightItems, 13);
+rightResolved.forEach(item => {
+  const color = colorForChange(item.d);
+  if (Math.abs(item.y - item.origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xRight + 2, y1: item.origY, x2: xRight + 6, y2: item.y, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xRight + 7, y: item.y + 3.5, "text-anchor": "start",
+    "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: color
+  }, `${item.d.b}%  ${item.d.n}`));
+});
+
+// Legend
+const legX = (xLeft + xRight) / 2 - 80;
+const legY = H - 6;
+const legItems = [
+  { color: "#3D7A5A", label: "+40pp or more" },
+  { color: "#8BAD72", label: "+10 to +40pp" },
+  { color: "#C4715A", label: "< +10pp or declined" }
+];
+legItems.forEach((l, i) => {
+  svg.appendChild(mkEl("rect", { x: legX + i * 130, y: legY - 8, width: 8, height: 8, fill: l.color }));
+  svg.appendChild(mkEl("text", { x: legX + i * 130 + 11, y: legY, "font-size": "8", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" }, l.label));
+});
+</script>
+</body></html>

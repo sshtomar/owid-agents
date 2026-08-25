@@ -5858,7 +5858,89 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourism Arrivals, 2000\u20132020",
+      "description": "COVID-19 caused the sharpest collapse in international tourism ever recorded. Top 10 destination countries \u2014 Hong Kong and Japan lost over 90% of arrivals in 2020.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Hong Kong lost 94% of arrivals in 2020 (55.9M to 3.6M)",
+        "Japan lost 87% (31.9M to 4.1M)",
+        "France, the top destination, dropped 46% from 217M to 117M arrivals"
+      ],
+      "createdAt": "2026-08-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Age Dependency Ratio, 1960\u20132024",
+      "description": "Dependents per 100 working-age people. East Asian economies fell sharply through development; Japan reversed as its population aged; Sub-Saharan Africa remains persistently high.",
+      "datasetIds": [
+        "wb--SP-POP-DPND"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan's dependency ratio has risen since 1992 as the population ages \u2014 now back above 70",
+        "South Korea fell from 80 to 42 in six decades \u2014 fastest demographic transition recorded",
+        "Ethiopia peaked above 100 and is now declining as fertility falls"
+      ],
+      "createdAt": "2026-08-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Tuberculosis Treatment Coverage: Early 2000s vs. 2019\u20132024",
+      "description": "Share of estimated TB patients who received treatment. Indonesia made the most dramatic gains (+57pp). Russia was already at 100%. Botswana regressed sharply.",
+      "datasetIds": [
+        "who--TB_1"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Indonesia: 11% to 68% \u2014 the largest gain among high-burden countries",
+        "Uganda: 62% to 100%, reaching full treatment coverage",
+        "Botswana: 68% to 38% \u2014 one of the sharpest declines"
+      ],
+      "createdAt": "2026-08-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Fossil Fuel Energy Consumption (% of Total), 1990\u20132014",
+      "description": "Share of total energy derived from coal, oil, and gas. Japan surged after Fukushima. Iceland and Brazil remain outliers. China deepened its fossil fuel dependence through industrialization.",
+      "datasetIds": [
+        "wb--EG-USE-COMM-FO-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan jumped from 81% to 95% fossil fuel after the 2011 Fukushima nuclear disaster",
+        "China rose from 75% to 90% through its industrial expansion",
+        "Iceland dropped from 28% to 11%, powered by geothermal and hydro",
+        "Denmark fell from 90% to 68% through wind energy expansion"
+      ],
+      "createdAt": "2026-08-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Anemia Prevalence Among Women of Reproductive Age, 2000 vs 2022",
+      "description": "Percentage of women ages 15\u201349 with anemia. India worsened slightly; Afghanistan increased by 13pp; many West African countries remain above 40% despite modest progress.",
+      "datasetIds": [
+        "wb--SH-ANM-ALLW-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "India \u2014 home to the largest anemic population \u2014 slightly worsened from 50% to 53%",
+        "Afghanistan rose sharply from 32% to 45%",
+        "Gambia and DR Congo improved most among high-burden countries (-14pp each)"
+      ],
+      "createdAt": "2026-08-25T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-25T00:00:00.000Z"
 }
