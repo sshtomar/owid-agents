@@ -5858,7 +5858,93 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Manufactures Exports as a Share of Merchandise Exports, 1990\u20132023",
+      "description": "Trend lines for 8 countries showing the share of manufactured goods in total merchandise exports. Reveals contrasting industrialisation paths: China's steady climb to 92%, Brazil's fall from 52% to 24% as commodities boomed, and Bangladesh's rise to 95% on garment exports.",
+      "datasetIds": [
+        "wb--TX-VAL-MANF-ZS-UN"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China climbed from 78% in 1992 to 92% in 2023 \u2014 manufacturing now dominates its export basket",
+        "Brazil fell from 52% to 24% as commodity exports boomed, a sign of deindustrialisation",
+        "Bangladesh rose to 95%, almost entirely driven by garment manufacturing"
+      ],
+      "createdAt": "2026-08-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Government Consumption Expenditure: 1995 vs. 2023",
+      "description": "Slope chart comparing general government final consumption as a share of GDP across 18 countries. Nordic states maintain 22\u201326%, while Bangladesh and Indonesia remain below 8% \u2014 a structural gap that reflects fundamentally different social contracts.",
+      "datasetIds": [
+        "wb--NE-CON-GOVT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Finland rose from 22% to 26%, widening the Nordic lead in public spending",
+        "South Korea expanded from 10% to 18% as its welfare state matured",
+        "Bangladesh and Indonesia remain below 8% \u2014 among the smallest public sectors globally"
+      ],
+      "createdAt": "2026-08-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Primary School Completion Rate by Income Group, 1990\u20132024",
+      "description": "Trend lines showing the share of children completing primary school across income groups. High-income countries hold near 98% while low-income countries remain stuck below 65% \u2014 a gap that has barely narrowed in 30 years.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Low-income countries rose from 40% to 63% \u2014 meaningful progress but still far from universal",
+        "Sub-Saharan Africa improved from 53% to 69% over 34 years, the slowest gain of any region",
+        "The gap between low-income and high-income countries has barely changed since 1990"
+      ],
+      "createdAt": "2026-08-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Age Dependency Ratio, 1960\u20132020",
+      "description": "Trend lines for 7 countries and regions showing the age dependency ratio (dependants as % of working-age population). Illustrates the demographic dividend in Asia and Latin America, Sub-Saharan Africa's persistent high ratio, and Japan's dramatic aging.",
+      "datasetIds": [
+        "wb--SP-POP-DPND"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "China's ratio fell from 80 to 44 \u2014 a 35-point drop driven by the one-child policy and economic transition",
+        "Brazil halved its ratio from 88 to 44, unlocking decades of demographic dividend",
+        "Japan reversed: fell to 43 by 1990 then climbed back to 70 as its population rapidly aged",
+        "Sub-Saharan Africa remains at ~83, the highest globally, with slow decline expected"
+      ],
+      "createdAt": "2026-08-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Urban Primacy: Share of Urban Population in Largest City, 1995 vs. 2022",
+      "description": "Slope chart comparing urban primacy across 21 countries. Countries like Armenia and Bangladesh show rising concentration in a single dominant city, while Ethiopia, Iraq, and South Korea have become more distributed. Germany and China sit at 3\u20135% with many large cities sharing the load.",
+      "datasetIds": [
+        "wb--EN-URB-LCTY-UR-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Bangladesh rose from 31% to 42% as Dhaka's primacy over national urban life intensified",
+        "Ethiopia fell from 27% to 18% as secondary cities grew faster than Addis Ababa",
+        "Germany (5%) and China (3%) show distributed urban systems with no dominant primate city"
+      ],
+      "createdAt": "2026-08-26T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-26T00:00:00.000Z"
 }
