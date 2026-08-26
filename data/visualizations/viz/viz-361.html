@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Urban Primacy: Share of Urban Population in Largest City, 1995 vs. 2022</h1>
+<p class="subtitle">How concentrated is urban life in a single dominant city? Armenia and Bangladesh saw the sharpest rise; Indonesia and Iraq the steepest fall. China and India — with many large cities — remain near the bottom.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Population in largest city (% of urban population)</p>
+<script>
+const slopeData = [{"y":1995,"n":"Armenia","a":52,"b":56},{"y":1995,"n":"Bangladesh","a":31,"b":42},{"y":1995,"n":"Dominican Republic","a":38,"b":43},{"y":1995,"n":"Egypt","a":43,"b":45},{"y":1995,"n":"Denmark","a":24,"b":26},{"y":1995,"n":"Argentina","a":38,"b":37},{"y":1995,"n":"Chile","a":42,"b":40},{"y":1995,"n":"Greece","a":41,"b":38},{"y":1995,"n":"Hungary","a":29,"b":26},{"y":1995,"n":"Japan","a":34,"b":32},{"y":1995,"n":"Ecuador","a":27,"b":27},{"y":1995,"n":"Ethiopia","a":27,"b":18},{"y":1995,"n":"France","a":21,"b":21},{"y":1995,"n":"Ghana","a":20,"b":19},{"y":1995,"n":"Iraq","a":33,"b":24},{"y":1995,"n":"Kenya","a":36,"b":30},{"y":1995,"n":"South Korea","a":29,"b":24},{"y":1995,"n":"Indonesia","a":11,"b":7},{"y":1995,"n":"India","a":6,"b":6},{"y":1995,"n":"Germany","a":5,"b":5},{"y":1995,"n":"China","a":3,"b":3}];
+
+// Sort by 2022 value descending
+slopeData.sort((a, b) => b.b - a.b);
+
+const W = 680, H = 620;
+const pad = { left: 130, right: 140, top: 50, bottom: 20 };
+const minV = 0, maxV = 60;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xL = pad.left, xR = W - pad.right;
+
+// Column headers
+[["1995", xL], ["2022", xR]].forEach(([lbl, x]) => {
+  const t = mkEl("text", { x, y: pad.top - 20, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": "10", fill: "#7A786F" });
+  t.textContent = lbl;
+  svg.appendChild(t);
+  svg.appendChild(mkEl("line", { x1: x, y1: pad.top - 12, x2: x, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+function colorForChange(diff) {
+  if (diff > 8) return "#EA5E33";
+  if (diff > 3) return "#F29A44";
+  if (diff >= -3) return "#A6C4A2";
+  if (diff >= -8) return "#C49A45";
+  return "#B34B3B";
+}
+
+const rows = [];
+slopeData.forEach(d => {
+  const ya = scale(d.a), yb = scale(d.b);
+  const color = colorForChange(d.b - d.a);
+  const g = mkEl("g", {});
+  const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5", opacity: "0.85" });
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  const dotL = mkEl("circle", { cx: xL, cy: ya, r: "3", fill: color });
+  const dotR = mkEl("circle", { cx: xR, cy: yb, r: "3", fill: color });
+  g.appendChild(line); g.appendChild(hit); g.appendChild(dotL); g.appendChild(dotR);
+  svg.appendChild(g);
+  rows.push({ g, line, hit, d, ya, yb, color });
+});
+
+// Left labels
+const leftItems = rows.map(r => ({ y: r.ya, ref: r }));
+const leftResolved = resolveCollisions(leftItems, 13);
+leftResolved.forEach(item => {
+  const { d, ya, color } = item.ref;
+  const lbl = mkEl("text", { x: xL - 6, y: item.y + 4, "text-anchor": "end", "font-size": "10", "font-weight": "500", fill: "#2B2A27" });
+  lbl.textContent = `${d.n}  ${d.a}%`;
+  svg.appendChild(lbl);
+  if (Math.abs(item.y - ya) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 4, y1: ya, x2: xL - 4, y2: item.y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+
+// Right labels
+const rightItems = rows.map(r => ({ y: r.yb, ref: r }));
+const rightResolved = resolveCollisions(rightItems, 13);
+rightResolved.forEach(item => {
+  const { d, yb, color } = item.ref;
+  const lbl = mkEl("text", { x: xR + 6, y: item.y + 4, "text-anchor": "start", "font-size": "10", "font-weight": "500", fill: "#2B2A27" });
+  lbl.textContent = `${d.b}%  ${d.n}`;
+  svg.appendChild(lbl);
+  if (Math.abs(item.y - yb) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 4, y1: yb, x2: xR + 4, y2: item.y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+
+const tip = document.getElementById("tip");
+rows.forEach(({ g, line, hit, d }) => {
+  const diff = d.b - d.a;
+  const sign = diff >= 0 ? "+" : "";
+  hit.addEventListener("mouseenter", () => {
+    rows.forEach(r => r.line.setAttribute("opacity", "0.1"));
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${sign}${diff} pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    rows.forEach(r => { r.line.setAttribute("opacity", "0.85"); r.line.setAttribute("stroke-width", "1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

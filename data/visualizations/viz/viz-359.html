@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Primary School Completion Rate by Income Group, 1990–2024</h1>
+<p class="subtitle">Share of children who complete primary school. High-income countries have near-universal completion, while low-income countries remain stuck below 65% — a striking gap that has barely closed in 30 years.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Primary completion rate, total (% of relevant age group)</p>
+<script>
+const data = [{"n":"High income","pts":[{"y":1999,"v":98.0},{"y":2000,"v":98.1},{"y":2001,"v":99.4},{"y":2002,"v":98.9},{"y":2003,"v":98.8},{"y":2004,"v":98.7},{"y":2005,"v":98.4},{"y":2006,"v":98.3},{"y":2007,"v":98.6},{"y":2008,"v":98.8},{"y":2009,"v":98.6},{"y":2010,"v":98.5},{"y":2011,"v":98.3},{"y":2012,"v":99.0},{"y":2013,"v":98.1},{"y":2014,"v":97.8},{"y":2015,"v":98.1},{"y":2016,"v":97.6},{"y":2017,"v":98.0},{"y":2018,"v":98.1},{"y":2019,"v":98.3},{"y":2020,"v":98.4},{"y":2021,"v":98.7},{"y":2022,"v":97.6},{"y":2023,"v":97.9},{"y":2024,"v":97.8}]},{"n":"Upper middle income","pts":[{"y":1990,"v":96.9},{"y":1991,"v":94.3},{"y":1992,"v":91.5},{"y":1993,"v":91.5},{"y":1994,"v":89.4},{"y":1995,"v":93.5},{"y":1996,"v":91.2},{"y":1997,"v":91.8},{"y":1998,"v":92.6},{"y":1999,"v":93.3},{"y":2000,"v":94.0},{"y":2001,"v":95.0},{"y":2002,"v":95.0},{"y":2003,"v":94.6},{"y":2004,"v":94.9},{"y":2005,"v":94.9},{"y":2006,"v":93.5},{"y":2007,"v":95.8},{"y":2008,"v":99.8},{"y":2009,"v":100.2},{"y":2010,"v":100.1},{"y":2011,"v":99.4},{"y":2012,"v":97.7},{"y":2013,"v":98.6},{"y":2014,"v":96.1},{"y":2015,"v":94.4},{"y":2016,"v":96.3},{"y":2017,"v":95.6},{"y":2018,"v":95.5},{"y":2019,"v":95.5},{"y":2020,"v":94.2},{"y":2021,"v":95.4},{"y":2022,"v":95.1},{"y":2023,"v":95.2}]},{"n":"World","pts":[{"y":1990,"v":82.5},{"y":1991,"v":81.6},{"y":1992,"v":80.5},{"y":1993,"v":80.6},{"y":1994,"v":79.9},{"y":1995,"v":81.2},{"y":1996,"v":80.4},{"y":1997,"v":80.7},{"y":1998,"v":81.1},{"y":1999,"v":81.6},{"y":2000,"v":81.9},{"y":2001,"v":82.7},{"y":2002,"v":83.3},{"y":2003,"v":83.5},{"y":2004,"v":84.2},{"y":2005,"v":85.0},{"y":2006,"v":85.3},{"y":2007,"v":86.5},{"y":2008,"v":88.2},{"y":2009,"v":89.0},{"y":2010,"v":88.5},{"y":2011,"v":87.8},{"y":2012,"v":88.1},{"y":2013,"v":88.3},{"y":2014,"v":88.1},{"y":2015,"v":87.9},{"y":2016,"v":88.5},{"y":2017,"v":88.2},{"y":2018,"v":88.1},{"y":2019,"v":87.9},{"y":2020,"v":88.0},{"y":2021,"v":88.7},{"y":2022,"v":91.1},{"y":2023,"v":87.3},{"y":2024,"v":88.0}]},{"n":"Lower middle income","pts":[{"y":1990,"v":71.0},{"y":1991,"v":71.1},{"y":1992,"v":71.0},{"y":1993,"v":71.2},{"y":1994,"v":71.4},{"y":1995,"v":71.6},{"y":1996,"v":71.7},{"y":1997,"v":71.7},{"y":1998,"v":71.9},{"y":1999,"v":72.5},{"y":2000,"v":72.8},{"y":2001,"v":73.3},{"y":2002,"v":74.6},{"y":2003,"v":76.8},{"y":2004,"v":78.5},{"y":2005,"v":80.5},{"y":2006,"v":82.3},{"y":2007,"v":83.2},{"y":2008,"v":84.0},{"y":2009,"v":85.2},{"y":2010,"v":84.4},{"y":2011,"v":83.8},{"y":2012,"v":85.4},{"y":2013,"v":86.3},{"y":2014,"v":87.6},{"y":2015,"v":88.2},{"y":2016,"v":88.2},{"y":2017,"v":87.9},{"y":2018,"v":87.3},{"y":2019,"v":86.8},{"y":2020,"v":87.8},{"y":2021,"v":88.4},{"y":2022,"v":94.6},{"y":2023,"v":86.6},{"y":2024,"v":88.0}]},{"n":"Sub-Saharan Africa","pts":[{"y":1990,"v":53.1},{"y":1991,"v":53.4},{"y":1992,"v":52.7},{"y":1993,"v":53.5},{"y":1994,"v":52.7},{"y":1995,"v":52.8},{"y":1996,"v":53.2},{"y":1997,"v":53.0},{"y":1998,"v":52.3},{"y":1999,"v":52.4},{"y":2000,"v":52.8},{"y":2001,"v":54.4},{"y":2002,"v":55.5},{"y":2003,"v":56.4},{"y":2004,"v":57.4},{"y":2005,"v":59.5},{"y":2006,"v":62.2},{"y":2007,"v":61.9},{"y":2008,"v":62.5},{"y":2009,"v":65.7},{"y":2010,"v":65.9},{"y":2011,"v":65.7},{"y":2012,"v":65.7},{"y":2013,"v":65.6},{"y":2014,"v":66.0},{"y":2015,"v":66.3},{"y":2016,"v":66.7},{"y":2017,"v":67.1},{"y":2018,"v":67.9},{"y":2019,"v":68.3},{"y":2020,"v":69.1},{"y":2021,"v":69.9},{"y":2022,"v":69.0},{"y":2023,"v":68.8},{"y":2024,"v":68.9}]},{"n":"Low income","pts":[{"y":1990,"v":40.5},{"y":1991,"v":40.8},{"y":1992,"v":40.5},{"y":1993,"v":41.0},{"y":1994,"v":40.1},{"y":1995,"v":40.1},{"y":1996,"v":40.9},{"y":1997,"v":40.8},{"y":1998,"v":40.8},{"y":1999,"v":41.0},{"y":2000,"v":42.2},{"y":2001,"v":44.2},{"y":2002,"v":45.9},{"y":2003,"v":48.1},{"y":2004,"v":49.4},{"y":2005,"v":52.0},{"y":2006,"v":53.5},{"y":2007,"v":54.7},{"y":2008,"v":57.2},{"y":2009,"v":60.2},{"y":2010,"v":60.7},{"y":2011,"v":60.3},{"y":2012,"v":60.6},{"y":2013,"v":59.2},{"y":2014,"v":60.2},{"y":2015,"v":60.5},{"y":2016,"v":61.6},{"y":2017,"v":62.3},{"y":2018,"v":63.5},{"y":2019,"v":64.3},{"y":2020,"v":65.0},{"y":2021,"v":65.4},{"y":2022,"v":63.9},{"y":2023,"v":62.9}]}];
+
+const COLORS = {
+  "High income": "#3D7A5A",
+  "Upper middle income": "#5B9E78",
+  "World": "#7A786F",
+  "Lower middle income": "#C49A45",
+  "Sub-Saharan Africa": "#C4715A",
+  "Low income": "#B34B3B"
+};
+
+const W = 820, H = 460;
+const margin = { top: 30, right: 155, bottom: 40, left: 50 };
+
+const yearMin = 1990, yearMax = 2024;
+const valMin = 35, valMax = 105;
+
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// 100% reference line
+svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(100), x2: W - margin.right, y2: yS(100), stroke: "#C2C0B5", "stroke-dasharray": "4,3", "stroke-width": "0.8" }));
+const refLbl = mkEl("text", { x: margin.left + 4, y: yS(100) - 4, "font-size": "9", "font-family": "JetBrains Mono", fill: "#7A786F" });
+refLbl.textContent = "100% (universal)";
+svg.appendChild(refLbl);
+
+// Grid lines
+[40, 50, 60, 70, 80, 90].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(v), x2: W - margin.right, y2: yS(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: yS(v) + 4, "text-anchor": "end", "font-family": "JetBrains Mono", "font-size": "9", fill: "#7A786F" });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// Year ticks
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("line", { x1: xS(y), y1: H - margin.bottom, x2: xS(y), y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: xS(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": "9", fill: "#7A786F" });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+data.forEach(series => {
+  const color = COLORS[series.n] || "#9A9890";
+  const pts = series.pts;
+  if (pts.length < 2) return;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const g = mkEl("g", {});
+  const isDashed = series.n === "World";
+  const path = mkEl("path", { d: pathD, stroke: color, "stroke-width": isDashed ? "1.2" : "2", fill: "none", "stroke-linejoin": "round", "stroke-dasharray": isDashed ? "5,3" : "none" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(path); g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, path, hit, series, pts, color });
+});
+
+// End labels with collision resolution
+const labelItems = groups.map(item => {
+  const last = item.pts[item.pts.length - 1];
+  return { y: yS(last.v), ref: item, rawY: last.v };
+});
+const resolved = resolveCollisions(labelItems.map(l => ({ y: l.y, ref: l })), 13);
+resolved.forEach(item => {
+  const { ref: { series, pts, color }, rawY } = item.ref;
+  const last = pts[pts.length - 1];
+  const labelX = xS(last.y) + 6;
+  const actualY = yS(rawY);
+  if (Math.abs(item.y - actualY) > 2) {
+    svg.appendChild(mkEl("line", { x1: xS(last.y) + 3, y1: actualY, x2: labelX + 1, y2: item.y, stroke: color, "stroke-width": "0.5", "stroke-dasharray": "2,2", opacity: "0.5" }));
+  }
+  const lbl = mkEl("text", { x: labelX, y: item.y + 4, "font-size": "10", "font-weight": "500", fill: color });
+  lbl.textContent = `${last.v}% ${series.n}`;
+  svg.appendChild(lbl);
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({ g, path, hit, series, pts, color }) => {
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach(other => { other.path.setAttribute("opacity", "0.1"); });
+    path.setAttribute("opacity", "1");
+    path.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const yr = Math.round((mx - margin.left) / (W - margin.left - margin.right) * (yearMax - yearMin) + yearMin);
+    const closest = pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best, pts[0]);
+    tip.textContent = `${series.n} (${closest.y}): ${closest.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(other => { other.path.setAttribute("opacity", "1"); other.path.setAttribute("stroke-width", other.series.n === "World" ? "1.2" : "2"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
