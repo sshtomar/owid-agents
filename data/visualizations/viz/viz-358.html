@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head>
+<body>
+<h1>Non-Communicable Diseases as Share of All Deaths, by Region</h1>
+<p class="subtitle">Percentage of total deaths caused by NCDs (cardiovascular disease, cancer, diabetes, chronic respiratory disease) from 2000 to 2021. The dip in 2020–2021 reflects COVID-19 reclassifying deaths as communicable. Hover a line to isolate it.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Cause of Death, by Non-Communicable Diseases (% of total) · SH.DTH.NCOM.ZS</p>
+<script>
+const data = [{"n":"East Asia & Pacific","pts":[{"y":2000,"v":75.3},{"y":2010,"v":81.8},{"y":2015,"v":83.9},{"y":2019,"v":85.5},{"y":2020,"v":83.8},{"y":2021,"v":81.1}]},{"n":"North America","pts":[{"y":2000,"v":87.9},{"y":2010,"v":88.0},{"y":2015,"v":87.9},{"y":2019,"v":88.3},{"y":2020,"v":79.4},{"y":2021,"v":78.1}]},{"n":"Europe & Central Asia","pts":[{"y":2000,"v":86.5},{"y":2010,"v":88.9},{"y":2015,"v":89.1},{"y":2019,"v":89.6},{"y":2020,"v":78.4},{"y":2021,"v":73.8}]},{"n":"World","pts":[{"y":2000,"v":59.2},{"y":2010,"v":67.0},{"y":2015,"v":70.9},{"y":2019,"v":73.7},{"y":2020,"v":68.8},{"y":2021,"v":63.4}]},{"n":"Mid. East & N. Africa","pts":[{"y":2000,"v":52.3},{"y":2010,"v":59.7},{"y":2015,"v":62.4},{"y":2019,"v":67.1},{"y":2020,"v":60.1},{"y":2021,"v":56.8}]},{"n":"Latin America & Caribbean","pts":[{"y":2000,"v":66.8},{"y":2010,"v":69.1},{"y":2015,"v":74.1},{"y":2019,"v":74.9},{"y":2020,"v":62.1},{"y":2021,"v":56.7}]},{"n":"South Asia","pts":[{"y":2000,"v":38.9},{"y":2010,"v":53.2},{"y":2015,"v":62.5},{"y":2019,"v":68.2},{"y":2020,"v":63.6},{"y":2021,"v":50.3}]},{"n":"Sub-Saharan Africa","pts":[{"y":2000,"v":20.6},{"y":2010,"v":27.7},{"y":2015,"v":32.1},{"y":2019,"v":35.8},{"y":2020,"v":36.1},{"y":2021,"v":34.5}]}];
+
+const COLORS = {
+  "East Asia & Pacific": "#EA5E33",
+  "North America": "#F29A44",
+  "Europe & Central Asia": "#3D7A5A",
+  "World": "#2B2A27",
+  "Mid. East & N. Africa": "#5B9E78",
+  "Latin America & Caribbean": "#8BAD72",
+  "South Asia": "#C49A45",
+  "Sub-Saharan Africa": "#C4715A"
+};
+
+const W = 720, H = 420;
+const margin = { top: 36, right: 160, bottom: 40, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const years = [2000, 2010, 2015, 2019, 2020, 2021];
+const minY = 2000, maxY = 2021;
+const minV = 15, maxV = 95;
+
+const xSc = y => margin.left + (y - minY) / (maxY - minY) * (W - margin.left - margin.right);
+const ySc = v => margin.top + (maxV - v) / (maxV - minV) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[20, 30, 40, 50, 60, 70, 80, 90].forEach(v => {
+  svg.appendChild(mkEl("line", {x1: margin.left, y1: ySc(v), x2: W - margin.right, y2: ySc(v), stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const t = mkEl("text", {x: margin.left - 6, y: ySc(v) + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono", "font-size": "8", fill: "#9A9890"});
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X-axis tick labels
+years.forEach(y => {
+  const t = mkEl("text", {x: xSc(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": "9", fill: "#7A786F"});
+  t.textContent = y;
+  svg.appendChild(t);
+  svg.appendChild(mkEl("line", {x1: xSc(y), y1: H - margin.bottom, x2: xSc(y), y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.7"}));
+});
+
+// COVID annotation
+const covid2020 = xSc(2020);
+const annot = mkEl("line", {x1: covid2020, y1: margin.top, x2: covid2020, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.8", "stroke-dasharray": "3,3"});
+svg.appendChild(annot);
+const annotT = mkEl("text", {x: covid2020 - 4, y: margin.top - 6, "text-anchor": "end", "font-family": "JetBrains Mono", "font-size": "8", fill: "#9A9890"});
+annotT.textContent = "COVID-19";
+svg.appendChild(annotT);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const endLabels = data.map((d, i) => {
+  const last = d.pts[d.pts.length - 1];
+  return {i, y: ySc(last.v)};
+});
+resolveCollisions(endLabels, 11);
+const labelMap = {};
+endLabels.forEach(l => labelMap[l.i] = l.y);
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = COLORS[d.n] || "#7A786F";
+  const isWorld = d.n === "World";
+  const g = mkEl("g", {});
+  g.style.opacity = "1";
+
+  // Path
+  const pathD = d.pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xSc(p.y).toFixed(1)} ${ySc(p.v).toFixed(1)}`).join(" ");
+  const line = mkEl("path", {d: pathD, stroke: color, "stroke-width": isWorld ? "2.2" : "1.5", fill: "none", "stroke-linejoin": "round"});
+  if (!isWorld) line.setAttribute("stroke-dasharray", "");
+  g.appendChild(line);
+
+  // Data dots
+  d.pts.forEach(p => {
+    g.appendChild(mkEl("circle", {cx: xSc(p.y).toFixed(1), cy: ySc(p.v).toFixed(1), r: isWorld ? "3" : "2.5", fill: color}));
+  });
+
+  // Hit area
+  const hitD = d.pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xSc(p.y).toFixed(1)} ${ySc(p.v).toFixed(1)}`).join(" ");
+  const hit = mkEl("path", {d: hitD, stroke: "transparent", "stroke-width": "12", fill: "none"});
+  g.appendChild(hit);
+
+  // Endpoint label
+  const last = d.pts[d.pts.length - 1];
+  const endX = xSc(last.y);
+  const labelY = labelMap[i];
+  const actualY = ySc(last.v);
+
+  if (Math.abs(labelY - actualY) > 2) {
+    g.appendChild(mkEl("line", {x1: endX + 4, y1: actualY, x2: endX + 4, y2: labelY, stroke: "#C2C0B5", "stroke-width": "0.5"}));
+  }
+
+  const lbl = mkEl("text", {x: endX + 8, y: labelY + 3.5, "font-family": "Inter", "font-size": "9", "font-weight": isWorld ? "600" : "500", fill: "#2B2A27"});
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  svg.appendChild(g);
+  groups.push({g, d, hit});
+});
+
+const tip = document.getElementById("tip");
+
+groups.forEach(({g, d, hit}) => {
+  function onEnter(e) {
+    groups.forEach(({g: og}) => og.style.opacity = og === g ? "1" : "0.1");
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  }
+  function onMove(e) {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    let best = d.pts[0], bestDist = Infinity;
+    d.pts.forEach(p => {
+      const dist = Math.abs(xSc(p.y) - mx);
+      if (dist < bestDist) { bestDist = dist; best = p; }
+    });
+    tip.textContent = `${d.n} (${best.y}): ${best.v}%`;
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  }
+  function onLeave() {
+    groups.forEach(({g: og}) => og.style.opacity = "1");
+    tip.style.opacity = "0";
+  }
+  [hit, g].forEach(el => {
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+  });
+});
+</script>
+</body></html>
