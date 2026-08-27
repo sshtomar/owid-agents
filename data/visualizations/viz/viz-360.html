@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head>
+<body>
+<h1>Female Labor Force Participation Rate by Region, 1990–2024</h1>
+<p class="subtitle">Share of female population ages 15–64 in the labor force (ILO modeled estimate). The Arab World remains well below all other regions. South Asia dipped mid-decade before recovering. Hover a line to isolate it.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Female Labor Force Participation Rate · SL.TLF.ACTI.FE.ZS</p>
+<script>
+const data = [{"n":"North America","s":[66.7,66.7,67.2,67.4,68.2,68.4,68.8,69.3,69.3,69.4,69.4,69.2,69.0,68.8,68.4,68.3,68.4,68.3,68.5,68.3,67.8,67.3,67.2,66.9,66.8,66.6,67.0,67.6,67.8,68.5,67.4,67.9,68.7,69.6,69.8],"y0":1990},{"n":"East Asia & Pacific","s":[71.5,71.2,70.9,70.5,70.3,70.1,69.8,69.4,69.1,68.7,68.3,68.1,67.6,67.3,67.1,66.8,66.6,66.9,66.7,66.5,66.4,66.6,66.5,66.3,66.5,66.5,66.6,66.6,66.9,67.0,65.8,66.9,66.9,67.4,67.1],"y0":1990},{"n":"Sub-Saharan Africa","s":[67.5,67.8,68.0,68.2,68.4,68.6,68.5,68.5,68.4,68.5,68.5,68.5,68.6,68.6,68.6,68.6,68.5,68.3,68.1,67.8,67.5,67.6,66.9,67.3,66.5,66.1,65.7,65.0,64.5,64.0,62.7,63.0,63.6,66.7,66.8],"y0":1990},{"n":"Europe & Central Asia","s":[58.8,59.2,58.9,58.2,58.4,58.3,58.3,58.0,58.0,59.2,59.1,58.9,59.5,59.7,59.8,60.2,60.6,60.9,61.0,61.2,61.3,61.6,62.0,62.2,62.5,62.7,63.2,63.5,63.8,64.0,63.3,64.3,65.4,66.0,66.3],"y0":1990},{"n":"Latin America","s":[45.1,45.5,46.3,47.2,48.0,49.0,48.9,50.1,50.6,51.0,51.1,51.6,52.1,52.8,53.6,54.3,54.7,54.9,54.9,55.6,55.2,54.9,55.3,55.3,55.1,55.5,55.8,56.2,56.7,57.4,53.1,56.0,57.0,57.2,57.5],"y0":1990},{"n":"World","s":[56.0,56.0,55.9,55.7,55.8,55.8,55.7,55.7,55.7,55.9,55.8,55.7,55.6,55.5,55.5,55.5,55.2,55.1,54.8,54.5,54.2,54.0,53.8,53.7,53.6,53.6,53.6,53.6,53.6,53.7,52.4,53.5,54.0,55.0,55.1],"y0":1990},{"n":"South Asia","s":[31.1,31.2,31.3,31.5,31.6,32.2,32.8,33.4,34.2,34.7,35.3,35.4,35.5,35.6,35.7,35.8,34.6,33.6,32.6,31.7,30.8,30.0,29.1,29.0,29.0,29.1,29.1,29.5,29.7,29.9,29.5,31.4,33.1,34.4,35.4],"y0":1990},{"n":"Arab World","s":[20.2,20.4,20.8,20.7,21.2,20.9,20.9,20.7,20.6,21.1,21.1,21.0,20.3,20.5,20.7,20.9,21.1,21.7,21.3,21.6,21.8,21.9,21.7,21.8,21.9,21.9,21.9,21.1,20.1,19.4,18.7,19.0,19.0,20.4,20.3],"y0":1990}];
+
+const COLORS = {
+  "North America": "#EA5E33",
+  "East Asia & Pacific": "#F29A44",
+  "Sub-Saharan Africa": "#C49A45",
+  "Europe & Central Asia": "#3D7A5A",
+  "Latin America": "#5B9E78",
+  "World": "#2B2A27",
+  "South Asia": "#8BAD72",
+  "Arab World": "#C4715A"
+};
+
+const W = 740, H = 400;
+const margin = { top: 34, right: 148, bottom: 40, left: 50 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const startYear = 1990, endYear = 2024;
+const nYears = endYear - startYear;
+const minV = 15, maxV = 75;
+
+const xSc = y => margin.left + (y - startYear) / nYears * (W - margin.left - margin.right);
+const ySc = v => margin.top + (maxV - v) / (maxV - minV) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[20, 30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", {x1: margin.left, y1: ySc(v), x2: W - margin.right, y2: ySc(v), stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const t = mkEl("text", {x: margin.left - 6, y: ySc(v) + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono", "font-size": "8", fill: "#9A9890"});
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X-axis labels
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const t = mkEl("text", {x: xSc(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": "9", fill: "#7A786F"});
+  t.textContent = y;
+  svg.appendChild(t);
+  svg.appendChild(mkEl("line", {x1: xSc(y), y1: H - margin.bottom, x2: xSc(y), y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.7"}));
+});
+
+// COVID annotation
+const covidX = xSc(2020);
+svg.appendChild(mkEl("line", {x1: covidX, y1: margin.top, x2: covidX, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.8", "stroke-dasharray": "3,3"}));
+const covidT = mkEl("text", {x: covidX - 4, y: margin.top - 6, "text-anchor": "end", "font-family": "JetBrains Mono", "font-size": "8", fill: "#9A9890"});
+covidT.textContent = "COVID";
+svg.appendChild(covidT);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const endLabels = data.map((d, i) => ({i, y: ySc(d.s[d.s.length - 1])}));
+resolveCollisions(endLabels, 11);
+const labelMap = {};
+endLabels.forEach(l => labelMap[l.i] = l.y);
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = COLORS[d.n] || "#7A786F";
+  const isWorld = d.n === "World";
+  const g = mkEl("g", {});
+  g.style.opacity = "1";
+
+  const pathD = d.s.map((v, j) => `${j === 0 ? "M" : "L"} ${xSc(d.y0 + j).toFixed(1)} ${ySc(v).toFixed(1)}`).join(" ");
+  const line = mkEl("path", {d: pathD, stroke: color, "stroke-width": isWorld ? "2.2" : "1.5", fill: "none", "stroke-linejoin": "round"});
+  g.appendChild(line);
+
+  const hit = mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"});
+  g.appendChild(hit);
+
+  const lastY = ySc(d.s[d.s.length - 1]);
+  const labelY = labelMap[i];
+  const endX = xSc(endYear);
+
+  if (Math.abs(labelY - lastY) > 2) {
+    g.appendChild(mkEl("line", {x1: endX + 4, y1: lastY, x2: endX + 4, y2: labelY, stroke: "#C2C0B5", "stroke-width": "0.5"}));
+  }
+
+  const lbl = mkEl("text", {x: endX + 8, y: labelY + 3.5, "font-family": "Inter", "font-size": "9", "font-weight": isWorld ? "600" : "500", fill: "#2B2A27"});
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  svg.appendChild(g);
+  groups.push({g, d, hit});
+});
+
+const tip = document.getElementById("tip");
+
+groups.forEach(({g, d, hit}) => {
+  function onEnter(e) {
+    groups.forEach(({g: og}) => og.style.opacity = og === g ? "1" : "0.1");
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  }
+  function onMove(e) {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const yearF = d.y0 + (mx - margin.left) / (W - margin.left - margin.right) * nYears;
+    const idx = Math.max(0, Math.min(d.s.length - 1, Math.round(yearF - d.y0)));
+    const year = d.y0 + idx;
+    tip.textContent = `${d.n} (${year}): ${d.s[idx].toFixed(1)}%`;
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  }
+  function onLeave() {
+    groups.forEach(({g: og}) => og.style.opacity = "1");
+    tip.style.opacity = "0";
+  }
+  [hit, g].forEach(el => {
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+  });
+});
+</script>
+</body></html>

@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Cause of Death by Injury: 2000 vs. 2021",
+      "description": "Slope chart comparing the share of total deaths from injuries (road traffic, violence, drowning, falls) in 2000 vs 2021 for the 25 countries with the highest injury death rate in 2021. Afghanistan surged from 9.5% to 23.2% (conflict-driven); Colombia fell from 26.9% to 9.7% as the peace process took hold.",
+      "datasetIds": [
+        "wb--SH-DTH-INJR-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Afghanistan surged from 9.5% to 23.2% \u2014 largest absolute increase in the set",
+        "Colombia fell from 26.9% to 9.7% as the peace process reduced violence",
+        "Kenya and Burkina Faso both more than doubled their injury death share"
+      ],
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Non-Communicable Diseases as Share of All Deaths, by Region",
+      "description": "Trend lines showing what share of total deaths are caused by NCDs (cardiovascular disease, cancer, diabetes, chronic respiratory disease) in each world region, 2000-2021. All regions trended upward until 2019; the 2020-2021 dip reflects COVID-19 reclassifying many deaths as communicable.",
+      "datasetIds": [
+        "wb--SH-DTH-NCOM-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "South Asia's NCD share nearly doubled from 39% in 2000 to 68% in 2019",
+        "Sub-Saharan Africa lags far behind at 35% \u2014 still dominated by infectious disease",
+        "COVID-19 dip visible in 2020-2021 as pandemic deaths shifted the share"
+      ],
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Population Density: 24 Most Densely Populated Countries, 1990\u20132023",
+      "description": "Sparkline grid showing population density trends (people per sq. km) from 1990 to 2023 for the 24 most densely populated countries, sorted by 2023 density. Each cell is normalized to the country's own range. Bahrain's density more than doubled; Japan's has slightly declined since 2011.",
+      "datasetIds": [
+        "wb--EN-POP-DNST"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Bahrain's density surged from 746 to 1,971/km\u00b2 driven by labor immigration",
+        "Burundi rose from 218 to 533/km\u00b2 \u2014 one of the steepest population-driven increases",
+        "Japan peaked around 2010 and has since declined due to population aging"
+      ],
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Female Labor Force Participation Rate by Region, 1990\u20132024",
+      "description": "Trend lines showing the female labor force participation rate (% of female population ages 15-64) by world region, 1990-2024. The Arab World has remained persistently below all other regions. South Asia shows a U-shaped dip around 2015-2016. Europe & Central Asia trended consistently upward.",
+      "datasetIds": [
+        "wb--SL-TLF-ACTI-FE-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Arab World has stagnated at 18-22% \u2014 the only region without meaningful growth",
+        "Europe & Central Asia rose steadily from 59% to 66% over 34 years",
+        "South Asia dipped to 29% by 2016 before recovering to 35% by 2024"
+      ],
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Urban Population Growth Rate by Region, 1990\u20132024",
+      "description": "Trend lines showing the annual urban population growth rate by world region, 1990-2024. Sub-Saharan Africa leads at ~3.6%/year and urbanizes fastest. Latin America has slowed from 4.2% to under 1%. East Asia & Pacific is volatile due to China's periodic reclassification of rural areas.",
+      "datasetIds": [
+        "wb--SP-URB-GROW"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Sub-Saharan Africa urbanizes fastest at ~3.6%/year \u2014 roughly doubling urban population every 20 years",
+        "Latin America slowed dramatically from 4.2% (1990) to under 1% (2024)",
+        "Europe & Central Asia nearly stalled at 0.1-0.6% throughout the period"
+      ],
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-27T00:00:00.000Z"
 }

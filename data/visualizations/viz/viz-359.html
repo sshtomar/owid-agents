@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; max-width: 840px; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:hover { background: #F0EEE5; }
+  .cell-name { font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 3px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #7A786F; }
+</style></head>
+<body>
+<h1>Population Density: 24 Most Densely Populated Countries, 1990–2023</h1>
+<p class="subtitle">People per sq. km of land area. Each sparkline shows the full 1990–2023 trajectory, normalized to the country's own min–max range. Countries sorted by 2023 density (highest top-left). Hover for year and value.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Population Density (people per sq. km) · EN.POP.DNST</p>
+<script>
+const data = [{"n":"Hong Kong SAR, China","s":[5762.1,5810.1,5859.1,5960.6,6096.4,5863.0,6129.0,6180.3,6232.1,6291.9,6347.6,6394.6,6423.0,6410.3,6460.5,6488.8,6530.6,6587.0,6626.5,6640.8,6689.7,6734.9,6809.6,6837.0,6885.2,6944.1,6987.2,7041.1,7097.7,7150.4,7124.8,7060.1,6996.3,7177.2],"e":5762.1,"l":7177.2,"y0":1990},{"n":"Bahrain","s":[746.1,729.1,727.4,746.8,766.7,787.2,808.2,829.7,851.9,874.6,898.0,931.4,1000.8,1061.8,1128.4,1201.1,1297.9,1385.7,1452.0,1550.5,1612.3,1558.0,1570.1,1627.5,1705.0,1761.3,1827.6,1924.5,1932.0,1902.3,1875.4,1904.3,1930.0,1971.3],"e":746.1,"l":1971.3,"y0":1990},{"n":"Bangladesh","s":[857.6,874.1,890.8,907.5,924.5,941.8,959.2,977.2,995.8,1014.9,1033.6,1051.0,1067.3,1083.0,1097.8,1111.7,1124.7,1136.9,1148.3,1159.1,1169.3,1179.9,1191.3,1202.5,1213.5,1224.4,1235.4,1246.0,1256.2,1266.9,1277.5,1288.0,1300.4,1319.2],"e":857.6,"l":1319.2,"y0":1990},{"n":"Barbados","s":[601.4,603.2,605.3,607.0,608.4,609.4,610.0,610.2,610.3,610.5,609.4,610.3,614.3,618.1,621.6,624.9,627.9,630.9,634.2,637.5,640.1,642.2,644.0,645.7,647.3,648.8,650.2,651.6,652.8,654.0,655.1,656.2,656.6,656.6],"e":601.4,"l":656.6,"y0":1990},{"n":"Burundi","s":[217.6,222.1,228.1,221.1,222.5,236.2,236.4,236.4,240.9,246.8,252.0,258.3,265.7,274.3,284.7,295.5,306.3,317.8,331.2,348.4,365.1,378.4,392.2,406.5,420.6,430.2,437.7,448.1,461.8,477.2,491.3,504.9,518.7,533.1],"e":217.6,"l":533.1,"y0":1990},{"n":"Korea, Rep.","s":[444.4,448.8,453.5,458.2,462.8,467.5,472.0,476.4,479.9,483.3,487.3,489.7,492.2,494.8,496.6,497.5,500.0,502.3,505.8,508.0,509.8,513.8,515.9,517.6,520.9,523.5,525.4,526.7,529.0,530.4,531.1,530.4,529.4,529.8],"e":444.4,"l":529.8,"y0":1990},{"n":"India","s":[290.9,297.3,303.7,310.1,316.6,323.0,329.5,336.0,342.6,349.2,355.8,362.5,369.2,375.6,382.1,388.4,394.5,400.5,406.3,412.2,418.2,424.2,430.1,435.8,441.4,446.7,452.0,457.3,462.4,467.2,471.8,475.7,479.4,483.7],"e":290.9,"l":483.7,"y0":1990},{"n":"Comoros","s":[238.9,244.8,249.9,254.5,259.1,263.6,268.2,272.9,277.6,282.6,288.1,294.0,300.3,306.2,312.0,318.5,325.0,331.5,338.2,344.9,351.9,359.0,366.3,374.1,382.3,390.5,398.6,406.6,414.6,422.7,431.0,439.6,448.2,457.0],"e":238.9,"l":457.0,"y0":1990},{"n":"Israel","s":[215.3,228.7,236.7,243.1,249.5,256.2,263.0,269.7,275.9,283.0,290.6,297.6,303.6,309.1,314.6,320.2,326.0,331.8,337.7,345.9,352.3,358.9,365.5,372.4,379.7,387.3,394.9,402.6,410.5,418.4,425.8,433.1,441.7,455.1],"e":215.3,"l":455.1,"y0":1990},{"n":"Haiti","s":[248.7,253.8,258.9,264.1,269.2,274.4,279.7,285.0,290.4,295.8,301.3,306.8,312.3,317.8,323.3,328.8,334.4,340.1,345.8,351.6,355.7,359.8,365.4,370.9,376.4,381.8,387.2,392.5,397.8,402.9,408.0,412.7,417.4,422.3],"e":248.7,"l":422.3,"y0":1990},{"n":"Grenada","s":[294.0,296.4,298.8,301.1,303.3,305.5,307.6,309.7,311.8,313.9,316.0,317.6,318.8,320.2,321.5,322.7,323.9,325.1,326.2,327.2,328.2,329.6,331.7,333.8,335.7,337.3,338.6,339.5,340.3,341.1,342.2,343.2,343.9,344.4],"e":294.0,"l":344.4,"y0":1990},{"n":"Japan","s":[338.7,340,341.3,342.4,343.3,344.1,345.0,345.8,346.8,347.4,348.0,348.8,349.6,350.4,350.5,350.5,350.8,351.2,351.3,351.3,351.4,350.7,350.1,349.6,349.2,348.8,348.6,348.3,347.9,347.4,346.4,344.8,343.3,341.5],"e":338.7,"l":341.5,"y0":1990},{"n":"El Salvador","s":[260.6,265.2,269.6,273.2,275.8,278.1,280.2,282.1,283.8,285.4,286.8,288.0,288.9,289.5,289.8,289.8,289.7,290.0,291.0,291.9,292.9,293.9,295.1,296.3,297.4,298.4,299.3,299.9,300.2,300.3,300.9,301.9,303.1,304.5],"e":260.6,"l":304.5,"y0":1990},{"n":"Gambia, The","s":[104.2,108.7,113.2,117.4,121.3,124.9,128.6,132.3,136.1,139.9,143.8,147.7,151.7,155.9,160.2,164.7,169.5,174.5,179.6,184.9,190.4,196.0,201.9,207.9,213.9,219.8,225.7,231.4,237.1,242.8,248.6,254.5,260.5,266.6],"e":104.2,"l":266.6,"y0":1990},{"n":"Jamaica","s":[219.7,221.7,223.9,226.2,228.6,230.9,233.1,235.3,237.3,239.1,240.8,242.3,243.8,245.3,246.7,248.1,249.4,250.6,251.7,252.7,253.8,254.9,256.0,257.0,258.0,258.8,259.5,260.0,260.4,260.7,261.4,262.0,262.2,262.2],"e":219.7,"l":262.2,"y0":1990},{"n":"Germany","s":[227.5,229.2,230.9,232.5,233.3,234.0,234.7,235.0,235.1,235.3,235.6,236.0,236.5,236.6,236.6,236.5,236.2,235.9,235.5,234.9,234.6,230.3,230.8,231.2,232.1,234.2,235.7,236.6,237.3,237.8,238.0,238.1,238.1,238.4],"e":227.5,"l":238.4,"y0":1990},{"n":"Dominican Republic","s":[148.0,151.1,154.2,157.2,160.3,163.3,166.3,169.2,172.0,174.8,177.7,180.5,183.2,185.9,188.5,191.0,193.4,195.7,198.2,200.7,203.3,205.9,208.5,211.0,213.5,216.0,218.4,220.8,223.2,226.0,228.4,230.8,233.0,235.1],"e":148.0,"l":235.1,"y0":1990},{"n":"Korea, Dem. People's Rep.","s":[175.3,178.0,180.6,183.3,186.0,188.3,190.1,191.9,193.6,195.1,196.5,197.8,198.9,200.1,201.4,202.6,203.7,204.7,205.7,206.6,207.5,208.4,209.4,210.4,211.4,212.4,213.4,214.4,215.4,216.2,217.1,217.9,218.7,219.4],"e":175.3,"l":219.4,"y0":1990},{"n":"Antigua and Barbuda","s":[143.3,144.1,146.4,149.1,151.9,155.0,158.2,161.5,164.6,167.4,170.3,172.9,175.1,177.0,178.9,180.9,183.2,185.7,188.4,191.3,193.9,196.2,198.3,200.1,201.7,203.2,204.5,205.6,206.7,207.6,208.7,209.9,211,212.1],"e":143.3,"l":212.1,"y0":1990},{"n":"Italy","s":[192.9,193.0,193.1,193.2,193.3,193.3,193.3,193.4,193.5,193.5,192.6,192.7,193.1,194.1,195.6,196.7,197.5,198.7,200.2,201.4,202.3,203.0,203.5,203.9,204.0,203.7,203.3,202.9,202.5,202.0,201.0,200.0,199.6,199.5],"e":192.9,"l":199.5,"y0":1990},{"n":"Guatemala","s":[84.2,86.5,88.9,91.3,93.7,96.2,98.8,101.3,103.9,106.6,109.2,111.7,114.3,116.9,119.5,122.1,124.7,127.4,130.0,132.7,135.3,138.0,140.8,143.6,146.3,149.0,151.8,154.6,157.2,159.6,162.0,164.2,166.6,169.1],"e":84.2,"l":169.1,"y0":1990},{"n":"Kiribati","s":[92.4,94.3,95.9,97.3,98.8,100.3,102.0,103.9,105.7,107.6,109.4,111.5,113.9,116.3,118.6,121.0,123.5,126.0,128.7,131.4,134.2,136.6,138.6,140.5,142.4,144.2,146.3,148.5,150.7,153.0,155.7,158.5,161.1,163.6],"e":92.4,"l":163.6,"y0":1990},{"n":"China","s":[120.9,122.6,124.1,125.5,126.9,128.3,129.7,131.0,132.3,133.4,134.5,135.5,136.4,137.2,138.1,138.9,139.6,140.4,141.1,141.8,142.5,143.3,144.2,145.2,146.1,147.0,147.8,148.7,149.4,149.9,150.3,150.4,150.4,150.3],"e":120.9,"l":150.3,"y0":1990},{"n":"Denmark","s":[128.5,128.9,129.3,129.7,130.2,130.8,131.6,132.1,132.6,133.0,133.5,134.0,134.4,134.8,135.1,135.5,135.9,136.5,137.3,138.1,138.7,139.3,139.8,140.4,141.1,142.1,143.2,144.1,144.8,145.4,145.8,146.4,147.6,148.7],"e":128.5,"l":148.7,"y0":1990}];
+
+const COLS = 6;
+const CELL_W = 130, CELL_H = 68;
+const SPARK_TOP = 22, SPARK_BOT = 16, SPARK_LEFT = 6, SPARK_RIGHT = 6;
+
+const grid = document.getElementById("grid");
+const tip = document.getElementById("tip");
+
+data.forEach((d, idx) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const name = document.createElement("div");
+  name.className = "cell-name";
+  name.title = d.n;
+  name.textContent = d.n;
+  cell.appendChild(name);
+
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  const sparkW = CELL_W - SPARK_LEFT - SPARK_RIGHT;
+  const sparkH = CELL_H - SPARK_TOP - SPARK_BOT;
+  canvas.width = (CELL_W) * dpr;
+  canvas.height = (sparkH + 4) * dpr;
+  canvas.style.width = CELL_W + "px";
+  canvas.style.height = (sparkH + 4) + "px";
+  canvas.style.display = "block";
+  cell.appendChild(canvas);
+
+  const vals = document.createElement("div");
+  vals.className = "cell-vals";
+  const formatVal = v => v >= 1000 ? (v/1000).toFixed(1) + "k" : v.toFixed(0);
+  vals.innerHTML = `<span>${formatVal(d.e)}</span><span style="color:#EA5E33;font-weight:500">${formatVal(d.l)}</span>`;
+  cell.appendChild(vals);
+
+  grid.appendChild(cell);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const s = d.s;
+  const minV = Math.min(...s);
+  const maxV = Math.max(...s);
+  const range = maxV - minV || 1;
+  const norm = v => (sparkH + 2) - ((v - minV) / range) * sparkH;
+
+  function drawSparkline(highlightIdx) {
+    ctx.clearRect(0, 0, CELL_W, sparkH + 4);
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.2 * dpr;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    s.forEach((v, i) => {
+      const x = SPARK_LEFT + (i / (s.length - 1)) * sparkW;
+      const y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    if (highlightIdx !== undefined) {
+      const hx = SPARK_LEFT + (highlightIdx / (s.length - 1)) * sparkW;
+      ctx.strokeStyle = "#C2C0B5";
+      ctx.lineWidth = 0.7 * dpr;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(hx, 0);
+      ctx.lineTo(hx, sparkH + 4);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#EA5E33";
+      ctx.beginPath();
+      ctx.arc(hx, norm(s[highlightIdx]), 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  drawSparkline();
+
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left - SPARK_LEFT;
+    const idx = Math.max(0, Math.min(s.length - 1, Math.round(mx / sparkW * (s.length - 1))));
+    const year = d.y0 + idx;
+    drawSparkline(idx);
+    tip.textContent = `${d.n} (${year}): ${s[idx].toFixed(1)} /km²`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+
+  canvas.addEventListener("mouseleave", () => {
+    drawSparkline();
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; font-size: 10px; color: #7A786F; font-family: 'JetBrains Mono', monospace; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 3px; border-radius: 1px; }
+</style></head>
+<body>
+<h1>Cause of Death by Injury: 2000 vs. 2021</h1>
+<p class="subtitle">Share of total deaths attributable to injuries (road traffic, violence, drowning, falls) for the 25 countries with the highest injury death rate in 2021. Lines show the trajectory; red lines rose, green lines fell.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#EA5E33"></div>Increased</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5B9E78"></div>Decreased</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Cause of Death, by Injury (% of total) · SH.DTH.INJR.ZS</p>
+<script>
+const data = [{"n":"Afghanistan","a":9.52,"b":23.17},{"n":"El Salvador","a":23.97,"b":18.82},{"n":"Honduras","a":18.65,"b":18.41},{"n":"Belize","a":18.06,"b":15.62},{"n":"Iraq","a":15.87,"b":13.77},{"n":"Haiti","a":8.28,"b":12.25},{"n":"Burkina Faso","a":5.65,"b":11.69},{"n":"Ethiopia","a":10.16,"b":11.49},{"n":"Cabo Verde","a":12.7,"b":10.73},{"n":"Dominican Republic","a":11.59,"b":10.57},{"n":"Guatemala","a":12.29,"b":10.27},{"n":"Comoros","a":7.96,"b":10.26},{"n":"Burundi","a":18.93,"b":10.02},{"n":"Bhutan","a":12.99,"b":9.95},{"n":"Kenya","a":4.77,"b":9.93},{"n":"Eritrea","a":11.45,"b":9.82},{"n":"Colombia","a":26.89,"b":9.7},{"n":"Cote d'Ivoire","a":4.62,"b":9.53},{"n":"Benin","a":5.79,"b":9.27},{"n":"Jamaica","a":10.71,"b":9.16},{"n":"Ecuador","a":14.69,"b":9.01},{"n":"Guinea","a":5.69,"b":8.96},{"n":"Central African Republic","a":5.45,"b":8.94},{"n":"Eswatini","a":5.13,"b":8.91},{"n":"Guyana","a":12.22,"b":8.77}];
+
+const W = 720, H = 680;
+const pad = { left: 130, right: 135, top: 44, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = Math.min(...allVals) - 1;
+const maxV = Math.max(...allVals) + 1;
+const sc = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xL = pad.left;
+const xR = W - pad.right;
+
+// Grid lines
+[5, 10, 15, 20, 25].forEach(v => {
+  if (v < minV || v > maxV) return;
+  svg.appendChild(mkEl("line", {x1: xL, y1: sc(v), x2: xR, y2: sc(v), stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  svg.appendChild(mkEl("text", {x: xL - 6, y: sc(v) + 3, "text-anchor": "end", "font-family": "JetBrains Mono", "font-size": "8", fill: "#9A9890"})).textContent = v + "%";
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", {x1: xL, y1: pad.top - 8, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1"}));
+svg.appendChild(mkEl("line", {x1: xR, y1: pad.top - 8, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1"}));
+
+// Column headers
+const hdr = mkEl("text", {x: xL, y: pad.top - 14, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": "10", fill: "#7A786F", "font-weight": "500"});
+hdr.textContent = "2000";
+svg.appendChild(hdr);
+const hdr2 = mkEl("text", {x: xR, y: pad.top - 14, "text-anchor": "middle", "font-family": "JetBrains Mono", "font-size": "10", fill: "#7A786F", "font-weight": "500"});
+hdr2.textContent = "2021";
+svg.appendChild(hdr2);
+
+function colorForChange(d) {
+  const chg = d.b - d.a;
+  if (chg > 8) return "#EA5E33";
+  if (chg > 3) return "#F29A44";
+  if (chg > 0) return "#F5D38A";
+  if (chg > -5) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+// Prepare label positions for collision resolution
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const labelsL = data.map((d, i) => ({i, y: sc(d.a), origY: sc(d.a)}));
+const labelsR = data.map((d, i) => ({i, y: sc(d.b), origY: sc(d.b)}));
+resolveCollisions(labelsL, 11);
+resolveCollisions(labelsR, 11);
+
+const labelMapL = {};
+labelsL.forEach(l => labelMapL[l.i] = l.y);
+const labelMapR = {};
+labelsR.forEach(l => labelMapR[l.i] = l.y);
+
+// Draw rows
+const groups = [];
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const yA = sc(d.a), yB = sc(d.b);
+  const g = mkEl("g", {});
+  g.style.opacity = "1";
+  g.style.cursor = "pointer";
+
+  // Hit area
+  const hit = mkEl("line", {x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "12"});
+
+  // Line
+  const line = mkEl("line", {x1: xL, y1: yA, x2: xR, y2: yB, stroke: color, "stroke-width": "1.5"});
+
+  // Endpoint dots
+  const dotL = mkEl("circle", {cx: xL, cy: yA, r: "3", fill: color});
+  const dotR = mkEl("circle", {cx: xR, cy: yB, r: "3", fill: color});
+
+  // Left label (right-aligned before axis)
+  const lblL = mkEl("text", {"text-anchor": "end", x: xL - 7, y: labelMapL[i] + 3.5, "font-size": "9", "font-family": "Inter", fill: "#2B2A27", "font-weight": "500"});
+  lblL.textContent = d.n;
+
+  // Leader line if label was moved
+  if (Math.abs(labelMapL[i] - yA) > 2) {
+    g.appendChild(mkEl("line", {x1: xL - 5, y1: yA, x2: xL - 5, y2: labelMapL[i], stroke: "#C2C0B5", "stroke-width": "0.5"}));
+  }
+
+  // Right label (left-aligned after axis)
+  const chg = d.b - d.a;
+  const sign = chg >= 0 ? "+" : "";
+  const lblR = mkEl("text", {"text-anchor": "start", x: xR + 7, y: labelMapR[i] + 3.5, "font-size": "9", "font-family": "Inter", fill: "#2B2A27", "font-weight": "500"});
+  lblR.textContent = `${d.b.toFixed(1)}% ${d.n}`;
+
+  if (Math.abs(labelMapR[i] - yB) > 2) {
+    g.appendChild(mkEl("line", {x1: xR + 5, y1: yB, x2: xR + 5, y2: labelMapR[i], stroke: "#C2C0B5", "stroke-width": "0.5"}));
+  }
+
+  g.appendChild(hit);
+  g.appendChild(line);
+  g.appendChild(dotL);
+  g.appendChild(dotR);
+  g.appendChild(lblL);
+  g.appendChild(lblR);
+  svg.appendChild(g);
+  groups.push({g, d, hit});
+});
+
+const tip = document.getElementById("tip");
+
+groups.forEach(({g, d, hit}) => {
+  const chg = d.b - d.a;
+  const sign = chg >= 0 ? "+" : "";
+  const tipText = `${d.n}: ${d.a}% → ${d.b}% (${sign}${chg.toFixed(1)}pp)`;
+
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach(({g: og}) => og.style.opacity = og === g ? "1" : "0.1");
+    tip.textContent = tipText;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(({g: og}) => og.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+  g.addEventListener("mouseenter", e => {
+    groups.forEach(({g: og}) => og.style.opacity = og === g ? "1" : "0.1");
+    tip.textContent = tipText;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  g.addEventListener("mouseleave", () => {
+    groups.forEach(({g: og}) => og.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
