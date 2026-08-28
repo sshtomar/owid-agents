@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Tourism Arrivals Collapse: Before and After COVID-19</h1>
+<p class="subtitle">International tourist arrivals (millions) for top destinations in 2019 vs. 2020. Pandemic border closures caused the deepest single-year drop in modern tourism history — a near-total halt in East Asia.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — International Tourism, Number of Arrivals (ST.INT.ARVL)</p>
+
+<script>
+const data = [{"n":"France","a":217877000,"b":117109000},{"n":"China","a":162538000,"b":30402000},{"n":"Italy","a":95399000,"b":38419000},{"n":"Hungary","a":61397000,"b":31641000},{"n":"Croatia","a":60021000,"b":21608000},{"n":"Hong Kong","a":55913000,"b":3569000},{"n":"Germany","a":39563000,"b":12449000},{"n":"Greece","a":34005000,"b":7406000},{"n":"Denmark","a":33093000,"b":15595000},{"n":"Austria","a":31884000,"b":15091000},{"n":"Japan","a":31881000,"b":4115800},{"n":"Korea","a":17503000,"b":2519000},{"n":"Indonesia","a":16107000,"b":4053000},{"n":"Bulgaria","a":12552000,"b":4973000}];
+const fmt = v => (v / 1e6).toFixed(1) + "M";
+
+const W = 700, H = 540;
+const pad = { left: 132, right: 132, top: 52, bottom: 24 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = 230e6, minV = 0;
+const scaleY = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left, xR = W - pad.right;
+
+function colorForDrop(pct) {
+  if (pct > 85) return "#EA5E33";
+  if (pct > 70) return "#F29A44";
+  if (pct > 54) return "#C49A45";
+  return "#A6C4A2";
+}
+// Drop threshold in raw units
+function dropPct(d) { return (d.a - d.b) / d.a * 100; }
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Year headers
+const hdr = mkEl("text", {x: xL, y: pad.top - 18, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F"});
+hdr.textContent = "2019";
+svg.appendChild(hdr);
+const hdr2 = mkEl("text", {x: xR, y: pad.top - 18, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F"});
+hdr2.textContent = "2020";
+svg.appendChild(hdr2);
+
+// Axis lines
+svg.appendChild(mkEl("line", {x1: xL, y1: pad.top - 10, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}));
+svg.appendChild(mkEl("line", {x1: xR, y1: pad.top - 10, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8"}));
+
+// Resolve label collisions
+const leftLabels = data.map(d => ({ d, y: scaleY(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scaleY(d.b) }));
+const leftResolved = resolveCollisions(leftLabels, 13);
+const rightResolved = resolveCollisions(rightLabels, 13);
+
+const yBound = [pad.top, H - pad.bottom];
+const lMap = Object.fromEntries(leftResolved.map(it => [it.d.n, Math.max(yBound[0], Math.min(yBound[1], it.y))]));
+const rMap = Object.fromEntries(rightResolved.map(it => [it.d.n, Math.max(yBound[0], Math.min(yBound[1], it.y))]));
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const drop = dropPct(d);
+  const color = colorForDrop(drop);
+  const ya = scaleY(d.a), yb = scaleY(d.b);
+  const ly = lMap[d.n], ry = rMap[d.n];
+
+  const g = mkEl("g", {});
+
+  g.appendChild(mkEl("line", {x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5", "stroke-linejoin": "round"}));
+  g.appendChild(mkEl("circle", {cx: xL, cy: ya, r: "3", fill: color}));
+  g.appendChild(mkEl("circle", {cx: xR, cy: yb, r: "3", fill: color}));
+
+  // Left label
+  const lt = mkEl("text", {x: xL - 8, y: ly + 3.5, "text-anchor": "end", "font-size": "9", fill: "#2B2A27"});
+  lt.textContent = `${d.n}  ${fmt(d.a)}`;
+  g.appendChild(lt);
+  if (Math.abs(ly - ya) > 4) {
+    g.appendChild(mkEl("line", {x1: xL - 4, y1: ly, x2: xL, y2: ya, stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "2,2"}));
+  }
+
+  // Right label
+  const rt = mkEl("text", {x: xR + 8, y: ry + 3.5, "text-anchor": "start", "font-size": "9", fill: "#2B2A27"});
+  rt.textContent = `${fmt(d.b)}  ${d.n}`;
+  g.appendChild(rt);
+  if (Math.abs(ry - yb) > 4) {
+    g.appendChild(mkEl("line", {x1: xR + 4, y1: ry, x2: xR, y2: yb, stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "2,2"}));
+  }
+
+  // Hit area
+  const hit = mkEl("line", {x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12", cursor: "pointer"});
+  hit.addEventListener("mousemove", e => {
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+    tip.textContent = `${d.n}: ${fmt(d.a)} → ${fmt(d.b)} (−${Math.round(drop)}%)`;
+    groups.forEach(og => { og.style.opacity = og === g ? "1" : "0.12"; });
+    g.querySelectorAll("line:not([stroke='transparent'])").forEach(el => el.setAttribute("stroke-width", "2.5"));
+    g.querySelectorAll("circle").forEach(el => el.setAttribute("r", "4.5"));
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(og => { og.style.opacity = "1"; });
+    g.querySelectorAll("line:not([stroke='transparent'])").forEach(el => el.setAttribute("stroke-width", "1.5"));
+    g.querySelectorAll("circle").forEach(el => el.setAttribute("r", "3"));
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Legend
+const legendItems = [
+  {color: "#EA5E33", label: ">85% collapse"},
+  {color: "#F29A44", label: "70–85% drop"},
+  {color: "#C49A45", label: "55–70% drop"},
+  {color: "#A6C4A2", label: "<55% drop"},
+];
+legendItems.forEach((item, i) => {
+  const lx = 12 + i * 140, ly = 20;
+  svg.appendChild(mkEl("rect", {x: lx, y: ly - 7, width: 10, height: 10, fill: item.color, rx: "1"}));
+  const t = mkEl("text", {x: lx + 14, y: ly + 3, "font-size": "9", fill: "#7A786F"});
+  t.textContent = item.label;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
