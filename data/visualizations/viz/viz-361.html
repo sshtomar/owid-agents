@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Resource Dependency: Natural Resource Rents as % of GDP, 2000–2021</h1>
+<p class="subtitle">Total rents from oil, gas, coal, minerals, and forests as a share of GDP. Oil price crashes in 2009 and 2015 are visible across all petrostates; Iraq's extreme exposure reflects its near-total dependence on oil exports.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Total Natural Resource Rents, % of GDP (NY.GDP.TOTL.RT.ZS)</p>
+
+<script>
+const data = [
+  {"n":"Iraq","pts":[{"y":2000,"v":48.86},{"y":2001,"v":49.57},{"y":2002,"v":46.97},{"y":2003,"v":53.3},{"y":2004,"v":64.78},{"y":2005,"v":65.32},{"y":2006,"v":63.73},{"y":2007,"v":53.22},{"y":2008,"v":55.69},{"y":2009,"v":39.51},{"y":2010,"v":43.57},{"y":2011,"v":51.19},{"y":2012,"v":49.85},{"y":2013,"v":45.58},{"y":2014,"v":46.85},{"y":2015,"v":37.5},{"y":2016,"v":33.22},{"y":2017,"v":39.2},{"y":2018,"v":46.15},{"y":2019,"v":40.61},{"y":2020,"v":27.42},{"y":2021,"v":43.45}]},
+  {"n":"Congo, Rep.","pts":[{"y":2000,"v":59.68},{"y":2001,"v":48.1},{"y":2002,"v":46.65},{"y":2003,"v":39.32},{"y":2004,"v":40.08},{"y":2005,"v":48.1},{"y":2006,"v":53.31},{"y":2007,"v":47.49},{"y":2008,"v":52.64},{"y":2009,"v":35.58},{"y":2010,"v":43.94},{"y":2011,"v":51.84},{"y":2012,"v":41.36},{"y":2013,"v":33.14},{"y":2014,"v":27.66},{"y":2015,"v":15.89},{"y":2016,"v":17.0},{"y":2017,"v":29.81},{"y":2018,"v":42.67},{"y":2019,"v":39.24},{"y":2020,"v":26.22},{"y":2021,"v":37.71}]},
+  {"n":"Angola","pts":[{"y":2000,"v":59.14},{"y":2001,"v":44.22},{"y":2002,"v":32.88},{"y":2003,"v":28.41},{"y":2004,"v":33.77},{"y":2005,"v":42.76},{"y":2006,"v":40.75},{"y":2007,"v":45.88},{"y":2008,"v":52.56},{"y":2009,"v":30.31},{"y":2010,"v":38.16},{"y":2011,"v":39.02},{"y":2012,"v":34.73},{"y":2013,"v":29.4},{"y":2014,"v":22.12},{"y":2015,"v":13.31},{"y":2016,"v":20.89},{"y":2017,"v":25.95},{"y":2018,"v":32.05},{"y":2019,"v":28.9},{"y":2020,"v":20.25},{"y":2021,"v":29.97}]},
+  {"n":"Kazakhstan","pts":[{"y":2000,"v":27.32},{"y":2001,"v":20.96},{"y":2002,"v":23.09},{"y":2003,"v":22.88},{"y":2004,"v":28.25},{"y":2005,"v":30.28},{"y":2006,"v":28.79},{"y":2007,"v":26.49},{"y":2008,"v":33.25},{"y":2009,"v":21.59},{"y":2010,"v":21.74},{"y":2011,"v":25.77},{"y":2012,"v":21.98},{"y":2013,"v":18.22},{"y":2014,"v":17.25},{"y":2015,"v":9.33},{"y":2016,"v":11.03},{"y":2017,"v":14.9},{"y":2018,"v":20.78},{"y":2019,"v":17.93},{"y":2020,"v":12.84},{"y":2021,"v":26.84}]},
+  {"n":"Azerbaijan","pts":[{"y":2000,"v":35.08},{"y":2001,"v":27.91},{"y":2002,"v":25.88},{"y":2003,"v":26.09},{"y":2004,"v":28.74},{"y":2005,"v":38.59},{"y":2006,"v":41.47},{"y":2007,"v":39.14},{"y":2008,"v":43.04},{"y":2009,"v":29.64},{"y":2010,"v":27.88},{"y":2011,"v":32.88},{"y":2012,"v":29.01},{"y":2013,"v":25.53},{"y":2014,"v":22.52},{"y":2015,"v":14.44},{"y":2016,"v":14.79},{"y":2017,"v":19.67},{"y":2018,"v":27.62},{"y":2019,"v":23.43},{"y":2020,"v":13.0},{"y":2021,"v":29.94}]},
+  {"n":"Canada","pts":[{"y":2000,"v":4.61},{"y":2001,"v":3.5},{"y":2002,"v":2.87},{"y":2003,"v":4.13},{"y":2004,"v":4.44},{"y":2005,"v":5.56},{"y":2006,"v":4.08},{"y":2007,"v":3.9},{"y":2008,"v":5.07},{"y":2009,"v":1.92},{"y":2010,"v":2.13},{"y":2011,"v":2.59},{"y":2012,"v":1.44},{"y":2013,"v":1.71},{"y":2014,"v":1.69},{"y":2015,"v":0.33},{"y":2016,"v":0.79},{"y":2017,"v":1.2},{"y":2018,"v":1.8},{"y":2019,"v":1.93},{"y":2020,"v":1.24},{"y":2021,"v":4.95}]},
+  {"n":"China","pts":[{"y":2000,"v":2.7},{"y":2001,"v":2.59},{"y":2002,"v":1.96},{"y":2003,"v":2.02},{"y":2004,"v":4.72},{"y":2005,"v":5.1},{"y":2006,"v":5.52},{"y":2007,"v":6.33},{"y":2008,"v":9.65},{"y":2009,"v":3.92},{"y":2010,"v":6.29},{"y":2011,"v":7.69},{"y":2012,"v":4.09},{"y":2013,"v":2.98},{"y":2014,"v":2.31},{"y":2015,"v":1.17},{"y":2016,"v":1.05},{"y":2017,"v":1.31},{"y":2018,"v":1.43},{"y":2019,"v":1.27},{"y":2020,"v":0.86},{"y":2021,"v":1.71}]}
+];
+
+const colors = ["#EA5E33","#F29A44","#C49A45","#8BAD72","#5B9E78","#A6C4A2","#7A786F"];
+
+const W = 800, H = 460;
+const margin = {top: 30, right: 104, bottom: 36, left: 52};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 2000, yearMax = 2021;
+const valMin = 0, valMax = 72;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", {x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const t = mkEl("text", {x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F"});
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// Annotation for oil price crashes
+const crash2009x = xScale(2009);
+const crash2015x = xScale(2015);
+[{x: crash2009x, lbl: "2009 oil crash"}, {x: crash2015x, lbl: "2015 glut"}].forEach(({x, lbl}) => {
+  svg.appendChild(mkEl("line", {x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-dasharray": "3,3", "stroke-width": "0.8"}));
+  const t = mkEl("text", {x: x + 3, y: margin.top + 10, "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"});
+  t.textContent = lbl;
+  svg.appendChild(t);
+});
+
+// X axis ticks
+[2000, 2005, 2010, 2015, 2021].forEach(yr => {
+  const x = xScale(yr);
+  svg.appendChild(mkEl("line", {x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.8"}));
+  const t = mkEl("text", {x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F"});
+  t.textContent = yr;
+  svg.appendChild(t);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+const endLabels = data.map((d, i) => {
+  const last = d.pts[d.pts.length - 1];
+  return {n: d.n, i, y: yScale(last.v)};
+});
+const resolved = resolveCollisions(endLabels, 12);
+const labelMap = Object.fromEntries(resolved.map(it => [it.n, Math.max(margin.top, Math.min(H - margin.bottom, it.y))]));
+
+data.forEach((d, i) => {
+  const color = colors[i];
+  const g = mkEl("g", {});
+
+  const pathD = d.pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const line = mkEl("path", {d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"});
+  g.appendChild(line);
+
+  const last = d.pts[d.pts.length - 1];
+  const ly = labelMap[d.n];
+  const lx = xScale(last.y);
+  const lt = mkEl("text", {x: lx + 8, y: ly + 3.5, "font-size": "9.5", "font-weight": "500", fill: color});
+  lt.textContent = `${last.v.toFixed(1)}%  ${d.n}`;
+  g.appendChild(lt);
+  if (Math.abs(ly - yScale(last.v)) > 4) {
+    g.appendChild(mkEl("line", {x1: lx + 4, y1: ly, x2: lx, y2: yScale(last.v), stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "2,2"}));
+  }
+
+  const hit = mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "14", fill: "none", cursor: "pointer"});
+  hit.addEventListener("mousemove", e => {
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+    const x = e.clientX - svg.getBoundingClientRect().left;
+    const ratio = (x - margin.left) / (W - margin.left - margin.right);
+    const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const near = d.pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best);
+    tip.textContent = `${d.n} ${near.y}: ${near.v.toFixed(1)}% of GDP`;
+    groups.forEach(og => { og.style.opacity = og === g ? "1" : "0.1"; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(og => { og.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.8");
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push(g);
+});
+</script>
+</body></html>
