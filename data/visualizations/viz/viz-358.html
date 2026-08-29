@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Wind Electricity Generation: 2010 vs 2024</h1>
+<p class="subtitle">How wind power output (TWh) has changed for the world's top 12 wind-producing countries. China went from 4th to 1st with a 20-fold increase; Brazil emerged from near zero.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Ember Climate — ember--GEN-WIND</p>
+<script>
+const data = [
+  {"n":"China","a":49.4,"b":997.0,"y":2010},
+  {"n":"United States of America","a":94.7,"b":451.9,"y":2010},
+  {"n":"Germany","a":38.5,"b":141.6,"y":2010},
+  {"n":"Brazil","a":2.2,"b":108.5,"y":2010},
+  {"n":"United Kingdom","a":10.3,"b":83.3,"y":2010},
+  {"n":"India","a":19.5,"b":81.5,"y":2010},
+  {"n":"Spain","a":44.3,"b":62.2,"y":2010},
+  {"n":"Canada","a":8.7,"b":46.8,"y":2010},
+  {"n":"France","a":9.9,"b":45.4,"y":2010},
+  {"n":"Sweden","a":3.5,"b":40.5,"y":2010},
+  {"n":"Turkey","a":2.9,"b":36.5,"y":2010},
+  {"n":"Netherlands","a":4.0,"b":33.5,"y":2010}
+];
+
+const W = 700, H = 560;
+const pad = { left: 120, right: 130, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const colorForChange = d => {
+  const ratio = d.b / Math.max(d.a, 0.1);
+  if (ratio > 15) return "#EA5E33";
+  if (ratio > 8) return "#F29A44";
+  if (ratio > 4) return "#C49A45";
+  if (ratio > 2) return "#8BAD72";
+  return "#A6C4A2";
+};
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = 1010;
+const xLeft = pad.left, xRight = W - pad.right;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+// Column headers
+svg.appendChild(mkEl("text", { x: xLeft, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace", "font-weight": "500" }, "2010"));
+svg.appendChild(mkEl("text", { x: xRight, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace", "font-weight": "500" }, "2024"));
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top - 8, x2: xLeft, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top - 8, x2: xRight, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+resolveCollisions(leftLabels, 14);
+resolveCollisions(rightLabels, 14);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.style.cursor = "pointer";
+
+  g.appendChild(mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: color, "stroke-width": "1.5" }));
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color }));
+  const hitLine = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  g.appendChild(hitLine);
+
+  hitLine.addEventListener("mouseenter", e => {
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "0.15");
+    g.style.opacity = "1";
+    const name = d.n === "United States of America" ? "USA" : d.n === "United Kingdom" ? "UK" : d.n;
+    const chg = ((d.b / d.a) - 1) * 100;
+    tip.textContent = `${name}: ${d.a} → ${d.b} TWh (+${chg.toFixed(0)}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hitLine.addEventListener("mouseleave", () => {
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "1");
+    tip.style.opacity = "0";
+  });
+  hitLine.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+
+  svg.appendChild(g);
+});
+
+// Left labels
+leftLabels.forEach(({ d, y }) => {
+  const color = colorForChange(d);
+  const name = d.n === "United States of America" ? "USA" : d.n === "United Kingdom" ? "UK" : d.n;
+  svg.appendChild(mkEl("text", { x: xLeft - 8, y: y + 3.5, "text-anchor": "end", fill: color, "font-size": "9", "font-weight": "500" }, `${name}  ${d.a}`));
+});
+
+// Right labels
+rightLabels.forEach(({ d, y }) => {
+  const color = colorForChange(d);
+  const name = d.n === "United States of America" ? "USA" : d.n === "United Kingdom" ? "UK" : d.n;
+  svg.appendChild(mkEl("text", { x: xRight + 8, y: y + 3.5, "text-anchor": "start", fill: color, "font-size": "9", "font-weight": "500" }, `${d.b}  ${name}`));
+});
+
+// Legend
+const legend = [
+  { label: ">15× growth", color: "#EA5E33" },
+  { label: "8–15×", color: "#F29A44" },
+  { label: "4–8×", color: "#C49A45" },
+  { label: "2–4×", color: "#8BAD72" },
+  { label: "<2×", color: "#A6C4A2" }
+];
+legend.forEach((l, i) => {
+  const lx = pad.left + i * 110;
+  svg.appendChild(mkEl("rect", { x: lx, y: H - pad.bottom + 4, width: 8, height: 8, fill: l.color }));
+  svg.appendChild(mkEl("text", { x: lx + 12, y: H - pad.bottom + 12, fill: "#7A786F", "font-size": "8", "font-family": "JetBrains Mono, monospace" }, l.label));
+});
+</script>
+</body></html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border-left: 1px solid #E2E0D5; border-top: 1px solid #E2E0D5; }
+  .cell { padding: 10px 10px 8px; border-right: 1px solid #E2E0D5; border-bottom: 1px solid #E2E0D5; cursor: crosshair; position: relative; min-width: 0; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-canvas { display: block; width: 100%; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 2px; }
+  .cell-val { font-family: 'JetBrains Mono', monospace; font-size: 7px; color: #7A786F; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Freshwater Biodiversity Areas Under Protection, 2000–2025</h1>
+<p class="subtitle">Proportion of freshwater Key Biodiversity Areas (KBAs) covered by protected areas, by country. Each sparkline shows 25 years of progress — many countries made dramatic commitments in single years.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG 15.1.2 — sdg--15-1-2--ER_PTD_FRHWTR</p>
+<script>
+const data = [
+  {"n":"Comoros","s":[0,0,0,0,0,0,0,0,0,0,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100],"y0":2000,"l":100},
+  {"n":"Honduras","s":[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100],"y0":2000,"l":100},
+  {"n":"Croatia","s":[16.8,17.4,17.4,17.4,17.4,17.4,17.4,17.4,17.4,17.4,17.4,41.8,41.8,100,100,100,100,100,100,100,100,100,100,100,100,100],"y0":2000,"l":100},
+  {"n":"Seychelles","s":[0,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9,98.9],"y0":2000,"l":98.9},
+  {"n":"Bosnia and Herzegovina","s":[33.3,33.3,33.3,33.3,33.3,33.3,33.3,75.1,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9,99.9],"y0":2000,"l":99.9},
+  {"n":"Bulgaria","s":[14,18.5,35.6,35.6,35.6,35.6,35.9,94.9,94.9,94.9,94.9,94.9,94.9,94.9,94.9,94.9,94.9,94.9,98.6,98.6,98.6,98.7,98.7,98.7,98.7,98.7],"y0":2000,"l":98.7},
+  {"n":"Albania","s":[49.5,49.5,49.5,49.5,49.5,49.5,49.5,55.7,55.7,55.7,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3,97.3],"y0":2000,"l":97.3},
+  {"n":"El Salvador","s":[0,0,0,0,0,48.6,48.6,48.6,48.6,59.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7,97.7],"y0":2000,"l":97.7},
+  {"n":"Dominican Republic","s":[17.6,17.6,17.6,17.6,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7,94.7],"y0":2000,"l":94.7},
+  {"n":"Cuba","s":[0,61.1,61.1,61.1,61.1,61.1,61.1,61.1,61.8,61.8,86.2,86.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2,98.2],"y0":2000,"l":98.2},
+  {"n":"Mali","s":[0,0,0,0,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5,89.5],"y0":2000,"l":89.5},
+  {"n":"Slovenia","s":[10.7,10.7,27.6,27.6,83.6,83.6,83.6,83.6,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84],"y0":2000,"l":84},
+  {"n":"Algeria","s":[11.7,32.1,32.1,39.9,69.2,69.2,69.2,69.2,69.2,76.8,76.8,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9,78.9],"y0":2000,"l":78.9},
+  {"n":"Afghanistan","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16.6,16.6,16.6,60.9,60.9,60.9,60.9,60.9,60.9],"y0":2000,"l":60.9},
+  {"n":"Kenya","s":[33.9,33.9,37.5,37.5,37.5,41.1,41.2,41.2,41.2,41.4,42.3,42.6,42.6,42.6,42.6,42.6,42.6,42.8,42.8,42.8,42.8,42.8,42.8,42.8,42.8,42.8],"y0":2000,"l":42.8},
+  {"n":"Australia","s":[23,23,26,26.3,26.5,26.5,26.6,28.9,29,30.3,30.3,30.6,31.4,32.9,34.6,34.6,34.9,35.3,37,37.3,37.3,37.8,37.8,37.8,37.8,37.8],"y0":2000,"l":37.8},
+  {"n":"United States of America","s":[23.8,24.5,24.6,25,25.2,25.3,25.7,26.7,27.3,27.4,28,28.2,28.7,29.1,29.6,30,30.2,30.2,30.2,30.6,30.6,30.6,30.6,30.6,30.6,30.6],"y0":2000,"l":30.6},
+  {"n":"Brazil","s":[29.1,29.1,29.1,29.1,29.1,29.1,29.1,29.1,30.2,30.2,30.2,30.2,30.2,30.2,30.2,30.2,30.2,30.3,30.3,30.4,30.4,30.4,30.7,30.7,30.7,30.7],"y0":2000,"l":30.7},
+  {"n":"South Africa","s":[15.1,15.8,15.8,15.8,18.2,18.4,18.4,18.4,18.4,18.5,18.5,18.7,18.7,19,19.2,19.4,20,20.1,21.1,21.3,21.4,21.5,21.6,21.7,21.8,21.9],"y0":2000,"l":21.9},
+  {"n":"India","s":[2.6,2.6,2.6,2.6,2.6,2.6,2.6,2.6,2.6,2.6,2.6,2.6,7.8,7.8,7.8,7.8,8.2,8.2,8.2,11,12.5,14.4,16.3,16.3,16.3,16.3],"y0":2000,"l":16.3},
+  {"n":"China","s":[2.7,2.7,4,4,4.8,4.8,6.9,6.9,7.3,7.3,7.3,8.4,8.4,8.9,8.9,9.3,9.3,9.3,10.1,10.1,10.3,10.3,10.7,10.7,10.7,10.7],"y0":2000,"l":10.7}
+];
+
+const tip = document.getElementById("tip");
+const grid = document.getElementById("grid");
+const CELL_H = 52;
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "cell-name";
+  nameEl.textContent = d.n;
+  cell.appendChild(nameEl);
+
+  const canvas = document.createElement("canvas");
+  canvas.className = "cell-canvas";
+  canvas.height = CELL_H;
+  cell.appendChild(canvas);
+
+  const valsEl = document.createElement("div");
+  valsEl.className = "cell-vals";
+  const startVal = document.createElement("span");
+  startVal.className = "cell-val";
+  startVal.textContent = d.s[0].toFixed(0) + "%";
+  const endVal = document.createElement("span");
+  endVal.className = "cell-val";
+  endVal.textContent = d.l.toFixed(0) + "%";
+  valsEl.appendChild(startVal);
+  valsEl.appendChild(endVal);
+  cell.appendChild(valsEl);
+
+  grid.appendChild(cell);
+
+  const dpr = window.devicePixelRatio || 1;
+  const drawCell = () => {
+    const cw = cell.clientWidth - 20;
+    canvas.width = cw * dpr;
+    canvas.height = CELL_H * dpr;
+    canvas.style.width = cw + "px";
+    canvas.style.height = CELL_H + "px";
+
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
+    const s = d.s;
+    const minV = Math.min(...s);
+    const maxV = Math.max(...s);
+    const rng = maxV - minV || 1;
+    const norm = v => CELL_H - 2 - ((v - minV) / rng) * (CELL_H - 4);
+
+    // Fill area under line
+    ctx.beginPath();
+    s.forEach((v, i) => {
+      const x = (i / (s.length - 1)) * cw;
+      const y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(cw, CELL_H);
+    ctx.lineTo(0, CELL_H);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(234, 94, 51, 0.08)";
+    ctx.fill();
+
+    // Draw line
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.2;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    s.forEach((v, i) => {
+      const x = (i / (s.length - 1)) * cw;
+      const y = norm(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    return { ctx, s, cw, norm, minV, maxV, rng };
+  };
+
+  let cellCtx = drawCell();
+
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, mx / rect.width));
+    const idx = Math.round(ratio * (cellCtx.s.length - 1));
+    const year = d.y0 + idx;
+    const val = cellCtx.s[idx];
+    tip.textContent = `${d.n} · ${year}: ${val.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  cell.addEventListener("mouseleave", () => { tip.style.opacity = "0"; });
+
+  window.addEventListener("resize", () => { cellCtx = drawCell(); }, { passive: true });
+});
+</script>
+</body></html>
