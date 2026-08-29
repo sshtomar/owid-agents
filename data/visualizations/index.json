@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Solar Electricity Generation, 2000\u20132024",
+      "description": "Annual solar power output (TWh) for the top 10 producing countries. China's output grew 8,000-fold over 22 years.",
+      "datasetIds": [
+        "ember--GEN-SOLAR"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China produced 839 TWh of solar in 2024 \u2014 more than the next nine countries combined",
+        "Brazil emerged from near zero to 71 TWh in just 9 years",
+        "All major economies are on an exponential solar growth curve since ~2013"
+      ],
+      "createdAt": "2026-08-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Wind Electricity Generation: 2010 vs 2024",
+      "description": "Slope chart comparing wind power output (TWh) in 2010 and 2024 for the world's top 12 wind-producing countries.",
+      "datasetIds": [
+        "ember--GEN-WIND"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "China's wind output grew 20-fold from 49 to 997 TWh \u2014 now the world's largest by far",
+        "Brazil went from 2 TWh to 108 TWh in 14 years",
+        "Spain's wind output grew only 40%, the slowest of the group"
+      ],
+      "createdAt": "2026-08-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Nuclear Electricity Generation, 2000\u20132024",
+      "description": "Annual nuclear power output (TWh) for the top 9 producing countries. The US has held steady, France has declined, China is surging, and Japan collapsed after Fukushima.",
+      "datasetIds": [
+        "ember--GEN-NUCLEAR"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Japan's nuclear output fell from 319 TWh to 18 TWh in one year following Fukushima (2011)",
+        "China grew from 17 TWh in 2000 to 451 TWh in 2024 \u2014 a 27-fold increase",
+        "France fell to a low of 295 TWh in 2022 due to simultaneous reactor maintenance and corrosion issues"
+      ],
+      "createdAt": "2026-08-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Arable Land (% of Land Area): 2000 vs 2022",
+      "description": "Slope chart comparing the share of land used for crops in 2000 and 2022, highlighting the contrast between densely farmed Asia and expanding South American and African agriculture.",
+      "datasetIds": [
+        "wb--AG-LND-ARBL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Bangladesh leads the world at 61% arable land share, despite a 3-point decline since 2000",
+        "Burundi expanded arable land by 13 points \u2014 one of the fastest expansions globally",
+        "Czechia fell from 42% to 32% as post-communist agricultural restructuring continued"
+      ],
+      "createdAt": "2026-08-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Freshwater Biodiversity Areas Under Protection, 2000\u20132025",
+      "description": "Sparkline grid showing the proportion of freshwater Key Biodiversity Areas (KBAs) covered by protected areas in 21 countries. Many countries made dramatic single-year commitments.",
+      "datasetIds": [
+        "sdg--15-1-2--ER_PTD_FRHWTR"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Comoros, Croatia, and several Balkan nations reached 100% coverage through protected area designations",
+        "China and India show slow, steady progress \u2014 both below 17% despite large freshwater ecosystems",
+        "Australia has made consistent incremental gains, reaching 38% by 2025"
+      ],
+      "createdAt": "2026-08-29T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-29T00:00:00.000Z"
 }
