@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Water Productivity: GDP per Cubic Meter of Freshwater Used</h1>
+<p class="subtitle">Constant 2015 US dollars generated per cubic meter of freshwater withdrawn, 2000 vs 2022. Israel generates $250 per cubic meter — 54 times more than India at $4.60 — reflecting advanced drip irrigation and recycling infrastructure.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Water productivity, total (ER.GDP.FWTL.M3.KD)</p>
+<script>
+const data = [{"n":"Israel","y":2000,"a":114.6,"b":249.8},{"n":"Germany","y":2000,"a":64.3,"b":144.5},{"n":"Australia","y":2000,"a":40.4,"b":137.0},{"n":"France","y":2000,"a":62.0,"b":108.5},{"n":"Japan","y":2000,"a":44.6,"b":58.8},{"n":"China","y":2000,"a":5.1,"b":29.4},{"n":"Brazil","y":2000,"a":21.1,"b":28.0},{"n":"Egypt","y":2000,"a":3.2,"b":5.9},{"n":"Indonesia","y":2000,"a":3.5,"b":5.0},{"n":"India","y":2000,"a":1.3,"b":4.6}];
+
+const W = 700, H = 520;
+const pad = { left: 120, right: 130, top: 50, bottom: 24 };
+const xL = pad.left, xR = W - pad.right;
+
+const minV = 0, maxV = 270;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function colorForChange(d) {
+  const pctGain = (d.b - d.a) / Math.max(d.a, 1) * 100;
+  if (pctGain > 200) return "#EA5E33";
+  if (pctGain > 100) return "#F29A44";
+  if (pctGain > 50) return "#C49A45";
+  if (pctGain > 20) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+
+[0, 50, 100, 150, 200, 250].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xL, y1: scale(v), x2: xR, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: scale(v) + 3.5, "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  }, "$" + v));
+});
+
+svg.appendChild(mkEl("text", {
+  x: xL, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500"
+}, "2000"));
+svg.appendChild(mkEl("text", {
+  x: xR, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500"
+}, "2022"));
+
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 8, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 8, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a), orig: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b), orig: scale(d.b) }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+data.forEach(d => {
+  const color = colorForChange(d);
+  const yA = scale(d.a);
+  const yB = scale(d.b);
+  const g = mkEl("g", {});
+
+  g.appendChild(mkEl("line", {
+    x1: xL, y1: yA, x2: xR, y2: yB,
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "3", fill: color }));
+
+  const hit = mkEl("line", {
+    x1: xL, y1: yA, x2: xR, y2: yB,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const chg = ((d.b - d.a) / d.a * 100).toFixed(0);
+    tip.textContent = `${d.n}: $${d.a} → $${d.b} per m³ (+${chg}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "0.15");
+    g.style.opacity = "1";
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "1");
+  });
+
+  svg.appendChild(g);
+});
+
+leftLabels.forEach(({ d, y }) => {
+  const yA = scale(d.a);
+  if (Math.abs(y - yA) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 2, y1: yA, x2: xL - 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: y + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `${d.n}  $${d.a}`));
+});
+
+rightLabels.forEach(({ d, y }) => {
+  const yB = scale(d.b);
+  if (Math.abs(y - yB) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 2, y1: yB, x2: xR + 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xR + 8, y: y + 3.5, "text-anchor": "start", fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `$${d.b}  ${d.n}`));
+});
+
+const legendItems = [
+  { color: "#EA5E33", label: ">200% gain" },
+  { color: "#F29A44", label: "100–200%" },
+  { color: "#C49A45", label: "50–100%" },
+  { color: "#8BAD72", label: "20–50%" },
+];
+let lx = xL;
+legendItems.forEach(l => {
+  svg.appendChild(mkEl("rect", { x: lx, y: H - 8, width: 8, height: 8, fill: l.color }));
+  svg.appendChild(mkEl("text", {
+    x: lx + 11, y: H - 1, fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  }, l.label));
+  lx += 100;
+});
+</script>
+</body></html>
