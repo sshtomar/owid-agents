@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Nuclear Share of Electricity Generation</h1>
+<p class="subtitle">Share of electricity produced from nuclear sources in 1990 vs 2024. Germany phased out its last reactor in 2023; France remains by far the world's most nuclear-dependent large economy.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Electricity production from nuclear sources (EG.ELC.NUCL.ZS)</p>
+<script>
+const data = [{"n":"France","a":74.6,"b":66.8},{"n":"Hungary","a":48.3,"b":42.2},{"n":"Belgium","a":60.2,"b":40.5},{"n":"Bulgaria","a":34.8,"b":40.2},{"n":"Czechia","a":20.1,"b":40.2},{"n":"Finland","a":35.3,"b":39.2},{"n":"South Korea","a":48.4,"b":31.1},{"n":"Armenia","a":0,"b":30.8},{"n":"Belarus","a":0,"b":28.3},{"n":"Canada","a":15.1,"b":13.9},{"n":"Japan","a":23.2,"b":9.5},{"n":"Argentina","a":14.3,"b":7.3},{"n":"India","a":2.1,"b":2.4},{"n":"China","a":0,"b":4.6},{"n":"Germany","a":27.7,"b":1.4}];
+
+const W = 700, H = 580;
+const pad = { left: 120, right: 130, top: 50, bottom: 24 };
+const xL = pad.left, xR = W - pad.right;
+
+const allVals = data.flatMap(d => [d.a, d.b]).filter(v => v > 0);
+const minV = 0, maxV = 80;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function colorForChange(d) {
+  const chg = d.b - d.a;
+  if (chg > 10) return "#3D7A5A";
+  if (chg > 2) return "#8BAD72";
+  if (chg > -5) return "#C49A45";
+  if (chg > -15) return "#C4715A";
+  return "#EA5E33";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+// Background
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xL, y1: scale(v), x2: xR, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: scale(v) + 3.5,
+    "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  }, v + "%"));
+});
+
+// Column headers
+svg.appendChild(mkEl("text", {
+  x: xL, y: pad.top - 18,
+  "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500"
+}, "1990"));
+svg.appendChild(mkEl("text", {
+  x: xR, y: pad.top - 18,
+  "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500"
+}, "2024"));
+
+// Vertical axes
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 8, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 8, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+// Compute label positions
+const leftLabels = data.map(d => ({ d, y: scale(d.a), orig: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b), orig: scale(d.b) }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+// Draw lines and hit areas
+const tip = document.getElementById("tip");
+data.forEach(d => {
+  const color = colorForChange(d);
+  const yA = scale(d.a);
+  const yB = scale(d.b);
+  const g = mkEl("g", {});
+
+  // Line
+  const line = mkEl("line", {
+    x1: xL, y1: yA, x2: xR, y2: yB,
+    stroke: color, "stroke-width": "1.5",
+    "stroke-linecap": "round", opacity: "1"
+  });
+  g.appendChild(line);
+
+  // Endpoint dots
+  if (d.a > 0) {
+    g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "3", fill: color }));
+  }
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "3", fill: color }));
+
+  // Wide invisible hit area
+  const hit = mkEl("line", {
+    x1: xL, y1: yA, x2: xR, y2: yB,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const chg = d.b - d.a;
+    const sign = chg >= 0 ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${sign}${chg.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    // Dim others
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "0.15");
+    g.style.opacity = "1";
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "1");
+  });
+
+  svg.appendChild(g);
+});
+
+// Left labels
+leftLabels.forEach(({ d, y }) => {
+  const yA = scale(d.a);
+  const color = colorForChange(d);
+  if (d.a === 0) return;
+  // Faint leader line if displaced
+  if (Math.abs(y - yA) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 2, y1: yA, x2: xL - 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: y + 3.5, "text-anchor": "end",
+    fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `${d.n}  ${d.a}%`));
+});
+
+// Right labels
+rightLabels.forEach(({ d, y }) => {
+  const yB = scale(d.b);
+  const color = colorForChange(d);
+  if (Math.abs(y - yB) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 2, y1: yB, x2: xR + 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xR + 8, y: y + 3.5, "text-anchor": "start",
+    fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `${d.b}%  ${d.n}`));
+});
+
+// Legend
+const legendY = H - 6;
+const legend = [
+  { color: "#3D7A5A", label: "Expanded >10pp" },
+  { color: "#C49A45", label: "Roughly stable" },
+  { color: "#EA5E33", label: "Reduced >15pp" },
+];
+let lx = xL;
+legend.forEach(l => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 7, width: 8, height: 8, fill: l.color }));
+  svg.appendChild(mkEl("text", {
+    x: lx + 11, y: legendY, fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  }, l.label));
+  lx += 130;
+});
+</script>
+</body></html>

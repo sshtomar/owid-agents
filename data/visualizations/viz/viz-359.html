@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Aging World: Old-Age Dependency Ratio, 1990–2024</h1>
+<p class="subtitle">Elderly people (65+) per 100 working-age adults (15–64). Japan now has 51 elderly dependents per 100 workers — tripling since 1990. Sub-Saharan Africa remains far younger, with fewer than 5 per 100.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Age dependency ratio, old (SP.POP.DPND.OL)</p>
+<script>
+const data = [{"n":"Japan","y":1990,"a":17.4,"b":50.7},{"n":"Finland","y":1990,"a":19.9,"b":38.9},{"n":"Italy","y":1990,"a":21.8,"b":38.8},{"n":"Germany","y":1990,"a":21.5,"b":36.9},{"n":"France","y":1990,"a":21.2,"b":36.1},{"n":"South Korea","y":1990,"a":7.1,"b":27.5},{"n":"China","y":1990,"a":8.1,"b":21.2},{"n":"Brazil","y":1990,"a":6.8,"b":15.9},{"n":"India","y":1990,"a":7.0,"b":10.5},{"n":"Bangladesh","y":1990,"a":6.5,"b":9.9},{"n":"Ethiopia","y":1990,"a":5.4,"b":5.6},{"n":"Kenya","y":1990,"a":4.4,"b":4.9}];
+
+const W = 700, H = 520;
+const pad = { left: 120, right: 130, top: 50, bottom: 24 };
+const xL = pad.left, xR = W - pad.right;
+
+const minV = 0, maxV = 56;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function colorForChange(d) {
+  const chg = d.b - d.a;
+  if (chg > 30) return "#EA5E33";
+  if (chg > 20) return "#F29A44";
+  if (chg > 15) return "#C49A45";
+  if (chg > 8) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+
+// Grid lines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xL, y1: scale(v), x2: xR, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: scale(v) + 3.5, "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  }, v));
+});
+
+// Column headers
+svg.appendChild(mkEl("text", {
+  x: xL, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500"
+}, "1990"));
+svg.appendChild(mkEl("text", {
+  x: xR, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500"
+}, "2024"));
+
+// Vertical axes
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top - 8, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top - 8, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a), orig: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b), orig: scale(d.b) }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+data.forEach(d => {
+  const color = colorForChange(d);
+  const yA = scale(d.a);
+  const yB = scale(d.b);
+  const g = mkEl("g", {});
+
+  g.appendChild(mkEl("line", {
+    x1: xL, y1: yA, x2: xR, y2: yB,
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "3", fill: color }));
+
+  const hit = mkEl("line", {
+    x1: xL, y1: yA, x2: xR, y2: yB,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const chg = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a} → ${d.b} per 100 workers (+${chg.toFixed(1)})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "0.15");
+    g.style.opacity = "1";
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    svg.querySelectorAll("g").forEach(gg => gg.style.opacity = "1");
+  });
+
+  svg.appendChild(g);
+});
+
+leftLabels.forEach(({ d, y }) => {
+  const yA = scale(d.a);
+  if (Math.abs(y - yA) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 2, y1: yA, x2: xL - 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: y + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `${d.n}  ${d.a}`));
+});
+
+rightLabels.forEach(({ d, y }) => {
+  const yB = scale(d.b);
+  if (Math.abs(y - yB) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 2, y1: yB, x2: xR + 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xR + 8, y: y + 3.5, "text-anchor": "start", fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `${d.b}  ${d.n}`));
+});
+
+// Legend
+const legendItems = [
+  { color: "#EA5E33", label: ">30pp increase" },
+  { color: "#F29A44", label: "20–30pp" },
+  { color: "#C49A45", label: "15–20pp" },
+  { color: "#8BAD72", label: "8–15pp" },
+  { color: "#A6C4A2", label: "<8pp" },
+];
+let lx = xL;
+legendItems.forEach(l => {
+  svg.appendChild(mkEl("rect", { x: lx, y: H - 8, width: 8, height: 8, fill: l.color }));
+  svg.appendChild(mkEl("text", {
+    x: lx + 11, y: H - 1, fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  }, l.label));
+  lx += 96;
+});
+</script>
+</body></html>

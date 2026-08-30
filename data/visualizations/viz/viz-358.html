@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Intensity of GDP, 2000–2022</h1>
+<p class="subtitle">Megajoules of primary energy consumed per $2021 PPP-adjusted dollar of GDP. Falling values mean an economy is becoming more energy-efficient. China's rapid industrialization and efficiency gains cut its intensity nearly in half.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Energy intensity level of primary energy (EG.EGY.PRIM.PP.KD)</p>
+<script>
+const data = [{"n":"China","s":[10.91,10.41,10.14,10.51,10.87,10.75,10.44,9.83,9.21,8.98,8.96,8.78,8.43,8.08,7.71,7.24,6.74,6.54,6.42,6.33,6.4,6.3],"y0":2000,"step":1},{"n":"Canada","s":[8.27,8.01,7.79,8.07,7.96,7.8,7.72,7.55,7.29,7.23,7.02,6.96,6.88,6.86,6.84,6.75,6.96,7.03,6.94,6.86,6.73,6.55,6.44],"y0":2000,"step":1},{"n":"South Korea","s":[7.23,6.99,6.82,6.74,6.59,6.37,6.15,6.05,6.0,6.01,6.14,6.17,6.09,5.91,5.83,5.76,5.79,5.61,5.45,5.29,5.25,5.32,5.11],"y0":2000,"step":1},{"n":"India","s":[7.01,6.78,6.71,6.37,6.24,5.94,5.74,5.54,5.63,5.67,5.41,5.28,5.28,5.11,5.08,4.82,4.54,4.46,4.41,4.25,4.25,4.21],"y0":2000,"step":1},{"n":"Australia","s":[6.0,5.71,5.54,5.57,5.45,5.33,5.4,5.31,5.38,5.28,5.17,5.06,4.82,4.79,4.64,4.53,4.4,4.46,4.37,4.36,4.44,4.1,4.12],"y0":2000,"step":1},{"n":"Japan","s":[4.7,4.6,4.62,4.52,4.56,4.46,4.4,4.3,4.19,4.26,4.3,3.98,3.83,3.78,3.64,3.53,3.48,3.44,3.36,3.29,3.2,3.25,3.15],"y0":2000,"step":1},{"n":"France","s":[4.33,4.4,4.35,4.43,4.38,4.32,4.14,4.0,4.02,3.95,4.0,3.84,3.83,3.82,3.63,3.65,3.54,3.46,3.37,3.26,3.18,3.23,2.83],"y0":2000,"step":1},{"n":"Indonesia","s":[5.5,5.43,5.38,5.15,5.22,5.02,4.86,4.55,4.31,4.35,4.26,4.1,3.84,3.53,3.48,3.26,3.18,3.14,3.24,3.19,3.11,3.04],"y0":2000,"step":1},{"n":"Germany","s":[3.97,4.02,3.94,3.96,3.94,3.89,3.86,3.56,3.57,3.53,3.57,3.26,3.27,3.32,3.11,3.08,3.02,2.95,2.85,2.76,2.69,2.7,2.47],"y0":2000,"step":1},{"n":"Brazil","s":[3.89,3.9,3.89,3.91,3.91,3.88,3.86,3.85,3.87,3.74,3.85,3.75,3.82,3.88,3.98,4.05,4.03,4.06,3.93,3.95,4.0,3.96,3.87],"y0":2000,"step":1}];
+
+const COLORS = ["#EA5E33","#C4715A","#F29A44","#C49A45","#8BAD72","#5B9E78","#3D7A5A","#6E9BAF","#9B8EC4","#7A786F"];
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 120, bottom: 36, left: 52 };
+
+const yearMin = 2000, yearMax = 2022;
+const valMin = 2.0, valMax = 11.5;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+
+// Grid lines and Y axis labels
+[2, 4, 6, 8, 10].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  }, v.toFixed(0)));
+});
+
+// Y axis label
+svg.appendChild(mkEl("text", {
+  x: 12, y: margin.top + (H - margin.top - margin.bottom) / 2,
+  "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+  transform: `rotate(-90, 12, ${margin.top + (H - margin.top - margin.bottom) / 2})`
+}, "MJ / $2021 PPP"));
+
+// X axis ticks
+[2000, 2005, 2010, 2015, 2020, 2022].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", {
+    x, y: H - margin.bottom + 13,
+    "text-anchor": "middle", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9"
+  }, y));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+const endLabels = [];
+
+data.forEach((series, idx) => {
+  const color = COLORS[idx];
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i * series.step, value: v }));
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year)} ${yScale(p.value)}`).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round", opacity: "1" });
+  g.appendChild(line);
+
+  const lastPt = pts[pts.length - 1];
+  endLabels.push({ d: series, y: yScale(lastPt.value), orig: yScale(lastPt.value), color, idx });
+
+  // Wide hit path
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const svgW = rect.width;
+    const ratio = (mx / svgW * W - margin.left) / (W - margin.left - margin.right);
+    const yearIdx = Math.max(0, Math.min(pts.length - 1, Math.round(ratio * (pts.length - 1))));
+    const pt = pts[yearIdx];
+    tip.textContent = `${series.n} ${pt.year}: ${pt.value.toFixed(2)} MJ/$`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    groups.forEach((gg, i) => gg.style.opacity = i === idx ? "1" : "0.1");
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(gg => gg.style.opacity = "1");
+    line.setAttribute("stroke-width", "1.5");
+  });
+
+  groups.push(g);
+  svg.appendChild(g);
+});
+
+// Resolve endpoint label collisions
+resolveCollisions(endLabels, 12);
+endLabels.forEach(({ d, y, orig, color }) => {
+  const lastPt = d.s[d.s.length - 1];
+  const xEnd = xScale(d.y0 + (d.s.length - 1) * d.step);
+  if (Math.abs(y - orig) > 3) {
+    svg.appendChild(mkEl("line", { x1: xEnd + 2, y1: orig, x2: xEnd + 10, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xEnd + 8, y: y + 3.5, "text-anchor": "start",
+    fill: "#2B2A27", "font-size": "9", "font-weight": "500"
+  }, `${lastPt.toFixed(1)}  ${d.n}`));
+});
+</script>
+</body></html>

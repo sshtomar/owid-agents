@@ -5858,7 +5858,97 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Nuclear Share of Electricity Generation",
+      "description": "Slope chart comparing nuclear electricity as a share of total generation in 1990 vs 2024 for 15 countries. France leads at 66.8%, Germany phased out nuclear almost entirely (27.7% to 1.4%), while Armenia and Belarus built new capacity from zero.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-357.html",
+      "generatedCode": "",
+      "highlights": [
+        "France generates 66.8% of electricity from nuclear \u2014 the highest of any large economy",
+        "Germany reversed course dramatically, from 27.7% in 1990 to just 1.4% in 2024",
+        "Armenia and Belarus both built nuclear from scratch, now exceeding 28%"
+      ],
+      "createdAt": "2026-08-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Intensity of GDP, 2000\u20132022",
+      "description": "Trend lines showing megajoules of primary energy consumed per dollar of GDP (2021 PPP) for 10 major economies. China cut its energy intensity nearly in half over two decades of rapid efficiency gains.",
+      "datasetIds": [
+        "wb--EG-EGY-PRIM-PP-KD"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-358.html",
+      "generatedCode": "",
+      "highlights": [
+        "China reduced energy intensity from 10.9 to 6.3 MJ/$ \u2014 the steepest drop of any major economy",
+        "Brazil's intensity stayed nearly flat, reflecting its hydro-heavy energy mix",
+        "Germany and France converged to similar low intensities around 2.5 MJ/$"
+      ],
+      "createdAt": "2026-08-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "The Aging World: Old-Age Dependency Ratio, 1990\u20132024",
+      "description": "Slope chart showing elderly dependents (65+) per 100 working-age adults (15\u201364) in 1990 vs 2024 for 12 countries. Japan's ratio tripled; Sub-Saharan Africa remains far younger.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-359.html",
+      "generatedCode": "",
+      "highlights": [
+        "Japan reached 50.7 elderly per 100 workers in 2024 \u2014 tripling from 17.4 in 1990",
+        "South Korea aged faster than any other country in the dataset, from 7.1 to 27.5",
+        "Kenya and Ethiopia remain below 5 per 100, reflecting young demographic structures"
+      ],
+      "createdAt": "2026-08-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Water Productivity: GDP per Cubic Meter of Freshwater Used",
+      "description": "Slope chart comparing water productivity (constant 2015 USD per cubic meter withdrawn) in 2000 vs 2022 for 10 countries. Israel generates $250 per cubic meter \u2014 54 times more than India \u2014 reflecting advanced irrigation and recycling.",
+      "datasetIds": [
+        "wb--ER-GDP-FWTL-M3-KD"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-360.html",
+      "generatedCode": "",
+      "highlights": [
+        "Israel generates $249.8 per cubic meter of water \u2014 highest in the world",
+        "Germany and Australia roughly tripled their water productivity since 2000",
+        "India and Indonesia remain below $5 per cubic meter, reflecting agriculture-heavy water use"
+      ],
+      "createdAt": "2026-08-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Progress in Primary School Completion, 2000\u20132023",
+      "description": "Slope chart tracking primary school completion rates in circa 2000 vs most recent year for 10 countries with large starting gaps. Dramatic progress across Sub-Saharan Africa and South/Southeast Asia, though critical gaps persist in Chad and the Sahel.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-361.html",
+      "generatedCode": "",
+      "highlights": [
+        "Cote d'Ivoire more than doubled its completion rate, from 37.7% to 75.9%",
+        "Ghana nearly reached universal completion, rising from 66% to 97.5%",
+        "Chad improved substantially but remains the lowest in this set at 41.8%"
+      ],
+      "createdAt": "2026-08-30T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-08-30T00:00:00.000Z"
 }
