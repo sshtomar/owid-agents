@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Universal Health Coverage Index, 2023</h1>
+<p class="subtitle">UHC Service Coverage Index (0–100), SDG 3.8.1. Measures access to essential health services. New Zealand and Norway top the chart at 89; Ethiopia scores 33 — the lowest available.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — UHC_INDEX_REPORTED (SDG 3.8.1)</p>
+<script>
+// n = ISO-3 country code (matches source), label = display name, y = year, v = UHC index value
+const data = [{"n":"NZL","label":"New Zealand","y":2023,"v":89},{"n":"NOR","label":"Norway","y":2023,"v":89},{"n":"NLD","label":"Netherlands","y":2023,"v":85},{"n":"CHN","label":"China","y":2023,"v":85},{"n":"KWT","label":"Kuwait","y":2023,"v":84},{"n":"CRI","label":"Costa Rica","y":2023,"v":84},{"n":"ARE","label":"UAE","y":2023,"v":84},{"n":"BRB","label":"Barbados","y":2023,"v":82},{"n":"COL","label":"Colombia","y":2023,"v":82},{"n":"UKR","label":"Ukraine","y":2023,"v":80},{"n":"BHS","label":"Bahamas","y":2023,"v":80},{"n":"UZB","label":"Uzbekistan","y":2023,"v":79},{"n":"TTO","label":"Trinidad & Tobago","y":2023,"v":75},{"n":"ZAF","label":"South Africa","y":2023,"v":74},{"n":"KGZ","label":"Kyrgyzstan","y":2023,"v":74},{"n":"VNM","label":"Vietnam","y":2023,"v":71},{"n":"DZA","label":"Algeria","y":2023,"v":70},{"n":"MNG","label":"Mongolia","y":2023,"v":70},{"n":"IND","label":"India","y":2023,"v":69},{"n":"ARM","label":"Armenia","y":2023,"v":69},{"n":"PER","label":"Peru","y":2023,"v":68},{"n":"BOL","label":"Bolivia","y":2023,"v":67},{"n":"FSM","label":"Micronesia","y":2023,"v":65},{"n":"NPL","label":"Nepal","y":2023,"v":58},{"n":"KEN","label":"Kenya","y":2023,"v":57},{"n":"PAK","label":"Pakistan","y":2023,"v":56},{"n":"COM","label":"Comoros","y":2023,"v":52},{"n":"GNQ","label":"Eq. Guinea","y":2023,"v":49},{"n":"TZA","label":"Tanzania","y":2023,"v":49},{"n":"LBR","label":"Liberia","y":2023,"v":49},{"n":"BDI","label":"Burundi","y":2023,"v":48},{"n":"SDN","label":"Sudan","y":2023,"v":48},{"n":"COD","label":"DR Congo","y":2023,"v":41},{"n":"CAF","label":"C. African Rep.","y":2023,"v":39},{"n":"ETH","label":"Ethiopia","y":2023,"v":33}];
+
+const barH = 16, barGap = 4;
+const rowH = barH + barGap;
+const N = data.length;
+const W = 700, H = N * rowH + 90;
+const labelW = 142, rightPad = 50, topPad = 30;
+const chartW = W - labelW - rightPad;
+
+function colorFor(v) {
+  if (v >= 80) return "#3D7A5A";
+  if (v >= 70) return "#5B9E78";
+  if (v >= 60) return "#8BAD72";
+  if (v >= 50) return "#C49A45";
+  if (v >= 40) return "#C4715A";
+  return "#EA5E33";
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xS = v => labelW + v / 100 * chartW;
+
+// Reference lines at 50, 80
+[50, 80].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xS(v), y1: topPad - 6, x2: xS(v), y2: topPad + N * rowH + 4, stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "3,3" }));
+  svg.appendChild(mkEl("text", { x: xS(v), y: topPad - 10, "text-anchor": "middle", "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#C2C0B5" })).textContent = v;
+});
+
+// x-axis ticks
+[0, 25, 50, 75, 100].forEach(v => {
+  svg.appendChild(mkEl("text", { x: xS(v), y: topPad + N * rowH + 16, "text-anchor": "middle", "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" })).textContent = v;
+});
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = topPad + i * rowH;
+  const color = colorFor(d.v);
+  const barWidth = xS(d.v) - labelW;
+
+  // Country label (use d.label for display)
+  const nameEl = mkEl("text", { x: labelW - 6, y: y + barH - 4, "text-anchor": "end", "font-size": "9.5", "font-family": "Inter, sans-serif", fill: "#2B2A27" });
+  nameEl.textContent = d.label;
+  svg.appendChild(nameEl);
+
+  // Bar background
+  svg.appendChild(mkEl("rect", { x: labelW, y, width: chartW, height: barH, fill: "#E2E0D5", rx: "2" }));
+
+  // Bar
+  const bar = mkEl("rect", { x: labelW, y, width: barWidth, height: barH, fill: color, rx: "2" });
+  svg.appendChild(bar);
+
+  // Value label
+  const valEl = mkEl("text", { x: xS(d.v) + 5, y: y + barH - 4, "font-size": "9.5", "font-family": "JetBrains Mono, monospace", "font-weight": "500", fill: color });
+  valEl.textContent = d.v;
+  svg.appendChild(valEl);
+
+  // Hover area
+  const hit = mkEl("rect", { x: 0, y, width: W, height: barH, fill: "transparent" });
+  svg.appendChild(hit);
+
+  hit.addEventListener("mouseenter", e => {
+    bar.setAttribute("fill-opacity", "0.7");
+    tip.textContent = `${d.label}: ${d.v} / 100`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    bar.setAttribute("fill-opacity", "1");
+    tip.style.opacity = "0";
+  });
+});
+
+// Legend
+const legendY = topPad + N * rowH + 38;
+const bands = [["≥ 80", "#3D7A5A"], ["70–79", "#5B9E78"], ["60–69", "#8BAD72"], ["50–59", "#C49A45"], ["40–49", "#C4715A"], ["< 40", "#EA5E33"]];
+let lx = labelW;
+bands.forEach(([label, color]) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 8, width: 8, height: 8, fill: color, rx: "1" }));
+  const t = mkEl("text", { x: lx + 11, y: legendY, "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 68;
+});
+const legendHdr = mkEl("text", { x: labelW, y: legendY - 15, "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#9A9890" });
+legendHdr.textContent = "UHC index score";
+svg.appendChild(legendHdr);
+</script>
+</body></html>
