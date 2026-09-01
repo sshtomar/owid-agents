@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>COVID-19 Tourism Collapse: International Arrivals 2019 vs 2020</h1>
+<p class="subtitle">Tourist arrivals (millions). Every major destination saw unprecedented drops in 2020 — Hong Kong lost 94%, Japan 87%, China 81%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — ST.INT.ARVL (World Tourism Organization)</p>
+<script>
+// Raw values (number of arrivals); y=year of 'a' value; divide by 1e6 for display
+const data = [{"n":"France","y":2019,"a":217877000,"b":117109000},{"n":"China","y":2019,"a":162538000,"b":30402000},{"n":"Italy","y":2019,"a":95399000,"b":38419000},{"n":"Hungary","y":2019,"a":61397000,"b":31641000},{"n":"Croatia","y":2019,"a":60021000,"b":21608000},{"n":"Hong Kong","y":2019,"a":55913000,"b":3569000},{"n":"Germany","y":2019,"a":39563000,"b":12449000},{"n":"Greece","y":2019,"a":34005000,"b":7406000},{"n":"Japan","y":2019,"a":31881000,"b":4116000},{"n":"S. Korea","y":2019,"a":17503000,"b":2519000},{"n":"Indonesia","y":2019,"a":16107000,"b":4053000}];
+
+const W = 700, H = 580;
+const pad = { left: 130, right: 150, top: 50, bottom: 30 };
+const M = 1e6; // display in millions
+
+const minV = 0, maxV = 230 * M;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left, xR = W - pad.right;
+
+function colorFor(d) {
+  const pct = (d.b - d.a) / d.a * 100;
+  if (pct < -80) return "#EA5E33";
+  if (pct < -60) return "#F29A44";
+  if (pct < -40) return "#C4715A";
+  return "#C49A45";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Column headers
+[["2019 (pre-COVID)", xL], ["2020 (COVID year)", xR]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", { x, y: 28, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" })).textContent = label;
+  svg.appendChild(mkEl("line", { x1: x, y1: 34, x2: x, y2: H - pad.bottom, stroke: "#E2E0D5", "stroke-width": "1" }));
+});
+
+const tip = document.getElementById("tip");
+const rowGroups = [];
+
+data.forEach(d => {
+  const color = colorFor(d);
+  const yA = scale(d.a), yB = scale(d.b);
+  const aM = (d.a / M).toFixed(1), bM = (d.b / M).toFixed(1);
+  const pctChg = Math.round((d.b - d.a) / d.a * 100);
+  const g = mkEl("g", {});
+  svg.appendChild(g);
+
+  const line = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: color, "stroke-width": "1.5" });
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "3", fill: color }));
+
+  // Wide invisible hit area
+  const hit = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "14" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  rowGroups.push({ g, line, color, d, yA, yB });
+
+  hit.addEventListener("mouseenter", e => {
+    rowGroups.forEach(r => {
+      r.line.setAttribute("stroke-opacity", r.d === d ? "1" : "0.12");
+      r.line.setAttribute("stroke-width", r.d === d ? "2.5" : "1.5");
+      r.g.querySelectorAll("circle").forEach(c => c.setAttribute("opacity", r.d === d ? "1" : "0.12"));
+    });
+    tip.textContent = `${d.n}: ${aM}M → ${bM}M (${pctChg}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    rowGroups.forEach(r => {
+      r.line.setAttribute("stroke-opacity", "1");
+      r.line.setAttribute("stroke-width", "1.5");
+      r.g.querySelectorAll("circle").forEach(c => c.setAttribute("opacity", "1"));
+    });
+    tip.style.opacity = "0";
+  });
+});
+
+// Left labels (2019 values, displayed in millions)
+const leftItems = data.map(d => ({ y: scale(d.a), name: d.n, val: d.a, color: colorFor(d) }));
+const leftResolved = resolveCollisions(leftItems, 13);
+leftResolved.forEach(item => {
+  const orig = data.find(d => d.n === item.name);
+  if (Math.abs(item.y - scale(orig.a)) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 2, y1: scale(orig.a), x2: xL - 7, y2: item.y, stroke: item.color, "stroke-width": "0.5", "stroke-opacity": "0.5" }));
+  }
+  const t = mkEl("text", { x: xL - 9, y: item.y + 3, "text-anchor": "end", "font-size": "9.5", "font-family": "Inter, sans-serif", "font-weight": "500", fill: item.color });
+  t.textContent = `${item.name}  ${(item.val / M).toFixed(1)}M`;
+  svg.appendChild(t);
+});
+
+// Right labels (2020 values + % change, displayed in millions)
+const rightItems = data.map(d => ({ y: scale(d.b), name: d.n, val: d.b, pct: Math.round((d.b - d.a) / d.a * 100), color: colorFor(d) }));
+const rightResolved = resolveCollisions(rightItems, 13);
+rightResolved.forEach(item => {
+  const orig = data.find(d => d.n === item.name);
+  if (Math.abs(item.y - scale(orig.b)) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 2, y1: scale(orig.b), x2: xR + 7, y2: item.y, stroke: item.color, "stroke-width": "0.5", "stroke-opacity": "0.5" }));
+  }
+  const t = mkEl("text", { x: xR + 9, y: item.y + 3, "text-anchor": "start", "font-size": "9.5", "font-family": "Inter, sans-serif", "font-weight": "500", fill: item.color });
+  t.textContent = `${(item.val / M).toFixed(1)}M  ${item.pct}%`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendY = H - 12;
+const bands = [["−80%+", "#EA5E33"], ["−60–80%", "#F29A44"], ["−40–60%", "#C4715A"]];
+let lx = pad.left;
+bands.forEach(([label, color]) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 8, width: 8, height: 8, fill: color }));
+  const t = mkEl("text", { x: lx + 11, y: legendY, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 90;
+});
+const legendLabel = mkEl("text", { x: pad.left - 0, y: legendY - 13, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#9A9890" });
+legendLabel.textContent = "decline from 2019";
+svg.appendChild(legendLabel);
+</script>
+</body></html>
