@@ -5858,7 +5858,75 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Global Tourism Arrivals: Rise and COVID Collapse",
+      "description": "Trend lines showing international tourist arrivals for 10 major destinations, 1995-2020. France leads with ~218M annual arrivals by 2019, followed by China and Italy. All markets crashed in 2020 when COVID-19 shut borders.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "France leads with 217.9M arrivals in 2019, nearly 4x its 1996 figure",
+        "China grew 3.5x from 2000 to 2019, reaching 162.5M arrivals",
+        "Hong Kong saw the steepest collapse: -94% from 65M to 3.6M in 2020"
+      ],
+      "createdAt": "2026-09-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Labor Productivity: The Persistent Global Gap",
+      "description": "Trend lines showing GDP per person employed (constant 2021 PPP $) across 11 economies at different income levels, 1991-2024. China's 14-fold rise is exceptional; the gap between rich and poor economies remains vast.",
+      "datasetIds": [
+        "wb--SL-GDP-PCAP-EM-KD"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Ireland's productivity soared to $234k in 2024, partly from MNC profit-shifting",
+        "China's GDP per worker rose 14x from $3,280 in 1991 to $45,834 in 2024",
+        "Ethiopia at $7,173 \u2014 a 33-year-old worker in Addis produces 33x less than one in Dublin"
+      ],
+      "createdAt": "2026-09-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Energy Use per Capita: The Consumption Divide",
+      "description": "Trend lines showing energy consumption per person (kg of oil equivalent) for 8 economies, 1990-2023. North American and East Asian energy use dwarfs South Asia. Germany and France show steady efficiency declines; China's use tripled.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Canada consumes 7,161 kgoe per person \u2014 11x more than India's 763",
+        "Germany has cut energy use by 36% since 1990 through efficiency gains",
+        "China tripled per-capita energy use over 33 years, from 773 to 2,851 kgoe"
+      ],
+      "createdAt": "2026-09-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "China's Rise in Global Science",
+      "description": "Trend lines showing scientific and technical journal article output for 11 major research nations, 1996-2022. China grew 26-fold to 886,000 articles annually, overtaking all other individual nations.",
+      "datasetIds": [
+        "wb--IP-JRN-ARTC-SC"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "China published 886,000 articles in 2022 \u2014 up from 33,621 in 1996 (26x growth)",
+        "India surpassed Japan in 2017, now second with 200,000 articles",
+        "Iran grew from 649 articles in 1996 to 58,000 in 2022 \u2014 the fastest rise after China"
+      ],
+      "createdAt": "2026-09-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-02T00:00:00.000Z"
 }
