@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Intensity of GDP, 2000 vs 2021–2022</h1>
+<p class="subtitle">Megajoules of primary energy consumed per $2021 PPP-adjusted GDP. Lower is more efficient. Most economies have sharply decoupled energy from growth over two decades.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · Energy intensity level of primary energy (EG.EGY.PRIM.PP.KD)</p>
+<script>
+const data = [
+  {"n":"Bhutan","y":2000,"a":19.34,"b":9.04},
+  {"n":"Azerbaijan","y":2000,"a":14.06,"b":4.40},
+  {"n":"Iceland","y":2000,"a":11.40,"b":11.93},
+  {"n":"China","y":2000,"a":10.91,"b":6.30},
+  {"n":"Bulgaria","y":2000,"a":9.05,"b":4.72},
+  {"n":"Canada","y":2000,"a":8.27,"b":6.44},
+  {"n":"Estonia","y":2000,"a":7.94,"b":4.12},
+  {"n":"Korea, Rep.","y":2000,"a":7.23,"b":5.11},
+  {"n":"India","y":2000,"a":7.01,"b":4.21},
+  {"n":"Czechia","y":2000,"a":6.72,"b":3.98},
+  {"n":"Australia","y":2000,"a":6.00,"b":4.12},
+  {"n":"Hungary","y":2000,"a":5.22,"b":3.12},
+  {"n":"Japan","y":2000,"a":4.70,"b":3.15},
+  {"n":"Chile","y":2000,"a":4.60,"b":3.19},
+  {"n":"France","y":2000,"a":4.33,"b":2.83},
+  {"n":"Croatia","y":2000,"a":4.30,"b":2.75},
+  {"n":"Germany","y":2000,"a":3.97,"b":2.47},
+  {"n":"Ireland","y":2000,"a":3.12,"b":0.97}
+];
+
+const W = 660, H = 560;
+const pad = { left: 130, right: 140, top: 44, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = Math.ceil(Math.max(...allVals) / 2) * 2 + 1;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xLeft = pad.left, xRight = W - pad.right;
+
+// Column headers
+["2000", "2021–22"].forEach((lbl, i) => {
+  svg.appendChild(mkEl("text", {
+    x: i === 0 ? xLeft : xRight, y: pad.top - 14,
+    "font-family": "JetBrains Mono, monospace", "font-size": "10",
+    "text-anchor": "middle", fill: "#7A786F"
+  }, lbl));
+});
+
+// Axis tick lines
+[0, 4, 8, 12, 16, 20].forEach(v => {
+  if (v > maxV) return;
+  const y = scale(v);
+  svg.appendChild(mkEl("line", {
+    x1: xLeft - 4, y1: y, x2: xRight + 4, y2: y,
+    stroke: "#E2E0D5", "stroke-width": "0.4"
+  }));
+});
+
+function colorForChange(d) {
+  const pct = (d.a - d.b) / d.a * 100;
+  if (pct > 60) return "#3D7A5A";
+  if (pct > 45) return "#5B9E78";
+  if (pct > 30) return "#8BAD72";
+  if (pct > 15) return "#C49A45";
+  if (pct > 0) return "#C4715A";
+  return "#EA5E33";
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 22) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const leftLabels = [], rightLabels = [];
+const rows = [];
+
+const DISPLAY_NAMES = {"Korea, Rep.": "South Korea"};
+data.forEach(d => {
+  const color = colorForChange(d);
+  const yA = scale(d.a), yB = scale(d.b);
+  const g = mkEl("g", {});
+  const label = DISPLAY_NAMES[d.n] || d.n;
+
+  // Connecting line
+  const line = mkEl("line", { x1: xLeft, y1: yA, x2: xRight, y2: yB, stroke: color, "stroke-width": "1.5", opacity: "0.9" });
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: yA, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: yB, r: "3", fill: color }));
+
+  // Invisible hit area
+  const hit = mkEl("line", { x1: xLeft, y1: yA, x2: xRight, y2: yB, stroke: "transparent", "stroke-width": "14" });
+  g.appendChild(hit);
+
+  const leftLbl = mkEl("text", {
+    x: xLeft - 7, y: yA + 4,
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    "text-anchor": "end", fill: "#2B2A27"
+  }, `${label}  ${d.a}`);
+  g.appendChild(leftLbl);
+
+  const pctChange = ((d.b - d.a) / d.a * 100).toFixed(0);
+  const rightLbl = mkEl("text", {
+    x: xRight + 7, y: yB + 4,
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    "text-anchor": "start", fill: color
+  }, `${d.b}  ${pctChange > 0 ? '+' : ''}${pctChange}%`);
+  g.appendChild(rightLbl);
+
+  leftLabels.push({ el: leftLbl, y: yA });
+  rightLabels.push({ el: rightLbl, y: yB });
+
+  hit.addEventListener("mouseenter", () => {
+    rows.forEach(rg => rg.style.opacity = "0.12");
+    g.style.opacity = "1";
+    const pct = ((d.b - d.a) / d.a * 100).toFixed(1);
+    showTip(`${label}: ${d.a} → ${d.b} MJ/$GDP (${pct > 0 ? '+' : ''}${pct}%)`, { clientX: 0, clientY: 0 });
+  });
+  hit.addEventListener("mousemove", e => {
+    const pct = ((d.b - d.a) / d.a * 100).toFixed(1);
+    showTip(`${label}: ${d.a} → ${d.b} MJ/$GDP (${pct > 0 ? '+' : ''}${pct}%)`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    rows.forEach(rg => rg.style.opacity = "1");
+    hideTip();
+  });
+
+  rows.push(g);
+  svg.appendChild(g);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y = Math.max(pad.top, sorted[i - 1].y - shift);
+        sorted[i].y = Math.min(H - pad.bottom, sorted[i].y + shift);
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(item => item.el.setAttribute("y", item.y + 4));
+}
+
+resolveCollisions(leftLabels, 12);
+resolveCollisions(rightLabels, 12);
+
+// Legend
+const legendY = pad.top - 26;
+const legendItems = [
+  { color: "#3D7A5A", label: ">60% reduction" },
+  { color: "#5B9E78", label: "45–60%" },
+  { color: "#8BAD72", label: "30–45%" },
+  { color: "#C49A45", label: "15–30%" },
+  { color: "#C4715A", label: "0–15%" },
+  { color: "#EA5E33", label: "Increased" }
+];
+let lx = xLeft;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY, width: 8, height: 8, fill: item.color, rx: "1" }));
+  const lbl = mkEl("text", { x: lx + 11, y: legendY + 7, "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#7A786F" }, item.label);
+  svg.appendChild(lbl);
+  lx += item.label.length * 5.2 + 18;
+});
+</script>
+</body></html>
