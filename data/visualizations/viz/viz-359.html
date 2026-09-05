@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Gross Savings as % of GDP, 1980–2023</h1>
+<p class="subtitle">National saving rates reveal stark divergences between East Asian economies — where high savings have funded investment booms — and much of the West and Latin America.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · Gross savings (% of GDP) (NY.GNS.ICTR.ZS)</p>
+<script>
+const data = [
+  {"n":"China","s":[null,null,33.7,33.1,34.8,35.2,35.2,37.2,37.9,35.8,36.6,38.4,40.5,41.6,41.6,39.4,38.6,39.5,38.2,36.4,35.6,37.1,38.7,42.2,45.4,45.5,47.8,49.8,51.3,49.9,50.8,48.6,48.2,47.0,47.3,45.1,43.9,44.3,43.8,43.3,43.5,44.7,44.8,42.6],"y0":1980},
+  {"n":"South Korea","s":[25.5,25.1,27.0,30.7,32.8,32.8,36.1,39.8,41.9,39.2,39.6,39.5,38.6,38.6,38.1,37.9,36.1,36.0,37.9,35.6,34.2,32.3,31.7,33.1,35.5,33.8,32.9,33.4,33.2,33.1,35.0,34.4,34.3,34.5,34.6,35.8,36.3,36.5,35.4,34.3,35.8,36.6,34.3,33.4],"y0":1980},
+  {"n":"Germany","s":[19.8,18.4,18.7,19.3,19.9,20.7,22.2,21.4,22.5,23.5,24.8,null,null,null,null,null,null,null,null,22.3,22.1,22.3,21.8,20.8,23.3,23.1,25.4,27.3,26.3,23.6,25.1,27.4,26.5,26.3,27.4,27.6,28.7,28.7,30.0,29.3,28.0,29.5,27.0,27.6],"y0":1980},
+  {"n":"Japan","s":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,34.9,34.7,33.4,31.7,32.2,30.9,29.8,29.8,30.3,30.4,30.8,31.3,29.7,26.4,27.3,26.5,25.9,26.2,27.1,29.5,30.1,30.6,30.5,30.6,29.7,31.0,30.2,31.4],"y0":1980},
+  {"n":"India","s":[14.5,15.8,15.8,15.4,15.8,16.8,15.8,17.0,18.2,20.1,21.2,21.8,23.2,24.1,26.0,27.0,27.0,27.6,25.9,25.6,26.1,26.3,28.1,30.5,33.3,34.4,36.4,37.0,36.3,35.6,36.3,35.1,35.3,34.3,33.5,32.5,31.7,31.7,31.4,29.7,28.7,29.9,33.4,34.4],"y0":1980},
+  {"n":"France","s":[25.1,22.6,21.3,20.9,20.7,20.7,22.0,21.8,23.1,23.6,23.6,23.2,22.5,21.3,21.4,22.0,21.8,22.8,23.7,24.3,23.7,23.8,22.6,22.1,22.4,22.4,23.1,23.5,23.3,20.8,21.0,21.9,21.1,21.2,21.1,21.5,21.2,21.6,21.9,23.5,20.8,23.5,22.5,21.7],"y0":1980},
+  {"n":"Brazil","s":[17.7,19.0,15.9,14.3,17.5,20.2,17.9,22.7,25.7,35.8,19.0,18.7,20.2,20.3,19.1,14.4,14.0,13.7,13.9,12.7,14.0,13.6,15.4,16.4,18.9,18.1,18.4,19.3,19.2,16.4,17.8,18.6,17.7,18.2,16.1,14.5,13.4,13.6,12.7,12.3,14.8,17.2,15.9,15.0],"y0":1980}
+];
+
+const COLORS = ["#EA5E33","#F29A44","#3D7A5A","#5B9E78","#8BAD72","#C49A45","#C4715A"];
+
+const W = 780, H = 440;
+const margin = { top: 30, right: 118, bottom: 36, left: 48 };
+const Y_MIN = 0, Y_MAX = 55;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const xScale = yr => margin.left + (yr - 1980) / 43 * (W - margin.left - margin.right);
+const yScale = v => margin.top + (Y_MAX - v) / (Y_MAX - Y_MIN) * (H - margin.top - margin.bottom);
+
+// Grid
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3,
+    "font-family": "JetBrains Mono, monospace", "font-size": "9",
+    "text-anchor": "end", fill: "#7A786F"
+  }, v + "%"));
+});
+
+// X axis
+[1980, 1990, 2000, 2010, 2020].forEach(yr => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(yr), y: H - margin.bottom + 14,
+    "font-family": "JetBrains Mono, monospace", "font-size": "9",
+    "text-anchor": "middle", fill: "#7A786F"
+  }, yr.toString()));
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 22) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+data.forEach((d, di) => {
+  const color = COLORS[di];
+  const g = mkEl("g", {});
+
+  let pathD = "";
+  let inSeg = false;
+  d.s.forEach((v, i) => {
+    if (v === null) { inSeg = false; return; }
+    const x = xScale(1980 + i), y = yScale(v);
+    pathD += inSeg ? ` L ${x} ${y}` : `M ${x} ${y}`;
+    inSeg = true;
+  });
+
+  g.appendChild(mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hit);
+
+  // Endpoint label
+  const lastIdx = d.s.reduceRight((a, v, i) => a === -1 && v !== null ? i : a, -1);
+  const lastV = d.s[lastIdx];
+  const lbl = mkEl("text", {
+    x: xScale(1980 + lastIdx) + 5, y: yScale(lastV) + 4,
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    fill: color
+  }, `${lastV}%  ${d.n}`);
+  g.appendChild(lbl);
+
+  hit.addEventListener("mousemove", e => {
+    const mx = e.clientX - svg.getBoundingClientRect().left;
+    const idx = Math.max(0, Math.min(43, Math.round((mx - margin.left) / (W - margin.left - margin.right) * 43)));
+    const v = d.s[idx];
+    const yr = 1980 + idx;
+    if (v !== null) showTip(`${d.n} (${yr}): ${v.toFixed(1)}% of GDP`, e);
+  });
+  hit.addEventListener("mouseenter", () => { groups.forEach(og => og.style.opacity = "0.1"); g.style.opacity = "1"; });
+  hit.addEventListener("mouseleave", () => { groups.forEach(og => og.style.opacity = "1"); hideTip(); });
+
+  groups.push(g);
+  svg.appendChild(g);
+});
+
+// Collision resolution for endpoint labels
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let p = 0; p < 30; p++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y = Math.max(margin.top + 4, sorted[i-1].y - shift);
+        sorted[i].y = Math.min(H - margin.bottom, sorted[i].y + shift);
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(it => it.el.setAttribute("y", it.y + 4));
+}
+
+const lblItems = groups.map((g, i) => {
+  const el = g.querySelector("text");
+  const lastIdx = data[i].s.reduceRight((a, v, idx) => a === -1 && v !== null ? idx : a, -1);
+  return { el, y: yScale(data[i].s[lastIdx]) };
+});
+resolveCollisions(lblItems, 12);
+</script>
+</body></html>

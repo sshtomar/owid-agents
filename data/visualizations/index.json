@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourist Arrivals by Top Destination, 1995\u20132020",
+      "description": "Trend lines showing annual tourist arrivals (millions) for 10 major destination countries from 1995 to 2020. The 2020 COVID-19 pandemic caused the sharpest collapse in global tourism ever recorded, with Asian destinations hardest hit.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "France leads globally with 218M arrivals in 2019, falling 46% to 117M in 2020",
+        "Japan (-87%) and South Korea (-86%) saw the steepest COVID collapses",
+        "Croatia grew from 16M to 60M arrivals between 1995 and 2019"
+      ],
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Intensity of GDP, 2000 vs 2021\u20132022",
+      "description": "Slope chart comparing megajoules of primary energy per $2021 PPP-adjusted GDP for 18 countries. Shows the broad global trend of decoupling economic output from energy consumption over two decades.",
+      "datasetIds": [
+        "wb--EG-EGY-PRIM-PP-KD"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Ireland dropped from 3.12 to 0.97 MJ/$GDP (-69%), driven by growth in low-energy services",
+        "Azerbaijan fell from 14.06 to 4.40 (-69%), shedding Soviet-era industrial inefficiency",
+        "Iceland barely changed (11.40 to 11.93) due to its already-renewable energy base"
+      ],
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Gross Savings as % of GDP, 1980\u20132023",
+      "description": "Trend lines showing national saving rates for major economies over four decades. Reveals the stark divergence between East Asian high-savers and much of the West and Latin America.",
+      "datasetIds": [
+        "wb--NY-GNS-ICTR-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China's savings rate peaked above 51% of GDP in 2008, far exceeding any other large economy",
+        "South Korea has held a consistently high 30\u201340% saving rate since the 1980s",
+        "Brazil has been in long-run savings decline from ~35% in the 1980s to ~15% recently"
+      ],
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Pre-Primary School Enrollment, 2000 vs 2020\u20132021",
+      "description": "Slope chart comparing gross enrollment in pre-primary education across 14 countries. Documents the remarkable expansion of early childhood education in developing countries over two decades.",
+      "datasetIds": [
+        "wb--SE-PRE-ENRR"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Bhutan jumped from 1.1% to 51.9% \u2014 nearly 50-fold increase in preschool access",
+        "Ethiopia rose from 1.6% to 30.1%; Cambodia from 6.4% to 33.6%",
+        "Ghana crossed 100% gross enrollment, reflecting older children also attending preschool"
+      ],
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Hepatitis C Prevalence by Country, 2015",
+      "description": "Horizontal bar chart showing the percentage of the general population living with chronic hepatitis C infection. Reveals the geographic concentration of the global HCV burden in sub-Saharan Africa and Central Asia.",
+      "datasetIds": [
+        "who--HEPATITIS_HCV_PREVALENCE_PER100"
+      ],
+      "chartType": "bar-chart",
+      "highlights": [
+        "Gabon (5.46%) and Pakistan (5.45%) carry the highest HCV burdens globally",
+        "Pakistan's high rate reflects historical unsafe injection practices and poor blood safety",
+        "Several southern African nations (Botswana, Lesotho, Eswatini, South Africa) share a 1.93% rate"
+      ],
+      "createdAt": "2026-09-05T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-05T00:00:00.000Z"
 }
