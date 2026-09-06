@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style>
+</head>
+<body>
+<h1>The Early Learning Gap: Pre-Primary Enrollment, ~1990 vs ~2020</h1>
+<p class="subtitle">Gross enrollment ratio in pre-primary education (can exceed 100% due to age overlaps). Ghana tripled its rate; Iran went from under 10% to 72%. Sub-Saharan countries like Burkina Faso and DR Congo remain below 7% — leaving most young children without early schooling.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SE.PRE.ENRR · ~1990 vs ~2020</p>
+<script>
+const data = [{"n":"Australia","s":71.0,"e":160.2},{"n":"Grenada","s":62.8,"e":130.8},{"n":"Ghana","s":35.7,"e":116.1},{"n":"Czechia","s":85.2,"e":113.5},{"n":"Belgium","s":114.3,"e":112.4},{"n":"Israel","s":86.5,"e":111.2},{"n":"Kazakhstan","s":61.8,"e":74.1},{"n":"Iran","s":8.9,"e":72.5},{"n":"Croatia","s":28.0,"e":70.9},{"n":"Albania","s":35.8,"e":69.2},{"n":"Congo, Rep.","s":2.0,"e":14.3},{"n":"Djibouti","s":0.5,"e":11.6},{"n":"Cote d'Ivoire","s":1.4,"e":10.7},{"n":"DR Congo","s":0.9,"e":6.9},{"n":"Burkina Faso","s":0.9,"e":6.5}];
+
+function colorForChange(d) {
+  const gain = d.e - d.s;
+  if (gain > 70) return "#EA5E33";
+  if (gain > 40) return "#F29A44";
+  if (gain > 20) return "#C49A45";
+  if (gain > 5) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+const W = 700, H = 560;
+const pad = {left: 130, right: 140, top: 40, bottom: 30};
+const minV = 0, maxV = 175;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 4, Math.min(H - pad.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Column headers
+function hdr(x, txt) {
+  const t = mkEl("text", {x, y: 20, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "10", fill: "#7A786F"});
+  t.textContent = txt;
+  svg.appendChild(t);
+}
+hdr(pad.left, "~1990");
+hdr(W - pad.right, "~2020");
+
+// Grid ticks
+for (const t of [0, 25, 50, 75, 100, 125, 150, 175]) {
+  const y = scale(t);
+  svg.appendChild(mkEl("line", {x1: pad.left - 2, y1: y, x2: W - pad.right + 2, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const lbl = mkEl("text", {x: pad.left - 6, y: y + 3, "text-anchor": "end", "font-size": "8", fill: "#B8B6AE", "font-family": "'JetBrains Mono', monospace"});
+  lbl.textContent = t + "%";
+  svg.appendChild(lbl);
+}
+
+// 100% reference line
+svg.appendChild(mkEl("line", {x1: pad.left, y1: scale(100), x2: W - pad.right, y2: scale(100), stroke: "#C2C0B5", "stroke-dasharray": "3,3", "stroke-width": "0.7"}));
+const refLbl = mkEl("text", {x: W - pad.right + 4, y: scale(100) + 3, "font-size": "8", fill: "#7A786F"});
+refLbl.textContent = "100%";
+svg.appendChild(refLbl);
+
+const leftLabels = data.map(d => ({n: d.n, y: scale(d.s), v: d.s, d}));
+const rightLabels = data.map(d => ({n: d.n, y: scale(d.e), v: d.e, d}));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const rows = [];
+const x1 = pad.left + 4, x2 = W - pad.right - 4;
+
+data.forEach((d, i) => {
+  const y1 = scale(d.s), y2 = scale(d.e);
+  const col = colorForChange(d);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", {x1, y1, x2, y2, stroke: col, "stroke-width": "1.5", opacity: "0.85"});
+  g.appendChild(line);
+
+  [y1, y2].forEach((y, j) => {
+    g.appendChild(mkEl("circle", {cx: j === 0 ? x1 : x2, cy: y, r: "2.5", fill: col}));
+  });
+
+  const ll = leftLabels.find(l => l.n === d.n);
+  const lt = mkEl("text", {x: x1 - 8, y: ll.y + 3.5, "text-anchor": "end", "font-size": "10", fill: "#2B2A27"});
+  lt.textContent = `${d.n}  ${d.s}%`;
+  g.appendChild(lt);
+  if (Math.abs(ll.y - y1) > 4) {
+    g.appendChild(mkEl("line", {x1: x1 - 6, y1, x2: x1 - 6, y2: ll.y, stroke: "#C2C0B5", "stroke-width": "0.4"}));
+  }
+
+  const rl = rightLabels.find(l => l.n === d.n);
+  const rt = mkEl("text", {x: x2 + 8, y: rl.y + 3.5, "text-anchor": "start", "font-size": "10", fill: "#2B2A27"});
+  rt.textContent = `${d.e}%  ${d.n}`;
+  g.appendChild(rt);
+  if (Math.abs(rl.y - y2) > 4) {
+    g.appendChild(mkEl("line", {x1: x2 + 6, y1: y2, x2: x2 + 6, y2: rl.y, stroke: "#C2C0B5", "stroke-width": "0.4"}));
+  }
+
+  const hit = mkEl("line", {x1, y1, x2, y2, stroke: "transparent", "stroke-width": "14", style: "cursor:pointer"});
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({g, line, d, col, y1, y2});
+});
+
+// Legend
+const legend = [
+  {col: "#EA5E33", label: ">70pp gain"},
+  {col: "#F29A44", label: "40-70pp"},
+  {col: "#C49A45", label: "20-40pp"},
+  {col: "#8BAD72", label: "5-20pp"},
+  {col: "#A6C4A2", label: "<5pp"},
+];
+legend.forEach((l, i) => {
+  const lx = 30 + i * 124;
+  const ly = H - 2;
+  svg.appendChild(mkEl("rect", {x: lx, y: ly - 5, width: 10, height: 3, fill: l.col, rx: "1"}));
+  const t = mkEl("text", {x: lx + 14, y: ly, "font-size": "8", fill: "#7A786F", "font-family": "'JetBrains Mono', monospace"});
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "1.5"); }
+    else if (i === idx) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "3"); }
+    else { row.g.style.opacity = "0.12"; row.line.setAttribute("stroke-width", "1"); }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+  const t = Math.max(0, Math.min(1, (sx - x1) / (x2 - x1)));
+  let best = -1, bestDist = 18;
+  rows.forEach((row, i) => {
+    const lineY = row.y1 + (row.y2 - row.y1) * t;
+    if (Math.abs(sy - lineY) < bestDist) { bestDist = Math.abs(sy - lineY); best = i; }
+  });
+  highlight(best);
+  if (best >= 0) {
+    const d = rows[best].d;
+    const gain = (d.e - d.s).toFixed(1);
+    tip.textContent = `${d.n}: ~1990: ${d.s}% → ~2020: ${d.e}% (+${gain}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else { tip.style.opacity = "0"; }
+});
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body>
+</html>

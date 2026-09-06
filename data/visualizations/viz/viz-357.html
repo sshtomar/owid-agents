@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+  svg text { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body>
+<h1>Demographic Crossroads: Age Dependency Ratios, 1960-2024</h1>
+<p class="subtitle">Dependents (children + elderly) per 100 working-age adults. Japan and Germany are aging into high dependency. S. Korea fell to record lows before rebounding. China's one-child policy carved a steep descent. Ethiopia remains above 73.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SP.POP.DPND</p>
+<script>
+const data = [{"n":"Ethiopia","pts":[{"y":1960,"v":82.0},{"y":1964,"v":81.9},{"y":1968,"v":86.2},{"y":1972,"v":91.3},{"y":1976,"v":94.4},{"y":1980,"v":96.5},{"y":1984,"v":95.9},{"y":1988,"v":95.1},{"y":1992,"v":95.9},{"y":1996,"v":98.2},{"y":2000,"v":101.5},{"y":2004,"v":100.9},{"y":2008,"v":97.2},{"y":2012,"v":90.2},{"y":2016,"v":82.7},{"y":2020,"v":77.1},{"y":2024,"v":73.3}],"latest":73.3},{"n":"Japan","pts":[{"y":1960,"v":55.2},{"y":1964,"v":47.1},{"y":1968,"v":43.6},{"y":1972,"v":44.5},{"y":1976,"v":47.1},{"y":1980,"v":48.2},{"y":1984,"v":47.6},{"y":1988,"v":44.6},{"y":1992,"v":42.9},{"y":1996,"v":44.0},{"y":2000,"v":46.7},{"y":2004,"v":50.3},{"y":2008,"v":55.7},{"y":2012,"v":60.5},{"y":2016,"v":67.3},{"y":2020,"v":69.9},{"y":2024,"v":70.1}],"latest":70.1},{"n":"Germany","pts":[{"y":1960,"v":48.7},{"y":1964,"v":53.6},{"y":1968,"v":57.6},{"y":1972,"v":58.4},{"y":1976,"v":56.2},{"y":1980,"v":51.6},{"y":1984,"v":44.6},{"y":1988,"v":44.1},{"y":1992,"v":45.5},{"y":1996,"v":46.4},{"y":2000,"v":47.3},{"y":2004,"v":49.3},{"y":2008,"v":51.8},{"y":2012,"v":51.6},{"y":2016,"v":52.6},{"y":2020,"v":55.3},{"y":2024,"v":59.0}],"latest":59.0},{"n":"Egypt","pts":[{"y":1960,"v":85.1},{"y":1964,"v":84.9},{"y":1968,"v":83.8},{"y":1972,"v":82.4},{"y":1976,"v":82.0},{"y":1980,"v":82.5},{"y":1984,"v":82.5},{"y":1988,"v":82.3},{"y":1992,"v":79.5},{"y":1996,"v":75.0},{"y":2000,"v":69.4},{"y":2004,"v":63.9},{"y":2008,"v":60.9},{"y":2012,"v":61.0},{"y":2016,"v":62.3},{"y":2020,"v":61.7},{"y":2024,"v":59.0}],"latest":59.0},{"n":"India","pts":[{"y":1960,"v":78.2},{"y":1964,"v":82.3},{"y":1968,"v":82.3},{"y":1972,"v":81.3},{"y":1976,"v":79.7},{"y":1980,"v":77.8},{"y":1984,"v":76.5},{"y":1988,"v":75.2},{"y":1992,"v":73.0},{"y":1996,"v":70.2},{"y":2000,"v":66.6},{"y":2004,"v":62.9},{"y":2008,"v":58.9},{"y":2012,"v":55.1},{"y":2016,"v":51.6},{"y":2020,"v":48.7},{"y":2024,"v":46.6}],"latest":46.6},{"n":"Brazil","pts":[{"y":1960,"v":87.7},{"y":1964,"v":88.9},{"y":1968,"v":86.1},{"y":1972,"v":81.4},{"y":1976,"v":76.4},{"y":1980,"v":72.2},{"y":1984,"v":69.9},{"y":1988,"v":67.3},{"y":1992,"v":63.5},{"y":1996,"v":58.6},{"y":2000,"v":53.9},{"y":2004,"v":49.8},{"y":2008,"v":46.9},{"y":2012,"v":44.6},{"y":2016,"v":43.4},{"y":2020,"v":43.6},{"y":2024,"v":44.3}],"latest":44.3},{"n":"China","pts":[{"y":1960,"v":79.5},{"y":1964,"v":81.5},{"y":1968,"v":80.8},{"y":1972,"v":79.1},{"y":1976,"v":79.5},{"y":1980,"v":68.0},{"y":1984,"v":58.7},{"y":1988,"v":52.6},{"y":1992,"v":51.5},{"y":1996,"v":49.6},{"y":2000,"v":46.1},{"y":2004,"v":40.7},{"y":2008,"v":37.4},{"y":2012,"v":37.7},{"y":2016,"v":40.4},{"y":2020,"v":44.1},{"y":2024,"v":44.2}],"latest":44.2},{"n":"S. Korea","pts":[{"y":1960,"v":80.0},{"y":1964,"v":86.5},{"y":1968,"v":86.5},{"y":1972,"v":80.1},{"y":1976,"v":69.8},{"y":1980,"v":60.9},{"y":1984,"v":54.6},{"y":1988,"v":47.0},{"y":1992,"v":42.6},{"y":1996,"v":39.9},{"y":2000,"v":39.0},{"y":2004,"v":39.5},{"y":2008,"v":38.4},{"y":2012,"v":36.8},{"y":2016,"v":36.5},{"y":2020,"v":38.8},{"y":2024,"v":42.5}],"latest":42.5}];
+
+const COLORS = ["#C4715A","#EA5E33","#F29A44","#C49A45","#8BAD72","#5B9E78","#3D7A5A","#2A5E8A"];
+const W = 820, H = 480;
+const M = {top: 36, right: 110, bottom: 28, left: 44};
+
+const yearMin = 1960, yearMax = 2024;
+const valMin = 30, valMax = 110;
+
+const xScale = y => M.left + (y - yearMin) / (yearMax - yearMin) * (W - M.left - M.right);
+const yScale = v => M.top + (valMax - v) / (valMax - valMin) * (H - M.top - M.bottom);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%"});
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+// Grid lines
+const gridYears = [1960,1970,1980,1990,2000,2010,2020,2024];
+for (const gy of gridYears) {
+  const x = xScale(gy);
+  svg.appendChild(mkEl("line", {x1: x, y1: M.top, x2: x, y2: H - M.bottom, stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const t = mkEl("text", {x, y: H - M.bottom + 12, "text-anchor": "middle", "font-size": "9", fill: "#7A786F"});
+  t.textContent = gy;
+  svg.appendChild(t);
+}
+
+const gridVals = [30, 40, 50, 60, 70, 80, 90, 100, 110];
+for (const gv of gridVals) {
+  const y = yScale(gv);
+  svg.appendChild(mkEl("line", {x1: M.left, y1: y, x2: W - M.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5"}));
+  const t = mkEl("text", {x: M.left - 6, y: y + 3.5, "text-anchor": "end", "font-size": "9", fill: "#7A786F"});
+  t.textContent = gv;
+  svg.appendChild(t);
+}
+
+// Y axis label
+const yLbl = mkEl("text", {x: 10, y: M.top + (H - M.top - M.bottom) / 2, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", transform: `rotate(-90 10 ${M.top + (H - M.top - M.bottom) / 2})`});
+yLbl.textContent = "dependents per 100 working-age adults";
+svg.appendChild(yLbl);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to bounds
+  for (const item of sorted) {
+    item.y = Math.max(M.top + 6, Math.min(H - M.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const rows = [];
+
+data.forEach((d, i) => {
+  const col = COLORS[i % COLORS.length];
+  const pts = d.pts;
+  const g = mkEl("g", {});
+
+  // Line path
+  const pathD = pts.map((p, j) => `${j === 0 ? "M" : "L"}${xScale(p.y)},${yScale(p.v)}`).join(" ");
+  const line = mkEl("path", {d: pathD, stroke: col, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", opacity: "0.85"});
+  g.appendChild(line);
+
+  // Invisible wide hit path
+  const hit = mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", style: "cursor:pointer"});
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({g, line, d, col, pts});
+});
+
+// Endpoint labels (right side)
+const labelItems = data.map((d, i) => {
+  const last = d.pts[d.pts.length - 1];
+  return {n: d.n, y: yScale(last.v), v: last.v, i};
+});
+resolveCollisions(labelItems, 13);
+
+labelItems.forEach(item => {
+  const d = data[item.i];
+  const last = d.pts[d.pts.length - 1];
+  const realY = yScale(last.v);
+  const labelY = item.y;
+  const xEnd = xScale(last.y) + 4;
+
+  // Leader line if displaced
+  if (Math.abs(labelY - realY) > 3) {
+    svg.appendChild(mkEl("line", {x1: xEnd, y1: realY, x2: xEnd + 4, y2: labelY, stroke: COLORS[item.i], "stroke-width": "0.5", opacity: "0.4"}));
+  }
+
+  const t = mkEl("text", {x: xEnd + 6, y: labelY + 3.5, "font-size": "10", fill: COLORS[item.i]});
+  t.textContent = `${d.n}`;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+// Interactivity
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "1.8");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "3");
+    } else {
+      row.g.style.opacity = "0.1";
+      row.line.setAttribute("stroke-width", "1");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+
+  // Map sx to year
+  const year = yearMin + (sx - M.left) / (W - M.left - M.right) * (yearMax - yearMin);
+
+  let best = -1, bestDist = 18;
+  rows.forEach((row, i) => {
+    // Find nearest point
+    const nearPt = row.pts.reduce((a, b) => Math.abs(b.y - year) < Math.abs(a.y - year) ? b : a);
+    const lineY = yScale(nearPt.v);
+    const dist = Math.abs(sy - lineY);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  highlight(best);
+
+  if (best >= 0) {
+    const d = rows[best].d;
+    const year2 = Math.round(Math.max(yearMin, Math.min(yearMax, year)));
+    const nearPt = d.pts.reduce((a, b) => Math.abs(b.y - year2) < Math.abs(a.y - year2) ? b : a);
+    tip.textContent = `${d.n} (${nearPt.y}): ${nearPt.v}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body>
+</html>
