@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 580px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 820px; }
+  .cell { padding: 12px 10px 10px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; box-sizing: border-box; }
+  .cell:nth-child(4n) { border-right: none; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 2px; }
+  .cell-vals { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; margin-top: 2px; }
+</style>
+</head>
+<body>
+<h1>Income Trajectories: GNI per Capita Since 1990</h1>
+<p class="subtitle">Gross National Income per capita (Atlas method, current US$), every 4 years from 1990. S. Korea grew 5.5x. China grew 41x from a tiny base. Japan stagnated. Ethiopia, Kenya, and Bangladesh remain far below — but are finally growing.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank NY.GNP.PCAP.CD</p>
+<script>
+const data = [{"n":"Germany","s":[21360,27630,28070,23920,38890,45530,48610,48770,55200],"e":21360,"l":55090,"y0":1990},{"n":"France","s":[20470,24260,25740,23040,37920,44040,43470,40960,46010],"e":20470,"l":45160,"y0":1990},{"n":"Japan","s":[28990,38380,35530,35880,41030,44290,45180,42720,44300],"e":28990,"l":37170,"y0":1990},{"n":"S. Korea","s":[6660,10440,10720,13320,21610,23250,29480,34610,38590],"e":6660,"l":36750,"y0":1990},{"n":"Argentina","s":[3180,7570,7960,4010,5440,9160,12240,12390,11890],"e":3180,"l":13530,"y0":1990},{"n":"China","s":[330,470,800,1130,2090,4410,7600,9720,13170],"e":330,"l":13660,"y0":1990},{"n":"Colombia","s":[1350,2080,2600,2410,3540,5690,8280,6350,6560],"e":1350,"l":7090,"y0":1990},{"n":"Brazil","s":[2470,2620,4980,3120,4890,9750,12280,9320,8440],"e":2470,"l":9930,"y0":1990},{"n":"Indonesia","s":[560,840,640,780,1350,2490,3570,3810,4520],"e":560,"l":4920,"y0":1990},{"n":"India","s":[390,340,410,460,780,1210,1540,1970,2360],"e":390,"l":2550,"y0":1990},{"n":"Bangladesh","s":[290,300,390,420,550,780,1080,2020,2850],"e":290,"l":2820,"y0":1990},{"n":"Ghana","s":[380,370,380,270,570,1200,1830,2060,2270],"e":380,"l":2260,"y0":1990},{"n":"Kenya","s":[390,270,450,390,590,930,1250,1720,2170],"e":390,"l":2070,"y0":1990},{"n":"Ethiopia","s":[260,170,130,120,180,370,530,730,960],"e":260,"l":1100,"y0":1990}];
+
+const grid = document.getElementById("grid");
+const tip = document.getElementById("tip");
+
+const YEARS_PER_STEP = 4;
+const START_YEAR = 1990;
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const name = document.createElement("div");
+  name.className = "cell-name";
+  name.textContent = d.n;
+  cell.appendChild(name);
+
+  const cnv = document.createElement("canvas");
+  const CW = 160, CH = 44;
+  cnv.width = CW; cnv.height = CH;
+  cnv.style.width = "100%";
+  cnv.style.height = CH + "px";
+  cnv.style.display = "block";
+  cell.appendChild(cnv);
+
+  const vals = document.createElement("div");
+  vals.className = "cell-vals";
+  vals.innerHTML = `<span>$${d.e.toLocaleString()}</span><span>$${d.l.toLocaleString()}</span>`;
+  cell.appendChild(vals);
+
+  grid.appendChild(cell);
+
+  const ctx = cnv.getContext("2d");
+  const s = d.s;
+  const minV = Math.min(...s);
+  const maxV = Math.max(...s);
+  const range = maxV - minV || 1;
+  const norm = v => CH - 4 - ((v - minV) / range) * (CH - 8);
+
+  // Draw line
+  ctx.beginPath();
+  ctx.strokeStyle = "#EA5E33";
+  ctx.lineWidth = 1.3;
+  ctx.lineJoin = "round";
+  s.forEach((v, i) => {
+    const x = (i / (s.length - 1)) * CW;
+    const y = norm(v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Fill area
+  ctx.beginPath();
+  s.forEach((v, i) => {
+    const x = (i / (s.length - 1)) * CW;
+    const y = norm(v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(CW, CH);
+  ctx.lineTo(0, CH);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(234,94,51,0.07)";
+  ctx.fill();
+
+  // Crosshair interaction
+  let crossX = -1;
+
+  function drawCrosshair(x) {
+    ctx.clearRect(0, 0, CW, CH);
+    // Redraw fill
+    ctx.beginPath();
+    s.forEach((v, i) => {
+      const px = (i / (s.length - 1)) * CW;
+      const py = norm(v);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.lineTo(CW, CH);
+    ctx.lineTo(0, CH);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(234,94,51,0.07)";
+    ctx.fill();
+    // Redraw line
+    ctx.beginPath();
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.3;
+    ctx.lineJoin = "round";
+    s.forEach((v, i) => {
+      const px = (i / (s.length - 1)) * CW;
+      const py = norm(v);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    if (x >= 0) {
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(43,42,39,0.2)";
+      ctx.lineWidth = 0.8;
+      ctx.setLineDash([2, 2]);
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, CH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  cnv.addEventListener("mousemove", e => {
+    const rect = cnv.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / rect.width * CW;
+    const idx = Math.round((mx / CW) * (s.length - 1));
+    const clamped = Math.max(0, Math.min(s.length - 1, idx));
+    const year = START_YEAR + clamped * YEARS_PER_STEP;
+    const val = s[clamped];
+    crossX = (clamped / (s.length - 1)) * CW;
+    drawCrosshair(crossX);
+    tip.textContent = `${d.n} (${year}): $${val.toLocaleString()}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+
+  cnv.addEventListener("mouseleave", () => {
+    crossX = -1;
+    drawCrosshair(-1);
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body>
+</html>
