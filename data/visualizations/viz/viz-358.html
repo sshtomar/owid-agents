@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Conservation Gains: Terrestrial Protected Areas, 2013 vs 2023</h1>
+<p class="subtitle">Share of total land area designated as terrestrial protected areas (%). Croatia, Bhutan, Cambodia, and Cyprus have dramatically expanded nature protection over the past decade, while some countries have seen small declines.</p>
+<div id="chart" style="position:relative;"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank — Terrestrial protected areas (ER.LND.PTLD.ZS)</p>
+<script>
+const data = [
+  {"n":"Croatia","a":13.8,"b":38.5},{"n":"Bahamas","a":13.3,"b":36.6},{"n":"Bhutan","a":28.8,"b":49.7},
+  {"n":"Cyprus","a":20.6,"b":38.7},{"n":"Cambodia","a":26.3,"b":39.7},{"n":"Japan","a":16.4,"b":29.7},
+  {"n":"South Korea","a":6.6,"b":17.0},{"n":"Bolivia","a":21.4,"b":30.9},{"n":"Australia","a":12.9,"b":20.4},
+  {"n":"Brazil","a":26.4,"b":30.6},{"n":"France","a":25.4,"b":28.4},{"n":"Belize","a":36.8,"b":37.5},
+  {"n":"Greece","a":35.1,"b":35.2},{"n":"Germany","a":37.9,"b":37.6},{"n":"Bulgaria","a":45.2,"b":41.0},
+  {"n":"Canada","a":9.4,"b":12.8},{"n":"India","a":5.9,"b":7.5},{"n":"China","a":17.0,"b":15.6},
+  {"n":"Colombia","a":23.1,"b":16.4},{"n":"Ecuador","a":25.6,"b":23.5},{"n":"Kenya","a":14.3,"b":12.2}
+];
+
+const W = 700, H = 580;
+const pad = {left:130, right:140, top:50, bottom:20};
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = Math.floor(Math.min(...allVals) / 5) * 5;
+const maxV = Math.ceil(Math.max(...allVals) / 5) * 5;
+
+function scale(v) { return pad.top + (maxV - v)/(maxV - minV) * (H - pad.top - pad.bottom); }
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap)/2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 20) return "#3D7A5A";
+  if (change > 10) return "#5B9E78";
+  if (change > 5)  return "#8BAD72";
+  if (change > 0)  return "#C49A45";
+  if (change > -3) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Column headers
+const lx = pad.left - 20, rx = W - pad.right + 20;
+const hText = mkEl("text",{x:lx,y:pad.top-16,"font-size":"10","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"middle"});
+hText.textContent = "2013";
+svg.appendChild(hText);
+const hText2 = mkEl("text",{x:rx,y:pad.top-16,"font-size":"10","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"middle"});
+hText2.textContent = "2023";
+svg.appendChild(hText2);
+
+// Axis lines
+svg.appendChild(mkEl("line",{x1:lx,y1:pad.top-8,x2:lx,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"0.8"}));
+svg.appendChild(mkEl("line",{x1:rx,y1:pad.top-8,x2:rx,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"0.8"}));
+
+// Prepare label positions
+const leftLabels = data.map((d,i) => ({i, y: scale(d.a), origY: scale(d.a), val: d.a, name: d.n}));
+const rightLabels = data.map((d,i) => ({i, y: scale(d.b), origY: scale(d.b), val: d.b, name: d.n}));
+const resolvedL = resolveCollisions(leftLabels.map(e => ({...e})), 13);
+const resolvedR = resolveCollisions(rightLabels.map(e => ({...e})), 13);
+
+const tip = document.getElementById("tip");
+
+// Draw slope lines and hit areas
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const y1 = scale(d.a), y2 = scale(d.b);
+  const change = d.b - d.a;
+  const sign = change >= 0 ? "+" : "";
+
+  const line = mkEl("line",{x1:lx,y1,x2:rx,y2,stroke:color,"stroke-width":"1.5","stroke-linecap":"round"});
+  svg.appendChild(line);
+
+  const hit = mkEl("line",{x1:lx,y1,x2:rx,y2,stroke:"transparent","stroke-width":"12",style:"cursor:pointer"});
+  svg.appendChild(hit);
+
+  hit.addEventListener("mouseenter", () => {
+    svg.querySelectorAll("line[stroke]").forEach(l => { if (l !== hit) l.setAttribute("opacity","0.12"); });
+    line.setAttribute("stroke-width","3");
+    line.setAttribute("opacity","1");
+  });
+  hit.addEventListener("mouseleave", () => {
+    svg.querySelectorAll("line[stroke]").forEach(l => l.setAttribute("opacity","1"));
+    line.setAttribute("stroke-width","1.5");
+    tip.style.opacity = "0";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}:  ${d.a}% → ${d.b}%  (${sign}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top = (e.clientY-22)+"px";
+  });
+
+  // Dots
+  svg.appendChild(mkEl("circle",{cx:lx,cy:y1,r:"3",fill:color}));
+  svg.appendChild(mkEl("circle",{cx:rx,cy:y2,r:"3",fill:color}));
+});
+
+// Left labels
+resolvedL.forEach(label => {
+  const origY = leftLabels.find(e => e.i === label.i).origY;
+  if (Math.abs(label.y - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:lx-3,y1:origY,x2:lx-3,y2:label.y,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  }
+  const txt = mkEl("text",{x:lx-8,y:label.y+4,"font-size":"9","font-family":"Inter, sans-serif","font-weight":"500",fill:"#2B2A27","text-anchor":"end"});
+  txt.textContent = `${label.name}  ${label.val.toFixed(1)}%`;
+  svg.appendChild(txt);
+});
+
+// Right labels
+resolvedR.forEach(label => {
+  const origY = rightLabels.find(e => e.i === label.i).origY;
+  if (Math.abs(label.y - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:rx+3,y1:origY,x2:rx+3,y2:label.y,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  }
+  const txt = mkEl("text",{x:rx+8,y:label.y+4,"font-size":"9","font-family":"Inter, sans-serif","font-weight":"500",fill:"#2B2A27","text-anchor":"start"});
+  txt.textContent = `${label.val.toFixed(1)}%  ${label.name}`;
+  svg.appendChild(txt);
+});
+
+// Legend
+const legendItems = [
+  {color:"#3D7A5A",label:">20pp increase"},
+  {color:"#5B9E78",label:"10–20pp"},
+  {color:"#8BAD72",label:"5–10pp"},
+  {color:"#C49A45",label:"0–5pp"},
+  {color:"#B34B3B",label:"Decrease"}
+];
+const lgy = H - 8;
+let lx2 = pad.left;
+legendItems.forEach(item => {
+  const rect = mkEl("rect",{x:lx2,y:lgy-7,width:8,height:8,fill:item.color,rx:"1"});
+  svg.appendChild(rect);
+  const txt = mkEl("text",{x:lx2+11,y:lgy,"font-size":"8","font-family":"Inter, sans-serif",fill:"#7A786F"});
+  txt.textContent = item.label;
+  svg.appendChild(txt);
+  lx2 += 90;
+});
+</script>
+</body></html>

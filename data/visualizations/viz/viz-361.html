@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Intentional Homicides: 200-fold Differences Across Countries</h1>
+<p class="subtitle">Homicide rate per 100,000 people, most recent year (2021–2023). Jamaica and Ecuador exceed 45 per 100,000; Japan and Bahrain register under 0.25. The 15 highest- and 15 lowest-rate countries in this dataset are shown.</p>
+<div id="chart" style="position:relative;"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank — Intentional homicides (per 100,000 people) (VC.IHR.PSRC.P5)</p>
+<script>
+// Top 15 highest + 15 lowest homicide rates (most recent year >= 2018). y = source year.
+const high = [
+  {"n":"Jamaica","v":49.44,"y":2023},{"n":"Ecuador","v":45.72,"y":2023},{"n":"Haiti","v":41.15,"y":2023},
+  {"n":"Bahamas","v":32.2,"y":2022},{"n":"Honduras","v":31.44,"y":2023},{"n":"Belize","v":28.06,"y":2022},
+  {"n":"Dominica","v":27.06,"y":2023},{"n":"Colombia","v":24.91,"y":2023},{"n":"Guatemala","v":23.37,"y":2023},
+  {"n":"Brazil","v":19.28,"y":2023},{"n":"Guyana","v":19.12,"y":2023},{"n":"Costa Rica","v":17.75,"y":2023},
+  {"n":"Grenada","v":13.67,"y":2023},{"n":"Eswatini","v":12.51,"y":2021},{"n":"Botswana","v":11.37,"y":2021}
+];
+const low = [
+  {"n":"Australia","v":0.85,"y":2023},{"n":"Denmark","v":0.84,"y":2023},{"n":"Greece","v":0.84,"y":2023},
+  {"n":"Cyprus","v":0.82,"y":2023},{"n":"Czechia","v":0.77,"y":2023},{"n":"Hungary","v":0.72,"y":2023},
+  {"n":"Croatia","v":0.67,"y":2023},{"n":"Ireland","v":0.65,"y":2023},{"n":"Italy","v":0.57,"y":2023},
+  {"n":"China","v":0.5,"y":2020},{"n":"South Korea","v":0.48,"y":2023},{"n":"Hong Kong","v":0.38,"y":2023},
+  {"n":"Indonesia","v":0.3,"y":2022},{"n":"Japan","v":0.23,"y":2023},{"n":"Bahrain","v":0.2,"y":2022}
+];
+
+const data = [...high, ...low];
+const maxV = Math.max(...data.map(d => d.v));
+const W = 720, rowH = 22, gap = 14;
+const nHigh = high.length, nLow = low.length;
+const totalRows = nHigh + 1 + nLow; // +1 for separator gap
+const H = totalRows * rowH + gap + 50;
+const margin = {left:110, right:60, top:24, bottom:20};
+const barW = W - margin.left - margin.right;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+
+function xScale(v) { return margin.left + (v / maxV) * barW; }
+
+// Column header
+const hdr = mkEl("text",{x:margin.left,y:14,"font-size":"9","font-family":"JetBrains Mono, monospace",fill:"#7A786F"});
+hdr.textContent = "homicides per 100,000 people";
+svg.appendChild(hdr);
+
+// Grid verticals
+[0,10,20,30,40,50].forEach(v => {
+  if (v > maxV) return;
+  const x = xScale(v);
+  svg.appendChild(mkEl("line",{x1:x,y1:margin.top,x2:x,y2:H-margin.bottom,stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const lbl = mkEl("text",{x,y:H-margin.bottom+10,"font-size":"8","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"middle"});
+  lbl.textContent = v;
+  svg.appendChild(lbl);
+});
+
+const tip = document.getElementById("tip");
+
+// High group label
+const gHdr1 = mkEl("text",{x:margin.left-4,y:margin.top-4,"font-size":"8","font-family":"Inter, sans-serif","font-weight":"600",fill:"#9A9890"});
+gHdr1.textContent = "HIGHEST RATES";
+svg.appendChild(gHdr1);
+
+// Draw bars
+data.forEach((d, i) => {
+  // Insert a gap separator between high and low groups
+  const row = i < nHigh ? i : i + 1; // skip one row at position nHigh
+  const y = margin.top + row * rowH;
+
+  if (i === nHigh) {
+    // Low group label
+    const gHdr2 = mkEl("text",{x:margin.left-4,y:y+rowH*0.7,"font-size":"8","font-family":"Inter, sans-serif","font-weight":"600",fill:"#9A9890"});
+    gHdr2.textContent = "LOWEST RATES";
+    svg.appendChild(gHdr2);
+  }
+
+  const isHigh = i < nHigh;
+  const barColor = isHigh
+    ? (d.v > 30 ? "#EA5E33" : d.v > 15 ? "#F29A44" : "#F5D38A")
+    : "#A6C4A2";
+
+  const bw = xScale(d.v) - margin.left;
+  const barY = y + 4;
+  const barH2 = rowH - 10;
+
+  const bar = mkEl("rect",{x:margin.left,y:barY,width:Math.max(1,bw),height:barH2,fill:barColor,rx:"1"});
+  svg.appendChild(bar);
+
+  // Country name (left)
+  const lbl = mkEl("text",{x:margin.left-5,y:y+rowH/2+3,"font-size":"9.5","font-family":"Inter, sans-serif","font-weight":"500",fill:"#2B2A27","text-anchor":"end"});
+  lbl.textContent = d.n;
+  svg.appendChild(lbl);
+
+  // Value label (right of bar)
+  const vLbl = mkEl("text",{x:xScale(d.v)+4,y:y+rowH/2+3,"font-size":"8.5","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"start"});
+  vLbl.textContent = d.v.toFixed(2);
+  svg.appendChild(vLbl);
+
+  // Hover interaction
+  const hitBox = mkEl("rect",{x:0,y,width:W,height:rowH,fill:"transparent",style:"cursor:pointer"});
+  svg.appendChild(hitBox);
+
+  hitBox.addEventListener("mouseenter", () => {
+    bar.setAttribute("opacity","0.7");
+  });
+  hitBox.addEventListener("mouseleave", () => {
+    bar.setAttribute("opacity","1");
+    tip.style.opacity = "0";
+  });
+  hitBox.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}:  ${d.v.toFixed(2)} per 100,000`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top = (e.clientY-22)+"px";
+  });
+});
+</script>
+</body></html>

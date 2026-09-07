@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Nuclear Electricity: Diverging National Paths</h1>
+<p class="subtitle">Share of electricity produced from nuclear sources (%), 1990–2024. While Germany completed its phase-out and Japan's capacity collapsed after Fukushima (2011), France maintains the world's most nuclear-dependent grid and Czech Republic has quietly grown its share.</p>
+<div id="chart" style="position:relative;"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank — Electricity production from nuclear sources (EG.ELC.NUCL.ZS)</p>
+<script>
+const data = [{"n":"France","pts":[{"y":1990,"v":74.6},{"y":1991,"v":72.7},{"y":1992,"v":73.0},{"y":1993,"v":77.9},{"y":1994,"v":75.5},{"y":1995,"v":76.3},{"y":1996,"v":77.4},{"y":1997,"v":78.3},{"y":1998,"v":75.9},{"y":1999,"v":75.0},{"y":2000,"v":76.9},{"y":2001,"v":76.6},{"y":2002,"v":78.1},{"y":2003,"v":77.8},{"y":2004,"v":78.1},{"y":2005,"v":78.4},{"y":2006,"v":78.3},{"y":2007,"v":77.2},{"y":2008,"v":76.6},{"y":2009,"v":76.5},{"y":2010,"v":75.3},{"y":2011,"v":77.1},{"y":2012,"v":74.2},{"y":2013,"v":72.7},{"y":2014,"v":76.2},{"y":2015,"v":75.4},{"y":2016,"v":71.4},{"y":2017,"v":70.8},{"y":2018,"v":70.9},{"y":2019,"v":69.8},{"y":2020,"v":66.4},{"y":2021,"v":68.3},{"y":2022,"v":62.2},{"y":2023,"v":64.3},{"y":2024,"v":66.8}]},{"n":"Belgium","pts":[{"y":1990,"v":60.2},{"y":1991,"v":59.6},{"y":1992,"v":60.2},{"y":1993,"v":59.2},{"y":1994,"v":56.3},{"y":1995,"v":55.6},{"y":1996,"v":56.9},{"y":1997,"v":60.1},{"y":1998,"v":55.5},{"y":1999,"v":58.0},{"y":2000,"v":57.3},{"y":2001,"v":58.1},{"y":2002,"v":57.7},{"y":2003,"v":56.0},{"y":2004,"v":56.2},{"y":2005,"v":55.6},{"y":2006,"v":55.1},{"y":2007,"v":54.7},{"y":2008,"v":54.0},{"y":2009,"v":51.8},{"y":2010,"v":50.7},{"y":2011,"v":53.2},{"y":2012,"v":48.5},{"y":2013,"v":51.1},{"y":2014,"v":46.5},{"y":2015,"v":37.4},{"y":2016,"v":50.8},{"y":2017,"v":48.7},{"y":2018,"v":38.1},{"y":2019,"v":46.5},{"y":2020,"v":38.5},{"y":2021,"v":50.1},{"y":2022,"v":45.7},{"y":2023,"v":39.4},{"y":2024,"v":40.5}]},{"n":"Hungary","pts":[{"y":1990,"v":48.3},{"y":1991,"v":45.8},{"y":1992,"v":44.1},{"y":1993,"v":41.9},{"y":1994,"v":41.9},{"y":1995,"v":41.2},{"y":1996,"v":40.4},{"y":1997,"v":39.5},{"y":1998,"v":37.5},{"y":1999,"v":37.3},{"y":2000,"v":40.3},{"y":2001,"v":38.8},{"y":2002,"v":38.6},{"y":2003,"v":32.3},{"y":2004,"v":35.3},{"y":2005,"v":38.7},{"y":2006,"v":37.5},{"y":2007,"v":36.7},{"y":2008,"v":37.0},{"y":2009,"v":43.0},{"y":2010,"v":42.2},{"y":2011,"v":43.5},{"y":2012,"v":45.6},{"y":2013,"v":50.7},{"y":2014,"v":53.2},{"y":2015,"v":52.2},{"y":2016,"v":50.3},{"y":2017,"v":48.9},{"y":2018,"v":49.1},{"y":2019,"v":47.5},{"y":2020,"v":46.0},{"y":2021,"v":44.3},{"y":2022,"v":44.2},{"y":2023,"v":44.8},{"y":2024,"v":42.2}]},{"n":"Czech Rep.","pts":[{"y":1990,"v":20.1},{"y":1991,"v":20.0},{"y":1992,"v":20.7},{"y":1993,"v":21.4},{"y":1994,"v":22.1},{"y":1995,"v":20.1},{"y":1996,"v":20.0},{"y":1997,"v":19.3},{"y":1998,"v":20.2},{"y":1999,"v":20.6},{"y":2000,"v":18.5},{"y":2001,"v":19.8},{"y":2002,"v":24.5},{"y":2003,"v":31.1},{"y":2004,"v":31.2},{"y":2005,"v":29.9},{"y":2006,"v":30.9},{"y":2007,"v":29.7},{"y":2008,"v":31.7},{"y":2009,"v":33.1},{"y":2010,"v":32.6},{"y":2011,"v":32.3},{"y":2012,"v":34.7},{"y":2013,"v":35.4},{"y":2014,"v":35.2},{"y":2015,"v":32.0},{"y":2016,"v":28.9},{"y":2017,"v":32.6},{"y":2018,"v":34.0},{"y":2019,"v":34.8},{"y":2020,"v":36.9},{"y":2021,"v":36.1},{"y":2022,"v":36.6},{"y":2023,"v":39.5},{"y":2024,"v":40.2}]},{"n":"Finland","pts":[{"y":1990,"v":35.3},{"y":1991,"v":33.6},{"y":1992,"v":33.4},{"y":1993,"v":32.6},{"y":1994,"v":29.6},{"y":1995,"v":30.0},{"y":1996,"v":28.1},{"y":1997,"v":30.2},{"y":1998,"v":31.1},{"y":1999,"v":33.1},{"y":2000,"v":32.1},{"y":2001,"v":30.6},{"y":2002,"v":29.7},{"y":2003,"v":27.0},{"y":2004,"v":26.5},{"y":2005,"v":33.0},{"y":2006,"v":27.8},{"y":2007,"v":28.8},{"y":2008,"v":29.6},{"y":2009,"v":32.6},{"y":2010,"v":28.3},{"y":2011,"v":31.5},{"y":2012,"v":32.6},{"y":2013,"v":33.1},{"y":2014,"v":34.6},{"y":2015,"v":33.9},{"y":2016,"v":33.7},{"y":2017,"v":33.3},{"y":2018,"v":32.4},{"y":2019,"v":34.8},{"y":2020,"v":33.6},{"y":2021,"v":32.7},{"y":2022,"v":35.1},{"y":2023,"v":42.1},{"y":2024,"v":39.2}]},{"n":"South Korea","pts":[{"y":1990,"v":48.4},{"y":1991,"v":46.9},{"y":1992,"v":42.0},{"y":1993,"v":38.6},{"y":1994,"v":34.4},{"y":1995,"v":35.8},{"y":1996,"v":35.5},{"y":1997,"v":34.0},{"y":1998,"v":41.0},{"y":1999,"v":42.7},{"y":2000,"v":37.7},{"y":2001,"v":36.2},{"y":2002,"v":36.4},{"y":2003,"v":37.5},{"y":2004,"v":35.3},{"y":2005,"v":37.9},{"y":2006,"v":36.7},{"y":2007,"v":35.2},{"y":2008,"v":35.7},{"y":2009,"v":33.9},{"y":2010,"v":31.3},{"y":2011,"v":29.4},{"y":2012,"v":28.1},{"y":2013,"v":25.8},{"y":2014,"v":29.0},{"y":2015,"v":30.0},{"y":2016,"v":28.8},{"y":2017,"v":25.9},{"y":2018,"v":22.5},{"y":2019,"v":24.9},{"y":2020,"v":27.0},{"y":2021,"v":25.2},{"y":2022,"v":28.2},{"y":2023,"v":29.6},{"y":2024,"v":31.1}]},{"n":"Canada","pts":[{"y":1990,"v":15.1},{"y":1991,"v":16.7},{"y":1992,"v":15.5},{"y":1993,"v":17.6},{"y":1994,"v":19.4},{"y":1995,"v":17.4},{"y":1996,"v":16.2},{"y":1997,"v":14.4},{"y":1998,"v":12.7},{"y":1999,"v":12.7},{"y":2000,"v":12.0},{"y":2001,"v":13.0},{"y":2002,"v":12.5},{"y":2003,"v":12.7},{"y":2004,"v":15.1},{"y":2005,"v":14.8},{"y":2006,"v":16.0},{"y":2007,"v":14.9},{"y":2008,"v":15.2},{"y":2009,"v":14.8},{"y":2010,"v":15.0},{"y":2011,"v":14.8},{"y":2012,"v":15.0},{"y":2013,"v":15.7},{"y":2014,"v":16.3},{"y":2015,"v":15.5},{"y":2016,"v":15.2},{"y":2017,"v":15.3},{"y":2018,"v":15.3},{"y":2019,"v":15.5},{"y":2020,"v":15.1},{"y":2021,"v":14.3},{"y":2022,"v":13.2},{"y":2023,"v":14.1},{"y":2024,"v":13.9}]},{"n":"Japan","pts":[{"y":1990,"v":23.2},{"y":1991,"v":23.8},{"y":1992,"v":24.7},{"y":1993,"v":27.3},{"y":1994,"v":27.8},{"y":1995,"v":29.4},{"y":1996,"v":29.9},{"y":1997,"v":30.8},{"y":1998,"v":32.2},{"y":1999,"v":30.2},{"y":2000,"v":30.2},{"y":2001,"v":30.5},{"y":2002,"v":27.6},{"y":2003,"v":22.7},{"y":2004,"v":25.9},{"y":2005,"v":27.5},{"y":2006,"v":27.3},{"y":2007,"v":23.1},{"y":2008,"v":23.3},{"y":2009,"v":25.7},{"y":2010,"v":24.6},{"y":2011,"v":9.2},{"y":2012,"v":1.5},{"y":2013,"v":0.8},{"y":2014,"v":0.0},{"y":2015,"v":0.9},{"y":2016,"v":1.7},{"y":2017,"v":3.0},{"y":2018,"v":6.1},{"y":2019,"v":6.1},{"y":2020,"v":3.8},{"y":2021,"v":6.7},{"y":2022,"v":5.5},{"y":2023,"v":8.4},{"y":2024,"v":9.5}]},{"n":"Germany","pts":[{"y":1990,"v":27.7},{"y":1991,"v":27.3},{"y":1992,"v":29.5},{"y":1993,"v":29.1},{"y":1994,"v":28.5},{"y":1995,"v":28.5},{"y":1996,"v":28.8},{"y":1997,"v":30.9},{"y":1998,"v":29.1},{"y":1999,"v":30.6},{"y":2000,"v":29.4},{"y":2001,"v":29.2},{"y":2002,"v":28.1},{"y":2003,"v":27.1},{"y":2004,"v":27.0},{"y":2005,"v":26.2},{"y":2006,"v":26.1},{"y":2007,"v":21.9},{"y":2008,"v":23.2},{"y":2009,"v":22.6},{"y":2010,"v":22.2},{"y":2011,"v":17.6},{"y":2012,"v":15.8},{"y":2013,"v":15.2},{"y":2014,"v":15.5},{"y":2015,"v":14.2},{"y":2016,"v":13.0},{"y":2017,"v":11.7},{"y":2018,"v":11.9},{"y":2019,"v":12.4},{"y":2020,"v":11.2},{"y":2021,"v":11.7},{"y":2022,"v":6.0},{"y":2023,"v":1.4}]}];
+
+const COLORS = ["#EA5E33","#F29A44","#3D7A5A","#5B9E78","#8BAD72","#C49A45","#C4715A","#A6C4A2","#7A786F"];
+const W = 800, H = 460;
+const margin = {top:30, right:130, bottom:36, left:50};
+const yearMin = 1990, yearMax = 2024;
+const valMin = 0, valMax = 85;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+
+function xScale(year) { return margin.left + (year - yearMin)/(yearMax - yearMin)*(W - margin.left - margin.right); }
+function yScale(val) { return margin.top + (valMax - val)/(valMax - valMin)*(H - margin.top - margin.bottom); }
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap)/2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yScale(v),x2:W-margin.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:margin.left-6,y:yScale(v)+4,"font-size":"9","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"end"})).textContent = v + "%";
+});
+
+// Year axis
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("text",{x:xScale(y),y:H-margin.bottom+16,"font-size":"9","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"middle"})).textContent = y;
+});
+
+// Fukushima annotation
+const fx = xScale(2011);
+const fLine = mkEl("line",{x1:fx,y1:margin.top,x2:fx,y2:H-margin.bottom,stroke:"#C2C0B5","stroke-width":"0.8","stroke-dasharray":"4,3"});
+svg.appendChild(fLine);
+const fLabel = mkEl("text",{x:fx+3,y:margin.top+10,"font-size":"8","font-family":"JetBrains Mono, monospace",fill:"#9A9890"});
+fLabel.textContent = "Fukushima";
+svg.appendChild(fLabel);
+
+// Build endpoint labels for collision resolution
+const endLabels = data.map((s, i) => {
+  const last = s.pts[s.pts.length - 1];
+  return {idx: i, y: yScale(last.v), origY: yScale(last.v), val: last.v, name: s.n};
+});
+const resolved = resolveCollisions(endLabels.map(e => ({...e})), 12);
+
+// Draw lines
+const groups = [];
+data.forEach((series, i) => {
+  const color = COLORS[i];
+  const g = mkEl("g",{});
+
+  const pathD = series.pts.map((p,j) => `${j===0?"M":"L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path",{d:pathD,stroke:color,"stroke-width":"1.8",fill:"none","stroke-linejoin":"round"});
+  g.appendChild(line);
+
+  // Invisible hit area
+  const hit = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none","stroke-linejoin":"round",style:"cursor:pointer"});
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  groups.push({g, line, hit, series, color});
+});
+
+// Draw endpoint labels (after lines so they're on top)
+const tip = document.getElementById("tip");
+resolved.forEach((label, ri) => {
+  const i = endLabels.findIndex(e => e.idx === label.idx);
+  const resolvedItem = resolved.find(r => r.idx === label.idx);
+  const lx = W - margin.right + 6;
+  const ly = resolvedItem.y;
+
+  // Leader line if displaced
+  const origY = endLabels.find(e => e.idx === label.idx).origY;
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:W-margin.right,y1:origY,x2:lx,y2:ly,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  }
+
+  const txt = mkEl("text",{x:lx,y:ly+3,"font-size":"9","font-family":"Inter, sans-serif","font-weight":"500",fill:"#2B2A27"});
+  txt.textContent = `${label.val.toFixed(1)}%  ${label.name}`;
+  svg.appendChild(txt);
+});
+
+// Interactivity
+groups.forEach(({g, line, hit, series, color}) => {
+  function onEnter(e) {
+    groups.forEach(({line: l}) => l.setAttribute("opacity","0.1"));
+    line.setAttribute("opacity","1");
+    line.setAttribute("stroke-width","3");
+  }
+  function onLeave() {
+    groups.forEach(({line: l}) => { l.setAttribute("opacity","1"); l.setAttribute("stroke-width","1.8"); });
+    tip.style.opacity = "0";
+  }
+  function onMove(e) {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(series.pts.length-1, Math.round(ratio*(series.pts.length-1))));
+    const pt = series.pts[idx];
+    tip.textContent = `${series.n}  ${pt.y}: ${pt.v.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  }
+  hit.addEventListener("mouseenter", onEnter);
+  hit.addEventListener("mouseleave", onLeave);
+  hit.addEventListener("mousemove", onMove);
+});
+</script>
+</body></html>
