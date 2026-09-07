@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Global Higher Education Boom</h1>
+<p class="subtitle">Tertiary school enrollment as % of gross enrollment (students per 100 people of college-going age), by world region, 1999–2024. East Asia & Pacific surged from 17% to 63%, while Sub-Saharan Africa remains far behind at under 10%.</p>
+<div id="chart" style="position:relative;"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank — School enrollment, tertiary % gross (SE.TER.ENRR)</p>
+<script>
+const data = [
+  {"n":"Europe & Central Asia","pts":[{"y":1999,"v":43.6},{"y":2000,"v":45.8},{"y":2001,"v":48.1},{"y":2002,"v":50.7},{"y":2003,"v":53.2},{"y":2004,"v":54.4},{"y":2005,"v":56.1},{"y":2006,"v":57.6},{"y":2007,"v":58.7},{"y":2008,"v":59.5},{"y":2009,"v":60.6},{"y":2010,"v":62.2},{"y":2011,"v":63.2},{"y":2012,"v":63.8},{"y":2013,"v":64.9},{"y":2014,"v":66.4},{"y":2015,"v":67.4},{"y":2016,"v":68.9},{"y":2017,"v":70.5},{"y":2018,"v":72.0},{"y":2019,"v":73.7},{"y":2020,"v":75.7},{"y":2021,"v":79.2},{"y":2022,"v":81.0},{"y":2023,"v":81.5},{"y":2024,"v":84.9}]},
+  {"n":"North America","pts":[{"y":1999,"v":69.6},{"y":2000,"v":66.9},{"y":2001,"v":71.5},{"y":2002,"v":76.0},{"y":2003,"v":77.6},{"y":2004,"v":79.2},{"y":2005,"v":78.8},{"y":2006,"v":81.1},{"y":2007,"v":82.1},{"y":2008,"v":83.0},{"y":2009,"v":85.3},{"y":2010,"v":85.4},{"y":2011,"v":85.8},{"y":2012,"v":86.1},{"y":2013,"v":86.5},{"y":2014,"v":86.6},{"y":2015,"v":86.8},{"y":2016,"v":87.0},{"y":2017,"v":86.4},{"y":2018,"v":86.4},{"y":2019,"v":86.4},{"y":2020,"v":86.3},{"y":2021,"v":84.4},{"y":2022,"v":79.3},{"y":2023,"v":82.2},{"y":2024,"v":79.0}]},
+  {"n":"East Asia & Pacific","pts":[{"y":1999,"v":15.1},{"y":2000,"v":16.6},{"y":2001,"v":17.5},{"y":2002,"v":19.1},{"y":2003,"v":20.8},{"y":2004,"v":22.3},{"y":2005,"v":23.5},{"y":2006,"v":24.7},{"y":2007,"v":25.5},{"y":2008,"v":26.2},{"y":2009,"v":27.4},{"y":2010,"v":29.0},{"y":2011,"v":30.5},{"y":2012,"v":32.6},{"y":2013,"v":35.0},{"y":2014,"v":41.9},{"y":2015,"v":44.3},{"y":2016,"v":45.9},{"y":2017,"v":46.6},{"y":2018,"v":47.4},{"y":2019,"v":49.5},{"y":2020,"v":52.7},{"y":2021,"v":56.1},{"y":2022,"v":59.3},{"y":2023,"v":61.9},{"y":2024,"v":63.3}]},
+  {"n":"Latin America & Caribbean","pts":[{"y":1999,"v":22.6},{"y":2000,"v":23.8},{"y":2001,"v":25.3},{"y":2002,"v":27.1},{"y":2003,"v":28.7},{"y":2004,"v":30.1},{"y":2005,"v":31.8},{"y":2006,"v":38.6},{"y":2007,"v":36.4},{"y":2008,"v":39.3},{"y":2009,"v":40.3},{"y":2010,"v":41.8},{"y":2011,"v":43.2},{"y":2012,"v":44.4},{"y":2013,"v":45.5},{"y":2014,"v":47.1},{"y":2015,"v":48.4},{"y":2016,"v":50.4},{"y":2017,"v":51.8},{"y":2018,"v":52.4},{"y":2019,"v":53.4},{"y":2020,"v":54.9},{"y":2021,"v":56.8},{"y":2022,"v":58.2},{"y":2023,"v":60.6},{"y":2024,"v":58.9}]},
+  {"n":"South Asia","pts":[{"y":1999,"v":9.2},{"y":2000,"v":9.2},{"y":2001,"v":9.4},{"y":2002,"v":9.9},{"y":2003,"v":10.3},{"y":2004,"v":10.6},{"y":2005,"v":10.5},{"y":2006,"v":11.3},{"y":2007,"v":12.9},{"y":2008,"v":14.7},{"y":2009,"v":15.8},{"y":2010,"v":17.6},{"y":2011,"v":21.8},{"y":2012,"v":23.1},{"y":2013,"v":22.7},{"y":2014,"v":24.0},{"y":2015,"v":25.4},{"y":2016,"v":25.5},{"y":2017,"v":26.1},{"y":2018,"v":26.9},{"y":2019,"v":27.7},{"y":2020,"v":28.2},{"y":2021,"v":29.8},{"y":2022,"v":30.9},{"y":2023,"v":32.4},{"y":2024,"v":32.8}]},
+  {"n":"World","pts":[{"y":1999,"v":18.8},{"y":2000,"v":19.5},{"y":2001,"v":20.4},{"y":2002,"v":21.6},{"y":2003,"v":22.8},{"y":2004,"v":23.6},{"y":2005,"v":24.3},{"y":2006,"v":25.7},{"y":2007,"v":26.3},{"y":2008,"v":27.4},{"y":2009,"v":28.3},{"y":2010,"v":29.6},{"y":2011,"v":31.1},{"y":2012,"v":32.3},{"y":2013,"v":33.1},{"y":2014,"v":35.6},{"y":2015,"v":36.6},{"y":2016,"v":37.1},{"y":2017,"v":37.5},{"y":2018,"v":37.9},{"y":2019,"v":38.7},{"y":2020,"v":39.7},{"y":2021,"v":41.1},{"y":2022,"v":42.0},{"y":2023,"v":43.2},{"y":2024,"v":43.6}]},
+  {"n":"Sub-Saharan Africa","pts":[{"y":1970,"v":1.4},{"y":1980,"v":2.1},{"y":1990,"v":3.1},{"y":1999,"v":4.0},{"y":2000,"v":4.4},{"y":2001,"v":4.7},{"y":2002,"v":5.1},{"y":2003,"v":5.5},{"y":2004,"v":5.7},{"y":2005,"v":6.1},{"y":2006,"v":6.2},{"y":2007,"v":6.4},{"y":2008,"v":6.7},{"y":2009,"v":7.1},{"y":2010,"v":7.6},{"y":2011,"v":7.9},{"y":2012,"v":8.2},{"y":2013,"v":8.6},{"y":2014,"v":8.7},{"y":2015,"v":8.8},{"y":2016,"v":8.8},{"y":2017,"v":9.0},{"y":2018,"v":9.1},{"y":2019,"v":9.1},{"y":2020,"v":9.2},{"y":2021,"v":9.3}]}
+];
+
+const COLORS = ["#3D7A5A","#EA5E33","#F29A44","#5B9E78","#C49A45","#9A9890","#B34B3B"];
+const W = 800, H = 460;
+const margin = {top:30, right:160, bottom:36, left:50};
+const yearMin = 1999, yearMax = 2024;
+const valMin = 0, valMax = 100;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+
+function xScale(year) { return margin.left + (year - yearMin)/(yearMax - yearMin)*(W - margin.left - margin.right); }
+function yScale(val) { return margin.top + (valMax - val)/(valMax - valMin)*(H - margin.top - margin.bottom); }
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap)/2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Grid lines
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yScale(v),x2:W-margin.right,y2:yScale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const lbl = mkEl("text",{x:margin.left-6,y:yScale(v)+4,"font-size":"9","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"end"});
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// Year axis
+[1999,2005,2010,2015,2020,2024].forEach(y => {
+  const lbl = mkEl("text",{x:xScale(y),y:H-margin.bottom+16,"font-size":"9","font-family":"JetBrains Mono, monospace",fill:"#7A786F","text-anchor":"middle"});
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+// Build endpoint labels
+const endLabels = data.map((s, i) => {
+  const visiblePts = s.pts.filter(p => p.y >= yearMin);
+  const last = visiblePts[visiblePts.length - 1];
+  return {idx: i, y: yScale(last.v), origY: yScale(last.v), val: last.v, name: s.n};
+});
+const resolved = resolveCollisions(endLabels.map(e => ({...e})), 12);
+
+data.forEach((series, i) => {
+  const color = COLORS[i];
+  const visiblePts = series.pts.filter(p => p.y >= yearMin);
+  const pathD = visiblePts.map((p,j) => `${j===0?"M":"L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path",{d:pathD,stroke:color,"stroke-width":"2",fill:"none","stroke-linejoin":"round"});
+  svg.appendChild(line);
+
+  const hit = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none",style:"cursor:pointer"});
+  svg.appendChild(hit);
+
+  groups.push({line, hit, series, color, visiblePts});
+});
+
+// Draw endpoint labels
+resolved.forEach(label => {
+  const i = endLabels.findIndex(e => e.idx === label.idx);
+  const origY = endLabels[label.idx].origY;
+  const lx = W - margin.right + 8;
+  const ly = label.y;
+  if (Math.abs(ly - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:W-margin.right,y1:origY,x2:lx,y2:ly,stroke:"#C2C0B5","stroke-width":"0.5"}));
+  }
+  const txt = mkEl("text",{x:lx,y:ly+3,"font-size":"9","font-family":"Inter, sans-serif","font-weight":"500",fill:COLORS[label.idx]});
+  txt.textContent = `${label.val.toFixed(1)}%  ${label.name}`;
+  svg.appendChild(txt);
+});
+
+// Interactivity
+groups.forEach(({line, hit, series, visiblePts}) => {
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach(({line:l}) => l.setAttribute("opacity","0.1"));
+    line.setAttribute("opacity","1");
+    line.setAttribute("stroke-width","3");
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(({line:l}) => { l.setAttribute("opacity","1"); l.setAttribute("stroke-width","2"); });
+    tip.style.opacity = "0";
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(visiblePts.length-1, Math.round(ratio*(visiblePts.length-1))));
+    const pt = visiblePts[idx];
+    tip.textContent = `${series.n}  ${pt.y}: ${pt.v.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+14)+"px";
+    tip.style.top = (e.clientY-22)+"px";
+  });
+});
+</script>
+</body></html>
