@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Gross Savings Rate: Who Is Saving More? 2000 vs 2023</h1>
+<p class="subtitle">National gross savings as % of GDP. Asian economies have surged; Greece collapsed after its debt crisis; Denmark and Indonesia joined the high-savers club.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Gross savings (% of GDP) (NY.GNS.ICTR.ZS)</p>
+<script>
+const data = [
+  {"n":"China","a":35.6,"b":42.6,"y":2000},
+  {"n":"Korea, Rep.","a":34.2,"b":33.4,"y":2000},
+  {"n":"Japan","a":32.2,"b":31.4,"y":2000},
+  {"n":"Bangladesh","a":27.8,"b":34.9,"y":2000},
+  {"n":"Indonesia","a":26.3,"b":35.9,"y":2000},
+  {"n":"Denmark","a":24.9,"b":34.6,"y":2000},
+  {"n":"Canada","a":23.8,"b":21.9,"y":2000},
+  {"n":"France","a":23.7,"b":21.7,"y":2000},
+  {"n":"Germany","a":22.1,"b":27.6,"y":2000},
+  {"n":"Australia","a":21.2,"b":23.8,"y":2000},
+  {"n":"Greece","a":20.2,"b":9.1,"y":2000},
+  {"n":"India","a":26.1,"b":34.4,"y":2000},
+  {"n":"Ghana","a":15.3,"b":9.2,"y":2000},
+  {"n":"Brazil","a":14.0,"b":15.0,"y":2000}
+];
+
+const W = 700, H = 560;
+const pad = { left: 135, right: 145, top: 50, bottom: 30 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const minV = 5, maxV = 47;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left, xRight = W - pad.right;
+
+["2000", "2023"].forEach((label, i) => {
+  svg.appendChild(mkEl("text", {
+    x: i === 0 ? xLeft : xRight, y: pad.top - 18,
+    "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "10", "font-weight": "500", fill: "#7A786F"
+  }, label));
+});
+
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top - 10, x2: xLeft, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top - 10, x2: xRight, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+function colorForChange(change) {
+  if (change > 7) return "#3D7A5A";
+  if (change > 3) return "#5B9E78";
+  if (change > -3) return "#C49A45";
+  if (change > -8) return "#F29A44";
+  return "#B34B3B";
+}
+
+const groups = data.map(d => ({
+  d, ay: scale(d.a), by: scale(d.b),
+  color: colorForChange(d.b - d.a)
+}));
+
+function resolveCollisions(items, minGap) {
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < items.length; i++) {
+      const gap = items[i].y - items[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        items[i - 1].y -= shift;
+        items[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  items.forEach(it => { it.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 4, it.y)); });
+  return items;
+}
+
+const leftItems = groups.map(g => ({ y: g.ay, ref: g })).sort((a, b) => a.y - b.y);
+resolveCollisions(leftItems, 13);
+const rightItems = groups.map(g => ({ y: g.by, ref: g })).sort((a, b) => a.y - b.y);
+resolveCollisions(rightItems, 13);
+
+const tip = document.getElementById("tip");
+const rowEls = [];
+
+groups.forEach((g, gi) => {
+  const line = mkEl("line", { x1: xLeft, y1: g.ay, x2: xRight, y2: g.by, stroke: g.color, "stroke-width": "1.8", opacity: "1" });
+  const hit = mkEl("line", { x1: xLeft - 10, y1: g.ay, x2: xRight + 10, y2: g.by, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+  rowEls.push({ line });
+  svg.appendChild(line);
+  svg.appendChild(hit);
+
+  hit.addEventListener("mouseenter", e => {
+    const change = g.d.b - g.d.a;
+    tip.textContent = `${g.d.n}: ${g.d.a}% → ${g.d.b}% (${change >= 0 ? "+" : ""}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+    rowEls.forEach((el, i) => { el.line.style.opacity = i === gi ? "1" : "0.1"; el.line.setAttribute("stroke-width", i === gi ? "3" : "1.8"); });
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    rowEls.forEach(el => { el.line.style.opacity = "1"; el.line.setAttribute("stroke-width", "1.8"); });
+  });
+});
+
+leftItems.forEach(item => {
+  const g = item.ref;
+  if (Math.abs(item.y - g.ay) > 2) {
+    svg.appendChild(mkEl("line", { x1: xLeft, y1: g.ay, x2: xLeft - 3, y2: item.y, stroke: g.color, "stroke-width": "0.6", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", { x: xLeft - 8, y: item.y + 3.5, "text-anchor": "end", "font-size": "9", fill: "#2B2A27" }, g.d.n));
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 8, y: item.y + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "8.5", fill: "#9A9890"
+  }, `${g.d.a}%  `));
+});
+
+rightItems.forEach(item => {
+  const g = item.ref;
+  if (Math.abs(item.y - g.by) > 2) {
+    svg.appendChild(mkEl("line", { x1: xRight, y1: g.by, x2: xRight + 3, y2: item.y, stroke: g.color, "stroke-width": "0.6", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", { x: xRight + 8, y: item.y + 3.5, "text-anchor": "start", "font-size": "9", fill: g.color }, `${g.d.b}%`));
+});
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "+7pp or more" },
+  { color: "#5B9E78", label: "+3 to +7pp" },
+  { color: "#C49A45", label: "Roughly stable" },
+  { color: "#F29A44", label: "−3 to −8pp" },
+  { color: "#B34B3B", label: "−8pp or more" }
+];
+legendItems.forEach((li, i) => {
+  const lx = pad.left + i * 115, ly = H - 8;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 8, height: 8, fill: li.color, rx: "1" }));
+  svg.appendChild(mkEl("text", { x: lx + 11, y: ly, "font-size": "9", fill: "#7A786F" }, li.label));
+});
+</script>
+</body></html>
