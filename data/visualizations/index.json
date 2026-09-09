@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Aging World: Old-Age Dependency Ratios, 1960\u20132024",
+      "description": "Trend lines showing the ratio of older dependents (65+) per 100 working-age people (15\u201364) for 9 contrasting economies. Japan surged from 9 to 51; South Korea is following the same trajectory decades later.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan's old-age dependency ratio grew from 8.9 in 1960 to 50.7 in 2024 \u2014 world's highest",
+        "South Korea rose from 5.6 to 27.5, the fastest aging trajectory after Japan",
+        "Chad and Sub-Saharan Africa remain below 5 \u2014 a young population dividend"
+      ],
+      "createdAt": "2026-09-09T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Nuclear Electricity: Diverging Paths, 1990\u20132024",
+      "description": "Trend lines for 8 key nuclear nations showing the % of electricity from nuclear sources. Germany deliberately exited; Japan collapsed after Fukushima; France and Eastern Europe held steady.",
+      "datasetIds": [
+        "wb--EG-ELC-NUCL-ZS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "France maintained 62\u201378% nuclear share throughout, the highest of any large economy",
+        "Germany fell from 28% in 1990 to ~1.4% in 2023 after its Energiewende phase-out",
+        "Japan crashed from 25% to near 0% after Fukushima (2011) and is slowly recovering"
+      ],
+      "createdAt": "2026-09-09T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Hydroelectric Power: Who Diversified, 2000 vs 2023",
+      "description": "Slope chart comparing the share of electricity from hydropower in 2000 versus 2023 for countries where hydro was historically dominant. Some held steady; others diversified sharply.",
+      "datasetIds": [
+        "wb--EG-ELC-HYRO-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Congo DR, Ethiopia, and Albania still generate over 96% of electricity from hydro",
+        "Congo Rep. fell from 99.7% to 35% and Ghana from 91.5% to 38% as thermal expanded",
+        "Angola increased its hydro share from 63% to 72% by completing new dam capacity"
+      ],
+      "createdAt": "2026-09-09T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Gross Savings Rate: Who Is Saving More? 2000 vs 2023",
+      "description": "Slope chart of gross savings (% of GDP) comparing 2000 and 2023 for 14 economies. Asian nations raised savings; Greece collapsed after its debt crisis.",
+      "datasetIds": [
+        "wb--NY-GNS-ICTR-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Denmark rose from 25% to 35% and Indonesia from 26% to 36% \u2014 joining Asian high-savers",
+        "Greece fell from 20% to 9% and Ghana from 15% to 9%, both squeezed by fiscal crises",
+        "China at 42.6% and Bangladesh at 34.9% illustrate the Asian savings surplus"
+      ],
+      "createdAt": "2026-09-09T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Labor Productivity: GDP per Worker, 1991\u20132024",
+      "description": "Trend lines of GDP per person employed (constant 2021 PPP $) from 1991 to 2024. China's 14-fold rise contrasts with Italy and Japan's near-stagnation.",
+      "datasetIds": [
+        "wb--SL-GDP-PCAP-EM-KD"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China's output per worker grew 14x \u2014 from $3,280 in 1991 to $45,834 in 2024",
+        "South Korea converged toward Western European levels ($36k to $98k in 33 years)",
+        "Italy grew only 15% over 33 years; Japan grew 20% \u2014 both near the bottom of rich-country peers"
+      ],
+      "createdAt": "2026-09-09T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-09T00:00:00.000Z"
 }
