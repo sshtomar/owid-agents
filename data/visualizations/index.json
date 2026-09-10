@@ -5858,7 +5858,76 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourist Arrivals, 1995\u20132020",
+      "description": "Trend lines showing annual international tourist arrivals (millions) for the top 10 destination countries. Reveals decades of growth and the unprecedented COVID-19 collapse in 2020 \u2014 Hong Kong fell 94% from its 2018 peak.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "France led with 217.9M arrivals in 2019, the largest in the world",
+        "Hong Kong collapsed from 65.1M (2018) to just 3.6M in 2020 (-94%)",
+        "Japan grew from 3.3M in 1995 to 31.9M in 2019, a 10x increase",
+        "COVID-19 wiped out 25 years of global tourism growth in a single year"
+      ],
+      "createdAt": "2026-09-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Use per Capita, 1990\u20132022",
+      "description": "Trend lines showing total primary energy consumption per person (kg of oil equivalent) for 8 countries spanning the income spectrum. China\u2019s rapid industrialization is narrowing the gap with Germany.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Canada stable at ~7,500 kg; Korea rose 2.6x from 2,088 to 5,412 kg",
+        "Germany declined 35% (4,422 to 2,825 kg) through efficiency and deindustrialization",
+        "China tripled energy use per capita, from 773 to 2,676 kg \u2014 approaching Germany",
+        "Chad at 199 kg uses just 2.6% of what Canada consumes per person"
+      ],
+      "createdAt": "2026-09-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Old-Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing people aged 65+ per 100 working-age adults. Japan\u2019s demographic aging is without parallel \u2014 it now has more than 50 retirees per 100 workers, while India remains comparatively young.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan reached 50.7 retirees per 100 workers in 2024 \u2014 the highest in the world",
+        "Korea jumped from 5.6% (1960) to 27.5% (2024), one of the fastest aging transitions",
+        "China\u2019s one-child policy effects are now visible as a steep rise from ~2010",
+        "India at 10.5% remains among the world\u2019s youngest major economies"
+      ],
+      "createdAt": "2026-09-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Employment in Industry: 1995 vs. 2022",
+      "description": "Slope chart comparing industry\u2019s share of total employment between 1995 and 2022. Rich economies shed industrial jobs while China and India absorbed them \u2014 a structural shift in where the world\u2019s factories are.",
+      "datasetIds": [
+        "wb--SL-IND-EMPL-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Hong Kong lost 13pp (27% to 14%) as finance replaced manufacturing",
+        "India gained 11pp (15% to 26%), the largest increase in the set",
+        "China grew from 23% to 31% while already-industrialized neighbors declined",
+        "Ethiopia barely moved (6.5% to 6.3%) \u2014 still pre-industrial"
+      ],
+      "createdAt": "2026-09-10T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-10T00:00:00.000Z"
 }

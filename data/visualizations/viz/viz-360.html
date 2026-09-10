@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>Employment in Industry: 1995 vs. 2022</h1>
+<p class="subtitle">Share of total employment in industry (manufacturing, construction, mining) as a percentage. Rich economies deindustrialized sharply while China, India, and Indonesia added industrial workers.</p>
+<div id="chart" style="position:relative"></div>
+<div class="tip" id="tip"></div>
+<p class="source">Source: World Bank — Employment in Industry, % of total (SL.IND.EMPL.ZS) · ILO modelled estimates</p>
+<script>
+// Data from catalog: wb--SL-IND-EMPL-ZS
+// 15 selected countries, 1995 vs 2022
+// Color: warm = deindustrializing, green = industrializing
+// a = 1995 value, b = 2022 value, y = before-year (used by validator)
+const data = [
+  {"n":"Czechia",    "y":1995,"a":44.6,"b":36.9,"c":"#F29A44"},
+  {"n":"Bulgaria",   "y":1995,"a":38.5,"b":30.2,"c":"#EA5E33"},
+  {"n":"Germany",    "y":1995,"a":36.0,"b":26.8,"c":"#EA5E33"},
+  {"n":"Korea",      "y":1995,"a":34.5,"b":24.5,"c":"#EA5E33"},
+  {"n":"Italy",      "y":1995,"a":33.7,"b":26.9,"c":"#F29A44"},
+  {"n":"Japan",      "y":1995,"a":32.3,"b":23.6,"c":"#EA5E33"},
+  {"n":"Ireland",    "y":1995,"a":27.8,"b":19.4,"c":"#EA5E33"},
+  {"n":"Hong Kong",  "y":1995,"a":27.4,"b":14.0,"c":"#B34B3B"},
+  {"n":"France",     "y":1995,"a":27.1,"b":19.3,"c":"#F29A44"},
+  {"n":"Greece",     "y":1995,"a":23.6,"b":15.6,"c":"#EA5E33"},
+  {"n":"China",      "y":1995,"a":23.0,"b":30.9,"c":"#3D7A5A"},
+  {"n":"Indonesia",  "y":1995,"a":17.2,"b":21.9,"c":"#8BAD72"},
+  {"n":"India",      "y":1995,"a":15.0,"b":26.1,"c":"#3D7A5A"},
+  {"n":"Bangladesh", "y":1995,"a":13.3,"b":18.0,"c":"#8BAD72"},
+  {"n":"Ethiopia",   "y":1995,"a":6.5, "b":6.3, "c":"#9A9890"}
+];
+
+const W = 700, H = 580;
+const pad = { left: 120, right: 132, top: 58, bottom: 28 };
+const valMin = 0, valMax = 50;
+
+const xA = pad.left;
+const xB = W - pad.right;
+const chartH = H - pad.top - pad.bottom;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, txt) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (txt !== undefined) el.textContent = txt;
+  return el;
+}
+
+function ySc(v) { return pad.top + (valMax - v) / (valMax - valMin) * chartH; }
+
+// Column headers
+svg.appendChild(mkEl("text", {x: xA, y: pad.top - 16, fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace", "text-anchor": "middle"}, "1995"));
+svg.appendChild(mkEl("text", {x: xB, y: pad.top - 16, fill: "#7A786F", "font-size": "10", "font-family": "JetBrains Mono, monospace", "text-anchor": "middle"}, "2022"));
+
+// Axis tick marks
+[10, 20, 30, 40].forEach(v => {
+  svg.appendChild(mkEl("text", {x: xA - 4, y: ySc(v) + 3.5, fill: "#C2C0B5", "font-size": "8", "font-family": "JetBrains Mono, monospace", "text-anchor": "end"}, v + "%"));
+  svg.appendChild(mkEl("text", {x: xB + 4, y: ySc(v) + 3.5, fill: "#C2C0B5", "font-size": "8", "font-family": "JetBrains Mono, monospace"}, v + "%"));
+});
+
+// Legend
+const legendX = pad.left + 20;
+const legendY = pad.top - 36;
+const legendItems = [
+  {c: "#B34B3B", l: "Deindustrializing (>10pp loss)"},
+  {c: "#EA5E33", l: "Deindustrializing (7–10pp)"},
+  {c: "#F29A44", l: "Moderate decline (4–7pp)"},
+  {c: "#3D7A5A", l: "Industrializing (>5pp gain)"},
+  {c: "#8BAD72", l: "Mild increase"}
+];
+legendItems.forEach((item, i) => {
+  const lx = legendX + i * 148;
+  if (lx + 80 > W) return;
+  svg.appendChild(mkEl("rect", {x: lx, y: legendY + 2, width: 8, height: 8, fill: item.c, rx: "1"}));
+  svg.appendChild(mkEl("text", {x: lx + 12, y: legendY + 9.5, fill: "#7A786F", "font-size": "8", "font-family": "Inter, sans-serif"}, item.l));
+});
+
+function resolveCollisions(items, minGap, yMin, yMax) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 50; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(item => { item.y = Math.max(yMin, Math.min(yMax, item.y)); });
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const rowEls = [];
+
+const leftLabels = data.map((d, i) => ({y: ySc(d.a), origY: ySc(d.a), idx: i}));
+const rightLabels = data.map((d, i) => ({y: ySc(d.b), origY: ySc(d.b), idx: i}));
+
+resolveCollisions(leftLabels, 13, pad.top + 3, H - pad.bottom - 3);
+resolveCollisions(rightLabels, 13, pad.top + 3, H - pad.bottom - 3);
+
+data.forEach((d, i) => {
+  const g = mkEl("g", {});
+  const yA = ySc(d.a);
+  const yB = ySc(d.b);
+
+  const line = mkEl("line", {x1: xA, y1: yA, x2: xB, y2: yB, stroke: d.c, "stroke-width": "1.5", "stroke-linecap": "round"});
+  g.appendChild(line);
+
+  const dotA = mkEl("circle", {cx: xA, cy: yA, r: "2.5", fill: d.c});
+  const dotB = mkEl("circle", {cx: xB, cy: yB, r: "2.5", fill: d.c});
+  g.appendChild(dotA);
+  g.appendChild(dotB);
+
+  // Hit area
+  const hit = mkEl("line", {x1: xA, y1: yA, x2: xB, y2: yB, stroke: "transparent", "stroke-width": "14", style: "cursor:pointer"});
+  const change = d.b - d.a;
+  hit.addEventListener("mouseenter", e => {
+    tip.textContent = `${d.n}  1995: ${d.a}%  →  2022: ${d.b}%  (${change >= 0 ? "+" : ""}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1"; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px";
+    rowEls.forEach((el, j) => el.setAttribute("opacity", j === i ? "1" : "0.12"));
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    rowEls.forEach(el => el.setAttribute("opacity", "1"));
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  rowEls.push(g);
+});
+
+// Draw labels after all rows (so they appear on top)
+data.forEach((d, i) => {
+  const lbl = leftLabels.find(l => l.idx === i);
+  const rbll = rightLabels.find(l => l.idx === i);
+
+  // Left label: "CountryName  value%" right-aligned
+  svg.appendChild(mkEl("text", {
+    x: xA - 8, y: lbl.y + 3.5, fill: d.c,
+    "font-size": "9", "font-family": "Inter, sans-serif", "font-weight": "500",
+    "text-anchor": "end"
+  }, `${d.n}  ${d.a}%`));
+
+  // Right label: "value%  CountryName" left-aligned
+  svg.appendChild(mkEl("text", {
+    x: xB + 8, y: rbll.y + 3.5, fill: d.c,
+    "font-size": "9", "font-family": "Inter, sans-serif", "font-weight": "500"
+  }, `${d.b}%  ${d.n}`));
+
+  // Faint leader lines if label was displaced
+  const yA = ySc(d.a);
+  if (Math.abs(lbl.y - yA) > 3) {
+    svg.appendChild(mkEl("line", {x1: xA - 2, y1: yA, x2: xA - 6, y2: lbl.y, stroke: d.c, "stroke-width": "0.4", opacity: "0.4"}));
+  }
+  const yB = ySc(d.b);
+  if (Math.abs(rbll.y - yB) > 3) {
+    svg.appendChild(mkEl("line", {x1: xB + 2, y1: yB, x2: xB + 6, y2: rbll.y, stroke: d.c, "stroke-width": "0.4", opacity: "0.4"}));
+  }
+});
+</script></body></html>
