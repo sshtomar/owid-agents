@@ -5858,7 +5858,115 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Solar Surge: Electricity Generation by Country, 2000\u20132025",
+      "description": "Trend lines for the top 10 solar-generating countries showing solar electricity output in TWh from 2000 to 2025. China alone now generates as much solar power as the next nine countries combined.",
+      "datasetIds": [
+        "ember--GEN-SOLAR"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "generatedCode": "",
+      "highlights": [
+        "China generated 1,175 TWh of solar in 2025 \u2014 more than the next 9 countries combined",
+        "Solar generation doubled every 2\u20133 years for most top producers between 2015 and 2025",
+        "Brazil and India are the fastest-growing solar markets outside China"
+      ],
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Wind Power's Steady Rise: Electricity Generation by Country, 2000\u20132025",
+      "description": "Trend lines for the top 10 wind-generating countries showing wind electricity output in TWh from 2000 to 2025. Unlike solar, wind leadership is spread more evenly, with China, the USA, Germany, and Brazil all approaching or exceeding 100 TWh.",
+      "datasetIds": [
+        "ember--GEN-WIND"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "generatedCode": "",
+      "highlights": [
+        "China overtook the USA as the world's top wind power generator around 2012",
+        "Brazil grew from near zero in 2000 to 118 TWh in 2025 \u2014 a standout late mover",
+        "Wind is far more evenly distributed than solar: 4 countries each exceed 100 TWh"
+      ],
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "The Solar Capacity Race: 24 Countries, 2000\u20132025",
+      "description": "Sparkline grid showing installed solar capacity growth (GW) for the top 24 countries. Each cell is scaled to its own range, revealing the growth curve shape \u2014 from China's exponential climb to late movers like Poland and Vietnam.",
+      "datasetIds": [
+        "ember--CAP-SOLAR"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-359.html",
+      "generatedCode": "",
+      "highlights": [
+        "China reached 1,202 GW by 2025 \u2014 more than the rest of the top 24 combined",
+        "Vietnam installed nearly all of its 19 GW capacity in a single year (2019)",
+        "Poland, Turkey, and Chile show dramatic late-decade acceleration curves"
+      ],
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Global Depression Rates: Estimated Prevalence by Country, 2015",
+      "description": "Horizontal bar chart ranking 37 countries by estimated depression prevalence (% of population) in 2015. Eastern European and high-income countries cluster at the top; Pacific island nations show the lowest rates.",
+      "datasetIds": [
+        "who--GDO_q35"
+      ],
+      "chartType": "bar-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "generatedCode": "",
+      "highlights": [
+        "Ukraine (6.3%), Australia (5.9%), and Estonia (5.9%) have the highest estimated rates",
+        "Solomon Islands (2.9%), Papua New Guinea (3.0%), and Timor-Leste (3.0%) show the lowest",
+        "High-income countries tend to have higher measured rates, partly due to better diagnosis"
+      ],
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Deindustrialisation and the Asian Factory: Manufacturing as % of GDP, 1990\u20132024",
+      "description": "Trend lines showing manufacturing value added as a share of GDP for 8 countries from 1990 to 2024. France fell from 16% to under 10%; Bangladesh climbed from 13% to 22% on the back of garments.",
+      "datasetIds": [
+        "wb--NV-IND-MANF-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-361.html",
+      "generatedCode": "",
+      "highlights": [
+        "France's manufacturing share halved from 16% in 1990 to under 10% by 2024",
+        "Bangladesh surged from 13% to 22%, driven by the garment export boom",
+        "Germany and Japan remain notably more industrialised than their Western peers"
+      ],
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
+    },
+    {
+      "id": "viz-362",
+      "title": "Closing the Education Gap: Primary School Completion by World Region, 1990\u20132024",
+      "description": "Trend lines for regional aggregates showing primary school completion rates (% of relevant age group) from 1990 to 2024. South Asia made the greatest gains; Sub-Saharan Africa still trails at 69%.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-362.html",
+      "generatedCode": "",
+      "highlights": [
+        "South Asia went from 73% completion in 1999 to over 94% by 2024 \u2014 the sharpest gain",
+        "Sub-Saharan Africa improved from 52% to 69%, still the lowest regional rate",
+        "Latin America reached near-universal completion (~96%) by the 2010s"
+      ],
+      "createdAt": "2026-09-11T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-362.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-11T00:00:00.000Z"
 }

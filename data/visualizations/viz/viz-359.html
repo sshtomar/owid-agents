@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 520px; line-height: 1.5; }
+    .source { font-family: "JetBrains Mono", monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: repeat(6, 1fr); max-width: 760px; }
+    .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; }
+    .cell:nth-child(6n) { border-right: none; }
+    .cell-name { font-size: 9px; font-weight: 600; color: #2B2A27; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cell-vals { display: flex; justify-content: space-between; margin-top: 2px; font-family: "JetBrains Mono", monospace; font-size: 8px; color: #7A786F; }
+    canvas { display: block; width: 100%; }
+    #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: "JetBrains Mono", monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 100; }
+  </style>
+</head>
+<body>
+  <h1>The Solar Capacity Race: 24 Countries, 2000–2025</h1>
+  <p class="subtitle">Installed solar capacity in GW (each sparkline scaled to its own range). China's curve dwarfs all others; late movers like Poland, Chile, and Vietnam show steeper recent ramps.</p>
+  <div class="grid" id="grid"></div>
+  <div id="tip"></div>
+  <p class="source">Source: Ember — Yearly Electricity Data</p>
+  <script>
+const data = [{"n":"China","s":[0.03,0.04,0.06,0.07,0.08,0.14,0.16,0.2,0.25,0.41,1.02,3.11,6.72,17.76,28.4,43.55,77.82,130.83,175.26,204.97,253.86,306.97,393.03,609.92,887.1,1202.18],"e":0.03,"l":1202.18,"y0":2000},{"n":"USA","s":[0.59,0.46,0.46,0.68,0.75,0.88,1.1,1.44,1.62,2.09,3.38,5.64,8.61,13.04,17.65,23.44,34.72,43.11,51.57,60.83,75.79,94.79,112.84,139.93,177.59,211.61],"e":0.59,"l":211.61,"y0":2000},{"n":"India","s":[0,0.01,0.01,0.01,0.01,0.01,0.01,0.03,0.03,0.04,0.07,0.57,0.99,1.6,3.78,5.7,9.98,18.26,27.48,35.25,39.71,49.98,63.48,73.05,98.48,135.5],"e":0,"l":135.5,"y0":2000},{"n":"Germany","s":[0.11,0.19,0.26,0.44,1.11,2.06,2.9,4.17,6.12,10.57,18.01,25.92,34.08,36.71,37.9,39.22,40.68,42.29,45.16,48.91,53.67,60.04,61.19,75.52,91.2,106.27],"e":0.11,"l":106.27,"y0":2000},{"n":"Japan","s":[0.33,0.45,0.64,0.86,1.13,1.42,1.71,1.92,2.14,2.63,3.62,4.91,6.63,13.6,23.34,34.15,42.04,49.5,56.16,63.19,71.87,78.41,83.06,87.07,89.6,92.21],"e":0.33,"l":92.21,"y0":2000},{"n":"Brazil","s":[0,0,0,0,0,0,0,0,0,0,0,0.01,0.01,0.01,0.02,0.05,0.14,1.21,2.46,4.67,8.39,14.31,25.07,37.56,53.11,64.69],"e":0,"l":64.69,"y0":2000},{"n":"Spain","s":[0.02,0.02,0.03,0.03,0.05,0.07,0.16,0.52,3.47,3.73,4.63,5.46,6.6,7.02,7.03,7.04,7.04,7.05,7.1,11.15,12.47,16.06,26.24,31.92,38.16,47.21],"e":0.02,"l":47.21,"y0":2000},{"n":"Italy","s":[0.02,0.02,0.02,0.03,0.03,0.03,0.05,0.11,0.48,1.26,3.6,13.04,16.66,18.03,18.44,18.74,19.12,19.5,19.92,20.62,21.36,22.29,24.56,29.36,35.44,41.19],"e":0.02,"l":41.19,"y0":2000},{"n":"Australia","s":[0.03,0.03,0.03,0.04,0.05,0.05,0.06,0.07,0.09,0.33,1.09,1.42,2.51,3.31,4.14,5.04,5.88,7.24,11.13,15.45,19.77,24.4,28.89,30.67,36,41.07],"e":0.03,"l":41.07,"y0":2000},{"n":"France","s":[0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.03,0.08,0.28,1.04,2.99,4.3,5.16,5.86,6.82,7.32,7.52,8.73,9.8,11.13,14.21,16.8,20.12,25.46,31.23],"e":0.01,"l":31.23,"y0":2000},{"n":"S. Korea","s":[0,0,0,0.01,0.01,0.01,0.04,0.08,0.36,0.52,0.65,0.74,1.04,1.56,2.44,3.47,4.34,5.63,7.7,10.85,14.76,17.91,20.53,23.53,26.68,30.35],"e":0,"l":30.35,"y0":2000},{"n":"Netherlands","s":[0.01,0.02,0.03,0.05,0.05,0.05,0.05,0.05,0.06,0.07,0.09,0.15,0.29,0.65,1.01,1.53,2.14,2.91,4.61,7.23,11.11,14.82,17.36,21.96,24.77,25.88],"e":0.01,"l":25.88,"y0":2000},{"n":"Turkey","s":[0,0,0,0,0,0,0,0,0,0,0.01,0.01,0.01,0.02,0.04,0.25,0.83,3.42,5.06,6,6.67,7.82,9.43,15.61,20.23,25.47],"e":0,"l":25.47,"y0":2000},{"n":"Poland","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.03,0.1,0.18,0.27,0.53,1.43,3.66,7.09,11.06,15.92,21.72,25.42],"e":0,"l":25.42,"y0":2000},{"n":"UK","s":[0,0,0,0.01,0.01,0.01,0.01,0.02,0.02,0.03,0.09,1,1.75,2.94,5.53,9.6,11.91,12.75,13.06,13.34,13.77,14.25,14.81,16.43,19,21.66],"e":0,"l":21.66,"y0":2000},{"n":"Vietnam","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.01,0.01,0.01,0.01,0.1,4.99,16.66,16.66,16.7,18.59,18.67,19.25],"e":0,"l":19.25,"y0":2000},{"n":"Taiwan","s":[0,0,0,0,0,0,0,0,0.01,0.01,0.03,0.13,0.23,0.41,0.64,0.88,1.25,1.77,2.74,4.15,5.82,7.7,9.72,12.42,14.28,15.47],"e":0,"l":15.47,"y0":2000},{"n":"Mexico","s":[0.01,0.01,0.02,0.02,0.02,0.02,0.02,0.02,0.02,0.03,0.03,0.04,0.07,0.11,0.17,0.29,0.61,1.07,2.77,6.25,7.16,8.93,9.36,10.91,11.99,12.93],"e":0.01,"l":12.93,"y0":2000},{"n":"Chile","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0.02,0.22,0.58,1.13,1.72,2.3,2.72,3.29,4.71,6.89,8.74,11.02,12.14],"e":0,"l":12.14,"y0":2000},{"n":"Greece","s":[0,0,0,0,0,0,0,0.01,0.01,0.05,0.2,0.61,1.54,2.58,2.6,2.6,2.6,2.55,2.59,2.75,3.17,4.07,5.1,6.69,8.83,11.08],"e":0,"l":11.08,"y0":2000},{"n":"Belgium","s":[0,0,0,0,0,0,0,0.02,0.06,0.39,0.84,1.86,2.6,2.86,2.98,3.11,3.29,3.6,3.96,4.52,5.45,5.93,6.78,8.36,9.64,10.4],"e":0,"l":10.4,"y0":2000},{"n":"Austria","s":[0,0.01,0.01,0.02,0.03,0.02,0.03,0.03,0.03,0.05,0.09,0.18,0.34,0.63,0.79,0.94,1.1,1.28,1.46,1.71,2.05,2.79,3.8,6.39,8.9,10.3],"e":0,"l":10.3,"y0":2000},{"n":"Switzerland","s":[0.02,0.02,0.02,0.02,0.02,0.03,0.03,0.04,0.05,0.08,0.13,0.22,0.43,0.75,1.04,1.36,1.62,1.86,2.12,2.42,2.88,3.52,4.53,6.06,7.76,9.11],"e":0.02,"l":9.11,"y0":2000},{"n":"Hungary","s":[0,0,0,0,0,0,0,0,0,0,0,0,0.01,0.04,0.09,0.17,0.23,0.34,0.73,1.4,2.13,2.97,4.24,5.91,7.17,8.18],"e":0,"l":8.18,"y0":2000}];
+
+const tip = document.getElementById("tip");
+const grid = document.getElementById("grid");
+const dpr = window.devicePixelRatio || 1;
+const cellW = 100, cellH = 48;
+
+data.forEach((d, di) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const name = document.createElement("div");
+  name.className = "cell-name";
+  name.textContent = d.n;
+  cell.appendChild(name);
+
+  const cvs = document.createElement("canvas");
+  cvs.width = cellW * dpr;
+  cvs.height = cellH * dpr;
+  cvs.style.width = "100%";
+  cvs.style.height = cellH + "px";
+  cell.appendChild(cvs);
+
+  const vals = document.createElement("div");
+  vals.className = "cell-vals";
+  const fmtGW = v => v >= 100 ? Math.round(v) + " GW" : v >= 10 ? v.toFixed(1) + " GW" : v.toFixed(2) + " GW";
+  vals.innerHTML = `<span>2000</span><span>${fmtGW(d.l)}</span>`;
+  cell.appendChild(vals);
+
+  grid.appendChild(cell);
+
+  const ctx = cvs.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const series = d.s;
+  const mn = Math.min(...series), mx = Math.max(...series);
+  const range = mx - mn || 1;
+  const norm = v => cellH - 2 - ((v - mn) / range) * (cellH - 4);
+
+  // Fill area
+  ctx.beginPath();
+  series.forEach((v, i) => {
+    const x = (i / (series.length - 1)) * cellW;
+    const y = norm(v);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(cellW, cellH);
+  ctx.lineTo(0, cellH);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(234,94,51,0.08)";
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  series.forEach((v, i) => {
+    const x = (i / (series.length - 1)) * cellW;
+    const y = norm(v);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = "#EA5E33";
+  ctx.lineWidth = 1.2 * dpr / dpr;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  // Crosshair interaction
+  let crossX = null;
+  cell.addEventListener("mousemove", e => {
+    const r = cvs.getBoundingClientRect();
+    const mx2 = e.clientX - r.left;
+    const ratio = mx2 / r.width;
+    const idx = Math.max(0, Math.min(series.length - 1, Math.round(ratio * (series.length - 1))));
+    const year = d.y0 + idx;
+    const val = series[idx];
+
+    // Redraw with crosshair
+    ctx.clearRect(0, 0, cellW, cellH);
+
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * cellW;
+      const y = norm(v);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.lineTo(cellW, cellH); ctx.lineTo(0, cellH); ctx.closePath();
+    ctx.fillStyle = "rgba(234,94,51,0.08)"; ctx.fill();
+
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * cellW;
+      const y = norm(v);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = "#EA5E33"; ctx.lineWidth = 1.2; ctx.lineJoin = "round"; ctx.stroke();
+
+    const cx = (idx / (series.length - 1)) * cellW;
+    ctx.beginPath();
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, cellH);
+    ctx.strokeStyle = "#C2C0B5"; ctx.lineWidth = 0.5; ctx.stroke();
+
+    const fmtGW2 = v => v >= 100 ? Math.round(v) + " GW" : v.toFixed(v >= 10 ? 1 : 2) + " GW";
+    tip.textContent = `${d.n} ${year}: ${fmtGW2(val)}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+
+  cell.addEventListener("mouseleave", () => {
+    ctx.clearRect(0, 0, cellW, cellH);
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * cellW;
+      const y = norm(v);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.lineTo(cellW, cellH); ctx.lineTo(0, cellH); ctx.closePath();
+    ctx.fillStyle = "rgba(234,94,51,0.08)"; ctx.fill();
+
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * cellW;
+      const y = norm(v);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = "#EA5E33"; ctx.lineWidth = 1.2; ctx.lineJoin = "round"; ctx.stroke();
+    tip.style.opacity = "0";
+  });
+});
+  </script>
+</body>
+</html>

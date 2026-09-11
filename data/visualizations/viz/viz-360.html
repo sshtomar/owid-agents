@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 520px; line-height: 1.5; }
+    .source { font-family: "JetBrains Mono", monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: "JetBrains Mono", monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 100; }
+  </style>
+</head>
+<body>
+  <h1>Global Depression Rates: Estimated Prevalence by Country, 2015</h1>
+  <p class="subtitle">Share of the population estimated to have depression, 2015. Eastern European and high-income countries show higher rates; Pacific island nations show the lowest.</p>
+  <div id="chart" style="position:relative;"></div>
+  <div id="tip"></div>
+  <p class="source">Source: WHO Global Health Observatory — GDO_q35</p>
+  <script>
+// Top 30 highest + 10 lowest depression prevalence countries
+const data = [{"n":"Ukraine","v":6.31},{"n":"Australia","v":5.94},{"n":"Estonia","v":5.91},{"n":"USA","v":5.86},{"n":"Brazil","v":5.76},{"n":"Greece","v":5.74},{"n":"Portugal","v":5.67},{"n":"Lithuania","v":5.62},{"n":"Finland","v":5.61},{"n":"Belarus","v":5.57},{"n":"Russia","v":5.51},{"n":"Cuba","v":5.49},{"n":"Moldova","v":5.37},{"n":"New Zealand","v":5.35},{"n":"Barbados","v":5.35},{"n":"Paraguay","v":5.23},{"n":"Spain","v":5.21},{"n":"Germany","v":5.19},{"n":"Bahamas","v":5.18},{"n":"Trinidad & Tobago","v":5.18},{"n":"Czechia","v":5.16},{"n":"Bulgaria","v":5.16},{"n":"Italy","v":5.14},{"n":"UAE","v":5.12},{"n":"Hungary","v":5.10},{"n":"Slovenia","v":5.09},{"n":"Slovakia","v":5.09},{"n":"Austria","v":5.08},{"n":"Croatia","v":5.08},{"n":"Malta","v":5.07},{"n":"Nepal","v":3.23},{"n":"Laos","v":3.21},{"n":"Kiribati","v":3.14},{"n":"Vanuatu","v":3.09},{"n":"Timor-Leste","v":2.99},{"n":"Papua N. Guinea","v":2.98},{"n":"Solomon Is.","v":2.90}];
+
+const W = 620, H = data.length * 14 + 50;
+const margin = { top: 24, right: 60, bottom: 20, left: 130 };
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:620px" });
+document.getElementById("chart").appendChild(svg);
+const tip = document.getElementById("tip");
+
+const valMin = 0, valMax = 7;
+const barW = W - margin.left - margin.right;
+const xScale = v => margin.left + (v / valMax) * barW;
+const rowH = 14;
+
+// Gridlines
+[1, 2, 3, 4, 5, 6, 7].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top - 8, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x, y: margin.top - 10, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, v + "%"));
+});
+
+// Gap indicator between top 30 and bottom 7
+const gapRow = 30;
+
+data.forEach((d, i) => {
+  const y = margin.top + i * rowH;
+
+  // Add divider gap line between top 30 and bottom
+  if (i === gapRow) {
+    svg.appendChild(mkEl("line", { x1: margin.left - 4, y1: y - 2, x2: W - margin.right, y2: y - 2, stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "3,3" }));
+    svg.appendChild(mkEl("text", { x: margin.left - 4, y: y - 4, "text-anchor": "end", "font-size": "8", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, "…lowest rates" }));
+  }
+
+  const isLow = i >= gapRow;
+  const color = isLow ? "#A6C4A2" : (d.v >= 5.5 ? "#EA5E33" : d.v >= 5.2 ? "#F29A44" : "#F5D38A");
+  const barW2 = xScale(d.v) - margin.left;
+
+  const rect = mkEl("rect", { x: margin.left, y: y + 1, width: barW2, height: rowH - 3, fill: color, rx: "1" });
+  svg.appendChild(rect);
+
+  // Country label
+  svg.appendChild(mkEl("text", { x: margin.left - 5, y: y + rowH - 4, "text-anchor": "end", "font-size": "9", fill: "#2B2A27", "font-family": "Inter, sans-serif" }, d.n));
+
+  // Value label
+  svg.appendChild(mkEl("text", { x: xScale(d.v) + 3, y: y + rowH - 4, "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, d.v.toFixed(2) + "%"));
+
+  // Invisible hit area
+  const hit = mkEl("rect", { x: margin.left, y, width: barW, height: rowH, fill: "transparent" });
+  hit.addEventListener("mouseover", () => { rect.setAttribute("opacity", "0.8"); });
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${d.v.toFixed(2)}% estimated depression prevalence (2015)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseout", () => { rect.setAttribute("opacity", "1"); tip.style.opacity = "0"; });
+  svg.appendChild(hit);
+});
+
+// Axis baseline
+svg.appendChild(mkEl("line", { x1: margin.left, y1: margin.top - 8, x2: margin.left, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  </script>
+</body>
+</html>
