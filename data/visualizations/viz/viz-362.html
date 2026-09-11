@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: "Inter", sans-serif; margin: 0; padding: 24px; background: #F6F5EE; color: #2B2A27; }
+    h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+    .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 20px; max-width: 520px; line-height: 1.5; }
+    .source { font-family: "JetBrains Mono", monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+    #tip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: "JetBrains Mono", monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 100; }
+  </style>
+</head>
+<body>
+  <h1>Closing the Education Gap: Primary School Completion by World Region, 1990–2024</h1>
+  <p class="subtitle">Share of children completing primary school (% of relevant age group). South Asia made the greatest gains — from 73% in 1999 to over 94% today. Sub-Saharan Africa still trails at 69%.</p>
+  <div id="chart" style="position:relative;"></div>
+  <div id="tip"></div>
+  <p class="source">Source: World Bank — SE.PRM.CMPT.ZS</p>
+  <script>
+const data = [
+  {"n":"East Asia & Pacific","pts":[{"y":1990,"v":99.1},{"y":1991,"v":95.4},{"y":1992,"v":91.7},{"y":1993,"v":91.6},{"y":1994,"v":89.1},{"y":1995,"v":94.2},{"y":1996,"v":91.3},{"y":1997,"v":91.8},{"y":1998,"v":92.8},{"y":1999,"v":94.0},{"y":2000,"v":95.2},{"y":2001,"v":96.6},{"y":2002,"v":95.4},{"y":2003,"v":94.8},{"y":2004,"v":94.1},{"y":2005,"v":93.4},{"y":2006,"v":92.5},{"y":2007,"v":95.0},{"y":2008,"v":99.6},{"y":2009,"v":100.0},{"y":2010,"v":99.9},{"y":2011,"v":98.9},{"y":2012,"v":97.2},{"y":2013,"v":98.4},{"y":2014,"v":95.3},{"y":2015,"v":94.1},{"y":2016,"v":95.6},{"y":2017,"v":97.3},{"y":2018,"v":98.1},{"y":2019,"v":97.3},{"y":2020,"v":95.2},{"y":2021,"v":96.0},{"y":2022,"v":95.4}]},
+  {"n":"Latin America","pts":[{"y":1999,"v":89.9},{"y":2000,"v":90.4},{"y":2001,"v":90.3},{"y":2002,"v":92.2},{"y":2003,"v":92.5},{"y":2004,"v":93.3},{"y":2005,"v":94.4},{"y":2006,"v":95.6},{"y":2007,"v":97.3},{"y":2008,"v":97.4},{"y":2009,"v":98.4},{"y":2010,"v":98.9},{"y":2011,"v":99.2},{"y":2012,"v":99.9},{"y":2013,"v":99.5},{"y":2014,"v":99.8},{"y":2015,"v":98.4},{"y":2016,"v":97.8},{"y":2017,"v":96.5},{"y":2018,"v":95.6},{"y":2019,"v":95.3},{"y":2020,"v":95.4},{"y":2021,"v":96.1},{"y":2022,"v":95.6},{"y":2023,"v":96.5},{"y":2024,"v":96.5}]},
+  {"n":"South Asia","pts":[{"y":1999,"v":73.0},{"y":2000,"v":73.2},{"y":2001,"v":73.0},{"y":2002,"v":76.0},{"y":2003,"v":79.9},{"y":2004,"v":82.7},{"y":2005,"v":85.4},{"y":2006,"v":87.7},{"y":2007,"v":90.0},{"y":2008,"v":92.1},{"y":2009,"v":93.8},{"y":2010,"v":91.8},{"y":2011,"v":90.5},{"y":2012,"v":92.7},{"y":2013,"v":94.8},{"y":2014,"v":97.0},{"y":2015,"v":98.5},{"y":2016,"v":98.8},{"y":2017,"v":98.3},{"y":2018,"v":96.3},{"y":2019,"v":95.9},{"y":2020,"v":97.6},{"y":2021,"v":98.6},{"y":2023,"v":93.8},{"y":2024,"v":94.4}]},
+  {"n":"World","pts":[{"y":1990,"v":82.5},{"y":1991,"v":81.6},{"y":1992,"v":80.5},{"y":1993,"v":80.6},{"y":1994,"v":79.9},{"y":1995,"v":81.2},{"y":1996,"v":80.4},{"y":1997,"v":80.7},{"y":1998,"v":81.1},{"y":1999,"v":81.6},{"y":2000,"v":81.9},{"y":2001,"v":82.7},{"y":2002,"v":83.3},{"y":2003,"v":83.5},{"y":2004,"v":84.2},{"y":2005,"v":85.0},{"y":2006,"v":85.3},{"y":2007,"v":86.5},{"y":2008,"v":88.2},{"y":2009,"v":89.0},{"y":2010,"v":88.5},{"y":2011,"v":87.8},{"y":2012,"v":88.1},{"y":2013,"v":88.3},{"y":2014,"v":88.1},{"y":2015,"v":87.9},{"y":2016,"v":88.5},{"y":2017,"v":88.2},{"y":2018,"v":88.1},{"y":2019,"v":87.9},{"y":2020,"v":88.0},{"y":2021,"v":88.7},{"y":2022,"v":91.1},{"y":2023,"v":87.3},{"y":2024,"v":88.0}]},
+  {"n":"Arab World","pts":[{"y":1990,"v":72.2},{"y":1991,"v":72.0},{"y":1992,"v":72.5},{"y":1993,"v":72.5},{"y":1994,"v":72.9},{"y":1995,"v":73.6},{"y":1996,"v":74.5},{"y":1997,"v":75.0},{"y":1998,"v":75.7},{"y":1999,"v":76.4},{"y":2000,"v":75.8},{"y":2001,"v":76.5},{"y":2002,"v":76.9},{"y":2003,"v":78.9},{"y":2004,"v":80.3},{"y":2005,"v":81.3},{"y":2006,"v":79.6},{"y":2007,"v":81.3},{"y":2008,"v":82.7},{"y":2009,"v":80.9},{"y":2010,"v":81.5},{"y":2011,"v":81.6},{"y":2012,"v":82.7},{"y":2013,"v":78.5},{"y":2014,"v":78.5},{"y":2015,"v":77.7},{"y":2016,"v":77.4},{"y":2017,"v":77.4},{"y":2018,"v":78.4},{"y":2019,"v":78.7},{"y":2020,"v":79.8},{"y":2021,"v":79.9},{"y":2022,"v":81.1},{"y":2023,"v":81.9},{"y":2024,"v":83.1}]},
+  {"n":"Sub-Saharan Africa","pts":[{"y":1990,"v":53.1},{"y":1991,"v":53.4},{"y":1992,"v":52.7},{"y":1993,"v":53.5},{"y":1994,"v":52.7},{"y":1995,"v":52.8},{"y":1996,"v":53.2},{"y":1997,"v":53.0},{"y":1998,"v":52.3},{"y":1999,"v":52.4},{"y":2000,"v":52.8},{"y":2001,"v":54.4},{"y":2002,"v":55.5},{"y":2003,"v":56.4},{"y":2004,"v":57.4},{"y":2005,"v":59.5},{"y":2006,"v":62.2},{"y":2007,"v":61.9},{"y":2008,"v":62.5},{"y":2009,"v":65.7},{"y":2010,"v":65.9},{"y":2011,"v":65.7},{"y":2012,"v":65.7},{"y":2013,"v":65.6},{"y":2014,"v":66.0},{"y":2015,"v":66.3},{"y":2016,"v":66.7},{"y":2017,"v":67.1},{"y":2018,"v":67.9},{"y":2019,"v":68.3},{"y":2020,"v":69.1},{"y":2021,"v":69.9},{"y":2022,"v":69.0},{"y":2023,"v":68.8},{"y":2024,"v":68.9}]}
+];
+
+const COLORS = {"East Asia & Pacific":"#3D7A5A","Latin America":"#5B9E78","South Asia":"#F29A44","World":"#7A786F","Arab World":"#C49A45","Sub-Saharan Africa":"#EA5E33"};
+
+const W = 760, H = 420;
+const margin = { top: 30, right: 130, bottom: 36, left: 42 };
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const svg = mkEl("svg", { width: "100%", viewBox: `0 0 ${W} ${H}`, style: "display:block;max-width:760px" });
+document.getElementById("chart").appendChild(svg);
+const tip = document.getElementById("tip");
+
+const yearMin = 1990, yearMax = 2024;
+const valMin = 45, valMax = 102;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - Math.min(v, 100)) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid
+[50, 60, 70, 80, 90, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: margin.left - 4, y: yScale(v) + 3, "text-anchor": "end", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, v + "%"));
+});
+
+// 100% reference
+svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(100), x2: W - margin.right, y2: yScale(100), stroke: "#C2C0B5", "stroke-width": "0.8", "stroke-dasharray": "4,3" }));
+svg.appendChild(mkEl("text", { x: W - margin.right + 4, y: yScale(100) + 3, "font-size": "8", fill: "#9A9890", "font-family": "JetBrains Mono, monospace" }, "universal"));
+
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  svg.appendChild(mkEl("text", { x: xScale(yr), y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", "font-family": "JetBrains Mono, monospace" }, yr));
+});
+svg.appendChild(mkEl("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topB = margin.top + 4, botB = H - margin.bottom - 4;
+  sorted.forEach(item => { item.y = Math.max(topB, Math.min(botB, item.y)); });
+  return sorted;
+}
+
+const groups = [];
+data.forEach(series => {
+  const color = COLORS[series.n] || "#7A786F";
+  const pts = series.pts;
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(line); g.appendChild(hit);
+  svg.appendChild(g);
+  const lastPt = pts[pts.length - 1];
+  groups.push({ g, line, hit, series, color, pts, lastY: yScale(lastPt.v), lastX: xScale(lastPt.y), lastV: lastPt.v });
+});
+
+const resolved = resolveCollisions(groups.map(gr => ({ y: gr.lastY, ref: gr })), 12);
+resolved.forEach(item => {
+  const gr = item.ref;
+  if (Math.abs(item.y - gr.lastY) > 3) {
+    svg.appendChild(mkEl("line", { x1: gr.lastX, y1: gr.lastY, x2: gr.lastX + 3, y2: item.y, stroke: gr.color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  svg.appendChild(mkEl("text", { x: gr.lastX + 5, y: item.y + 3, "font-size": "9", fill: gr.color, "font-family": "JetBrains Mono, monospace" }, gr.series.n));
+});
+
+groups.forEach(gr => {
+  gr.hit.addEventListener("mouseover", () => {
+    groups.forEach(other => other.line.setAttribute("opacity", other === gr ? "1" : "0.1"));
+    gr.line.setAttribute("stroke-width", "2.8");
+  });
+  gr.hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const year = Math.round((mx - margin.left) / (W - margin.left - margin.right) * (yearMax - yearMin) + yearMin);
+    const near = gr.pts.reduce((a, b) => Math.abs(b.y - year) < Math.abs(a.y - year) ? b : a);
+    tip.textContent = `${gr.series.n} ${near.y}: ${near.v.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  gr.hit.addEventListener("mouseout", () => {
+    groups.forEach(other => { other.line.setAttribute("opacity", "1"); other.line.setAttribute("stroke-width", "1.8"); });
+    tip.style.opacity = "0";
+  });
+});
+  </script>
+</body>
+</html>
