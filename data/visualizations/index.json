@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourism Arrivals, 1995\u20132020",
+      "description": "Trend lines showing annual international tourist arrivals for 8 major destinations. China's rise from 46M to 163M arrivals and the universal COVID-19 collapse in 2020 are the defining features.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China grew from 46M arrivals (1995) to 163M (2019), then crashed to 30M in 2020",
+        "Japan saw 10x growth from 3M to 32M before COVID cut it to 4M",
+        "Italy and Greece remained top European destinations throughout the period"
+      ],
+      "createdAt": "2026-09-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Intensity of Primary Energy, 2000 vs. 2020",
+      "description": "Slope chart comparing megajoules consumed per dollar of GDP for 25 countries. Most countries decoupled economic growth from energy use over two decades; a few exceptions increased intensity.",
+      "datasetIds": [
+        "wb--EG-EGY-PRIM-PP-KD"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Aruba reduced energy intensity by 75%, Azerbaijan by 67%, Ethiopia by 66%",
+        "Ireland slashed intensity from 3.1 to 1.2 MJ/$, driven by services-led growth",
+        "Brazil and Iceland are rare cases where intensity slightly increased"
+      ],
+      "createdAt": "2026-09-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Crude Death Rate by World Region, 1960\u20132024",
+      "description": "Trend lines showing deaths per 1,000 people across six world regions over six decades. Sub-Saharan Africa has seen the steepest decline; Europe and North America show upticks driven by aging populations.",
+      "datasetIds": [
+        "wb--SP-DYN-CDRT-IN"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Sub-Saharan Africa fell from 23 to 9 deaths per 1,000 \u2014 the largest absolute decline",
+        "East Asia & Pacific dropped from 21 to 7, largely driven by China's demographic transition",
+        "Europe & Central Asia has remained flat around 10-11, with aging offsetting health gains"
+      ],
+      "createdAt": "2026-09-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Government Health Expenditure (% of GDP), 2000 vs. 2022",
+      "description": "Slope chart of domestic government health spending as a share of GDP. Japan nearly doubled its share. China tripled from under 1%. Bangladesh and Haiti remain below 0.5%, well short of WHO guidelines.",
+      "datasetIds": [
+        "wb--SH-XPD-GHED-GD-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Japan rose from 5.7% to 10.6% of GDP on public health, driven by aging population costs",
+        "China's government health share tripled from 1.0% to 3.4% over two decades",
+        "Bangladesh (0.34%) and Haiti (0.34%) remain far below the WHO-recommended minimum"
+      ],
+      "createdAt": "2026-09-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Labor Productivity: GDP per Worker, 1995\u20132020",
+      "description": "Trend lines for GDP per person employed (constant 2021 PPP $) across 10 countries. China's 7x productivity surge contrasts with modest gains in high-income economies and slow progress in low-income countries.",
+      "datasetIds": [
+        "wb--SL-GDP-PCAP-EM-KD"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China rose from $5,196 to $37,511 per worker \u2014 a 7x increase in 25 years",
+        "India and Bangladesh both more than doubled productivity; Ethiopia nearly quadrupled from a low base",
+        "France, Germany, and Australia clustered around $100k\u2013$120k with modest gains"
+      ],
+      "createdAt": "2026-09-12T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-12T00:00:00.000Z"
 }

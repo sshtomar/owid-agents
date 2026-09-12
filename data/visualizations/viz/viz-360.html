@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Government Health Expenditure (% of GDP), 2000 vs. 2022</h1>
+<p class="subtitle">Domestic general government health spending as a share of GDP. Japan nearly doubled its share. China's investment tripled from a low base. Many low-income countries remain under 2%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Domestic General Government Health Expenditure (SH.XPD.GHED.GD.ZS)</p>
+<script>
+const data = [
+  {"n":"Japan","a":5.66,"b":10.6},
+  {"n":"Cuba","a":5.51,"b":10.47},
+  {"n":"Germany","a":7.66,"b":10.02},
+  {"n":"France","a":6.99,"b":8.91},
+  {"n":"Austria","a":6.87,"b":8.66},
+  {"n":"Denmark","a":6.74,"b":8.0},
+  {"n":"Canada","a":6.01,"b":7.87},
+  {"n":"Australia","a":5.45,"b":7.35},
+  {"n":"Brazil","a":3.47,"b":4.26},
+  {"n":"China","a":0.98,"b":3.39},
+  {"n":"Indonesia","a":0.55,"b":1.39},
+  {"n":"India","a":0.85,"b":1.37},
+  {"n":"Ethiopia","a":1.8,"b":0.72},
+  {"n":"Bangladesh","a":0.51,"b":0.34},
+  {"n":"Haiti","a":0.87,"b":0.34}
+];
+
+const W = 660, H = 500;
+const pad = { left: 120, right: 136, top: 44, bottom: 20 };
+const plotH = H - pad.top - pad.bottom;
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const maxV = 12;
+const minV = 0;
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * plotH;
+}
+
+function colorForChange(d) {
+  const delta = d.b - d.a;
+  if (delta > 3.5) return "#3D7A5A";
+  if (delta > 2)   return "#5B9E78";
+  if (delta > 0.5) return "#8BAD72";
+  if (delta > -0.5) return "#C49A45";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const lo = pad.top + 4, hi = H - pad.bottom - 4;
+  sorted.forEach(item => { item.y = Math.max(lo, Math.min(hi, item.y)); });
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+["2000", "2022"].forEach((yr, i) => {
+  svg.appendChild(mkEl("text", {
+    x: i === 0 ? xLeft : xRight, y: pad.top - 18,
+    "text-anchor": "middle",
+    "font-size": "10", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace", "font-weight": "500"
+  }, yr));
+  svg.appendChild(mkEl("line", {
+    x1: i === 0 ? xLeft : xRight, y1: pad.top - 12,
+    x2: i === 0 ? xLeft : xRight, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+// Grid ticks
+[0,2,4,6,8,10,12].forEach(v => {
+  const y = scale(v);
+  svg.appendChild(mkEl("line", {
+    x1: xLeft - 4, y1: y, x2: xLeft, y2: y,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 7, y: y + 3.5,
+    "text-anchor": "end",
+    "font-size": "8", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace"
+  }, v + "%"));
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 26) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const allGroups = [];
+const leftLabels = [];
+const rightLabels = [];
+
+data.forEach((d, idx) => {
+  const color = colorForChange(d);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const delta = (d.b - d.a).toFixed(2);
+  const sign = d.b >= d.a ? "+" : "";
+
+  const g = mkEl("g", {});
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.3"
+  });
+  const hitLine = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "10"
+  });
+  const dotA = mkEl("circle", { cx: xLeft, cy: ya, r: "2.5", fill: color });
+  const dotB = mkEl("circle", { cx: xRight, cy: yb, r: "2.5", fill: color });
+
+  g.appendChild(line);
+  g.appendChild(dotA);
+  g.appendChild(dotB);
+  g.appendChild(hitLine);
+  svg.appendChild(g);
+  allGroups.push(g);
+
+  leftLabels.push({ idx, y: ya, val: d.a, name: d.n, color });
+  rightLabels.push({ idx, y: yb, val: d.b, name: d.n, color, delta: `${sign}${delta}pp` });
+
+  hitLine.addEventListener("mousemove", e => {
+    allGroups.forEach((gg, i) => {
+      gg.querySelectorAll("line:first-child, circle").forEach(el => {
+        el.setAttribute("opacity", i === idx ? "1" : "0.1");
+      });
+    });
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${delta}pp)`, e);
+  });
+  hitLine.addEventListener("mouseleave", () => {
+    allGroups.forEach(gg => {
+      gg.querySelectorAll("line:first-child, circle").forEach(el => {
+        el.setAttribute("opacity", "1");
+      });
+    });
+    hideTip();
+  });
+});
+
+// Left labels
+const resolvedLeft = resolveCollisions(leftLabels, 12);
+resolvedLeft.forEach(({ idx, y, val, name, color }) => {
+  const origY = scale(data[idx].a);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft - 4, y1: origY, x2: xLeft - 9, y2: y,
+      stroke: color, "stroke-width": "0.4", opacity: "0.5"
+    }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 11, y: y + 3.5,
+    "text-anchor": "end",
+    "font-size": "9", fill: "#2B2A27",
+    "font-family": "Inter, sans-serif"
+  }, `${name}  ${val}%`));
+});
+
+// Right labels
+const resolvedRight = resolveCollisions(rightLabels, 12);
+resolvedRight.forEach(({ idx, y, val, name, color, delta }) => {
+  const origY = scale(data[idx].b);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: xRight + 4, y1: origY, x2: xRight + 9, y2: y,
+      stroke: color, "stroke-width": "0.4", opacity: "0.5"
+    }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: xRight + 11, y: y + 3.5,
+    "text-anchor": "start",
+    "font-size": "9", fill: "#2B2A27",
+    "font-family": "Inter, sans-serif"
+  }, `${val}%  ${name}`));
+  svg.appendChild(mkEl("text", {
+    x: xRight + 11, y: y + 14,
+    "text-anchor": "start",
+    "font-size": "8", fill: color,
+    "font-family": "JetBrains Mono, monospace"
+  }, delta));
+});
+</script>
+</body></html>
