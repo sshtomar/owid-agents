@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Labor Productivity: GDP per Worker, 1995–2020</h1>
+<p class="subtitle">GDP per person employed in constant 2021 PPP dollars. China's 7× increase is the defining story; high-income economies have seen modest gains while lower-income countries are slowly closing the gap.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — GDP per Person Employed, Constant 2021 PPP $ (SL.GDP.PCAP.EM.KD)</p>
+<script>
+const raw = [
+  {"n":"Germany","s":[101656,110916,115735,115223,119688,120284],"y0":1995,"step":5},
+  {"n":"France","s":[103861,114080,116069,118247,124330,119634],"y0":1995,"step":5},
+  {"n":"Japan","s":[73602,78021,83830,85030,88998,83658],"y0":1995,"step":5},
+  {"n":"Australia","s":[84522,95966,101718,104994,112710,115508],"y0":1995,"step":5},
+  {"n":"Canada","s":[89705,98476,102252,102803,108377,111043],"y0":1995,"step":5},
+  {"n":"Brazil","s":[33062,34062,34309,39603,40241,41893],"y0":1995,"step":5},
+  {"n":"China","s":[5196,7508,11399,18968,27527,37511],"y0":1995,"step":5},
+  {"n":"India","s":[7302,8413,10354,14148,18097,20544],"y0":1995,"step":5},
+  {"n":"Bangladesh","s":[7005,7693,9037,11053,14411,17564],"y0":1995,"step":5},
+  {"n":"Ethiopia","s":[1796,1958,2265,3194,4502,6344],"y0":1995,"step":5}
+];
+
+const COLORS = [
+  "#3D7A5A","#5B9E78","#8BAD72","#C49A45","#C4715A",
+  "#EA5E33","#F29A44","#B34B3B","#7A5B9E","#9A7A5B"
+];
+
+const W = 780, H = 440;
+const margin = { top: 30, right: 108, bottom: 40, left: 70 };
+const plotW = W - margin.left - margin.right;
+const plotH = H - margin.top - margin.bottom;
+
+const yearMin = 1995, yearMax = 2020;
+const valMin = 0, valMax = 135000;
+
+function xScale(y) { return margin.left + (y - yearMin) / (yearMax - yearMin) * plotW; }
+function yScale(v) { return margin.top + (valMax - v) / (valMax - valMin) * plotH; }
+
+function fmt(v) {
+  if (v >= 1000) return (v / 1000).toFixed(0) + "k";
+  return v.toString();
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const lo = margin.top + 4, hi = H - margin.bottom - 4;
+  sorted.forEach(item => { item.y = Math.max(lo, Math.min(hi, item.y)); });
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+// Grid lines
+[0, 25000, 50000, 75000, 100000, 125000].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end",
+    "font-size": "9", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace"
+  }, fmt(v)));
+});
+
+// X axis ticks
+[1995, 2000, 2005, 2010, 2015, 2020].forEach(y => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: H - margin.bottom,
+    x2: xScale(y), y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 14,
+    "text-anchor": "middle",
+    "font-size": "9", fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace"
+  }, y.toString()));
+});
+
+// Y axis label
+svg.appendChild(mkEl("text", {
+  x: margin.left - 6, y: margin.top - 10,
+  "text-anchor": "end",
+  "font-size": "9", fill: "#7A786F",
+  "font-family": "JetBrains Mono, monospace"
+}, "2021 PPP $"));
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 26) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+const endLabels = [];
+
+raw.forEach((series, idx) => {
+  const color = COLORS[idx % COLORS.length];
+  const pts = series.s.map((v, i) => ({
+    year: series.y0 + i * series.step,
+    value: v
+  })).filter(p => p.value !== null);
+
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.year)} ${yScale(p.value)}`
+  ).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", {
+    d: pathD, stroke: color,
+    "stroke-width": "1.8", fill: "none",
+    "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  const hitPath = mkEl("path", {
+    d: pathD, stroke: "transparent",
+    "stroke-width": "12", fill: "none"
+  });
+  const lastPt = pts[pts.length - 1];
+
+  g.appendChild(line);
+  g.appendChild(hitPath);
+  svg.appendChild(g);
+  groups.push(g);
+  endLabels.push({ idx, y: yScale(lastPt.value), lastX: xScale(lastPt.year), lastPt, color, series });
+
+  hitPath.addEventListener("mousemove", e => {
+    groups.forEach((gg, i) => {
+      gg.querySelectorAll("path:first-child").forEach(l => {
+        l.setAttribute("opacity", i === idx ? "1" : "0.08");
+        l.setAttribute("stroke-width", i === idx ? "2.8" : "1.8");
+      });
+    });
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / plotW));
+    const rawYear = yearMin + ratio * (yearMax - yearMin);
+    const nearestPt = pts.reduce((best, p) => Math.abs(p.year - rawYear) < Math.abs(best.year - rawYear) ? p : best, pts[0]);
+    showTip(`${series.n} ${nearestPt.year}: $${nearestPt.value.toLocaleString()}`, e);
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    groups.forEach(gg => {
+      gg.querySelectorAll("path:first-child").forEach(l => {
+        l.setAttribute("opacity", "1");
+        l.setAttribute("stroke-width", "1.8");
+      });
+    });
+    hideTip();
+  });
+});
+
+// Endpoint labels
+const resolved = resolveCollisions(endLabels, 13);
+resolved.forEach(({ idx, y, lastX, lastPt, color, series }) => {
+  const origY = yScale(lastPt.value);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: lastX + 4, y1: origY, x2: lastX + 10, y2: y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: lastX + 13, y: y + 3.5,
+    "font-size": "9.5", fill: "#2B2A27",
+    "font-family": "Inter, sans-serif", "font-weight": "500"
+  }, `$${fmt(lastPt.value)}  ${series.n}`));
+});
+</script>
+</body></html>
