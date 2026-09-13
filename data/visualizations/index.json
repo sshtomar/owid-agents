@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Population Growth Rate, 1961\u20132024",
+      "description": "Trend lines showing annual population growth rates (%) for 12 major countries. Almost every country has converged toward zero \u2014 Japan, South Korea, and Germany are already in decline.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan (-0.44%), South Korea (0.07%), and Germany (0.27%) now at or near zero",
+        "Kenya peaked near 4% in the 1980s and has steadily declined to 1.96%",
+        "Iran's post-revolution baby boom (5.3% in 1981) gave way to rapid decline"
+      ],
+      "createdAt": "2026-09-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Scientific and Technical Journal Articles, 1996\u20132023",
+      "description": "Annual publication count (thousands) for the top 10 countries. China grew from 34K to 933K articles \u2014 a 28-fold increase \u2014 while Japan and Germany have plateaued.",
+      "datasetIds": [
+        "wb--IP-JRN-ARTC-SC"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China surpassed the US around 2016 and now publishes more than the next 4 countries combined",
+        "India's rise is also sharp: 19K in 1996 to 228K in 2023",
+        "Japan and Germany have plateaued or slightly declined since ~2010"
+      ],
+      "createdAt": "2026-09-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "DPT Immunization Coverage by World Region, 1980\u20132024",
+      "description": "Share of children ages 12\u201323 months immunized against diphtheria, pertussis, and tetanus (%). Shows the dramatic global rise from near-zero in 1980 to 74\u201394% across all regions by 2024.",
+      "datasetIds": [
+        "wb--SH-IMM-IDPT"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "South Asia rose from 6% in 1980 to 94% in 2024 \u2014 most dramatic regional gain",
+        "Sub-Saharan Africa reached 74% despite starting near zero in 1980",
+        "Coverage dipped during 2020\u20132021 due to COVID-19 disruptions, then recovered"
+      ],
+      "createdAt": "2026-09-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Primary School Completion Rate: 2000 vs. Latest Year",
+      "description": "Slope chart comparing primary completion rates around 2000 and in the most recent available year for 25 countries. Colored by magnitude of improvement.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Cambodia: 42% to 91% (+49pp) \u2014 largest gain in the selection",
+        "Congo DRC, Cote d'Ivoire, and Congo Rep. each gained more than 40pp",
+        "Chad and Burkina Faso show gains but remain below 55% \u2014 still far from universal"
+      ],
+      "createdAt": "2026-09-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Child Wasting Prevalence \u2014 Countries with Highest Burden",
+      "description": "Sparkline grid showing wasting prevalence (% of children under 5 with weight-for-height <-2 SD) for the 18 most-affected countries. South Asia and the Sahel dominate the list.",
+      "datasetIds": [
+        "who--NUTRITION_WH_2"
+      ],
+      "chartType": "sparkline-grid",
+      "highlights": [
+        "India has the highest burden at 16.3% despite improvement from 28% in 1992",
+        "Yemen spiked to 21.8% in 2013 (conflict-era crisis) before declining to 14.2%",
+        "Niger shows volatile year-to-year swings reflecting seasonal food crises"
+      ],
+      "createdAt": "2026-09-13T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-13T00:00:00.000Z"
 }

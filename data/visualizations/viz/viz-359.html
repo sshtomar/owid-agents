@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>DPT Immunization Coverage by World Region, 1980–2024</h1>
+<p class="subtitle">Share of children ages 12–23 months immunized against diphtheria, pertussis, and tetanus (%). From near-zero coverage in 1980, South Asia reached 94% by 2024.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.IMM.IDPT</p>
+<script>
+const data = [{"n":"Sub-Saharan Africa","s":[5,11,12,19,24,29,34,41,44,50,56,49,49,49,53,52,50,49,47,49,50,51,53,56,59,62,64,66,69,72,71,72,69,69,71,70,73,74,75,76,74,73,73,74,74],"y0":1980,"step":1},{"n":"South Asia","s":[6,6,11,13,15,17,19,28,38,50,69,59,57,63,69,71,68,65,63,62,62,63,63,65,68,69,69,68,74,77,81,84,84,85,87,88,89,90,91,92,87,87,93,92,94],"y0":1980,"step":1},{"n":"East Asia & Pacific","s":[9,12,12,48,58,65,69,69,84,87,90,88,85,83,82,79,82,82,82,83,83,84,83,84,85,85,89,89,92,94,94,94,95,94,95,94,95,94,94,94,92,87,93,89,88],"y0":1980,"step":1},{"n":"Latin America & Caribbean","s":[37,42,47,49,56,56,56,59,62,64,68,78,77,79,80,83,82,83,86,89,91,90,91,93,93,94,93,93,92,94,93,93,93,90,89,90,90,85,86,80,76,75,79,83,82],"y0":1980,"step":1},{"n":"World","s":[17,20,22,36,42,47,50,54,63,68,76,72,71,70,73,73,72,71,71,72,72,73,73,74,76,77,78,78,81,83,84,85,84,84,85,85,86,86,87,87,84,82,85,84,85],"y0":1980,"step":1}];
+
+const W = 760, H = 440;
+const margin = { top: 40, right: 160, bottom: 36, left: 50 };
+
+const colors = ["#EA5E33","#F29A44","#5B9E78","#C49A45","#7A786F"];
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+
+const valMin = 0, valMax = 100;
+const yearMin = 1980, yearMax = 2024;
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - Math.min(valMax, Math.max(0, v))) / valMax * (H - margin.top - margin.bottom);
+
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(v), x2: W - margin.right, y2: yS(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: margin.left - 6, y: yS(v) + 3.5, "text-anchor": "end", "font-size": "9", "font-family": "'JetBrains Mono', monospace", fill: "#7A786F" })).textContent = v + "%";
+});
+
+[1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020].forEach(y => {
+  svg.appendChild(mkEl("text", { x: xS(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "9", "font-family": "'JetBrains Mono', monospace", fill: "#7A786F" })).textContent = y;
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+
+data.forEach((series, si) => {
+  const color = colors[si];
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i, value: v }));
+  const g = mkEl("g", {});
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.year)} ${yS(p.value)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "2", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const idx = Math.round(ratio * (pts.length - 1));
+    const pt = pts[idx];
+    if (!pt) return;
+    tip.textContent = `${series.n} · ${pt.year}: ${pt.value}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach((gg, gi) => { gg.g.style.opacity = gi === si ? "1" : "0.1"; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(gg => { gg.g.style.opacity = "1"; gg.line.setAttribute("stroke-width", "2"); });
+  });
+
+  const endPt = pts[pts.length - 1];
+  groups.push({ g, line, endY: yS(endPt.value), name: series.n, val: endPt.value });
+  svg.appendChild(g);
+});
+
+const labelItems = groups.map(gg => ({ ...gg, y: gg.endY }));
+resolveCollisions(labelItems, 12);
+
+const rightX = W - margin.right + 8;
+labelItems.forEach(item => {
+  const origY = item.endY;
+  const clampedY = Math.max(margin.top + 5, Math.min(H - margin.bottom - 5, item.y));
+  if (Math.abs(clampedY - origY) > 2) {
+    item.g.appendChild(mkEl("line", { x1: W - margin.right, y1: origY, x2: rightX + 2, y2: clampedY, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+  }
+  const t = mkEl("text", { x: rightX, y: clampedY + 3.5, "font-size": "9", "font-family": "'Inter', sans-serif", "font-weight": "500", fill: "#2B2A27" });
+  t.textContent = `${item.val}%  ${item.name}`;
+  item.g.appendChild(t);
+});
+</script>
+</body></html>

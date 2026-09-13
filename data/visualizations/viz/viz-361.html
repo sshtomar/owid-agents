@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; max-width: 780px; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:hover { background: #EFEDE4; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; font-family: 'Inter', sans-serif; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-canvas { display: block; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 2px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #7A786F; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Child Wasting Prevalence — Countries with Highest Burden</h1>
+<p class="subtitle">% of children under 5 with weight-for-height below −2 SD (acute malnutrition). South Asia and the Sahel persist as global hotspots. Data from survey years.</p>
+<div id="chart"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — NUTRITION_WH_2</p>
+<script>
+const data = [{"n":"India","s":[28.2,21.7,22.3,22.3,16.3,16.3],"y0":1992,"e":28.2,"l":16.3,"ly":2020},{"n":"Yemen","s":[11.6,9.5,15.3,14.0,21.8,14.2],"y0":1991,"e":11.6,"l":14.2,"ly":2022},{"n":"Burkina Faso","s":[13.9,10.9,4.0,3.9,5.5,8.4,13.5,12.9],"y0":1993,"e":13.9,"l":12.9,"ly":2021},{"n":"Tajikistan","s":[9.4,9.8,4.8,13.6,1.4,12.9],"y0":2000,"e":9.4,"l":12.9,"ly":2017},{"n":"Mauritania","s":[19.1,18.7,7.8,9.5,20.2,11.9],"y0":1988,"e":19.1,"l":11.9,"ly":2019},{"n":"Niger","s":[13.6,15.5,5.2,12.2,10.7,6.0,9.4,15.0,8.4,18.4,14.1,11.5],"y0":1998,"e":13.6,"l":11.5,"ly":2021},{"n":"Djibouti","s":[16.4,7.8,17.5,7.7,9.6],"y0":1996,"e":16.4,"l":9.6,"ly":2023},{"n":"Bangladesh","s":[15.2,19.5,8.3,14.2,10.0,11.2,13.8,7.2,9.5],"y0":1991,"e":15.2,"l":9.5,"ly":2019},{"n":"Senegal","s":[6.1,8.6,7.7,10.2,11.8,5.7,8.9,7.0,9.4],"y0":1986,"e":6.1,"l":9.4,"ly":2023},{"n":"Timor-Leste","s":[19.7,12.3,18.9,8.7,8.3],"y0":2002,"e":19.7,"l":8.3,"ly":2020},{"n":"Pakistan","s":[24.0,10.9,12.3,8.8,8.2],"y0":1986,"e":24.0,"l":8.2,"ly":2018},{"n":"Madagascar","s":[2.9,12.0,8.6,6.5,8.1],"y0":1992,"e":2.9,"l":8.1,"ly":2021},{"n":"Chad","s":[15.1,28.5,13.3,9.2,10.2,7.8],"y0":1997,"e":15.1,"l":7.8,"ly":2022},{"n":"Philippines","s":[6.9,4.8,4.5,6.5,6.7,3.6,3.8,7.4],"y0":1990,"e":6.9,"l":7.4,"ly":2019},{"n":"Mali","s":[26.0,8.1,5.4,20.1,10.6,6.5,9.2,8.4,6.9],"y0":1996,"e":26.0,"l":6.9,"ly":2021},{"n":"Vietnam","s":[6.3,11.9,9.5,7.3,9.4,10.8,11.1,10.5,10.2,3.9,6.6],"y0":1993,"e":6.3,"l":6.6,"ly":2013},{"n":"DR Congo","s":[15.4,11.2,10.4,6.4,6.5],"y0":2001,"e":15.4,"l":6.5,"ly":2023},{"n":"Sierra Leone","s":[9.4,9.2,8.9,8.8,7.2,6.2],"y0":1990,"e":9.4,"l":6.2,"ly":2019}];
+
+const CELL_W = 112, CELL_H = 54;
+const grid = document.createElement("div");
+grid.className = "grid";
+document.getElementById("chart").appendChild(grid);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, di) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "cell-name";
+  nameDiv.textContent = d.n;
+  cell.appendChild(nameDiv);
+
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CELL_W * dpr;
+  canvas.height = CELL_H * dpr;
+  canvas.style.width = CELL_W + "px";
+  canvas.style.height = CELL_H + "px";
+  canvas.className = "cell-canvas";
+  cell.appendChild(canvas);
+
+  const valsDiv = document.createElement("div");
+  valsDiv.className = "cell-vals";
+  valsDiv.innerHTML = `<span>${d.y0}</span><span>${d.e}%</span><span style="color:#2B2A27;font-weight:500">${d.l}%</span><span>${d.ly}</span>`;
+  cell.appendChild(valsDiv);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const series = d.s;
+  const minV = Math.min(...series);
+  const maxV = Math.max(...series);
+  const range = maxV - minV || 1;
+  const normY = v => CELL_H - 4 - ((v - minV) / range) * (CELL_H - 8);
+
+  // Fill area under line
+  ctx.beginPath();
+  series.forEach((v, i) => {
+    const x = (i / (series.length - 1)) * CELL_W;
+    const y = normY(v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(CELL_W, CELL_H);
+  ctx.lineTo(0, CELL_H);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(234, 94, 51, 0.08)";
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  series.forEach((v, i) => {
+    const x = (i / (series.length - 1)) * CELL_W;
+    const y = normY(v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = "#EA5E33";
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+
+  // Endpoint dot
+  const lastX = CELL_W;
+  const lastY = normY(series[series.length - 1]);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = "#EA5E33";
+  ctx.fill();
+
+  // Crosshair state
+  let crosshairX = null;
+  function draw(hoverIdx) {
+    ctx.clearRect(0, 0, CELL_W, CELL_H);
+
+    // Fill
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * CELL_W;
+      const y = normY(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(CELL_W, CELL_H);
+    ctx.lineTo(0, CELL_H);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(234, 94, 51, 0.08)";
+    ctx.fill();
+
+    ctx.beginPath();
+    series.forEach((v, i) => {
+      const x = (i / (series.length - 1)) * CELL_W;
+      const y = normY(v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = "#EA5E33";
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(CELL_W, normY(series[series.length - 1]), 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#EA5E33";
+    ctx.fill();
+
+    if (hoverIdx !== null && hoverIdx >= 0 && hoverIdx < series.length) {
+      const hx = (hoverIdx / (series.length - 1)) * CELL_W;
+      const hy = normY(series[hoverIdx]);
+      ctx.beginPath();
+      ctx.moveTo(hx, 0);
+      ctx.lineTo(hx, CELL_H);
+      ctx.strokeStyle = "rgba(43,42,39,0.25)";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(hx, hy, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#EA5E33";
+      ctx.fill();
+    }
+  }
+
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const idx = Math.round(Math.max(0, Math.min(1, mx / CELL_W)) * (series.length - 1));
+    draw(idx);
+    const year = d.y0 + Math.round(idx * (d.ly - d.y0) / (series.length - 1));
+    tip.textContent = `${d.n} · ~${year}: ${series[idx]}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  cell.addEventListener("mouseleave", () => {
+    draw(null);
+    tip.style.opacity = "0";
+  });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>
