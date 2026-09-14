@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Out-of-Pocket Health Costs: 2000 vs. 2022</h1>
+<p class="subtitle">Share of current health expenditure paid directly by households. High out-of-pocket costs signal weak health system coverage — families bear the burden of illness themselves. 30 highest-burden countries shown.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Out-of-Pocket Expenditure (% of Current Health Expenditure)</p>
+
+<script>
+const data = [{"n":"Armenia","a":62.0,"b":80.5},{"n":"Bangladesh","a":61.8,"b":79.3},{"n":"Cameroon","a":78.5,"b":67.7},{"n":"Equatorial Guinea","a":52.2,"b":66.0},{"n":"Azerbaijan","a":68.6,"b":64.6},{"n":"Guinea-Bissau","a":60.7,"b":61.6},{"n":"Cambodia","a":68.8,"b":60.6},{"n":"Georgia","a":81.0,"b":58.8},{"n":"Egypt","a":62.5,"b":57.2},{"n":"Guatemala","a":59.0,"b":57.2},{"n":"Comoros","a":79.7,"b":56.6},{"n":"Guinea","a":65.4,"b":54.4},{"n":"Honduras","a":45.9,"b":53.1},{"n":"Haiti","a":44.4,"b":52.4},{"n":"Chad","a":56.2,"b":51.7},{"n":"Barbados","a":39.4,"b":49.5},{"n":"Grenada","a":59.3,"b":48.5},{"n":"Eritrea","a":63.8,"b":48.4},{"n":"Albania","a":51.8,"b":48.3},{"n":"Ethiopia","a":36.0,"b":46.3},{"n":"Algeria","a":25.8,"b":45.0},{"n":"C.A.R.","a":48.3,"b":45.0},{"n":"India","a":71.7,"b":43.9},{"n":"Burkina Faso","a":57.6,"b":43.8},{"n":"Iran","a":59.6,"b":43.1},{"n":"Benin","a":54.9,"b":42.4},{"n":"Congo (DRC)","a":54.0,"b":38.0},{"n":"Bulgaria","a":40.4,"b":35.5},{"n":"Chile","a":42.8,"b":34.6},{"n":"Jordan","a":39.1,"b":34.5}];
+
+const W = 680, H = 600;
+const pad = { left: 130, right: 135, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = Math.floor(Math.min(...allVals) / 5) * 5;
+const maxV = Math.ceil(Math.max(...allVals) / 5) * 5;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left;
+const xR = W - pad.right;
+
+// Grid lines
+[20, 30, 40, 50, 60, 70, 80].forEach(v => {
+  if (v < minV || v > maxV) return;
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: xL - 6, y: scale(v) + 3, "text-anchor": "end", fill: "#9A9890", "font-family": "JetBrains Mono, monospace", "font-size": "9" })).textContent = v + "%";
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xL, y1: scale(minV), x2: xL, y2: scale(maxV), stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: scale(minV), x2: xR, y2: scale(maxV), stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+// Column headers
+const hdr = mkEl("text", { x: xL, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500" });
+hdr.textContent = "2000";
+svg.appendChild(hdr);
+const hdr2 = mkEl("text", { x: xR, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500" });
+hdr2.textContent = "2022";
+svg.appendChild(hdr2);
+
+function colorForChange(d) {
+  const ch = d.b - d.a;
+  if (ch > 15)  return "#B34B3B";
+  if (ch > 5)   return "#C4715A";
+  if (ch > -5)  return "#C49A45";
+  if (ch > -15) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+// Build label positions and resolve collisions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a), origY: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b), origY: scale(d.b) }));
+
+const resolvedL = resolveCollisions(leftLabels, 11);
+const resolvedR = resolveCollisions(rightLabels, 11);
+
+const leftMap = new Map(resolvedL.map(item => [item.d, item.y]));
+const rightMap = new Map(resolvedR.map(item => [item.d, item.y]));
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 24) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+data.forEach(d => {
+  const col = colorForChange(d);
+  const yA = scale(d.a), yB = scale(d.b);
+  const lyL = leftMap.get(d), lyR = rightMap.get(d);
+
+  const g = mkEl("g", { opacity: "1" });
+
+  // Main slope line
+  const line = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: col, "stroke-width": "1.2", "stroke-opacity": "0.85" });
+  g.appendChild(line);
+
+  // Endpoint dots
+  g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "2.5", fill: col }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "2.5", fill: col }));
+
+  // Leader lines if label shifted from data point
+  if (Math.abs(lyL - yA) > 1) {
+    g.appendChild(mkEl("line", { x1: xL - 4, y1: yA, x2: xL - 8, y2: lyL, stroke: col, "stroke-width": "0.5", "stroke-opacity": "0.4" }));
+  }
+  if (Math.abs(lyR - yB) > 1) {
+    g.appendChild(mkEl("line", { x1: xR + 4, y1: yB, x2: xR + 8, y2: lyR, stroke: col, "stroke-width": "0.5", "stroke-opacity": "0.4" }));
+  }
+
+  // Left label: "CountryName  value"
+  const lbl = mkEl("text", { x: xL - 10, y: lyL + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9", "font-weight": "500" });
+  lbl.textContent = `${d.n}  ${d.a}%`;
+  g.appendChild(lbl);
+
+  // Right label: "value  CountryName"
+  const rbl = mkEl("text", { x: xR + 10, y: lyR + 3.5, "text-anchor": "start", fill: "#2B2A27", "font-size": "9", "font-weight": "500" });
+  rbl.textContent = `${d.b}%  ${d.n}`;
+  g.appendChild(rbl);
+
+  // Hit area
+  const hit = mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gg => gg.setAttribute("opacity", "0.12"));
+    g.setAttribute("opacity", "1");
+    const ch = d.b - d.a;
+    const sign = ch >= 0 ? "+" : "";
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${ch.toFixed(1)}pp)`, e);
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gg => gg.setAttribute("opacity", "1"));
+    hideTip();
+  });
+  g.appendChild(hit);
+
+  groups.push(g);
+  svg.appendChild(g);
+});
+
+// Legend
+const legendY = pad.top - 10;
+const legendItems = [
+  { col: "#B34B3B", label: ">+15pp worse" },
+  { col: "#C4715A", label: "+5 to +15pp" },
+  { col: "#C49A45", label: "±5pp stable" },
+  { col: "#8BAD72", label: "-5 to -15pp" },
+  { col: "#3D7A5A", label: ">15pp improved" },
+];
+let lx = xL + 10;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 6, width: 8, height: 8, fill: item.col, rx: "1" }));
+  const lt = mkEl("text", { x: lx + 11, y: legendY + 2, fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "8" });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+  lx += 90;
+});
+</script>
+</body></html>

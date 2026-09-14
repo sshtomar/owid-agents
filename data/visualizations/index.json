@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Out-of-Pocket Health Costs: 2000 vs. 2022",
+      "description": "Slope chart comparing household out-of-pocket health spending as a share of total health expenditure across the 30 highest-burden countries. Armenia and Bangladesh now exceed 80%; India improved from 72% to 44%.",
+      "datasetIds": [
+        "wb--SH-XPD-OOPC-CH-ZS"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Armenia and Bangladesh now pay 80%+ of health costs out-of-pocket",
+        "India improved dramatically \u2014 from 72% in 2000 to 44% in 2022",
+        "Georgia dropped from 81% to 59% as UHC coverage expanded"
+      ],
+      "createdAt": "2026-09-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Learning Poverty: Children Unable to Read Proficiently at End of Primary School",
+      "description": "Horizontal bar chart of the 30 countries with the highest learning poverty rate \u2014 the share of children who cannot read and understand a simple text by the time they complete primary school.",
+      "datasetIds": [
+        "wb--SE-LPV-PRIM"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Congo DRC, Burundi, and Chad have near-universal reading failure (94\u201397%)",
+        "Kenya's most recent survey (2023) shows 79% learning poverty",
+        "Ireland, South Korea, and Japan are below 4%"
+      ],
+      "createdAt": "2026-09-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "International Tourism Arrivals: The World's Top 12 Destinations, 1995\u20132020",
+      "description": "Trend lines showing tourist arrivals (in millions) for the 12 most-visited countries. The COVID-19 pandemic caused a historic collapse in 2020, with Hong Kong losing 94% of visitors and China 81%.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "France led global arrivals every year, reaching 218M in 2019",
+        "Hong Kong lost 94% of visitors in 2020 \u2014 the steepest collapse",
+        "China went from 46M in 1995 to 163M in 2019, then crashed to 30M"
+      ],
+      "createdAt": "2026-09-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "The Demographic Transition: Youth Population Share (Ages 0\u201314), 1960\u20132024",
+      "description": "Trend lines for 13 diverse countries showing how the share of population aged 0\u201314 has changed over 65 years. The chart illustrates every stage of the demographic transition, from Sub-Saharan Africa to East Asia.",
+      "datasetIds": [
+        "wb--SP-POP-0014-TO-ZS"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "South Korea fell from 41% to 11% \u2014 the fastest demographic transition ever recorded",
+        "Congo DRC has stayed near 46% for 60 years, one of the world's youngest populations",
+        "China's one-child policy is visible as a sharp drop from 40% in 1975 to 18% by 2010"
+      ],
+      "createdAt": "2026-09-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Healthy Years After 60: Healthy Life Expectancy at Age 60 (HALE)",
+      "description": "Horizontal bar chart comparing how many years of healthy life a 60-year-old can expect across 30 countries. The global range spans from 20 years (Spain) to 8 years (Central African Republic).",
+      "datasetIds": [
+        "who--WHOSIS_000007"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Spain leads globally with 20.3 healthy years expected after age 60",
+        "Central African Republic offers only 8.3 years \u2014 a 2.5x global gap",
+        "Kazakhstan has only 10.8 healthy years despite being a middle-income country"
+      ],
+      "createdAt": "2026-09-14T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-14T00:00:00.000Z"
 }

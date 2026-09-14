@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Learning Poverty: Children Unable to Read Proficiently at End of Primary School</h1>
+<p class="subtitle">Percentage of children at primary school completion age who cannot read and understand a simple text, adjusted for out-of-school children. In the highest-poverty countries, nearly every child is affected.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Learning Poverty Indicator (SE.LPV.PRIM)</p>
+
+<script>
+const data = [{"n":"Congo, Dem. Rep.","v":96.6,"y":2019},{"n":"Burundi","v":95.8,"y":2019},{"n":"Chad","v":94.4,"y":2019},{"n":"Afghanistan","v":93.3,"y":2013},{"n":"Ethiopia","v":90.4,"y":2015},{"n":"Cambodia","v":90.0,"y":2019},{"n":"Comoros","v":86.0,"y":2008},{"n":"Guinea","v":82.7,"y":2019},{"n":"Cote d'Ivoire","v":79.9,"y":2019},{"n":"Honduras","v":79.3,"y":2019},{"n":"Kenya","v":79.3,"y":2023},{"n":"Guatemala","v":78.5,"y":2019},{"n":"Dominican Republic","v":77.7,"y":2019},{"n":"Belize","v":76.4,"y":2001},{"n":"Burkina Faso","v":73.9,"y":2019},{"n":"Cameroon","v":71.9,"y":2019},{"n":"Congo, Rep.","v":70.0,"y":2019},{"n":"El Salvador","v":69.1,"y":2019},{"n":"Algeria","v":67.9,"y":2007},{"n":"Ecuador","v":65.9,"y":2019},{"n":"Jordan","v":62.2,"y":2021},{"n":"Argentina","v":59.1,"y":2019},{"n":"Egypt","v":56.1,"y":2021},{"n":"India","v":56.1,"y":2017},{"n":"Benin","v":55.8,"y":2019},{"n":"Indonesia","v":52.8,"y":2015},{"n":"Colombia","v":51.4,"y":2019},{"n":"Bangladesh","v":51.2,"y":2022},{"n":"Botswana","v":50.8,"y":2011},{"n":"Brazil","v":46.9,"y":2019}];
+
+const W = 680, H = 700;
+const marginL = 148, marginR = 70, marginT = 30, marginB = 20;
+const barH = 15, rowH = (H - marginT - marginB) / data.length;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const chartW = W - marginL - marginR;
+const maxVal = 100;
+const xScale = v => (v / maxVal) * chartW;
+
+function colorForVal(v) {
+  if (v >= 85) return "#B34B3B";
+  if (v >= 70) return "#C4715A";
+  if (v >= 55) return "#EA5E33";
+  if (v >= 40) return "#F29A44";
+  return "#C49A45";
+}
+
+// Vertical gridlines
+[25, 50, 75, 100].forEach(v => {
+  const x = marginL + xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: marginT - 10, x2: x, y2: H - marginB, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: x, y: marginT - 14, "text-anchor": "middle", fill: "#9A9890", "font-family": "JetBrains Mono, monospace", "font-size": "8" })).textContent = v + "%";
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const bars = [];
+data.forEach((d, i) => {
+  const y = marginT + i * rowH;
+  const bw = xScale(d.v);
+  const col = colorForVal(d.v);
+  const cy = y + rowH / 2;
+
+  const g = mkEl("g", { opacity: "1" });
+
+  // Bar background
+  g.appendChild(mkEl("rect", { x: marginL, y: cy - barH / 2, width: chartW, height: barH, fill: "#E2E0D5", rx: "2" }));
+
+  // Bar
+  const bar = mkEl("rect", { x: marginL, y: cy - barH / 2, width: bw, height: barH, fill: col, rx: "2" });
+  g.appendChild(bar);
+
+  // Country name (left)
+  const lbl = mkEl("text", { x: marginL - 6, y: cy + 4, "text-anchor": "end", fill: "#2B2A27", "font-size": "9.5", "font-weight": "500" });
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  // Value label (right of bar)
+  const vx = marginL + bw + 5;
+  const vlbl = mkEl("text", { x: vx, y: cy + 4, "text-anchor": "start", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "8.5" });
+  vlbl.textContent = d.v + "%";
+  g.appendChild(vlbl);
+
+  // Hit area
+  const hit = mkEl("rect", { x: 0, y: cy - rowH / 2, width: W, height: rowH, fill: "transparent", cursor: "pointer" });
+  hit.addEventListener("mousemove", e => {
+    bars.forEach(b => b.setAttribute("opacity", "0.15"));
+    g.setAttribute("opacity", "1");
+    showTip(`${d.n}: ${d.v}% cannot read (${d.y} survey)`, e);
+  });
+  hit.addEventListener("mouseleave", () => { bars.forEach(b => b.setAttribute("opacity", "1")); hideTip(); });
+  g.appendChild(hit);
+
+  bars.push(g);
+  svg.appendChild(g);
+});
+</script>
+</body></html>
