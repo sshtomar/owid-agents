@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Use per Capita, 1990–2022</h1>
+<p class="subtitle">Kilograms of oil equivalent per person. Iceland's geothermal abundance and Canada's energy-intensive economy put them far above the global norm. China has nearly tripled its energy use since 1990; many low-income countries remain below 400 kg.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Energy use per capita (EG.USE.PCAP.KG.OE)</p>
+<script>
+const data = [{"n":"Iceland","s":[9058,7917,8446,8991,9292,11405,11168,10893,13184,17341,17025,17634,17947,15701,17347,16084,15807],"y0":1990,"step":2},{"n":"Canada","s":[7642,7617,7971,8071,7963,8225,7943,8371,8427,8098,7661,7638,7780,7945,8162,7495,7575],"y0":1990,"step":2},{"n":"Korea, Rep.","s":[2088,2546,2969,3461,3374,3952,4093,4255,4338,4513,4920,5123,5137,5391,5532,5196,5412],"y0":1990,"step":2},{"n":"Germany","s":[4422,4191,4089,4247,4178,4094,4109,4132,4236,4082,4030,3913,3794,3765,3659,3349,3262],"y0":1990,"step":2},{"n":"China","s":[773,757,821,885,872,898,976,1249,1490,1630,1900,2085,2178,2149,2311,2466,2676],"y0":1990,"step":2},{"n":"Iran","s":[1188,1323,1572,1553,1725,1852,2031,2215,2460,2711,2640,2741,2884,2861,2921,3257,3288],"y0":1990,"step":2},{"n":"Brazil","s":[942,937,980,1036,1082,1081,1103,1157,1202,1317,1384,1433,1522,1415,1403,1379,1433],"y0":1990,"step":2},{"n":"India","s":[324,336,348,368,378,395,397,415,442,482,532,572,610,627,668,632,728],"y0":1990,"step":2},{"n":"Indonesia","s":[461,490,524,587,568,586,606,635,644,633,674,686,710,724,832,856,959],"y0":1990,"step":2},{"n":"Bangladesh","s":[114,114,122,128,132,136,148,154,168,181,196,208,223,256,261,279,308],"y0":1990,"step":2},{"n":"Chad","s":[297,281,287,278,256,242,240,224,224,217,219,229,221,213,200,198,199],"y0":1990,"step":2},{"n":"Ethiopia","s":[368,361,364,365,364,364,367,368,366,369,368,372,380,383,384,380,379],"y0":1990,"step":2}];
+
+const COLORS = {
+  'Iceland': '#EA5E33',
+  'Canada': '#F29A44',
+  'Korea, Rep.': '#4A90D9',
+  'Germany': '#8BAD72',
+  'China': '#3D7A5A',
+  'Iran': '#C49A45',
+  'Brazil': '#5B9E78',
+  'India': '#5BA8C4',
+  'Indonesia': '#7CC8C0',
+  'Bangladesh': '#A6C4A2',
+  'Chad': '#C4715A',
+  'Ethiopia': '#B34B3B'
+};
+
+const W = 820, H = 460;
+const margin = { top: 36, right: 130, bottom: 36, left: 70 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const yearMin = 1990, yearMax = 2022;
+const valMin = 0, valMax = 18000;
+
+const xScale = yr => margin.left + (yr - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid
+[0, 3000, 6000, 9000, 12000, 15000, 18000].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = v >= 1000 ? (v/1000) + "k" : v;
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end", "font-family": "'JetBrains Mono',monospace",
+    "font-size": "9", fill: "#9A9890"
+  }, lbl));
+});
+
+[1990, 1996, 2002, 2008, 2014, 2020].forEach(yr => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(yr), y: H - margin.bottom + 14,
+    "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace",
+    "font-size": "9", fill: "#9A9890"
+  }, yr));
+});
+
+svg.appendChild(mkEl("text", {
+  x: 12, y: (margin.top + H - margin.bottom) / 2,
+  "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace",
+  "font-size": "9", fill: "#9A9890",
+  transform: `rotate(-90, 12, ${(margin.top + H - margin.bottom) / 2})`
+}, "kg of oil equivalent"));
+
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: H - margin.bottom,
+  x2: W - margin.right, y2: H - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "0.5"
+}));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const labelItems = data.map(d => {
+  const pts = d.s.map((v,i) => ({ year: d.y0 + i * d.step, v })).filter(p => p.v != null);
+  if (!pts.length) return null;
+  const last = pts[pts.length - 1];
+  return { n: d.n, y: yScale(last.v), lastV: last.v };
+}).filter(Boolean);
+
+const top = margin.top + 6, bottom = H - margin.bottom - 6;
+labelItems.forEach(l => { l.y = Math.max(top, Math.min(bottom, l.y)); });
+const resolved = resolveCollisions(labelItems, 12);
+const labelMap = {};
+resolved.forEach(l => { labelMap[l.n] = l.y; });
+
+const groups = [];
+data.forEach(d => {
+  const pts = d.s.map((v,i) => ({ year: d.y0 + i * d.step, v })).filter(p => p.v != null);
+  if (!pts.length) return;
+  const color = COLORS[d.n] || '#9A9890';
+  const pathD = pts.map((p,i) => `${i===0?'M':'L'} ${xScale(p.year).toFixed(1)} ${yScale(p.v).toFixed(1)}`).join(' ');
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+
+  const labelY = labelMap[d.n] ?? yScale(pts[pts.length-1].v);
+  const origY = yScale(pts[pts.length-1].v);
+  if (Math.abs(labelY - origY) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xScale(pts[pts.length-1].year) + 3, y1: origY,
+      x2: W - margin.right + 4, y2: labelY,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  g.appendChild(mkEl("text", {
+    x: W - margin.right + 6, y: labelY + 3.5,
+    "font-size": "9", "font-family": "'JetBrains Mono',monospace",
+    fill: color, "font-weight": "500"
+  }, d.n));
+
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, hit, line, pts, d, color });
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({ g, hit, line, pts, d }) => {
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    const idx = Math.round((yr - d.y0) / d.step);
+    const ci = Math.max(0, Math.min(pts.length - 1, idx));
+    const p = pts[ci];
+    tip.textContent = `${d.n}  ${p.year}: ${p.v.toLocaleString()} kg`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    groups.forEach(o => {
+      o.line.setAttribute("stroke-width", o.d.n === d.n ? "2.5" : "1.5");
+      o.g.style.opacity = o.d.n === d.n ? "1" : "0.12";
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(o => {
+      o.line.setAttribute("stroke-width", "1.5");
+      o.g.style.opacity = "1";
+    });
+  });
+});
+</script>
+</body></html>
