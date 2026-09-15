@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>School Life Expectancy, 1990 vs 2018</h1>
+<p class="subtitle">Average number of years a child is expected to spend in education, from primary through tertiary. Afghanistan and Burkina Faso more than tripled their school life expectancy in 28 years. Ireland and Greece nearly doubled theirs. The gap between richest and poorest has narrowed but persists.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — School life expectancy (SE.SCH.LIFE)</p>
+<script>
+// a = 1990 value, b = 2018 value; y = 1990 for validator
+const data = [{"n":"Ireland","y":1990,"a":12.35,"b":19.8},{"n":"Belgium","y":1990,"a":14.03,"b":19.6},{"n":"Greece","y":1990,"a":12.39,"b":19.5},{"n":"Finland","y":1990,"a":15.0,"b":19.5},{"n":"Iceland","y":1990,"a":14.24,"b":19.2},{"n":"Denmark","y":1990,"a":14.06,"b":18.8},{"n":"Czechia","y":1990,"a":11.84,"b":16.3},{"n":"Italy","y":1990,"a":12.82,"b":16.2},{"n":"Canada","y":1990,"a":16.77,"b":16.2},{"n":"Austria","y":1990,"a":13.93,"b":16.1},{"n":"Israel","y":1990,"a":12.87,"b":16.1},{"n":"Costa Rica","y":1990,"a":9.79,"b":15.9},{"n":"Estonia","y":1990,"a":13.13,"b":15.9},{"n":"France","y":1990,"a":14.09,"b":15.8},{"n":"Cyprus","y":1990,"a":9.23,"b":15.4},{"n":"Belarus","y":1990,"a":12.99,"b":15.4},{"n":"Hungary","y":1990,"a":11.13,"b":15.1},{"n":"Albania","y":1990,"a":11.6,"b":14.7},{"n":"Cuba","y":1990,"a":12.22,"b":14.3},{"n":"Bulgaria","y":1990,"a":12.01,"b":14.2},{"n":"Indonesia","y":1990,"a":10.07,"b":13.6},{"n":"Azerbaijan","y":1990,"a":11.07,"b":13.3},{"n":"Bangladesh","y":1990,"a":5.83,"b":12.0},{"n":"Burundi","y":1990,"a":4.52,"b":10.8},{"n":"Afghanistan","y":1990,"a":2.5,"b":10.2},{"n":"Burkina Faso","y":1990,"a":2.47,"b":9.3}];
+
+const W = 700, H = 640;
+const pad = { left: 120, right: 130, top: 50, bottom: 24 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const minV = 0, maxV = 21;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xA = pad.left, xB = W - pad.right;
+
+// Axes
+svg.appendChild(mkEl("line", { x1: xA, y1: pad.top, x2: xA, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xB, y1: pad.top, x2: xB, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+// Column headers
+svg.appendChild(mkEl("text", { x: xA, y: pad.top - 8, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F" }, "1990"));
+svg.appendChild(mkEl("text", { x: xB, y: pad.top - 8, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F" }, "2018"));
+
+// Grid
+[0, 5, 10, 15, 20].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xA, y1: scale(v), x2: xB, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xA - 20, y: scale(v) + 3.5,
+    "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace",
+    "font-size": "9", fill: "#9A9890"
+  }, v + "yr"));
+});
+
+function colorForChange(d) {
+  const gain = d.b - d.a;
+  if (gain >= 7) return "#EA5E33";
+  if (gain >= 5) return "#F29A44";
+  if (gain >= 3.5) return "#C49A45";
+  if (gain >= 2) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const top = pad.top + 4, bottom = H - pad.bottom - 4;
+
+const leftItems = data.map(d => ({ n: d.n, y: scale(d.a), d }));
+leftItems.forEach(l => { l.y = Math.max(top, Math.min(bottom, l.y)); });
+const leftResolved = resolveCollisions(leftItems, 12);
+
+const rightItems = data.map(d => ({ n: d.n, y: scale(d.b), d }));
+rightItems.forEach(r => { r.y = Math.max(top, Math.min(bottom, r.y)); });
+const rightResolved = resolveCollisions(rightItems, 12);
+
+const leftMap = {}, rightMap = {};
+leftResolved.forEach(l => { leftMap[l.n] = l.y; });
+rightResolved.forEach(r => { rightMap[r.n] = r.y; });
+
+const groups = [];
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", {
+    x1: xA, y1: ya, x2: xB, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  const hit = mkEl("line", {
+    x1: xA - 4, y1: ya, x2: xB + 4, y2: yb,
+    stroke: "transparent", "stroke-width": "10", cursor: "pointer"
+  });
+
+  g.appendChild(mkEl("circle", { cx: xA, cy: ya, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xB, cy: yb, r: "2.5", fill: color }));
+
+  const ly = leftMap[d.n];
+  if (Math.abs(ly - ya) > 2) {
+    g.appendChild(mkEl("line", { x1: xA - 4, y1: ya, x2: xA - 10, y2: ly, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  g.appendChild(mkEl("text", {
+    x: xA - 12, y: ly + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#2B2A27"
+  }, `${d.n}  ${d.a}`));
+
+  const ry = rightMap[d.n];
+  if (Math.abs(ry - yb) > 2) {
+    g.appendChild(mkEl("line", { x1: xB + 4, y1: yb, x2: xB + 10, y2: ry, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  g.appendChild(mkEl("text", {
+    x: xB + 12, y: ry + 3.5, "text-anchor": "start",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#2B2A27"
+  }, `${d.b}  ${d.n}`));
+
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, hit, line, d, color });
+});
+
+// Legend
+const legendItems = [
+  { label: "≥7 yr gain", color: "#EA5E33" },
+  { label: "5–7 yr gain", color: "#F29A44" },
+  { label: "3.5–5 yr gain", color: "#C49A45" },
+  { label: "2–3.5 yr gain", color: "#8BAD72" },
+  { label: "<2 yr gain", color: "#A6C4A2" }
+];
+let lx = pad.left;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: H - 14, width: 8, height: 8, fill: item.color, rx: "1" }));
+  svg.appendChild(mkEl("text", { x: lx + 11, y: H - 7, "font-size": "8", "font-family": "'JetBrains Mono',monospace", fill: "#7A786F" }, item.label));
+  lx += item.label.length * 5.5 + 20;
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({ g, hit, line, d }) => {
+  const gain = (d.b - d.a).toFixed(1);
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${d.a.toFixed(1)}yr → ${d.b}yr (+${gain}yr)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    groups.forEach(o => {
+      o.line.setAttribute("stroke-width", o.d.n === d.n ? "3" : "1.5");
+      o.g.style.opacity = o.d.n === d.n ? "1" : "0.12";
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(o => {
+      o.line.setAttribute("stroke-width", "1.5");
+      o.g.style.opacity = "1";
+    });
+  });
+});
+</script>
+</body></html>

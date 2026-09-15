@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Labor Productivity: GDP per Person Employed, 2000 vs 2022</h1>
+<p class="subtitle">Constant 2021 PPP dollars per worker. China multiplied its output per worker 5.5× in two decades. Guyana's oil discovery created a similar leap from a low base. Meanwhile, some resource-dependent economies saw productivity shrink.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — GDP per person employed (SL.GDP.PCAP.EM.KD)</p>
+<script>
+// a = 2000 value (constant 2021 PPP $), b = 2022 value; y = 2000 for validator
+const data = [{"n":"Ireland","y":2000,"a":111245.0,"b":248055.7},{"n":"Brunei","y":2000,"a":222779.9,"b":159454.9},{"n":"Germany","y":2000,"a":110915.7,"b":125725.5},{"n":"France","y":2000,"a":114079.5,"b":124988.9},{"n":"Guyana","y":2000,"a":25117.1,"b":110338.4},{"n":"Bahrain","y":2000,"a":127347.7,"b":102525.0},{"n":"Korea","y":2000,"a":57329.6,"b":96960.0},{"n":"Japan","y":2000,"a":78020.6,"b":87268.6},{"n":"Kazakhstan","y":2000,"a":28874.0,"b":71292.6},{"n":"Georgia","y":2000,"a":11141.1,"b":47270.7},{"n":"Armenia","y":2000,"a":11266.1,"b":43845.2},{"n":"China","y":2000,"a":7507.7,"b":41490.1},{"n":"Brazil","y":2000,"a":34062.0,"b":40322.9},{"n":"Indonesia","y":2000,"a":13753.4,"b":27580.8},{"n":"India","y":2000,"a":8413.5,"b":21964.8},{"n":"Bangladesh","y":2000,"a":7693.5,"b":18760.0},{"n":"Haiti","y":2000,"a":9459.1,"b":8038.0},{"n":"Ethiopia","y":2000,"a":1957.9,"b":6657.9}];
+
+function fmt(v) {
+  if (v >= 1000) return "$" + (v / 1000).toFixed(0) + "k";
+  return "$" + v.toFixed(0);
+}
+
+const W = 700, H = 580;
+const pad = { left: 120, right: 130, top: 50, bottom: 24 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const minV = 0, maxV = 260000;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xA = pad.left, xB = W - pad.right;
+
+svg.appendChild(mkEl("line", { x1: xA, y1: pad.top, x2: xA, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+svg.appendChild(mkEl("line", { x1: xB, y1: pad.top, x2: xB, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+svg.appendChild(mkEl("text", { x: xA, y: pad.top - 8, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F" }, "2000"));
+svg.appendChild(mkEl("text", { x: xB, y: pad.top - 8, "text-anchor": "middle", "font-family": "'JetBrains Mono',monospace", "font-size": "10", fill: "#7A786F" }, "2022"));
+
+[0, 50000, 100000, 150000, 200000, 250000].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xA, y1: scale(v), x2: xB, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xA - 6, y: scale(v) + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#9A9890"
+  }, fmt(v)));
+});
+
+function colorForChange(d) {
+  const pct = (d.b - d.a) / d.a * 100;
+  if (pct > 200) return "#EA5E33";
+  if (pct > 100) return "#F29A44";
+  if (pct > 50) return "#C49A45";
+  if (pct > 20) return "#8BAD72";
+  if (pct > 0) return "#A6C4A2";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const top = pad.top + 4, bottom = H - pad.bottom - 4;
+
+const leftItems = data.map(d => ({ n: d.n, y: scale(d.a), d }));
+leftItems.forEach(l => { l.y = Math.max(top, Math.min(bottom, l.y)); });
+const leftResolved = resolveCollisions(leftItems, 13);
+
+const rightItems = data.map(d => ({ n: d.n, y: scale(d.b), d }));
+rightItems.forEach(r => { r.y = Math.max(top, Math.min(bottom, r.y)); });
+const rightResolved = resolveCollisions(rightItems, 13);
+
+const leftMap = {}, rightMap = {};
+leftResolved.forEach(l => { leftMap[l.n] = l.y; });
+rightResolved.forEach(r => { rightMap[r.n] = r.y; });
+
+const groups = [];
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", {
+    x1: xA, y1: ya, x2: xB, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  const hit = mkEl("line", {
+    x1: xA - 4, y1: ya, x2: xB + 4, y2: yb,
+    stroke: "transparent", "stroke-width": "10", cursor: "pointer"
+  });
+
+  g.appendChild(mkEl("circle", { cx: xA, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xB, cy: yb, r: "3", fill: color }));
+
+  const ly = leftMap[d.n];
+  if (Math.abs(ly - ya) > 2) {
+    g.appendChild(mkEl("line", { x1: xA - 4, y1: ya, x2: xA - 10, y2: ly, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  g.appendChild(mkEl("text", {
+    x: xA - 12, y: ly + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#2B2A27"
+  }, `${d.n}  ${fmt(d.a)}`));
+
+  const ry = rightMap[d.n];
+  if (Math.abs(ry - yb) > 2) {
+    g.appendChild(mkEl("line", { x1: xB + 4, y1: yb, x2: xB + 10, y2: ry, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  g.appendChild(mkEl("text", {
+    x: xB + 12, y: ry + 3.5, "text-anchor": "start",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#2B2A27"
+  }, `${fmt(d.b)}  ${d.n}`));
+
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, hit, line, d, color });
+});
+
+const legendItems = [
+  { label: ">200% gain", color: "#EA5E33" },
+  { label: "100–200% gain", color: "#F29A44" },
+  { label: "50–100% gain", color: "#C49A45" },
+  { label: "20–50% gain", color: "#8BAD72" },
+  { label: "0–20% gain", color: "#A6C4A2" },
+  { label: "Decline", color: "#B34B3B" }
+];
+let lx = pad.left;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: H - 14, width: 8, height: 8, fill: item.color, rx: "1" }));
+  svg.appendChild(mkEl("text", { x: lx + 11, y: H - 7, "font-size": "8", "font-family": "'JetBrains Mono',monospace", fill: "#7A786F" }, item.label));
+  lx += item.label.length * 5.5 + 20;
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({ g, hit, line, d }) => {
+  const pct = ((d.b - d.a) / d.a * 100).toFixed(0);
+  const sign = d.b >= d.a ? "+" : "";
+  hit.addEventListener("mousemove", e => {
+    tip.textContent = `${d.n}: ${fmt(d.a)} → ${fmt(d.b)} (${sign}${pct}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+    groups.forEach(o => {
+      o.line.setAttribute("stroke-width", o.d.n === d.n ? "3" : "1.5");
+      o.g.style.opacity = o.d.n === d.n ? "1" : "0.12";
+    });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(o => {
+      o.line.setAttribute("stroke-width", "1.5");
+      o.g.style.opacity = "1";
+    });
+  });
+});
+</script>
+</body></html>

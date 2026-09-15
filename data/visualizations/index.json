@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines for 13 countries showing the demographic transition: Sub-Saharan Africa remains above 85 dependents per 100 workers, while Asia completed its transition and East Asian societies now face rising old-age dependency.",
+      "datasetIds": [
+        "wb--SP-POP-DPND"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Chad's dependency ratio rose from 82 in 1960 to over 100, never entering the demographic dividend",
+        "China and Korea fell below 40 by 2020 \u2014 among the fastest transitions in history \u2014 but Korea is now rising again",
+        "India declined from 78 to 49 over 64 years, tracking its economic rise"
+      ],
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Use per Capita, 1990\u20132022",
+      "description": "Trend lines for 12 countries showing the global energy divide: Iceland's geothermal abundance, China's tripling since 1990, and many low-income countries stuck below 400 kg of oil equivalent per person.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Iceland uses 40x more energy per capita than Chad or Bangladesh",
+        "China tripled per-capita energy use from 773 to 2,676 kg between 1990 and 2022",
+        "Germany reduced per-capita consumption by 26% through efficiency gains"
+      ],
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "International Tourist Arrivals, 2004\u20132020",
+      "description": "Trend lines for 9 major tourism destinations showing 15 years of steady growth erased by COVID-19. Japan's rise from 6 million to 32 million arrivals makes the 2020 collapse especially striking.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "France received 218 million arrivals in 2019 \u2014 the world's most visited country",
+        "Japan grew from 6M to 32M arrivals in just 15 years before crashing to 4M in 2020",
+        "China fell from 163M arrivals in 2019 to just 30M in 2020 \u2014 an 81% collapse"
+      ],
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Labor Productivity: GDP per Person Employed, 2000 vs 2022",
+      "description": "Slope chart showing labor productivity in 18 countries. China multiplied output per worker 5.5x in two decades. Guyana's oil discovery created a similar leap. Some resource-dependent economies declined.",
+      "datasetIds": [
+        "wb--SL-GDP-PCAP-EM-KD"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "China rose from $7,500 to $41,500 per worker (+453%) \u2014 the fastest productivity surge among large economies",
+        "Brunei and Bahrain shrank: their per-worker output fell as oil revenues declined relative to employment",
+        "Ireland's $248k per worker is inflated by multinational profit-shifting, but reflects genuine productivity gains"
+      ],
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "School Life Expectancy, 1990 vs 2018",
+      "description": "Slope chart showing school life expectancy in 26 countries. Afghanistan and Burkina Faso more than tripled their expected years of schooling. The gap between richest and poorest narrowed but persists at 9 vs 20 years.",
+      "datasetIds": [
+        "wb--SE-SCH-LIFE"
+      ],
+      "chartType": "slope",
+      "highlights": [
+        "Afghanistan rose from 2.5 to 10.2 years \u2014 the largest absolute gain in the dataset",
+        "Ireland and Greece gained over 7 years, now reaching nearly 20 years of expected education",
+        "Canada is the only country in the dataset where school life expectancy slightly declined"
+      ],
+      "createdAt": "2026-09-15T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-15T00:00:00.000Z"
 }
