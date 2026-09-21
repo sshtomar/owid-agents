@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #0f172a;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 0 0 16px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 20px; height: 3px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <h1>Universal Health Coverage: Progress Since 2000</h1>
+  <p class="subtitle">UHC Service Coverage Index (0-100) for 21 countries — earliest available vs. most recent value</p>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-swatch" style="background:#EA5E33"></span>+30 or more</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#F29A44"></span>+20 to +29</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#C4A23C"></span>+10 to +19</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#7FA97A"></span>Less than +10</span>
+  </div>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Health Observatory — UHC Service Coverage Index (SDG 3.8.1)</p>
+  <div id="tip"></div>
+  <script>
+    // Data: earliest available value (ya = year) and latest available value (yb = year)
+    const data = [
+      {"n":"Nepal","a":18,"b":58,"ya":2000,"yb":2023,"ch":40},
+      {"n":"Rwanda","a":21,"b":58,"ya":2003,"yb":2022,"ch":37},
+      {"n":"India","a":36,"b":69,"ya":2002,"yb":2023,"ch":33},
+      {"n":"Uganda","a":25,"b":52,"ya":2003,"yb":2020,"ch":27},
+      {"n":"Tanzania","a":27,"b":49,"ya":2005,"yb":2023,"ch":22},
+      {"n":"Pakistan","a":36,"b":56,"ya":2000,"yb":2023,"ch":20},
+      {"n":"Ethiopia","a":13,"b":33,"ya":2000,"yb":2023,"ch":20},
+      {"n":"China","a":65,"b":85,"ya":2002,"yb":2023,"ch":20},
+      {"n":"South Africa","a":57,"b":74,"ya":2004,"yb":2023,"ch":17},
+      {"n":"Central African Rep.","a":23,"b":39,"ya":2002,"yb":2023,"ch":16},
+      {"n":"Brazil","a":70,"b":84,"ya":2001,"yb":2020,"ch":14},
+      {"n":"Vietnam","a":57,"b":71,"ya":2004,"yb":2023,"ch":14},
+      {"n":"Colombia","a":70,"b":82,"ya":2004,"yb":2023,"ch":12},
+      {"n":"Philippines","a":57,"b":68,"ya":2002,"yb":2021,"ch":11},
+      {"n":"Turkey","a":66,"b":77,"ya":2003,"yb":2020,"ch":11},
+      {"n":"Thailand","a":71,"b":82,"ya":2004,"yb":2021,"ch":11},
+      {"n":"Mexico","a":68,"b":78,"ya":2000,"yb":2019,"ch":10},
+      {"n":"Iran","a":70,"b":80,"ya":2004,"yb":2020,"ch":10},
+      {"n":"United Kingdom","a":80,"b":88,"ya":2004,"yb":2022,"ch":8},
+      {"n":"Japan","a":78,"b":85,"ya":2003,"yb":2022,"ch":7},
+      {"n":"Morocco","a":58,"b":65,"ya":2005,"yb":2019,"ch":7}
+    ];
+
+    function colorForChange(ch) {
+      if (ch >= 30) return "#EA5E33";
+      if (ch >= 20) return "#F29A44";
+      if (ch >= 10) return "#C4A23C";
+      return "#7FA97A";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const W = 700, H = 580;
+    const pad = { left: 130, right: 145, top: 50, bottom: 20 };
+    const minV = 10, maxV = 92;
+
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = "720px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Axis lines
+    const leftX = pad.left;
+    const rightX = W - pad.right;
+
+    svg.appendChild(mkEl("line", { x1: leftX, y1: pad.top - 20, x2: leftX, y2: H - pad.bottom, stroke: "#E2E0DA", "stroke-width": "1.5" }));
+    svg.appendChild(mkEl("line", { x1: rightX, y1: pad.top - 20, x2: rightX, y2: H - pad.bottom, stroke: "#E2E0DA", "stroke-width": "1.5" }));
+
+    // Column headers
+    svg.appendChild(mkEl("text", { x: leftX, y: pad.top - 26, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F", "font-weight": "500" })).textContent = "~2000–05";
+    svg.appendChild(mkEl("text", { x: rightX, y: pad.top - 26, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F", "font-weight": "500" })).textContent = "2019–23";
+
+    // Horizontal grid ticks
+    for (const v of [20, 40, 60, 80]) {
+      const y = scale(v);
+      svg.appendChild(mkEl("line", { x1: leftX - 4, y1: y, x2: leftX + 4, y2: y, stroke: "#E2E0DA", "stroke-width": "1" }));
+      svg.appendChild(mkEl("text", { x: leftX - 8, y: y + 4, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#94a3b8" })).textContent = v;
+    }
+
+    // Build label collision input
+    const leftLabels = data.map(d => ({ ref: d, y: scale(d.a), orig: scale(d.a) }));
+    const rightLabels = data.map(d => ({ ref: d, y: scale(d.b), orig: scale(d.b) }));
+
+    const resolvedLeft = resolveCollisions(leftLabels, 13);
+    const resolvedRight = resolveCollisions(rightLabels, 13);
+
+    const tip = document.getElementById("tip");
+    function showTip(text, e) {
+      tip.textContent = text;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 24) + "px";
+    }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    const allRows = [];
+    data.forEach(d => {
+      const color = colorForChange(d.ch);
+      const ya_scaled = scale(d.a);
+      const yb_scaled = scale(d.b);
+
+      const g = mkEl("g", {});
+      g.style.cursor = "default";
+
+      // Main line
+      const line = mkEl("line", {
+        x1: leftX, y1: ya_scaled,
+        x2: rightX, y2: yb_scaled,
+        stroke: color, "stroke-width": "1.8",
+        "stroke-linejoin": "round"
+      });
+      g.appendChild(line);
+
+      // Endpoint dots
+      g.appendChild(mkEl("circle", { cx: leftX, cy: ya_scaled, r: "3", fill: color }));
+      g.appendChild(mkEl("circle", { cx: rightX, cy: yb_scaled, r: "3", fill: color }));
+
+      // Hit area
+      const hit = mkEl("line", {
+        x1: leftX, y1: ya_scaled,
+        x2: rightX, y2: yb_scaled,
+        stroke: "transparent", "stroke-width": "14"
+      });
+      hit.addEventListener("mousemove", e => {
+        allRows.forEach(r => r.style.opacity = "0.12");
+        g.style.opacity = "1";
+        showTip(`${d.n}: ${d.a} (${d.ya}) → ${d.b} (${d.yb})  +${d.ch} pts`, e);
+      });
+      hit.addEventListener("mouseout", () => {
+        allRows.forEach(r => r.style.opacity = "1");
+        hideTip();
+      });
+      g.appendChild(hit);
+
+      svg.appendChild(g);
+      allRows.push(g);
+    });
+
+    // Draw labels after all lines (so they render on top)
+    resolvedLeft.forEach(item => {
+      const d = item.ref;
+      const color = colorForChange(d.ch);
+      // Clamp to chart bounds
+      const yClamp = Math.max(pad.top, Math.min(H - pad.bottom, item.y));
+
+      // Leader line if label was moved
+      const origY = scale(d.a);
+      if (Math.abs(yClamp - origY) > 1) {
+        svg.appendChild(mkEl("line", {
+          x1: leftX - 6, y1: origY,
+          x2: leftX - 11, y2: yClamp,
+          stroke: "#C2C0B5", "stroke-width": "0.8"
+        }));
+      }
+
+      const txt = mkEl("text", {
+        x: leftX - 13,
+        y: yClamp + 4,
+        "text-anchor": "end",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9.5",
+        fill: "#334155"
+      });
+      txt.textContent = `${d.n}  ${d.a}`;
+      svg.appendChild(txt);
+    });
+
+    resolvedRight.forEach(item => {
+      const d = item.ref;
+      const color = colorForChange(d.ch);
+      const yClamp = Math.max(pad.top, Math.min(H - pad.bottom, item.y));
+
+      const origY = scale(d.b);
+      if (Math.abs(yClamp - origY) > 1) {
+        svg.appendChild(mkEl("line", {
+          x1: rightX + 6, y1: origY,
+          x2: rightX + 11, y2: yClamp,
+          stroke: "#C2C0B5", "stroke-width": "0.8"
+        }));
+      }
+
+      const txt = mkEl("text", {
+        x: rightX + 13,
+        y: yClamp + 4,
+        "text-anchor": "start",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9.5",
+        fill: "#334155"
+      });
+      txt.textContent = `${d.b}  ${d.n}`;
+      svg.appendChild(txt);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

@@ -5858,7 +5858,97 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Universal Health Coverage: Progress Since 2000",
+      "description": "Slope chart comparing UHC Service Coverage Index for 21 countries \u2014 earliest available (2000\u20132005) vs. most recent (2019\u20132023). Shows dramatic gains in Nepal, Rwanda, and India against modest progress in already-covered nations.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "slope",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Nepal improved from 18 to 58 (+40 points), the largest gain in the selection",
+        "Rwanda rose from 21 to 58 (+37) \u2014 comparable to Nepal despite starting later",
+        "China jumped from 65 to 85, reflecting a major universal coverage push",
+        "UK and Japan improved modestly from already-high baselines"
+      ],
+      "createdAt": "2026-09-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Human Capital Index, 2020",
+      "description": "Horizontal bar chart of the World Bank Human Capital Index for 30 countries across all income levels. Singapore leads at 0.879; Central African Republic is lowest at 0.292 \u2014 a threefold gap in the productivity potential of future workers.",
+      "datasetIds": [
+        "wb--HD-HCI-OVRL"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Singapore (0.879) leads all countries by a wide margin",
+        "The gap between top (Singapore) and bottom (Central African Republic, 0.292) is 3x",
+        "China (0.653) is within striking distance of the United States (0.702)",
+        "Sub-Saharan Africa clusters below 0.45 across all countries in the selection"
+      ],
+      "createdAt": "2026-09-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Researchers in R&D per Million People, 1996\u20132023",
+      "description": "Trend lines for 8 countries showing full-time equivalent researchers per million population. South Korea's fourfold surge to 9,472 is the defining story; China's rapid rise from 447 to 2,107 shows emerging science capacity; India at 259 remains far behind.",
+      "datasetIds": [
+        "wb--SP-POP-SCIE-RD-P6"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "South Korea went from 2,186 to 9,472 researchers per million \u2014 a fourfold increase in 27 years",
+        "Finland consistently leads European peers, reaching 8,315",
+        "China grew from 447 to 2,107 \u2014 the most rapid rise among large economies",
+        "India lags far behind at 259 per million, compared to China's 2,107"
+      ],
+      "createdAt": "2026-09-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Estimated Prevalence of Depression, 2015",
+      "description": "Horizontal bar chart ranking 25 countries by WHO's estimated share of population with depression. Eastern Europe and high-income English-speaking nations cluster at the top; Pacific Island nations and South/Southeast Asian countries show notably lower rates.",
+      "datasetIds": [
+        "who--GDO_q35"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Ukraine tops the list at 6.31% \u2014 nearly double the rate of Nepal (3.23%)",
+        "Australia, United States, and Estonia all exceed 5.8%",
+        "Pacific Island nations (Solomon Islands, Papua New Guinea, Timor-Leste) show the lowest rates",
+        "Global mean is approximately 4.4%; the range 2.9%\u20136.3% is narrower than many expect"
+      ],
+      "createdAt": "2026-09-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Average Annual Precipitation by Country",
+      "description": "Horizontal bar chart of long-run average annual precipitation for 25 countries, spanning from Egypt's near-zero 18 mm to Colombia's 3,230 mm. Illustrates the 180x range in rainfall that shapes water security, agriculture, and climate risk across nations.",
+      "datasetIds": [
+        "wb--AG-LND-PRCP-MM"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "Egypt averages just 18 mm per year \u2014 essentially a desert at the national scale",
+        "Colombia receives 3,230 mm, 180 times more than Egypt",
+        "Australia (534 mm) and China (645 mm) are surprisingly dry for large countries",
+        "Bangladesh (2,666 mm) and Indonesia (2,702 mm) show why monsoons dominate their agriculture"
+      ],
+      "createdAt": "2026-09-21T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-21T00:00:00.000Z"
 }
