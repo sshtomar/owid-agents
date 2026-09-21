@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #0f172a;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>Average Annual Precipitation by Country</h1>
+  <p class="subtitle">Long-run average rainfall in mm per year — from Egypt's 18 mm to Colombia's 3,230 mm</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Average precipitation in depth, AG.LND.PRCP.MM (1990–2022 average)</p>
+  <div id="tip"></div>
+  <script>
+    // Data: long-run average precipitation (mm/year), sorted driest to wettest
+    const data = [
+      {"n":"Egypt","v":18},
+      {"n":"Bahrain","v":83},
+      {"n":"Algeria","v":89},
+      {"n":"Jordan","v":111},
+      {"n":"Iraq","v":216},
+      {"n":"Iran","v":228},
+      {"n":"Azerbaijan","v":447},
+      {"n":"Australia","v":534},
+      {"n":"Argentina","v":591},
+      {"n":"China","v":645},
+      {"n":"Czechia","v":677},
+      {"n":"Germany","v":700},
+      {"n":"Belgium","v":847},
+      {"n":"Antigua & Barbuda","v":1030},
+      {"n":"India","v":1083},
+      {"n":"Bolivia","v":1146},
+      {"n":"Dominican Rep.","v":1410},
+      {"n":"Cameroon","v":1604},
+      {"n":"Japan","v":1668},
+      {"n":"Brazil","v":1774},
+      {"n":"Bangladesh","v":2666},
+      {"n":"Indonesia","v":2702},
+      {"n":"Brunei","v":2722},
+      {"n":"Costa Rica","v":2926},
+      {"n":"Colombia","v":3230}
+    ];
+
+    // Colors: dry = warm orange-red, wet = cool blue-green
+    function colorForValue(v, maxV) {
+      const ratio = v / maxV;
+      if (ratio >= 0.8) return "#2563EB";
+      if (ratio >= 0.6) return "#3D85C8";
+      if (ratio >= 0.4) return "#5B9E78";
+      if (ratio >= 0.2) return "#C4A23C";
+      if (ratio >= 0.08) return "#D97B3A";
+      return "#B34B3B";
+    }
+
+    const maxV = 3500;
+    const W = 640, barH = 22, gap = 5;
+    const leftPad = 130, rightPad = 80, topPad = 10, bottomPad = 10;
+    const H = data.length * (barH + gap) + topPad + bottomPad;
+
+    const barScale = v => (v / maxV) * (W - leftPad - rightPad);
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = "680px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Vertical axis
+    svg.appendChild(mkEl("line", {
+      x1: leftPad, y1: topPad - 4,
+      x2: leftPad, y2: H - bottomPad,
+      stroke: "#E2E0DA", "stroke-width": "1"
+    }));
+
+    // Grid lines
+    for (const v of [500, 1000, 1500, 2000, 2500, 3000]) {
+      const x = leftPad + barScale(v);
+      svg.appendChild(mkEl("line", {
+        x1: x, y1: topPad - 4,
+        x2: x, y2: H - bottomPad,
+        stroke: "#E2E0DA", "stroke-width": "0.8",
+        "stroke-dasharray": "3,3"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: x, y: topPad - 8,
+        "text-anchor": "middle",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9",
+        fill: "#94a3b8"
+      })).textContent = v >= 1000 ? (v/1000) + "k" : v;
+    }
+
+    const tip = document.getElementById("tip");
+    function showTip(text, e) {
+      tip.textContent = text;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 24) + "px";
+    }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    const allBars = [];
+    data.forEach((d, i) => {
+      const y = topPad + i * (barH + gap);
+      const color = colorForValue(d.v, maxV);
+      const bw = barScale(d.v);
+
+      const g = mkEl("g", {});
+      g.style.cursor = "default";
+
+      g.appendChild(mkEl("rect", {
+        x: leftPad, y: y,
+        width: bw, height: barH,
+        fill: color, rx: "2"
+      }));
+
+      const label = mkEl("text", {
+        x: leftPad - 8, y: y + barH * 0.65,
+        "text-anchor": "end",
+        "font-family": "Inter, sans-serif",
+        "font-size": "11",
+        fill: "#334155"
+      });
+      label.textContent = d.n;
+      g.appendChild(label);
+
+      const valLabel = mkEl("text", {
+        x: leftPad + bw + 6, y: y + barH * 0.65,
+        "text-anchor": "start",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "10",
+        fill: color
+      });
+      valLabel.textContent = d.v.toLocaleString() + " mm";
+      g.appendChild(valLabel);
+
+      g.addEventListener("mousemove", e => {
+        allBars.forEach(b => b.style.opacity = "0.2");
+        g.style.opacity = "1";
+        showTip(`${d.n}: ${d.v.toLocaleString()} mm average annual precipitation`, e);
+      });
+      g.addEventListener("mouseout", () => {
+        allBars.forEach(b => b.style.opacity = "1");
+        hideTip();
+      });
+
+      svg.appendChild(g);
+      allBars.push(g);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

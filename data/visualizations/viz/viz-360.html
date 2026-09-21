@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #0f172a;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>Estimated Prevalence of Depression, 2015</h1>
+  <p class="subtitle">Share of population estimated to have depression — Eastern Europe and wealthy English-speaking nations carry the highest burden</p>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Health Observatory — GDO_q35, 2015 estimates</p>
+  <div id="tip"></div>
+  <script>
+    // Data from WHO GDO_q35, 2015, sorted low to high
+    const data = [
+      {"n":"Vanuatu","v":3.09},
+      {"n":"Kiribati","v":3.14},
+      {"n":"Samoa","v":3.17},
+      {"n":"Nepal","v":3.23},
+      {"n":"Afghanistan","v":3.31},
+      {"n":"Mexico","v":4.16},
+      {"n":"China","v":4.17},
+      {"n":"Japan","v":4.24},
+      {"n":"Thailand","v":4.39},
+      {"n":"Turkey","v":4.39},
+      {"n":"Kenya","v":4.40},
+      {"n":"India","v":4.45},
+      {"n":"Argentina","v":4.73},
+      {"n":"Iran","v":4.86},
+      {"n":"Germany","v":5.19},
+      {"n":"Belarus","v":5.57},
+      {"n":"Finland","v":5.61},
+      {"n":"Lithuania","v":5.62},
+      {"n":"Portugal","v":5.67},
+      {"n":"Greece","v":5.74},
+      {"n":"Brazil","v":5.76},
+      {"n":"United States","v":5.86},
+      {"n":"Estonia","v":5.91},
+      {"n":"Australia","v":5.94},
+      {"n":"Ukraine","v":6.31}
+    ];
+
+    const W = 620, barH = 22, gap = 5;
+    const leftPad = 130, rightPad = 60, topPad = 10, bottomPad = 10;
+    const H = data.length * (barH + gap) + topPad + bottomPad;
+
+    const maxV = 7.0;
+    const barScale = v => (v / maxV) * (W - leftPad - rightPad);
+
+    // Midpoint for color split
+    const globalAvg = data.reduce((s, d) => s + d.v, 0) / data.length;
+
+    function colorForValue(v) {
+      if (v >= 5.5) return "#EA5E33";
+      if (v >= 5.0) return "#F29A44";
+      if (v >= 4.5) return "#C4A23C";
+      if (v >= 4.0) return "#6B9A77";
+      return "#7FA97A";
+    }
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = "660px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Vertical axis
+    svg.appendChild(mkEl("line", {
+      x1: leftPad, y1: topPad - 4,
+      x2: leftPad, y2: H - bottomPad,
+      stroke: "#E2E0DA", "stroke-width": "1"
+    }));
+
+    // Grid lines at 2%, 4%, 6%
+    for (const v of [2, 4, 6]) {
+      const x = leftPad + barScale(v);
+      svg.appendChild(mkEl("line", {
+        x1: x, y1: topPad - 4,
+        x2: x, y2: H - bottomPad,
+        stroke: "#E2E0DA", "stroke-width": "0.8",
+        "stroke-dasharray": "3,3"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: x, y: topPad - 8,
+        "text-anchor": "middle",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9",
+        fill: "#94a3b8"
+      })).textContent = v + "%";
+    }
+
+    // Global average line
+    const avgX = leftPad + barScale(globalAvg);
+    svg.appendChild(mkEl("line", {
+      x1: avgX, y1: topPad - 4,
+      x2: avgX, y2: H - bottomPad,
+      stroke: "#94a3b8", "stroke-width": "1",
+      "stroke-dasharray": "5,4"
+    }));
+    svg.appendChild(mkEl("text", {
+      x: avgX + 3, y: topPad - 8,
+      "text-anchor": "start",
+      "font-family": "Inter, sans-serif",
+      "font-size": "9",
+      fill: "#64748b"
+    })).textContent = `avg ${globalAvg.toFixed(1)}%`;
+
+    const tip = document.getElementById("tip");
+    function showTip(text, e) {
+      tip.textContent = text;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 24) + "px";
+    }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    const allBars = [];
+    data.forEach((d, i) => {
+      const y = topPad + i * (barH + gap);
+      const color = colorForValue(d.v);
+      const bw = barScale(d.v);
+
+      const g = mkEl("g", {});
+      g.style.cursor = "default";
+
+      g.appendChild(mkEl("rect", {
+        x: leftPad, y: y,
+        width: bw, height: barH,
+        fill: color, rx: "2"
+      }));
+
+      const label = mkEl("text", {
+        x: leftPad - 8, y: y + barH * 0.65,
+        "text-anchor": "end",
+        "font-family": "Inter, sans-serif",
+        "font-size": "11",
+        fill: "#334155"
+      });
+      label.textContent = d.n;
+      g.appendChild(label);
+
+      const valLabel = mkEl("text", {
+        x: leftPad + bw + 6, y: y + barH * 0.65,
+        "text-anchor": "start",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "10",
+        fill: color
+      });
+      valLabel.textContent = d.v.toFixed(2) + "%";
+      g.appendChild(valLabel);
+
+      g.addEventListener("mousemove", e => {
+        allBars.forEach(b => b.style.opacity = "0.2");
+        g.style.opacity = "1";
+        showTip(`${d.n}: ${d.v.toFixed(2)}% estimated depression prevalence (2015)`, e);
+      });
+      g.addEventListener("mouseout", () => {
+        allBars.forEach(b => b.style.opacity = "1");
+        hideTip();
+      });
+
+      svg.appendChild(g);
+      allBars.push(g);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

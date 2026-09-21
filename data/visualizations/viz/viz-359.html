@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #0f172a;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <h1>Researchers in R&amp;D, 1996–2023</h1>
+  <p class="subtitle">Full-time equivalent researchers per million people — South Korea's fourfold surge leads the world</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Researchers in R&D (SP.POP.SCIE.RD.P6)</p>
+  <div id="tip"></div>
+  <script>
+    // Data: {n: name, pts: [{y: year, v: value}]}
+    const data = [
+      {"n":"South Korea","pts":[{"y":1996,"v":2186},{"y":1997,"v":2239},{"y":1998,"v":2008},{"y":1999,"v":2161},{"y":2000,"v":2324},{"y":2001,"v":2672},{"y":2002,"v":3008},{"y":2003,"v":3281},{"y":2004,"v":3281},{"y":2005,"v":3763},{"y":2006,"v":4173},{"y":2007,"v":4627},{"y":2008,"v":4892},{"y":2009,"v":5218},{"y":2010,"v":5429},{"y":2011,"v":5909},{"y":2012,"v":6393},{"y":2013,"v":6722},{"y":2014,"v":6867},{"y":2015,"v":7055},{"y":2016,"v":7057},{"y":2017,"v":7453},{"y":2018,"v":7918},{"y":2019,"v":8367},{"y":2020,"v":8620},{"y":2021,"v":9119},{"y":2022,"v":9435},{"y":2023,"v":9472}]},
+      {"n":"Finland","pts":[{"y":2004,"v":7856},{"y":2005,"v":7874},{"y":2006,"v":7689},{"y":2007,"v":7559},{"y":2008,"v":7712},{"y":2009,"v":7873},{"y":2010,"v":7741},{"y":2011,"v":7677},{"y":2012,"v":7492},{"y":2013,"v":7223},{"y":2014,"v":7022},{"y":2015,"v":6760},{"y":2016,"v":6544},{"y":2017,"v":6650},{"y":2018,"v":6873},{"y":2019,"v":7246},{"y":2020,"v":7548},{"y":2021,"v":7720},{"y":2022,"v":8073},{"y":2023,"v":8315}]},
+      {"n":"Germany","pts":[{"y":1996,"v":2802},{"y":1997,"v":2885},{"y":1998,"v":2884},{"y":1999,"v":3075},{"y":2000,"v":3154},{"y":2001,"v":3225},{"y":2002,"v":3241},{"y":2003,"v":3263},{"y":2004,"v":3291},{"y":2005,"v":3316},{"y":2006,"v":3412},{"y":2007,"v":3509},{"y":2008,"v":3727},{"y":2009,"v":3873},{"y":2010,"v":4056},{"y":2011,"v":4189},{"y":2012,"v":4356},{"y":2013,"v":4336},{"y":2014,"v":4336},{"y":2015,"v":4705},{"y":2016,"v":4840},{"y":2017,"v":5058},{"y":2018,"v":5209},{"y":2019,"v":5277},{"y":2020,"v":5390},{"y":2021,"v":5587},{"y":2022,"v":5802},{"y":2023,"v":5926}]},
+      {"n":"Canada","pts":[{"y":1996,"v":3056},{"y":1997,"v":3080},{"y":1998,"v":3153},{"y":1999,"v":3238},{"y":2000,"v":3510},{"y":2001,"v":3774},{"y":2002,"v":3695},{"y":2003,"v":4079},{"y":2004,"v":4077},{"y":2005,"v":4234},{"y":2006,"v":4178},{"y":2007,"v":4335},{"y":2008,"v":4726},{"y":2009,"v":4713},{"y":2010,"v":4664},{"y":2011,"v":4803},{"y":2012,"v":4652},{"y":2013,"v":4627},{"y":2014,"v":4564},{"y":2015,"v":4457},{"y":2016,"v":4400},{"y":2017,"v":4429},{"y":2018,"v":4716},{"y":2019,"v":4808},{"y":2020,"v":5156},{"y":2021,"v":5412},{"y":2022,"v":5624}]},
+      {"n":"Japan","pts":[{"y":1996,"v":4906},{"y":1997,"v":5128},{"y":1998,"v":5165},{"y":1999,"v":5169},{"y":2000,"v":5102},{"y":2001,"v":5020},{"y":2002,"v":4891},{"y":2003,"v":5059},{"y":2004,"v":5117},{"y":2005,"v":5322},{"y":2006,"v":5353},{"y":2007,"v":5231},{"y":2008,"v":5125},{"y":2009,"v":5152},{"y":2010,"v":5117},{"y":2011,"v":5123},{"y":2012,"v":5049},{"y":2013,"v":5287},{"y":2014,"v":5352},{"y":2015,"v":5147},{"y":2016,"v":5233},{"y":2017,"v":5320},{"y":2018,"v":5340},{"y":2019,"v":5356},{"y":2020,"v":5450},{"y":2021,"v":5485},{"y":2022,"v":5630},{"y":2023,"v":5609}]},
+      {"n":"France","pts":[{"y":1996,"v":2656},{"y":1997,"v":2661},{"y":1998,"v":2655},{"y":1999,"v":2724},{"y":2000,"v":2903},{"y":2001,"v":3061},{"y":2002,"v":3101},{"y":2003,"v":3232},{"y":2004,"v":3321},{"y":2005,"v":3298},{"y":2006,"v":3405},{"y":2007,"v":3419},{"y":2008,"v":3636},{"y":2009,"v":3703},{"y":2010,"v":3850},{"y":2011,"v":3921},{"y":2012,"v":4052},{"y":2013,"v":4174},{"y":2014,"v":4210},{"y":2015,"v":4329},{"y":2016,"v":4392},{"y":2017,"v":4547},{"y":2018,"v":4671},{"y":2019,"v":4791},{"y":2020,"v":4883},{"y":2021,"v":4988},{"y":2022,"v":5182},{"y":2023,"v":5369}]},
+      {"n":"China","pts":[{"y":1996,"v":447},{"y":1997,"v":476},{"y":1998,"v":390},{"y":1999,"v":423},{"y":2000,"v":550},{"y":2001,"v":583},{"y":2002,"v":632},{"y":2003,"v":668},{"y":2004,"v":713},{"y":2005,"v":857},{"y":2006,"v":931},{"y":2007,"v":1077},{"y":2008,"v":1198},{"y":2009,"v":861},{"y":2010,"v":899},{"y":2011,"v":972},{"y":2012,"v":1029},{"y":2013,"v":1080},{"y":2014,"v":1102},{"y":2015,"v":1163},{"y":2016,"v":1209},{"y":2017,"v":1236},{"y":2018,"v":1317},{"y":2019,"v":1484},{"y":2020,"v":1600},{"y":2021,"v":1686},{"y":2022,"v":1849},{"y":2023,"v":2107}]},
+      {"n":"India","pts":[{"y":1996,"v":154},{"y":1998,"v":116},{"y":2000,"v":111},{"y":2005,"v":135},{"y":2010,"v":156},{"y":2015,"v":214},{"y":2018,"v":250},{"y":2020,"v":259}]}
+    ];
+
+    const COLORS = {
+      "South Korea": "#EA5E33",
+      "Finland":     "#E8963A",
+      "Germany":     "#3D7A5A",
+      "Canada":      "#5B9E78",
+      "Japan":       "#336B8A",
+      "France":      "#6B4FA0",
+      "China":       "#C4715A",
+      "India":       "#8B6914"
+    };
+
+    const W = 800, H = 460;
+    const margin = { top: 30, right: 130, bottom: 40, left: 56 };
+
+    const allYears = data.flatMap(s => s.pts.map(p => p.y));
+    const allVals = data.flatMap(s => s.pts.map(p => p.v));
+    const yearMin = Math.min(...allYears), yearMax = Math.max(...allYears);
+    const valMin = 0, valMax = 10000;
+
+    const xScale = yr => margin.left + (yr - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("width", "100%");
+    svg.style.maxWidth = "820px";
+    svg.style.display = "block";
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    // Grid
+    for (const v of [2000, 4000, 6000, 8000]) {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", {
+        x1: margin.left, y1: y, x2: W - margin.right, y2: y,
+        stroke: "#E2E0DA", "stroke-width": "0.8"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: margin.left - 6, y: y + 4,
+        "text-anchor": "end",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9", fill: "#94a3b8"
+      })).textContent = (v / 1000) + "k";
+    }
+
+    // X-axis
+    svg.appendChild(mkEl("line", {
+      x1: margin.left, y1: H - margin.bottom,
+      x2: W - margin.right, y2: H - margin.bottom,
+      stroke: "#E2E0DA", "stroke-width": "1"
+    }));
+    for (const yr of [1996, 2000, 2005, 2010, 2015, 2020, 2023]) {
+      const x = xScale(yr);
+      svg.appendChild(mkEl("text", {
+        x: x, y: H - margin.bottom + 14,
+        "text-anchor": "middle",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9", fill: "#94a3b8"
+      })).textContent = yr;
+    }
+
+    const tip = document.getElementById("tip");
+    function showTip(text, e) {
+      tip.textContent = text;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 24) + "px";
+    }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const allGroups = [];
+    const endLabels = [];
+
+    data.forEach(series => {
+      const color = COLORS[series.name] || COLORS[series.n] || "#888";
+      const seriesName = series.name || series.n;
+      const pts = series.pts;
+      const colorKey = COLORS[seriesName];
+
+      // Build path
+      const pathD = pts.map((p, i) =>
+        `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`
+      ).join(" ");
+
+      const g = mkEl("g", {});
+
+      const line = mkEl("path", {
+        d: pathD,
+        stroke: colorKey,
+        "stroke-width": "1.8",
+        fill: "none",
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round"
+      });
+      g.appendChild(line);
+
+      // Wide hit path
+      const hit = mkEl("path", {
+        d: pathD,
+        stroke: "transparent",
+        "stroke-width": "14",
+        fill: "none"
+      });
+
+      hit.addEventListener("mousemove", e => {
+        allGroups.forEach(grp => grp.style.opacity = "0.1");
+        g.style.opacity = "1";
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+        const nearest = pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best);
+        showTip(`${seriesName}: ${nearest.v.toLocaleString()} per million (${nearest.y})`, e);
+      });
+      hit.addEventListener("mouseout", () => {
+        allGroups.forEach(grp => grp.style.opacity = "1");
+        hideTip();
+      });
+      g.appendChild(hit);
+
+      svg.appendChild(g);
+      allGroups.push(g);
+
+      // Endpoint label
+      const lastPt = pts[pts.length - 1];
+      endLabels.push({
+        n: seriesName,
+        y: yScale(lastPt.v),
+        orig: yScale(lastPt.v),
+        v: lastPt.v,
+        color: colorKey
+      });
+    });
+
+    // Resolve endpoint label collisions
+    const resolved = resolveCollisions(endLabels, 13);
+    const rightX = W - margin.right + 8;
+    resolved.forEach(item => {
+      const yClamp = Math.max(margin.top, Math.min(H - margin.bottom, item.y));
+      if (Math.abs(yClamp - item.orig) > 1) {
+        svg.appendChild(mkEl("line", {
+          x1: rightX - 2, y1: item.orig,
+          x2: rightX + 3, y2: yClamp,
+          stroke: "#C2C0B5", "stroke-width": "0.8"
+        }));
+      }
+      const txt = mkEl("text", {
+        x: rightX + 5,
+        y: yClamp + 4,
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9.5",
+        fill: item.color || "#334155"
+      });
+      txt.textContent = item.n;
+      svg.appendChild(txt);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
