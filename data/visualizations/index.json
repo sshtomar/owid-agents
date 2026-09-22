@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Aging World: Old-Age Dependency Ratios, 1990 vs 2023",
+      "description": "Slope chart comparing the number of people aged 65+ per 100 working-age people across 20 countries. Japan tripled its ratio; South Korea and China signal the next wave of demographic pressure.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan's ratio tripled from 17 to 50 \u2014 by far the most dramatic shift",
+        "Bosnia & Herzegovina jumped from just 9.6 to 33.2, reflecting decades of emigration",
+        "South Korea (7\u219226) and China (8\u219221) show the next wave approaching"
+      ],
+      "createdAt": "2026-09-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Intentional Homicide Rates, 1990\u20132022",
+      "description": "Trend lines showing homicide deaths per 100,000 people for 10 countries. El Salvador's extraordinary trajectory \u2014 from 134 in 1994 to 7.9 in 2022 \u2014 contrasts with Ecuador's recent surge and Colombia's sustained long-run decline.",
+      "datasetIds": [
+        "wb--VC-IHR-PSRC-P5"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "El Salvador peaked at 138/100k in 1995, spiked again to 107 in 2015, then fell to 7.9 by 2022",
+        "Colombia sustained a 30-year decline from 85 to 25 per 100,000",
+        "Ecuador surged from 8 to 27 in the last decade \u2014 the sharpest recent increase"
+      ],
+      "createdAt": "2026-09-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "International Tourist Arrivals, 2005\u20132020",
+      "description": "Trend lines showing millions of arrivals for 10 major destinations. Fifteen years of near-universal growth ended abruptly in 2020: Hong Kong lost 94% of visitors while Hungary held on with just a 48% decline.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Hong Kong collapsed \u201394%, Japan \u201387%, South Korea \u201386% in 2020",
+        "France held the top position throughout but lost 46% in COVID year",
+        "Japan was a dramatic growth story: 7M arrivals in 2005 to 32M in 2019"
+      ],
+      "createdAt": "2026-09-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Electricity from Natural Gas: 1990 vs 2023",
+      "description": "Slope chart of the gas share in electricity generation. Israel pivoted from 0% to 70% by developing its offshore gas fields; Finland moved in the opposite direction, dropping from 9% to under 1% as renewables expanded.",
+      "datasetIds": [
+        "wb--EG-ELC-NGAS-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Israel switched from 0% to 70% \u2014 the largest absolute increase in the set",
+        "Bahrain and Algeria remain near 100% gas-dependent throughout",
+        "Finland fell from 9% to 0.9%, replacing gas with renewables and nuclear"
+      ],
+      "createdAt": "2026-09-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Energy Intensity of the Economy, 1990 vs 2022",
+      "description": "Slope chart of kg oil equivalent per $1,000 GDP. Post-Soviet economies started the 1990s extraordinarily energy-hungry; most cut intensity by 70\u201380%. Ireland's 78% drop is driven by services-led GDP growth as much as efficiency gains.",
+      "datasetIds": [
+        "wb--EG-USE-COMM-GD-PP-KD"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Bosnia & Herzegovina fell from 653 to 110 kg/$1,000 \u2014 an 83% reduction",
+        "Estonia and Armenia both cut intensity by over 80%",
+        "Brazil is the outlier: essentially flat at ~75, reflecting continued reliance on biomass"
+      ],
+      "createdAt": "2026-09-22T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-22T00:00:00.000Z"
 }
