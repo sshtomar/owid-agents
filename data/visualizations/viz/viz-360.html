@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Electricity from Natural Gas: 1990 vs 2023</h1>
+<p class="subtitle">Share of electricity production from natural gas sources (%). Israel switched from 0% to 70%; Finland moved in the opposite direction. Gas-dependent Gulf states like Bahrain and Algeria remain near 100%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Electricity Production from Natural Gas Sources (EG.ELC.NGAS.ZS)</p>
+<script>
+const data = [{"n":"Bahrain","year":1990,"a":100,"b":99.7},{"n":"Algeria","year":1990,"a":93.7,"b":99.0},{"n":"Azerbaijan","year":1990,"a":58.4,"b":92.4},{"n":"Israel","year":1990,"a":0,"b":69.8},{"n":"Bangladesh","year":1990,"a":84.3,"b":65.8},{"n":"Jordan","year":1990,"a":11.9,"b":61.7},{"n":"Argentina","year":1990,"a":27.0,"b":48.9},{"n":"Ireland","year":1990,"a":27.2,"b":47.9},{"n":"Italy","year":1990,"a":18.3,"b":43.7},{"n":"Germany","year":1990,"a":7.4,"b":17.5},{"n":"Australia","year":1990,"a":9.3,"b":17.3},{"n":"Brazil","year":1990,"a":0.1,"b":6.4},{"n":"France","year":1990,"a":0.7,"b":3.1},{"n":"Finland","year":1990,"a":8.6,"b":0.9}];
+
+const W = 680, H = 540;
+const pad = { left: 120, right: 130, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 0, maxV = 105;
+const scaleY = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Grid lines
+[0, 25, 50, 75, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scaleY(v), x2: xRight, y2: scaleY(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 8, y: scaleY(v) + 3.5,
+    "text-anchor": "end", fill: "#9A9890",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8"
+  })).textContent = v + "%";
+});
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top, x2: xLeft, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top, x2: xRight, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+
+// Column headers
+[["1990", xLeft], ["2023", xRight]].forEach(([label, x]) => {
+  const t = mkEl("text", { x, y: pad.top - 14, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500" });
+  t.textContent = label;
+  svg.appendChild(t);
+});
+
+function colorForChange(d) {
+  const chg = d.b - d.a;
+  if (chg > 40) return "#EA5E33";
+  if (chg > 15) return "#F29A44";
+  if (chg > 0) return "#C49A45";
+  return "#5B9E78";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 4, Math.min(H - pad.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: scaleY(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scaleY(d.b) }));
+const resolvedLeft = resolveCollisions(leftLabels, 12);
+const resolvedRight = resolveCollisions(rightLabels, 12);
+const leftMap = new Map(resolvedLeft.map(l => [l.d.n, l.y]));
+const rightMap = new Map(resolvedRight.map(l => [l.d.n, l.y]));
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const y1 = scaleY(d.a), y2 = scaleY(d.b);
+
+  const line = mkEl("line", { x1: xLeft, y1, x2: xRight, y2, stroke: color, "stroke-width": "1.5", opacity: "0.9" });
+  g.appendChild(line);
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: y1, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: y2, r: "3", fill: color }));
+
+  const hit = mkEl("line", { x1: xLeft, y1, x2: xRight, y2, stroke: "transparent", "stroke-width": "10" });
+  g.appendChild(hit);
+
+  const lyL = leftMap.get(d.n);
+  const leftTxt = mkEl("text", { x: xLeft - 8, y: lyL + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "9.5" });
+  leftTxt.textContent = `${d.n}  ${d.a}%`;
+  g.appendChild(leftTxt);
+
+  const lyR = rightMap.get(d.n);
+  const rightTxt = mkEl("text", { x: xRight + 8, y: lyR + 3.5, "text-anchor": "start", fill: "#2B2A27", "font-size": "9.5" });
+  rightTxt.textContent = `${d.b}%  ${d.n}`;
+  g.appendChild(rightTxt);
+
+  if (Math.abs(lyL - y1) > 2) {
+    g.appendChild(mkEl("line", { x1: xLeft - 4, y1: y1, x2: xLeft - 6, y2: lyL, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+  }
+  if (Math.abs(lyR - y2) > 2) {
+    g.appendChild(mkEl("line", { x1: xRight + 4, y1: y2, x2: xRight + 6, y2: lyR, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+  }
+
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach(gg => gg !== g && (gg.style.opacity = "0.12"));
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    const chg = (d.b - d.a).toFixed(1);
+    const dir = d.b >= d.a ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a}% (1990) → ${d.b}% (2023)  ${dir}${chg}pp`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gg => gg.style.opacity = "1");
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+
+  groups.push(g);
+  svg.appendChild(g);
+});
+
+// Legend
+const legendItems = [
+  { color: "#EA5E33", label: "Large increase (>40pp)" },
+  { color: "#F29A44", label: "Moderate increase (15–40pp)" },
+  { color: "#C49A45", label: "Small increase" },
+  { color: "#5B9E78", label: "Decrease" },
+];
+const lx = xLeft, ly = 12;
+legendItems.forEach((item, i) => {
+  svg.appendChild(mkEl("rect", { x: lx + i * 145, y: ly, width: 10, height: 10, fill: item.color }));
+  const t = mkEl("text", { x: lx + i * 145 + 14, y: ly + 9, fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
