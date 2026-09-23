@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Age Divide: Old-Age Dependency Ratios Since 1980",
+      "description": "Trend lines showing how old-age dependency ratios (retirees per 100 working-age adults) have diverged sharply since 1980 \u2014 Japan nearly quadrupled from 13% to 50% while Ethiopia remained flat near 5%.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Japan's ratio rose from 13% in 1980 to 50% in 2023 \u2014 one retiree per two workers",
+        "South Korea is aging even faster proportionally, reaching 26% by 2023",
+        "Ethiopia and India remain near 5-10%, reflecting young population structures"
+      ],
+      "createdAt": "2026-09-23T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Energy Appetite: Per Capita Energy Use, 1995\u20132022",
+      "description": "Trend lines comparing per capita energy consumption (kg of oil equivalent) across 11 countries. Highlights Iceland's exceptional outlier status, China's tripling of energy use, and Germany/Japan's efficiency gains.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Iceland consumes ~16x more energy per person than India \u2014 mostly geothermal for aluminum smelting",
+        "China tripled per capita energy use from 873 to 2,676 kg oe between 1995 and 2022",
+        "Germany and Japan reduced per capita energy use despite economic growth"
+      ],
+      "createdAt": "2026-09-23T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Tourism's COVID Collapse: International Arrivals 2000\u20132020",
+      "description": "Trend lines showing international tourist arrivals at top destinations from 2000 to 2020. Two decades of growth terminated abruptly in 2020 when COVID-19 travel restrictions cut arrivals by 60\u201380%.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China lost 81% of international arrivals in 2020, falling from 163M to 30M",
+        "Italy's arrivals fell 60% from 95M to 38M in a single year",
+        "All destinations collapsed simultaneously \u2014 no major market was spared"
+      ],
+      "createdAt": "2026-09-23T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Ocean Conservation Surge: Marine Protected Areas, 2013 vs 2024",
+      "description": "Slope chart comparing each country's marine protected area coverage (% of territorial waters) between 2013 and 2024. Kazakhstan, France, Chile, and Colombia all made extraordinary gains over the past decade.",
+      "datasetIds": [
+        "wb--ER-MRN-PTMR-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Kazakhstan expanded marine protection from 1% to 52.5% \u2014 largest absolute gain",
+        "Colombia grew from 2% to 41% and Chile from 4% to 41% in under 10 years",
+        "Germany and Australia already led in 2015 and maintained coverage above 43%"
+      ],
+      "createdAt": "2026-09-23T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Closing the Vaccination Gap: Measles Immunization Since 1990",
+      "description": "Trend lines of measles immunization coverage (% of children 12-23 months) from 1990 to 2023. India and Bangladesh nearly doubled coverage; DR Congo and Ethiopia remain below the WHO 95% herd-immunity threshold.",
+      "datasetIds": [
+        "wb--SH-IMM-MEAS"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "India rose from 56% to 93% \u2014 one of the largest sustained vaccination scale-ups",
+        "Bangladesh reached 96%, joining Germany and China above the WHO target",
+        "DR Congo rose only from 38% to 52% over 33 years, leaving millions unvaccinated"
+      ],
+      "createdAt": "2026-09-23T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-23T00:00:00.000Z"
 }
