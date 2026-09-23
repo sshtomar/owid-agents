@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Ocean Conservation Surge: Marine Protected Areas, 2013 vs 2024</h1>
+<p class="subtitle">Share of territorial waters designated as marine protected areas. Kazakhstan, France, Chile, and Colombia all made extraordinary gains over the past decade, while Germany and Australia were already leaders in 2013.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Marine protected areas (% of territorial waters)</p>
+<script>
+// Data exported from notebook — do not modify
+const data = [{"n":"Kazakhstan","a":1,"b":52.5},{"n":"France","a":20.4,"b":49.8},{"n":"Australia","a":43.9,"b":45.4},{"n":"Germany","a":45.5,"b":45.4},{"n":"Chile","a":4.4,"b":41.2},{"n":"Colombia","a":10.2,"b":41.1},{"n":"Belgium","a":36.7,"b":38.3},{"n":"Costa Rica","a":0.8,"b":28.4},{"n":"Gabon","a":0.9,"b":26.9},{"n":"Brazil","a":1.3,"b":26.6},{"n":"Bahrain","a":6.4,"b":21.4},{"n":"Belize","a":6.9,"b":20.4},{"n":"Ecuador","a":13,"b":19.3},{"n":"Estonia","a":18.6,"b":19.3},{"n":"Denmark","a":17.6,"b":18.6},{"n":"Japan","a":0.5,"b":13.8},{"n":"Dominican Republic","a":9,"b":13.3},{"n":"Argentina","a":0.3,"b":12},{"n":"Kiribati","a":11.8,"b":11.9},{"n":"Finland","a":9.7,"b":11.8}];
+
+const W = 700, H = 600;
+const pad = { left: 130, right: 150, top: 44, bottom: 24 };
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = 55;
+const xLeft = pad.left, xRight = W - pad.right;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function colorForChange(change) {
+  if (change > 35) return "#EA5E33";
+  if (change > 20) return "#F29A44";
+  if (change > 10) return "#C49A45";
+  if (change > 3)  return "#8BAD72";
+  return "#A6C4A2";
+}
+
+// Column headers
+[["2013", xLeft], ["2024", xRight]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 16, fill: "#7A786F", "font-size": "10",
+    "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = label;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 10, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.8"
+  }));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 60; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(pad.top + 4, Math.min(H - pad.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+resolveCollisions(leftLabels, 14);
+resolveCollisions(rightLabels, 14);
+
+const rows = [];
+data.forEach((d, idx) => {
+  const change = d.b - d.a;
+  const color = colorForChange(change);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "14", "pointer-events": "stroke"
+  });
+  g.appendChild(hit);
+
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color }));
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, color });
+});
+
+// Left labels
+leftLabels.forEach(item => {
+  const color = colorForChange(item.d.b - item.d.a);
+  const rawY = scale(item.d.a);
+  if (Math.abs(item.y - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft - 4, y1: rawY, x2: xLeft - 4, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: xLeft - 8, y: item.y + 3.5, fill: "#2B2A27",
+    "font-size": "9", "text-anchor": "end", "font-weight": "500"
+  });
+  txt.textContent = `${item.d.n}  ${item.d.a}%`;
+  svg.appendChild(txt);
+});
+
+// Right labels
+rightLabels.forEach(item => {
+  const color = colorForChange(item.d.b - item.d.a);
+  const rawY = scale(item.d.b);
+  if (Math.abs(item.y - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xRight + 4, y1: rawY, x2: xRight + 4, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: xRight + 8, y: item.y + 3.5, fill: "#2B2A27",
+    "font-size": "9", "text-anchor": "start", "font-weight": "500"
+  });
+  txt.textContent = `${item.d.b}%  ${item.d.n}`;
+  svg.appendChild(txt);
+});
+
+// Interactivity
+rows.forEach(({ g, line, d, color }) => {
+  const hit = g.querySelectorAll("line")[1];
+  hit.addEventListener("mouseover", e => {
+    const change = d.b - d.a;
+    const sign = change >= 0 ? "+" : "";
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${change.toFixed(1)} pp)`, e);
+    rows.forEach(other => {
+      other.line.style.opacity = other.d === d ? "1" : "0.1";
+      other.line.style.strokeWidth = other.d === d ? "2.5" : "1.5";
+    });
+  });
+  hit.addEventListener("mousemove", e => {
+    const change = d.b - d.a;
+    const sign = change >= 0 ? "+" : "";
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${change.toFixed(1)} pp)`, e);
+  });
+  hit.addEventListener("mouseout", () => {
+    hideTip();
+    rows.forEach(other => {
+      other.line.style.opacity = "1";
+      other.line.style.strokeWidth = "1.5";
+    });
+  });
+});
+</script>
+</body></html>

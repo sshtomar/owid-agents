@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Tourism's COVID Collapse: International Arrivals 2000–2020</h1>
+<p class="subtitle">International tourist arrivals (millions) at selected top destinations. Two decades of growth erased in a single year — China lost 81% of arrivals in 2020, Italy 60%, and no major destination was spared.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — International tourism, number of arrivals</p>
+<script>
+// Data exported from notebook — do not modify
+const data = [{"n":"China","s":[83.44,89.01,97.91,91.66,109.04,120.29,124.94,131.87,130.03,126.48,133.76,135.42,132.41,129.08,128.5,133.82,141.77,153.26,158.61,162.54,30.4],"y0":2000},{"n":"Italy","s":[62.7,60.96,63.56,63.03,58.48,59.23,66.35,70.27,70.72,71.69,73.22,75.87,76.29,76.76,77.69,81.07,84.92,89.93,93.23,95.4,38.42],"y0":2000},{"n":"Croatia","s":[37.23,40.13,41.74,42.86,44.97,45.76,47.73,52.27,51.34,47.57,49.01,49.97,47.19,48.34,51.17,55.86,57.59,59.24,57.67,60.02,21.61],"y0":2000},{"n":"Hungary","s":[31.14,30.68,31.74,31.41,33.93,36.17,38.32,39.38,39.55,40.62,39.9,41.3,43.56,43.61,45.98,48.34,52.89,54.96,57.67,61.4,31.64],"y0":2000},{"n":"Germany","s":[18.98,17.86,17.97,18.4,20.14,21.5,23.57,24.42,24.88,24.22,26.88,28.37,30.41,31.55,33.0,34.97,35.55,37.45,38.88,39.56,12.45],"y0":2000},{"n":"Austria","s":[17.98,18.18,18.61,19.08,19.37,19.95,20.27,20.77,21.93,21.36,22.0,23.01,24.15,24.81,25.29,26.73,28.12,29.46,30.82,31.88,15.09],"y0":2000},{"n":"Canada","s":[48.64,47.15,44.9,38.9,38.84,36.16,33.39,30.37,27.37,24.7,25.62,25.07,25.32,25.17,25.56,27.55,30.14,31.08,31.27,32.43,32.43],"y0":2000}];
+
+const W = 760, H = 460;
+const margin = { top: 36, right: 130, bottom: 36, left: 50 };
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 28) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const Y0 = 2000;
+const nYears = data[0].s.length;
+const valMin = 0, valMax = 180;
+
+const xScale = i => margin.left + i / (nYears - 1) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / valMax * (H - margin.top - margin.bottom);
+
+function colorForVal(v) {
+  if (v >= 120) return "#EA5E33";
+  if (v >= 70)  return "#F29A44";
+  if (v >= 40)  return "#C49A45";
+  if (v >= 25)  return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Shaded COVID band for 2020
+const x2019 = xScale(19), x2020 = xScale(20);
+svg.appendChild(mkEl("rect", {
+  x: x2019, y: margin.top,
+  width: x2020 - x2019,
+  height: H - margin.top - margin.bottom,
+  fill: "#EA5E33", opacity: "0.06"
+}));
+const covidLabel = mkEl("text", {
+  x: x2020 - 2, y: margin.top - 8,
+  fill: "#EA5E33", "font-size": "8.5", "text-anchor": "end",
+  "font-family": "'JetBrains Mono', monospace"
+});
+covidLabel.textContent = "COVID-19";
+svg.appendChild(covidLabel);
+
+// Grid lines
+[0, 50, 100, 150].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    fill: "#7A786F", "font-size": "9", "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v === 0 ? "0M" : v + "M";
+});
+
+// X axis ticks
+[0, 5, 10, 15, 19, 20].forEach(i => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(i), y: H - margin.bottom + 14,
+    fill: "#7A786F", "font-size": "9", "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = Y0 + i;
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 6, item.y));
+  }
+  return sorted;
+}
+
+const groups = [];
+data.forEach(series => {
+  const peakVal = Math.max(...series.s.filter(v => v != null));
+  const color = colorForVal(peakVal);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const pathD = series.s.map((v, i) =>
+    `${i === 0 ? "M" : "L"}${xScale(i).toFixed(1)},${yScale(v).toFixed(1)}`
+  ).join(" ");
+
+  const line = mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "14",
+    fill: "none", "pointer-events": "stroke"
+  });
+  g.appendChild(hit);
+
+  const lastX = xScale(nYears - 1);
+  const lastY = yScale(series.s[nYears - 1]);
+  g.appendChild(mkEl("circle", { cx: lastX, cy: lastY, r: "2.5", fill: color }));
+
+  svg.appendChild(g);
+  groups.push({ g, line, color, series, peakVal });
+});
+
+// Labels at 2020 endpoint
+const labelItems = data.map(d => ({
+  d, y: yScale(d.s[nYears - 1]),
+  peakVal: Math.max(...d.s.filter(v => v != null))
+}));
+resolveCollisions(labelItems, 12);
+
+labelItems.forEach(item => {
+  const color = colorForVal(item.peakVal);
+  const rawY = yScale(item.d.s[nYears - 1]);
+  const lx = xScale(nYears - 1) + 8;
+
+  if (Math.abs(item.y - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xScale(nYears - 1) + 2, y1: rawY,
+      x2: lx + 2, y2: item.y,
+      stroke: color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const txt = mkEl("text", {
+    x: lx, y: item.y + 3.5, fill: "#2B2A27",
+    "font-size": "9.5", "text-anchor": "start", "font-weight": "500"
+  });
+  txt.textContent = `${item.d.s[nYears-1]}M  ${item.d.n}`;
+  svg.appendChild(txt);
+});
+
+groups.forEach(({ g, line, series, peakVal }) => {
+  const color = colorForVal(peakVal);
+  const hitPath = g.querySelectorAll("path")[1];
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const svgX = (e.clientX - rect.left) / rect.width * W;
+    const i = Math.max(0, Math.min(nYears - 1, Math.round((svgX - margin.left) / (W - margin.left - margin.right) * (nYears - 1))));
+    const year = Y0 + i;
+    const val = series.s[i];
+    showTip(`${series.n} (${year}): ${val}M arrivals`, e);
+    groups.forEach(other => {
+      other.line.style.opacity = other.series === series ? "1" : "0.08";
+      other.line.style.strokeWidth = other.series === series ? "2.5" : "1.5";
+    });
+  });
+  hitPath.addEventListener("mouseout", () => {
+    hideTip();
+    groups.forEach(other => {
+      other.line.style.opacity = "1";
+      other.line.style.strokeWidth = "1.5";
+    });
+  });
+});
+</script>
+</body></html>
