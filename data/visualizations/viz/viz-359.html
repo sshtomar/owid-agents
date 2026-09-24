@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Primary School Completion Rate: ~2000 vs. ~2022</h1>
+<p class="subtitle">Share of children completing primary school (% of relevant age group). Sub-Saharan Africa has made real gains but still faces a wide gap from the rest of the world.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SE.PRM.CMPT.ZS</p>
+<script>
+const data = [
+  {"n":"Chad","a":21.8,"b":41.8,"y":2000},
+  {"n":"Burundi","a":24.6,"b":47.6,"y":2000},
+  {"n":"Burkina Faso","a":23.8,"b":58.3,"y":2000},
+  {"n":"Benin","a":34.9,"b":61.6,"y":2000},
+  {"n":"Guinea","a":31.9,"b":59.9,"y":2000},
+  {"n":"Cote d'Ivoire","a":37.7,"b":64.7,"y":2000},
+  {"n":"Ethiopia","a":22.0,"b":60.9,"y":2000},
+  {"n":"Comoros","a":43.7,"b":67.2,"y":1999},
+  {"n":"Congo, Rep.","a":54.1,"b":71.1,"y":2001},
+  {"n":"Cameroon","a":51.5,"b":70.4,"y":2000},
+  {"n":"Honduras","a":69.9,"b":68.2,"y":1998},
+  {"n":"Cambodia","a":50.6,"b":87.3,"y":2001},
+  {"n":"Guatemala","a":54.4,"b":86.5,"y":2000},
+  {"n":"Indonesia","a":93.7,"b":100.0,"y":2001},
+  {"n":"Colombia","a":100.0,"b":97.1,"y":2000},
+  {"n":"India","a":75.3,"b":93.5,"y":2000},
+  {"n":"Jordan","a":90.6,"b":95.8,"y":2000}
+];
+
+const W = 560, H = 540;
+const pad = { left: 130, right: 140, top: 44, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const VMIN = 15, VMAX = 105;
+const scale = v => pad.top + (VMAX - v) / (VMAX - VMIN) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Background axis lines
+svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top, x2: xLeft, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top, x2: xRight, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+// Column headers
+function axisLabel(x, text) {
+  const t = mkEl("text", { x, y: pad.top - 18, "text-anchor": "middle", fill: "#7A786F", "font-family": "'JetBrains Mono',monospace", "font-size": "10" });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+axisLabel(xLeft, "~2000");
+axisLabel(xRight, "~2022");
+
+// Y axis tick guides
+[20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xLeft - 3, y1: scale(v), x2: xRight + 3, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+});
+
+function colorForChange(delta) {
+  if (delta > 30) return "#3D7A5A";
+  if (delta > 20) return "#5B9E78";
+  if (delta > 10) return "#8BAD72";
+  if (delta >= 0) return "#C49A45";
+  return "#C4715A";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+function showTip(txt, e) { tip.textContent = txt; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 28) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const allLines = [];
+const leftLabels = [];
+const rightLabels = [];
+
+data.forEach(d => {
+  const color = colorForChange(d.b - d.a);
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+
+  // Connecting line
+  const ln = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: color, "stroke-width": "1.4", opacity: "1" });
+  svg.appendChild(ln);
+
+  // Endpoint dots
+  svg.appendChild(mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color }));
+  svg.appendChild(mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color }));
+
+  // Invisible hit area
+  const hit = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  svg.appendChild(hit);
+
+  leftLabels.push({ n: d.n, y: ya, origY: ya, val: d.a, color, ln });
+  rightLabels.push({ n: d.n, y: yb, origY: yb, val: d.b, color, ln });
+  allLines.push(ln);
+
+  hit.addEventListener("mouseenter", e => {
+    allLines.forEach(l => l.setAttribute("opacity", l === ln ? "1" : "0.07"));
+    ln.setAttribute("stroke-width", "2.5");
+    const delta = d.b - d.a;
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${delta >= 0 ? "+" : ""}${delta.toFixed(1)} pts)`, e);
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 28) + "px"; });
+  hit.addEventListener("mouseleave", () => {
+    allLines.forEach(l => { l.setAttribute("opacity", "1"); l.setAttribute("stroke-width", "1.4"); });
+    hideTip();
+  });
+});
+
+// Clamp + place labels
+const clamp = (y, minY, maxY) => Math.max(minY, Math.min(maxY, y));
+const resolvedL = resolveCollisions(leftLabels, 13);
+const resolvedR = resolveCollisions(rightLabels, 13);
+
+resolvedL.forEach(item => {
+  const cy = clamp(item.y, pad.top + 4, H - pad.bottom - 4);
+  if (Math.abs(cy - item.origY) > 1) {
+    svg.appendChild(mkEl("line", { x1: xLeft - 4, y1: item.origY, x2: xLeft - 5, y2: cy, stroke: item.color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const t = mkEl("text", { x: xLeft - 6, y: cy + 3, "text-anchor": "end", fill: item.color, "font-size": "9", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = `${item.n}  ${item.val}`;
+  svg.appendChild(t);
+});
+
+resolvedR.forEach(item => {
+  const cy = clamp(item.y, pad.top + 4, H - pad.bottom - 4);
+  if (Math.abs(cy - item.origY) > 1) {
+    svg.appendChild(mkEl("line", { x1: xRight + 4, y1: item.origY, x2: xRight + 5, y2: cy, stroke: item.color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+  const t = mkEl("text", { x: xRight + 6, y: cy + 3, "text-anchor": "start", fill: item.color, "font-size": "9", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = `${item.val}  ${item.n}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legend = [
+  { color: "#3D7A5A", label: "+30 pts" },
+  { color: "#5B9E78", label: "+20–30 pts" },
+  { color: "#8BAD72", label: "+10–20 pts" },
+  { color: "#C49A45", label: "0–10 pts" },
+  { color: "#C4715A", label: "decline" }
+];
+let lx = xLeft;
+const ly = H - 8;
+legend.forEach(({ color, label }) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 8, fill: color }));
+  const t = mkEl("text", { x: lx + 13, y: ly - 1, fill: "#7A786F", "font-size": "8", "font-family": "'JetBrains Mono',monospace" });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 80;
+});
+</script>
+</body></html>

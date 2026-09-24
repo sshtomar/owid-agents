@@ -5858,7 +5858,88 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourism Arrivals, 1995\u20132020",
+      "description": "Trend lines showing international tourist arrivals (millions) for 10 major destinations. The COVID-19 crash in 2020 erased decades of steady growth.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "China grew from 46M to 163M arrivals (1995\u20132019) then crashed to 30M in 2020 (-81%)",
+        "Hong Kong fell 94% in 2020, the steepest decline in the set",
+        "Japan fell 87% despite having grown from 3.4M to 32M over 25 years"
+      ],
+      "createdAt": "2026-09-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Old-Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing the number of elderly people (65+) per 100 working-age adults (15\u201364) for 9 countries. Japan's extreme aging trajectory stands alone.",
+      "datasetIds": [
+        "wb--SP-POP-DPND-OL"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Japan now has 50.7 elderly per 100 workers \u2014 the highest in the world",
+        "South Korea is rising faster than any other country, from 5.6 (1960) to 27.5 (2024)",
+        "India has barely moved: 5.9 (1960) to 10.5 (2024)"
+      ],
+      "createdAt": "2026-09-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Primary School Completion Rate: ~2000 vs. ~2022",
+      "description": "Slope chart comparing primary school completion rates for 17 countries. Sub-Saharan Africa has improved but still faces a stark gap from the rest of the world.",
+      "datasetIds": [
+        "wb--SE-PRM-CMPT-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Ethiopia improved from 22% to 61% \u2014 nearly tripling its completion rate",
+        "Cambodia rose from 51% to 87%; Guatemala from 54% to 87%",
+        "Chad remains the lowest in the set at 42%, up from 22% in 2000"
+      ],
+      "createdAt": "2026-09-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "DTP Immunization Coverage, 1980\u20132023",
+      "description": "Trend lines showing the share of children immunized against diphtheria, tetanus, and pertussis for 12 countries. Most nations converged toward full coverage; Haiti and Afghanistan remain outliers.",
+      "datasetIds": [
+        "wb--SH-IMM-IDPT"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Bhutan rose from 6% (1980) to 99% (2023) \u2014 one of the fastest immunization scale-ups ever",
+        "Iran rose from 32% to 99% over the same period",
+        "Haiti has stagnated at 48\u201365% for four decades despite international health investment"
+      ],
+      "createdAt": "2026-09-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Energy Use per Capita, 1990\u20132023",
+      "description": "Trend lines showing energy use (kg of oil equivalent per person) for 10 countries. Rich countries have plateaued or declined while South Korea and China have surged.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "South Korea tripled from 2,088 to 5,337 kg OE \u2014 now exceeding France and Japan",
+        "Germany fell 34%, from 4,422 to 2,928 kg OE, reflecting its energy efficiency gains",
+        "Bangladesh uses just 288 kg OE \u2014 4% of Canada's per-capita consumption"
+      ],
+      "createdAt": "2026-09-24T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-24T00:00:00.000Z"
 }
