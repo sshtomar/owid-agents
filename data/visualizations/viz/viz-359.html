@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+      max-width: 760px;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+      padding: 6px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Income Share Held by the Poorest 20%</h1>
+  <p class="subtitle">Share of national income going to the bottom fifth of the population. Latin America's poor receive far less than those in Europe or Asia.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank &mdash; World Development Indicators</p>
+  <div id="tip"></div>
+
+  <script>
+    // {n, a: early value, ay: early year, b: latest value, by: latest year}
+    const data = [{"n":"Colombia","a":3.6,"ay":2005,"b":3.2,"by":2024,"y":2005},{"n":"Honduras","a":1.9,"ay":2005,"b":3.7,"by":2024,"y":2005},{"n":"Brazil","a":2.9,"ay":2005,"b":3.9,"by":2024,"y":2005},{"n":"Argentina","a":3.7,"ay":2005,"b":5.1,"by":2024,"y":2005},{"n":"Chile","a":4,"ay":2003,"b":5.8,"by":2024,"y":2003},{"n":"Germany","a":8.2,"ay":2005,"b":6.9,"by":2022,"y":2005},{"n":"Kenya","a":5,"ay":2005,"b":7.1,"by":2022,"y":2005},{"n":"China","a":5.9,"ay":2005,"b":7.3,"by":2022,"y":2005},{"n":"France","a":8.6,"ay":2005,"b":7.7,"by":2023,"y":2005},{"n":"Indonesia","a":9.2,"ay":2005,"b":8.1,"by":2024,"y":2005},{"n":"Finland","a":9.5,"ay":2005,"b":9.2,"by":2023,"y":2005},{"n":"Czechia","a":9.3,"ay":2005,"b":9.5,"by":2023,"y":2005},{"n":"India","a":10,"ay":2004,"b":10.4,"by":2022,"y":2004}];
+
+    const W = 660, H = 520;
+    const pad = { left: 130, right: 140, top: 50, bottom: 24 };
+
+    const allVals = data.flatMap(d => [d.a, d.b]);
+    const minV = Math.floor(Math.min(...allVals)) - 1;
+    const maxV = Math.ceil(Math.max(...allVals)) + 1;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    function colorForChange(d) {
+      const change = d.b - d.a;
+      if (change > 2) return "#3D7A5A";
+      if (change > 0) return "#5B9E78";
+      if (change > -1) return "#C49A45";
+      return "#C4715A";
+    }
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: "display:block" });
+
+    const xLeft = pad.left;
+    const xRight = W - pad.right;
+    const midYear = Math.round(data.reduce((s,d)=>s+d.ay,0)/data.length);
+    const recentYear = Math.round(data.reduce((s,d)=>s+d.by,0)/data.length);
+
+    // Column headers
+    [["~2004", xLeft], ["~2023", xRight]].forEach(([label, x]) => {
+      const hdr = mkEl("text", { x, y: pad.top - 20, "text-anchor": "middle", "font-family": "JetBrains Mono,monospace", "font-size": "10", fill: "#7a786f" });
+      hdr.textContent = label;
+      svg.appendChild(hdr);
+    });
+
+    // Axis ticks
+    for (let v = Math.ceil(minV); v <= maxV; v++) {
+      const y = scale(v);
+      [xLeft, xRight].forEach(x => {
+        svg.appendChild(mkEl("line", { x1: x - 4, y1: y, x2: x + 4, y2: y, stroke: "#c2c0b5", "stroke-width": "1" }));
+      });
+    }
+
+    // Axis lines
+    svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top, x2: xLeft, y2: H - pad.bottom, stroke: "#c2c0b5", "stroke-width": "1" }));
+    svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top, x2: xRight, y2: H - pad.bottom, stroke: "#c2c0b5", "stroke-width": "1" }));
+
+    const tip = document.getElementById("tip");
+
+    // Prepare labels
+    const leftItems = data.map((d, i) => ({ y: scale(d.a), orig: scale(d.a), i }));
+    const rightItems = data.map((d, i) => ({ y: scale(d.b), orig: scale(d.b), i }));
+    const resolvedLeft = resolveCollisions(leftItems, 14);
+    const resolvedRight = resolveCollisions(rightItems, 14);
+
+    // Clamp to chart
+    [...resolvedLeft, ...resolvedRight].forEach(item => {
+      item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 4, item.y));
+    });
+
+    const leftByIdx = {}, rightByIdx = {};
+    resolvedLeft.forEach(item => { leftByIdx[item.i] = item.y; });
+    resolvedRight.forEach(item => { rightByIdx[item.i] = item.y; });
+
+    data.forEach((d, i) => {
+      const color = colorForChange(d);
+      const ya = scale(d.a);
+      const yb = scale(d.b);
+      const lyL = leftByIdx[i];
+      const lyR = rightByIdx[i];
+      const change = (d.b - d.a).toFixed(1);
+      const sign = d.b >= d.a ? "+" : "";
+
+      // Connecting line
+      const line = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: color, "stroke-width": "1.5", opacity: "1" });
+      line.dataset.idx = i;
+      svg.appendChild(line);
+
+      // Hit area
+      const hit = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+      hit.dataset.idx = i;
+      svg.appendChild(hit);
+
+      hit.addEventListener("mouseover", () => {
+        svg.querySelectorAll("line[data-idx], circle[data-idx]").forEach(el => {
+          el.setAttribute("opacity", el.dataset.idx == i ? "1" : "0.12");
+        });
+        svg.querySelectorAll("text[data-idx]").forEach(el => {
+          el.setAttribute("opacity", el.dataset.idx == i ? "1" : "0.15");
+        });
+        tip.textContent = `${d.n}: ${d.a}% (${d.ay}) → ${d.b}% (${d.by})  ${sign}${change}pp`;
+        tip.style.opacity = "1";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 28) + "px";
+      });
+      hit.addEventListener("mouseout", () => {
+        svg.querySelectorAll("line[data-idx], circle[data-idx], text[data-idx]").forEach(el => el.setAttribute("opacity", "1"));
+        tip.style.opacity = "0";
+      });
+
+      // Dots
+      const dotA = mkEl("circle", { cx: xLeft, cy: ya, r: "3.5", fill: color, opacity: "1" });
+      dotA.dataset.idx = i;
+      svg.appendChild(dotA);
+      const dotB = mkEl("circle", { cx: xRight, cy: yb, r: "3.5", fill: color, opacity: "1" });
+      dotB.dataset.idx = i;
+      svg.appendChild(dotB);
+
+      // Left label with leader line
+      if (Math.abs(lyL - ya) > 4) {
+        svg.appendChild(mkEl("line", { x1: xLeft - 4, y1: ya, x2: xLeft - 10, y2: lyL, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+      }
+      const lblL = mkEl("text", { x: xLeft - 14, y: lyL + 3.5, "text-anchor": "end", "font-family": "Inter,sans-serif", "font-size": "10", fill: "#2b2a27", opacity: "1", "font-weight": "500" });
+      lblL.textContent = d.n;
+      lblL.dataset.idx = i;
+      svg.appendChild(lblL);
+      const numL = mkEl("text", { x: xLeft - 14, y: lyL + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono,monospace", "font-size": "9", fill: "#7a786f", opacity: "1" });
+
+      // Right label with leader line
+      if (Math.abs(lyR - yb) > 4) {
+        svg.appendChild(mkEl("line", { x1: xRight + 4, y1: yb, x2: xRight + 10, y2: lyR, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+      }
+      const lblR = mkEl("text", { x: xRight + 14, y: lyR + 3.5, "font-family": "Inter,sans-serif", "font-size": "10", fill: "#2b2a27", opacity: "1", "font-weight": "500" });
+      lblR.textContent = `${d.b}%  ${d.n}`;
+      lblR.dataset.idx = i;
+      svg.appendChild(lblR);
+    });
+
+    // Legend
+    const legend = [
+      ["#3D7A5A", "Share rose >2pp"],
+      ["#5B9E78", "Share rose 0-2pp"],
+      ["#C49A45", "Share fell 0-1pp"],
+      ["#C4715A", "Share fell >1pp"]
+    ];
+    legend.forEach(([color, label], j) => {
+      const lx = pad.left + j * 150;
+      const ly = H - 4;
+      svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 9, height: 9, fill: color, rx: "1" }));
+      const lt = mkEl("text", { x: lx + 13, y: ly, "font-family": "Inter,sans-serif", "font-size": "9", fill: "#7a786f" });
+      lt.textContent = label;
+      svg.appendChild(lt);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

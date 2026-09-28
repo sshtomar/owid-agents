@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Renewable Energy Consumption (% of Total Final Energy)",
+      "description": "Sparkline grid comparing renewable energy share of total final energy consumption for 7 countries (1990-2021). Germany rose from 2% to 18%; China fell from 34% to 15% as fossil fuels powered its industrial expansion.",
+      "datasetIds": [
+        "wb--EG-FEC-RNEW-ZS"
+      ],
+      "chartType": "sparkline-grid",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Germany's renewable share grew 8x from 2.1% to 17.6% (1990-2021)",
+        "China's renewable share fell as fossil fuels powered industrial growth",
+        "Brazil maintains >45% renewables consistently, largely via hydropower"
+      ],
+      "createdAt": "2026-09-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "International Tourism Arrivals Collapse in 2020",
+      "description": "Trend lines showing international tourist arrivals for 8 major destinations (2010-2020). COVID-19 caused the largest single-year decline in tourism history, with Japan and Korea losing 86-87% of visitors.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "Japan fell from 31.9M to 4.1M arrivals (-87%) in a single year",
+        "Korea, Rep. fell from 17.5M to 2.5M arrivals (-86%) in 2020",
+        "France saw the smallest relative drop (-46%) among major destinations"
+      ],
+      "createdAt": "2026-09-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Income Share Held by the Poorest 20%",
+      "description": "Slope chart comparing the share of national income received by the bottom fifth of the population in ~2004 vs. ~2022 for 13 countries. Latin American countries cluster below 6% while India and Czechia exceed 9%.",
+      "datasetIds": [
+        "wb--SI-DST-FRST-20"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Colombia's poorest 20% receive only 3.2% of national income",
+        "India's poorest 20% receive 10.4% -- among the highest globally",
+        "Germany and France have seen slight declines in bottom-quintile share since 2005"
+      ],
+      "createdAt": "2026-09-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Deindustrialization: Manufacturing's Shrinking Share of GDP",
+      "description": "Slope chart comparing manufacturing value added as % of GDP in the early 1990s vs. 2024 for 10 countries. Advanced economies shed industry while Bangladesh surged as a global manufacturer.",
+      "datasetIds": [
+        "wb--NV-IND-MANF-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Bangladesh nearly doubled its manufacturing share from 13% to 22%",
+        "France deindustrialized sharply from 16% to under 10% of GDP",
+        "Korea is the rich-country outlier -- manufacturing share barely changed at ~25-27%"
+      ],
+      "createdAt": "2026-09-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "China's Rise to Dominate Global Patent Filings",
+      "description": "Trend lines showing patent applications by residents for 6 major innovation economies (1995-2021). China grew 142x from 10k to 1.4M annual filings, passing Japan in 2011 and now dwarfing all others.",
+      "datasetIds": [
+        "wb--IP-PAT-RESD"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "China grew from 10,011 to 1,426,644 patent applications -- a 142x increase in 26 years",
+        "China passed Japan in 2011 and now files more patents than all other tracked countries combined",
+        "India grew 17x from a small base; Japan actually declined from its 1990s peak"
+      ],
+      "createdAt": "2026-09-28T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-09-28T00:00:00.000Z"
 }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+      max-width: 860px;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+      padding: 6px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>China's Rise to Dominate Global Patent Filings</h1>
+  <p class="subtitle">Patent applications by residents, 1995&ndash;2021. China went from minor player to filing more patents than all other major economies combined.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank &mdash; WIPO (World Intellectual Property Organization)</p>
+  <div id="tip"></div>
+
+  <script>
+    const data = [{"n":"China","y0":1995,"s":[10011,11628,12672,13751,15626,25346,30038,39806,56769,65786,93485,122318,153060,194579,229096,293066,415829,535313,704936,801135,968252,1204981,1245709,1393815,1243568,1344817,1426644]},{"n":"Japan","y0":1995,"s":[334612,340101,350807,359381,360180,387364,386767,369458,358184,368416,367960,347060,333498,330110,295315,290081,287580,287013,271731,265959,258839,260244,260292,253630,245372,227348,222452]},{"n":"Korea, Rep.","y0":1995,"s":[59228,68405,67359,50596,55970,72831,73714,76570,90313,105250,122188,125476,128701,127114,127316,131805,138034,148136,159978,164073,167275,163424,159084,162561,171603,180477,186245]},{"n":"Germany","y0":1995,"s":[38103,42322,44438,46523,50029,51736,49989,47598,47818,48448,48367,48012,47853,49240,47859,47047,46986,46620,47353,48154,47384,48480,47785,46617,46632,42260,39822]},{"n":"India","y0":1995,"s":[1545,1661,1926,2247,2206,2206,2379,2693,3425,4014,4721,5686,6296,6425,7262,8853,8841,9553,10669,12040,12579,13199,14961,16289,19454,23141,26267]},{"n":"France","y0":1995,"s":[12419,12916,13252,13251,13592,13870,13499,13519,13511,14230,14327,14529,14722,14658,14100,14748,14655,14540,14690,14500,14306,14206,14415,14303,14103,12771,13386]}];
+
+    const COLORS = {
+      "China": "#EA5E33",
+      "Japan": "#4A7FB5",
+      "Korea, Rep.": "#3D7A5A",
+      "Germany": "#C49A45",
+      "India": "#7B5EA7",
+      "France": "#7A786F"
+    };
+
+    const W = 760, H = 440;
+    const margin = { top: 36, right: 140, bottom: 42, left: 60 };
+
+    const yearMin = 1995, yearMax = 2021;
+    const allVals = data.flatMap(d => d.s);
+    const valMin = 0, valMax = Math.max(...allVals) * 1.05;
+
+    const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: "display:block" });
+
+    // Y axis gridlines
+    const yTicks = [0, 250000, 500000, 750000, 1000000, 1250000];
+    yTicks.forEach(v => {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#e2e0d5", "stroke-width": "1" }));
+      const label = v >= 1000000 ? (v / 1000000).toFixed(1) + "M" : (v / 1000).toFixed(0) + "k";
+      const lbl = mkEl("text", { x: margin.left - 6, y: y + 3, "text-anchor": "end", "font-family": "JetBrains Mono,monospace", "font-size": "9", fill: "#7a786f" });
+      lbl.textContent = label;
+      svg.appendChild(lbl);
+    });
+
+    // X axis
+    [1995, 2000, 2005, 2010, 2015, 2021].forEach(y => {
+      const x = xScale(y);
+      svg.appendChild(mkEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#c2c0b5", "stroke-width": "1" }));
+      const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "JetBrains Mono,monospace", "font-size": "9", fill: "#7a786f" });
+      lbl.textContent = y;
+      svg.appendChild(lbl);
+    });
+
+    const tip = document.getElementById("tip");
+
+    // Endpoint labels deconfliction
+    const labelItems = data.map((d, i) => {
+      const lastVal = d.s[d.s.length - 1];
+      return { y: yScale(lastVal), val: lastVal, i };
+    });
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+    const resolved = resolveCollisions(labelItems, 13);
+    resolved.forEach(item => {
+      item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+    });
+    const labelByIdx = {};
+    resolved.forEach(item => { labelByIdx[item.i] = item.y; });
+
+    data.forEach((d, i) => {
+      const color = COLORS[d.n] || "#7a786f";
+      const startYear = d.y0;
+      const points = d.s.map((v, j) => ({ year: startYear + j, value: v }));
+      const pathD = points.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.year)} ${yScale(p.value)}`).join(" ");
+
+      const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": d.n === "China" ? "2.5" : "1.6", fill: "none", "stroke-linejoin": "round", opacity: "1" });
+      line.dataset.idx = i;
+      svg.appendChild(line);
+
+      const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+      hit.dataset.idx = i;
+      svg.appendChild(hit);
+
+      hit.addEventListener("mousemove", e => {
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+        const idx = Math.max(0, Math.min(d.s.length - 1, Math.round(ratio * (d.s.length - 1))));
+        const year = startYear + idx;
+        const val = d.s[idx];
+        const formatted = val >= 1000000 ? (val / 1000000).toFixed(2) + "M" : (val / 1000).toFixed(0) + "k";
+        svg.querySelectorAll("[data-idx]").forEach(el => el.setAttribute("opacity", el.dataset.idx == i ? "1" : "0.1"));
+        tip.textContent = `${d.n}: ${formatted} patents (${year})`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 28) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        svg.querySelectorAll("[data-idx]").forEach(el => el.setAttribute("opacity", "1"));
+        tip.style.opacity = "0";
+      });
+    });
+
+    // Endpoint labels
+    data.forEach((d, i) => {
+      const color = COLORS[d.n] || "#7a786f";
+      const lastVal = d.s[d.s.length - 1];
+      const labelY = labelByIdx[i];
+      const lineEndX = xScale(yearMax);
+      const actualEndY = yScale(lastVal);
+
+      if (Math.abs(labelY - actualEndY) > 3) {
+        svg.appendChild(mkEl("line", { x1: lineEndX + 2, y1: actualEndY, x2: lineEndX + 8, y2: labelY, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+      }
+      const formatted = lastVal >= 1000000 ? (lastVal / 1000000).toFixed(1) + "M" : (lastVal / 1000).toFixed(0) + "k";
+      const lbl = mkEl("text", { x: lineEndX + 10, y: labelY + 3.5, "font-family": "JetBrains Mono,monospace", "font-size": "9", fill: color });
+      lbl.textContent = `${formatted}  ${d.n.replace(", Rep.", "")}`;
+      svg.appendChild(lbl);
+    });
+
+    // Annotation: China passes Japan
+    const crossYear = 2011;
+    const cx = xScale(crossYear);
+    const anno = mkEl("text", { x: cx + 4, y: yScale(200000) - 10, "font-family": "Inter,sans-serif", "font-size": "10", fill: "#EA5E33" });
+    anno.textContent = "China passes Japan (2011)";
+    svg.appendChild(anno);
+    svg.appendChild(mkEl("line", { x1: cx, y1: yScale(122318), x2: cx, y2: yScale(347060), stroke: "#EA5E33", "stroke-width": "0.8", "stroke-dasharray": "3,3", opacity: "0.5" }));
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

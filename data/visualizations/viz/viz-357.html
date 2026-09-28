@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+      max-width: 860px;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid #e2e0d5;
+      border-left: 1px solid #e2e0d5;
+    }
+    .cell {
+      padding: 14px 12px 10px;
+      border-bottom: 1px solid #e2e0d5;
+      border-right: 1px solid #e2e0d5;
+      cursor: crosshair;
+      position: relative;
+    }
+    .cell-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: #2b2a27;
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .cell-canvas { display: block; width: 100%; }
+    .cell-vals {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 8px;
+      color: #7a786f;
+    }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 16px; }
+    #tip {
+      position: fixed;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+      padding: 6px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Renewable Energy Consumption (% of Total Final Energy)</h1>
+  <p class="subtitle">Share of renewable energy in total final energy consumption, 1990&ndash;2021. Includes hydro, solar, wind, biomass, and geothermal.</p>
+  <div class="grid" id="grid"></div>
+  <p class="source">Source: World Bank &mdash; Sustainable Energy for All (SE4ALL)</p>
+  <div id="tip"></div>
+
+  <script>
+    const data = [{"n":"Germany","y0":1990,"s":[2.1,2,2.1,2.1,2.3,2.3,2.2,2.8,3,3.3,3.7,3.9,4.4,5.4,6.3,7.3,8.6,10.5,10.2,10.7,11.6,12.5,13.6,13.6,14,14.6,14.2,15.2,16,17.1,18.5,17.6]},{"n":"France","y0":1990,"s":[10.5,11.1,11.3,10.9,11,10.7,10.5,10,9.7,9.8,9.3,9.4,8.7,8.8,8.9,8.6,8.5,9.4,10.5,11.2,11.9,10.6,12.3,13.4,13.2,13.3,14.2,14.1,15.2,15.5,16.8,16.2]},{"n":"Japan","y0":1990,"s":[4.3,4.5,4,4.2,3.3,3.7,3.6,3.8,3.8,3.7,3.7,3.5,3.7,4.2,4.3,4,4.4,4.3,4.4,4.5,4.7,4.8,4.7,5,5.6,6.2,6.4,6.9,7.3,7.8,8.5,8.8]},{"n":"Brazil","y0":1990,"s":[49.8,48.9,48.7,48.2,48.3,46.1,44.5,43.7,43.8,44,42.7,41.3,42.9,45.1,45.2,46.1,46.7,47.2,47,48.9,46.8,45.2,43.5,42.3,41.7,43.7,45.4,45.3,46.9,47.5,50,46.5]},{"n":"China","y0":1990,"s":[33.9,33.1,32.8,31.5,31.1,29.4,30.5,30,29.5,30.3,29.6,28.4,27,23.9,20.2,17.4,16.4,14.9,14.1,13.4,12.3,11.3,11.5,11.5,11.9,12.2,12.6,13.1,13.5,14.3,14.9,15.2]},{"n":"India","y0":1990,"s":[53,52,51.5,51.5,50.5,49.5,49.1,47.9,48,47.1,46.9,47.1,45.8,45.6,44.9,44.2,43.2,41.5,39.4,37.4,36.2,35,34.8,34.9,33.9,33.4,33,32.5,32.9,33.5,36.1,34.9]},{"n":"Indonesia","y0":1990,"s":[59.2,58.4,57.5,56.1,53.4,50.7,49.3,47.6,48.9,45.8,45.6,44.3,44.7,43,41.5,41.6,40.1,40,41.1,38.2,36,32.4,30.1,30.6,29.3,26.6,27.8,25.2,22,19.8,21.9,20.2]}];
+
+    const tip = document.getElementById("tip");
+    const grid = document.getElementById("grid");
+
+    const CELL_H = 60;
+    const COLORS = {
+      "Germany": "#EA5E33",
+      "France": "#3D7A5A",
+      "Japan": "#5B9E78",
+      "Brazil": "#4A7FB5",
+      "China": "#C4715A",
+      "India": "#C49A45",
+      "Indonesia": "#7A786F"
+    };
+
+    data.forEach(series => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      const name = document.createElement("div");
+      name.className = "cell-name";
+      name.textContent = series.n;
+      cell.appendChild(name);
+
+      const canvas = document.createElement("canvas");
+      canvas.className = "cell-canvas";
+      canvas.height = CELL_H;
+      cell.appendChild(canvas);
+
+      const vals = document.createElement("div");
+      vals.className = "cell-vals";
+      const firstVal = series.s[0].toFixed(1) + "%";
+      const lastVal = series.s[series.s.length - 1].toFixed(1) + "%";
+      vals.innerHTML = `<span>${series.y0}</span><span>${lastVal}</span>`;
+      cell.appendChild(vals);
+
+      grid.appendChild(cell);
+
+      const s = series.s;
+      const minV = Math.min(...s);
+      const maxV = Math.max(...s);
+      const range = maxV - minV || 1;
+      const color = COLORS[series.n] || "#EA5E33";
+
+      function drawCell(highlightIdx) {
+        const W = canvas.offsetWidth || canvas.parentElement.offsetWidth;
+        canvas.width = W;
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, W, CELL_H);
+
+        const norm = v => CELL_H - 4 - ((v - minV) / range) * (CELL_H - 8);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        s.forEach((v, i) => {
+          const x = (i / (s.length - 1)) * W;
+          const y = norm(v);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        if (highlightIdx !== undefined && highlightIdx >= 0 && highlightIdx < s.length) {
+          const hx = (highlightIdx / (s.length - 1)) * W;
+          ctx.strokeStyle = "#0f172a";
+          ctx.lineWidth = 0.8;
+          ctx.setLineDash([3, 2]);
+          ctx.beginPath();
+          ctx.moveTo(hx, 0);
+          ctx.lineTo(hx, CELL_H);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          const hy = norm(s[highlightIdx]);
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(hx, hy, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function resizeAndDraw() {
+        drawCell();
+      }
+      resizeAndDraw();
+      new ResizeObserver(resizeAndDraw).observe(canvas);
+
+      cell.addEventListener("mousemove", e => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const W = rect.width;
+        const idx = Math.round((mx / W) * (s.length - 1));
+        const clampedIdx = Math.max(0, Math.min(s.length - 1, idx));
+        const year = series.y0 + clampedIdx;
+        drawCell(clampedIdx);
+        tip.textContent = `${series.n}: ${s[clampedIdx].toFixed(1)}% (${year})`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 28) + "px";
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        drawCell();
+        tip.style.opacity = "0";
+      });
+    });
+  </script>
+</body>
+</html>
