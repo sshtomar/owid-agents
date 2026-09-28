@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      padding: 24px;
+      background: #fff;
+      color: #0f172a;
+      max-width: 760px;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed;
+      background: #1e293b;
+      color: #f8fafc;
+      font-size: 12px;
+      font-family: "JetBrains Mono", monospace;
+      padding: 6px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Deindustrialization: Manufacturing's Shrinking Share of GDP</h1>
+  <p class="subtitle">Manufacturing value added as % of GDP, early 1990s vs. 2024. Advanced economies shed industry while Bangladesh surged as a global manufacturer.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank &mdash; National Accounts</p>
+  <div id="tip"></div>
+
+  <script>
+    // {n, a: early value, ay, b: recent value, by}
+    const data = [{"n":"Korea, Rep.","a":25.24,"ay":1990,"b":26.62,"by":2024,"y":1990},{"n":"Germany","a":24.62,"ay":1991,"b":18.01,"by":2024,"y":1991},{"n":"Japan","a":23.39,"ay":1994,"b":18.82,"by":2024,"y":1994},{"n":"Brazil","a":22.83,"ay":1990,"b":12.11,"by":2024,"y":1990},{"n":"Italy","a":20.22,"ay":1990,"b":15.08,"by":2024,"y":1990},{"n":"Indonesia","a":19.89,"ay":1990,"b":18.98,"by":2024,"y":1990},{"n":"India","a":16.6,"ay":1990,"b":13.14,"by":2024,"y":1990},{"n":"France","a":16.03,"ay":1990,"b":9.57,"by":2024,"y":1990},{"n":"Bangladesh","a":13.24,"ay":1990,"b":21.89,"by":2024,"y":1990},{"n":"Canada","a":16.23,"ay":1997,"b":9.32,"by":2022,"y":1997}];
+
+    const W = 660, H = 500;
+    const pad = { left: 130, right: 150, top: 54, bottom: 30 };
+
+    const allVals = data.flatMap(d => [d.a, d.b]);
+    const minV = Math.floor(Math.min(...allVals)) - 2;
+    const maxV = Math.ceil(Math.max(...allVals)) + 2;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 40; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    function colorForChange(d) {
+      const pp = d.b - d.a;
+      if (pp > 3) return "#3D7A5A";
+      if (pp > 0) return "#5B9E78";
+      if (pp > -5) return "#C49A45";
+      if (pp > -10) return "#C4715A";
+      return "#B34B3B";
+    }
+
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: "display:block" });
+
+    const xLeft = pad.left;
+    const xRight = W - pad.right;
+
+    // Column headers
+    [["Early 1990s", xLeft], ["~2024", xRight]].forEach(([label, x]) => {
+      const hdr = mkEl("text", { x, y: pad.top - 22, "text-anchor": "middle", "font-family": "JetBrains Mono,monospace", "font-size": "10", fill: "#7a786f" });
+      hdr.textContent = label;
+      svg.appendChild(hdr);
+    });
+
+    // % label
+    const pctLbl = mkEl("text", { x: W / 2, y: pad.top - 8, "text-anchor": "middle", "font-family": "Inter,sans-serif", "font-size": "10", fill: "#94a3b8" });
+    pctLbl.textContent = "Manufacturing value added as % of GDP";
+    svg.appendChild(pctLbl);
+
+    // Axis gridlines
+    for (let v = Math.ceil(minV); v <= maxV; v += 5) {
+      const y = scale(v);
+      svg.appendChild(mkEl("line", { x1: xLeft, y1: y, x2: xRight, y2: y, stroke: "#e2e0d5", "stroke-width": "1" }));
+      [xLeft, xRight].forEach(x => {
+        const lbl = mkEl("text", { x: x + (x === xLeft ? -8 : 8), y: y + 3, "text-anchor": x === xLeft ? "end" : "start", "font-family": "JetBrains Mono,monospace", "font-size": "9", fill: "#7a786f" });
+        lbl.textContent = v + "%";
+        svg.appendChild(lbl);
+      });
+    }
+
+    // Axis lines
+    svg.appendChild(mkEl("line", { x1: xLeft, y1: pad.top, x2: xLeft, y2: H - pad.bottom, stroke: "#c2c0b5", "stroke-width": "1" }));
+    svg.appendChild(mkEl("line", { x1: xRight, y1: pad.top, x2: xRight, y2: H - pad.bottom, stroke: "#c2c0b5", "stroke-width": "1" }));
+
+    const tip = document.getElementById("tip");
+
+    // Prepare label positions
+    const leftItems = data.map((d, i) => ({ y: scale(d.a), orig: scale(d.a), i }));
+    const rightItems = data.map((d, i) => ({ y: scale(d.b), orig: scale(d.b), i }));
+    const resolvedLeft = resolveCollisions(leftItems, 14);
+    const resolvedRight = resolveCollisions(rightItems, 14);
+    [...resolvedLeft, ...resolvedRight].forEach(item => {
+      item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 4, item.y));
+    });
+    const leftByIdx = {}, rightByIdx = {};
+    resolvedLeft.forEach(item => { leftByIdx[item.i] = item.y; });
+    resolvedRight.forEach(item => { rightByIdx[item.i] = item.y; });
+
+    data.forEach((d, i) => {
+      const color = colorForChange(d);
+      const ya = scale(d.a);
+      const yb = scale(d.b);
+      const lyL = leftByIdx[i];
+      const lyR = rightByIdx[i];
+      const pp = (d.b - d.a).toFixed(1);
+      const sign = d.b >= d.a ? "+" : "";
+
+      // Connecting line
+      const line = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: color, "stroke-width": "1.8", opacity: "1" });
+      line.dataset.idx = i;
+      svg.appendChild(line);
+
+      // Hit area
+      const hit = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+      hit.dataset.idx = i;
+      svg.appendChild(hit);
+
+      hit.addEventListener("mouseover", () => {
+        svg.querySelectorAll("[data-idx]").forEach(el => el.setAttribute("opacity", el.dataset.idx == i ? "1" : "0.1"));
+        tip.textContent = `${d.n}: ${d.a}% (${d.ay}) → ${d.b}% (${d.by})  ${sign}${pp}pp`;
+        tip.style.opacity = "1";
+      });
+      hit.addEventListener("mousemove", e => {
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 28) + "px";
+      });
+      hit.addEventListener("mouseout", () => {
+        svg.querySelectorAll("[data-idx]").forEach(el => el.setAttribute("opacity", "1"));
+        tip.style.opacity = "0";
+      });
+
+      // Dots
+      const dA = mkEl("circle", { cx: xLeft, cy: ya, r: "3.5", fill: color }); dA.dataset.idx = i;
+      svg.appendChild(dA);
+      const dB = mkEl("circle", { cx: xRight, cy: yb, r: "3.5", fill: color }); dB.dataset.idx = i;
+      svg.appendChild(dB);
+
+      // Left labels
+      if (Math.abs(lyL - ya) > 4) {
+        svg.appendChild(mkEl("line", { x1: xLeft - 4, y1: ya, x2: xLeft - 10, y2: lyL, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+      }
+      const lblL = mkEl("text", { x: xLeft - 14, y: lyL + 3.5, "text-anchor": "end", "font-family": "Inter,sans-serif", "font-size": "10", fill: "#2b2a27", "font-weight": "500" });
+      lblL.textContent = d.n.replace(", Rep.", "");
+      lblL.dataset.idx = i;
+      svg.appendChild(lblL);
+
+      // Right labels
+      if (Math.abs(lyR - yb) > 4) {
+        svg.appendChild(mkEl("line", { x1: xRight + 4, y1: yb, x2: xRight + 10, y2: lyR, stroke: color, "stroke-width": "0.6", opacity: "0.5" }));
+      }
+      const lblR = mkEl("text", { x: xRight + 14, y: lyR + 3.5, "font-family": "Inter,sans-serif", "font-size": "10", fill: "#2b2a27", "font-weight": "500" });
+      lblR.textContent = `${d.b.toFixed(1)}%  ${d.n.replace(", Rep.", "")}`;
+      lblR.dataset.idx = i;
+      svg.appendChild(lblR);
+    });
+
+    // Legend
+    const legend = [
+      ["#3D7A5A", "Rose >3pp"],
+      ["#5B9E78", "Slight rise"],
+      ["#C49A45", "Fell 0–5pp"],
+      ["#C4715A", "Fell 5–10pp"],
+      ["#B34B3B", "Fell >10pp"]
+    ];
+    legend.forEach(([color, label], j) => {
+      const lx = 20 + j * 115;
+      const ly = H - 6;
+      svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 9, height: 9, fill: color, rx: "1" }));
+      const lt = mkEl("text", { x: lx + 13, y: ly, "font-family": "Inter,sans-serif", "font-size": "9", fill: "#7a786f" });
+      lt.textContent = label;
+      svg.appendChild(lt);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
