@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap');
+    body { font-family: "Inter", -apple-system, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+    #tip {
+      position: fixed; pointer-events: none; background: rgba(15,23,42,0.92);
+      color: #f8fafc; font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 99;
+      font-family: "JetBrains Mono", monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Depression Prevalence by Country (2015)</h1>
+  <p class="subtitle">Estimated % of population with depression. High-income and post-Soviet countries report the highest rates, partly reflecting greater diagnosis and reporting.</p>
+  <div id="chart"></div>
+  <p class="source">Source: WHO Global Depression Occurrence study (GDO_q35), 2015 estimates</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Ukraine","v":6.31},{"n":"Australia","v":5.94},{"n":"Estonia","v":5.91},{"n":"United States","v":5.86},{"n":"Brazil","v":5.76},{"n":"Greece","v":5.74},{"n":"Portugal","v":5.67},{"n":"Lithuania","v":5.62},{"n":"Finland","v":5.61},{"n":"Belarus","v":5.57},{"n":"Russia","v":5.51},{"n":"Cuba","v":5.49},{"n":"Moldova","v":5.37},{"n":"New Zealand","v":5.35},{"n":"Paraguay","v":5.23},{"n":"Spain","v":5.21},{"n":"Germany","v":5.19},{"n":"Czechia","v":5.16},{"n":"Italy","v":5.14},{"n":"Hungary","v":5.1},{"n":"Slovakia","v":5.09},{"n":"Slovenia","v":5.09}];
+
+    const W = 640, H = data.length * 24 + 60;
+    const pad = {top: 30, bottom: 30, left: 130, right: 70};
+    const barH = 14;
+
+    const maxV = Math.ceil(data[0].v * 10) / 10;
+    const xS = v => pad.left + v / maxV * (W - pad.left - pad.right);
+
+    const ns = "http://www.w3.org/2000/svg";
+    function el(tag, attrs, txt) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+      if (txt != null) e.textContent = txt;
+      return e;
+    }
+
+    const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:640px;display:block;`});
+
+    // X axis gridlines
+    [1, 2, 3, 4, 5, 6].forEach(v => {
+      if (v > maxV) return;
+      const x = xS(v);
+      svg.appendChild(el("line", {x1: x, y1: pad.top - 10, x2: x, y2: H - pad.bottom, stroke: "#e2e8f0", "stroke-width": "0.5"}));
+      svg.appendChild(el("text", {x, y: pad.top - 14, "text-anchor": "middle", "font-size": "9.5", "font-family": "JetBrains Mono", fill: "#94a3b8"}, v + "%"}));
+    });
+
+    // Y axis header
+    svg.appendChild(el("text", {x: pad.left - 6, y: pad.top - 14, "text-anchor": "end", "font-size": "9.5", "font-family": "JetBrains Mono", fill: "#94a3b8"}, "Country"));
+
+    const tip = document.getElementById("tip");
+
+    function colorForRank(i) {
+      if (i < 3) return "#EA5E33";
+      if (i < 8) return "#F29A44";
+      if (i < 15) return "#C49A45";
+      return "#94a3b8";
+    }
+
+    data.forEach((d, i) => {
+      const y = pad.top + i * 24;
+      const barW = xS(d.v) - pad.left;
+      const col = colorForRank(i);
+
+      const g = el("g", {cursor: "pointer"});
+
+      // Row background for hover
+      const bg = el("rect", {x: 0, y: y - 2, width: W, height: 20, fill: "transparent"});
+      // Bar
+      const bar = el("rect", {x: pad.left, y: y + 1, width: barW, height: barH, fill: col, rx: "2"});
+      // Country label
+      const label = el("text", {x: pad.left - 8, y: y + barH / 2 + 4.5, "text-anchor": "end", "font-size": "11", "font-family": "Inter", fill: "#1e293b"}, d.n);
+      // Value label
+      const vlabel = el("text", {x: xS(d.v) + 5, y: y + barH / 2 + 4.5, "font-size": "9.5", "font-family": "JetBrains Mono", fill: col}, d.v.toFixed(2) + "%");
+
+      g.addEventListener("mouseenter", e => {
+        bar.setAttribute("opacity", "0.8");
+        tip.textContent = `${d.n}: ${d.v.toFixed(2)}% depression prevalence (2015)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      g.addEventListener("mouseleave", () => {
+        bar.setAttribute("opacity", "1");
+        tip.style.opacity = "0";
+      });
+
+      g.appendChild(bg); g.appendChild(bar); g.appendChild(label); g.appendChild(vlabel);
+      svg.appendChild(g);
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>

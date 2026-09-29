@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap');
+    body { font-family: "Inter", -apple-system, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+    #tip {
+      position: fixed; pointer-events: none; background: rgba(15,23,42,0.92);
+      color: #f8fafc; font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 99;
+      font-family: "JetBrains Mono", monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nuclear Power's Share of Electricity: 1990 vs 2023</h1>
+  <p class="subtitle">% of electricity production from nuclear sources. Germany phased out; new plants in Armenia and Belarus; France still leads.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — Electricity production from nuclear sources (EG.ELC.NUCL.ZS)</p>
+  <div id="tip"></div>
+  <script>
+    // n=name, a=1990 value, b=recent value, recYear=year of recent value
+    const data = [{"n":"France","a":74.6,"b":66.8,"recYear":2024},{"n":"Hungary","a":48.3,"b":42.2,"recYear":2024},{"n":"Belgium","a":60.2,"b":40.5,"recYear":2024},{"n":"Czechia","a":20.1,"b":40.2,"recYear":2024},{"n":"Bulgaria","a":34.8,"b":40.2,"recYear":2023},{"n":"Finland","a":35.3,"b":39.2,"recYear":2024},{"n":"Korea, Rep.","a":48.4,"b":31.1,"recYear":2024},{"n":"Armenia","a":0,"b":30.8,"recYear":2023},{"n":"Belarus","a":0,"b":28.3,"recYear":2023},{"n":"Canada","a":15.1,"b":13.9,"recYear":2024},{"n":"Japan","a":23.2,"b":9.5,"recYear":2024},{"n":"China","a":0,"b":4.6,"recYear":2023},{"n":"India","a":2.1,"b":2.4,"recYear":2023},{"n":"Germany","a":27.7,"b":1.4,"recYear":2023}];
+
+    const W = 640, H = 560;
+    const pad = {left: 130, right: 130, top: 48, bottom: 20};
+
+    const allVals = data.flatMap(d => [d.a, d.b]);
+    const minV = 0, maxV = 80;
+    const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+    const ns = "http://www.w3.org/2000/svg";
+    function el(tag, attrs, txt) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+      if (txt != null) e.textContent = txt;
+      return e;
+    }
+
+    function colorForChange(delta) {
+      if (delta < -10) return "#EA5E33";
+      if (delta < -3) return "#F29A44";
+      if (delta > 10) return "#3D7A5A";
+      if (delta > 3) return "#5B9E78";
+      return "#94a3b8";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:640px;display:block;"});
+
+    // Column headers
+    const xL = pad.left, xR = W - pad.right;
+    svg.appendChild(el("text", {x: xL, y: pad.top - 14, "text-anchor": "middle", "font-size": "11", "font-family": "JetBrains Mono", fill: "#7A786F"}, "1990"));
+    svg.appendChild(el("text", {x: xR, y: pad.top - 14, "text-anchor": "middle", "font-size": "11", "font-family": "JetBrains Mono", fill: "#7A786F"}, "2023"));
+
+    // Axis lines
+    svg.appendChild(el("line", {x1: xL, y1: pad.top - 6, x2: xL, y2: H - pad.bottom, stroke: "#e2e8f0", "stroke-width": "1"}));
+    svg.appendChild(el("line", {x1: xR, y1: pad.top - 6, x2: xR, y2: H - pad.bottom, stroke: "#e2e8f0", "stroke-width": "1"}));
+
+    const tip = document.getElementById("tip");
+    function showTip(t, e) { tip.textContent = t; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    const rows = data.map((d, i) => {
+      const yA = scale(d.a), yB = scale(d.b);
+      const delta = d.b - d.a;
+      const col = colorForChange(delta);
+      const g = el("g", {});
+
+      // Slope line
+      const line = el("line", {x1: xL, y1: yA, x2: xR, y2: yB, stroke: col, "stroke-width": "1.5"});
+      // End dots
+      const dA = el("circle", {cx: xL, cy: yA, r: "3", fill: col});
+      const dB = el("circle", {cx: xR, cy: yB, r: "3", fill: col});
+      // Hit area
+      const hit = el("line", {x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "12", cursor: "pointer"});
+
+      hit.addEventListener("mouseenter", e => {
+        rows.forEach((r, j) => r.g.setAttribute("opacity", j === i ? "1" : "0.1"));
+        rows[i].line.setAttribute("stroke-width", "3");
+        const sign = delta >= 0 ? "+" : "";
+        showTip(`${d.n}: ${d.a}% (1990) → ${d.b}% (${d.recYear})  ${sign}${delta.toFixed(1)}pp`, e);
+      });
+      hit.addEventListener("mouseleave", () => {
+        rows.forEach(r => r.g.setAttribute("opacity", "1"));
+        rows[i].line.setAttribute("stroke-width", "1.5");
+        hideTip();
+      });
+
+      g.appendChild(line); g.appendChild(dA); g.appendChild(dB); g.appendChild(hit);
+      svg.appendChild(g);
+      return {g, line, yA, yB, col, d};
+    });
+
+    // Left labels (1990) - resolve collisions
+    const leftItems = rows.map(r => ({y: r.yA, name: r.d.n, val: r.d.a, col: r.col}));
+    resolveCollisions(leftItems, 13).forEach(item => {
+      const orig = rows.find(r => r.d.n === item.name).yA;
+      if (Math.abs(orig - item.y) > 2) {
+        svg.appendChild(el("line", {x1: xL - 2, y1: orig, x2: xL - 8, y2: item.y, stroke: item.col, "stroke-width": "0.5", opacity: "0.5"}));
+      }
+      svg.appendChild(el("text", {x: xL - 10, y: item.y + 3.5, "text-anchor": "end", "font-size": "9.5", "font-family": "JetBrains Mono", fill: "#475569"}, `${item.name}  ${item.val}%`));
+    });
+
+    // Right labels (recent) - resolve collisions
+    const rightItems = rows.map(r => ({y: r.yB, name: r.d.n, val: r.d.b, col: r.col}));
+    resolveCollisions(rightItems, 13).forEach(item => {
+      const orig = rows.find(r => r.d.n === item.name).yB;
+      if (Math.abs(orig - item.y) > 2) {
+        svg.appendChild(el("line", {x1: xR + 2, y1: orig, x2: xR + 8, y2: item.y, stroke: item.col, "stroke-width": "0.5", opacity: "0.5"}));
+      }
+      svg.appendChild(el("text", {x: xR + 10, y: item.y + 3.5, "font-size": "9.5", "font-family": "JetBrains Mono", fill: "#475569"}, `${item.val}%  ${item.name}`));
+    });
+
+    // Legend
+    const legend = [
+      {col: "#3D7A5A", label: "Growing (+3pp or more)"},
+      {col: "#94a3b8", label: "Stable"},
+      {col: "#EA5E33", label: "Declining (−10pp or more)"},
+    ];
+    legend.forEach((lp, i) => {
+      const lx = pad.left + 10, ly = H - 12 - (legend.length - 1 - i) * 16;
+      svg.appendChild(el("rect", {x: lx, y: ly - 8, width: 10, height: 10, fill: lp.col, rx: "2"}));
+      svg.appendChild(el("text", {x: lx + 14, y: ly, "font-size": "9", "font-family": "Inter", fill: "#64748b"}, lp.label));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
