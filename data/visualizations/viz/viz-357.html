@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap');
+    body { font-family: "Inter", -apple-system, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+    #tip {
+      position: fixed; pointer-events: none; background: rgba(15,23,42,0.92);
+      color: #f8fafc; font-size: 12px; padding: 6px 10px; border-radius: 5px;
+      opacity: 0; transition: opacity 0.1s; white-space: nowrap; z-index: 99;
+      font-family: "JetBrains Mono", monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>International Tourism Arrivals</h1>
+  <p class="subtitle">Annual visitor arrivals to top destinations (millions), 1995–2020. COVID-19 caused an unprecedented collapse.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank — International tourism, number of arrivals (ST.INT.ARVL)</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"France","s":[148.26,157.55,null,null,null,null,null,null,190.28,185.83,193.88,193.32,193.57,192.37,189.83,196.59,197.52,204.41,206.6,203.3,203.04,207.27,212.0,217.88,117.11],"y0":1996},{"n":"China","s":[46.39,51.13,57.59,63.48,72.8,83.44,89.01,97.91,91.66,109.04,120.29,124.94,131.87,130.03,126.48,133.76,135.42,132.41,129.08,128.5,133.82,141.77,153.26,158.61,162.54,30.4],"y0":1995},{"n":"Italy","s":[55.71,59.8,58.0,58.5,59.52,62.7,60.96,63.56,63.03,58.48,59.23,66.35,70.27,70.72,71.69,73.22,75.87,76.29,76.76,77.69,81.07,84.92,89.93,93.23,95.4,38.42],"y0":1995},{"n":"Croatia","s":[16.1,19.09,23.66,25.5,29.21,37.23,40.13,41.74,42.86,44.97,45.76,47.73,52.27,51.34,47.57,49.01,49.97,47.19,48.34,51.17,55.86,57.59,59.24,57.67,60.02,21.61],"y0":1995},{"n":"Hong Kong","s":[10.2,12.97,11.27,10.16,11.33,13.06,13.72,16.57,15.54,21.81,23.36,25.25,28.17,29.51,29.59,36.03,41.92,48.62,54.3,60.84,59.31,56.66,58.47,65.15,55.91,3.57],"y0":1995},{"n":"Germany","s":[14.85,15.21,15.84,16.51,17.12,18.98,17.86,17.97,18.4,20.14,21.5,23.57,24.42,24.88,24.22,26.88,28.37,30.41,31.55,33.0,34.97,35.55,37.45,38.88,39.56,12.45],"y0":1995},{"n":"Greece","s":[10.71,9.78,10.59,11.36,12.61,13.57,14.68,14.92,14.79,14.27,15.94,17.28,null,null,null,null,null,null,20.11,24.27,26.11,28.07,30.16,33.07,34.01,7.41],"y0":1995},{"n":"Austria","s":[17.17,17.09,16.65,17.35,17.47,17.98,18.18,18.61,19.08,19.37,19.95,20.27,20.77,21.93,21.36,22.0,23.01,24.15,24.81,25.29,26.73,28.12,29.46,30.82,31.88,15.09],"y0":1995},{"n":"Hungary","s":[39.24,39.83,37.31,33.62,28.8,31.14,30.68,31.74,31.41,33.93,36.17,38.32,39.38,39.55,40.62,39.9,41.3,43.56,43.61,45.98,48.34,52.89,54.96,57.67,61.4,31.64],"y0":1995}];
+
+    const COLORS = ["#3D7A5A","#EA5E33","#5B9E78","#F29A44","#2E6DA4","#8B5E3C","#A259C4","#C4715A","#6B8E5A"];
+
+    const W = 800, H = 460;
+    const margin = {top: 36, right: 100, bottom: 36, left: 52};
+
+    const allYears = [];
+    let yearMin = 9999, yearMax = 0;
+    data.forEach(d => {
+      yearMin = Math.min(yearMin, d.y0);
+      yearMax = Math.max(yearMax, d.y0 + d.s.length - 1);
+    });
+
+    let valMax = 0;
+    data.forEach(d => d.s.forEach(v => { if (v != null) valMax = Math.max(valMax, v); }));
+    valMax = Math.ceil(valMax / 50) * 50;
+
+    const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yS = v => margin.top + (valMax - v) / valMax * (H - margin.top - margin.bottom);
+
+    const ns = "http://www.w3.org/2000/svg";
+    function el(tag, attrs, txt) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+      if (txt != null) e.textContent = txt;
+      return e;
+    }
+
+    const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:800px;display:block;"});
+
+    // COVID annotation band (2020)
+    const covidX = xS(2019.5);
+    svg.appendChild(el("rect", {x: covidX, y: margin.top, width: W - margin.right - covidX, height: H - margin.top - margin.bottom, fill: "#EA5E33", opacity: "0.07"}));
+    svg.appendChild(el("text", {x: covidX + 3, y: margin.top + 10, "font-size": "9", "font-family": "JetBrains Mono", fill: "#EA5E33", opacity: "0.8"}, "COVID-19"));
+
+    // Y axis gridlines + labels
+    [0, 50, 100, 150, 200].forEach(v => {
+      if (v > valMax) return;
+      const y = yS(v);
+      svg.appendChild(el("line", {x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#e2e8f0", "stroke-width": "0.5"}));
+      svg.appendChild(el("text", {x: margin.left - 6, y: y + 4, "text-anchor": "end", "font-size": "10", "font-family": "JetBrains Mono", fill: "#94a3b8"}, v + "M"));
+    });
+
+    // X axis labels
+    [1995, 2000, 2005, 2010, 2015, 2020].forEach(yr => {
+      svg.appendChild(el("text", {x: xS(yr), y: H - 4, "text-anchor": "middle", "font-size": "10", "font-family": "JetBrains Mono", fill: "#94a3b8"}, yr));
+    });
+
+    // Endpoint labels with collision resolution
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i-1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i-1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const tip = document.getElementById("tip");
+    function showTip(t, e) { tip.textContent = t; tip.style.opacity = "1"; tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-20)+"px"; }
+    function hideTip() { tip.style.opacity = "0"; }
+
+    const groups = [];
+
+    data.forEach((d, i) => {
+      const pts = [];
+      d.s.forEach((v, j) => {
+        if (v != null) pts.push({year: d.y0 + j, v});
+      });
+      if (!pts.length) return;
+
+      const pathD = pts.map((p, j) => `${j===0?"M":"L"} ${xS(p.year).toFixed(1)} ${yS(p.v).toFixed(1)}`).join(" ");
+      const col = COLORS[i % COLORS.length];
+
+      const g = el("g", {});
+      const line = el("path", {d: pathD, stroke: col, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round"});
+      const hit = el("path", {d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer"});
+
+      const lastPt = pts[pts.length - 1];
+
+      hit.addEventListener("mouseenter", e => {
+        groups.forEach((gg, ii) => gg.g.setAttribute("opacity", ii === i ? "1" : "0.1"));
+        groups[i].line.setAttribute("stroke-width", "3");
+        showTip(`${d.n}: ${lastPt.v.toFixed(0)}M arrivals (${lastPt.year})`, e);
+      });
+      hit.addEventListener("mousemove", e => {
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+        const nearest = pts.reduce((a, b) => Math.abs(b.year - yr) < Math.abs(a.year - yr) ? b : a);
+        showTip(`${d.n}: ${nearest.v.toFixed(0)}M arrivals (${nearest.year})`, e);
+      });
+      hit.addEventListener("mouseleave", () => {
+        groups.forEach(gg => gg.g.setAttribute("opacity", "1"));
+        groups[i].line.setAttribute("stroke-width", "1.5");
+        hideTip();
+      });
+
+      g.appendChild(line);
+      g.appendChild(hit);
+      svg.appendChild(g);
+      groups.push({g, line, endY: yS(lastPt.v), name: d.n, val: lastPt.v, col});
+    });
+
+    // Resolve endpoint label collisions
+    const labelItems = groups.map(g => ({y: g.endY, name: g.name, val: g.val, col: g.col}));
+    const resolved = resolveCollisions(labelItems, 12);
+    resolved.forEach(item => {
+      const lx = W - margin.right + 6;
+      const origY = groups.find(g => g.name === item.name).endY;
+      // Leader line if moved
+      if (Math.abs(origY - item.y) > 3) {
+        svg.appendChild(el("line", {x1: W - margin.right, y1: origY, x2: lx, y2: item.y, stroke: item.col, "stroke-width": "0.5", opacity: "0.5"}));
+      }
+      svg.appendChild(el("text", {x: lx + 2, y: item.y + 3.5, "font-size": "9", "font-family": "JetBrains Mono", fill: item.col}, `${item.val.toFixed(0)}M ${item.name}`));
+    });
+
+    document.getElementById("chart").appendChild(svg);
+  </script>
+</body>
+</html>
