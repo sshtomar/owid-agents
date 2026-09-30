@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 580px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>The Nuclear Fork</h1>
+<p class="subtitle">Nuclear electricity as a share of total generation (%), 1990–2023. After Fukushima (2011), countries diverged sharply: Germany phased out nuclear entirely; Japan's share collapsed to near zero; France held steady; Czechia climbed.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank EG.ELC.NUCL.ZS</p>
+<script>
+const data = [
+  {n:"France",  s:[74.65,72.73,73.00,77.89,75.49,76.32,77.39,78.35,75.89,74.98,76.89,76.62,78.12,77.81,78.08,78.38,78.31,77.18,76.58,76.45,75.27,77.12,74.23,72.72,76.18,75.43,71.42,70.82,70.92,69.83,66.40,68.27,62.22,64.34]},
+  {n:"Belgium", s:[60.24,59.58,60.17,59.19,56.28,55.58,56.95,60.14,55.50,58.00,57.32,58.07,57.71,55.98,56.18,55.55,55.14,54.74,53.99,51.79,50.68,53.22,48.52,51.07,46.46,37.45,50.84,48.75,38.11,46.48,38.49,50.09,45.73,39.36]},
+  {n:"Finland", s:[35.34,33.65,33.37,32.63,29.60,30.01,28.07,30.20,31.14,33.08,32.12,30.57,29.74,26.96,26.46,32.97,27.83,28.83,29.65,32.64,28.26,31.55,32.65,33.13,34.63,33.89,33.75,33.29,32.44,34.77,33.62,32.72,35.10,42.08]},
+  {n:"Czechia", s:[20.12,20.04,20.66,21.44,22.11,20.10,20.00,19.34,20.24,20.65,18.50,19.76,24.54,31.09,31.22,29.95,30.87,29.67,31.74,33.11,32.59,32.33,34.69,35.37,35.20,31.99,28.93,32.55,33.99,34.75,36.85,36.15,36.56,39.49]},
+  {n:"Korea",   s:[48.44,46.95,42.04,38.64,34.40,35.79,35.49,34.01,40.98,42.73,37.69,36.16,36.41,37.47,35.29,37.90,36.66,35.21,35.67,33.86,31.28,29.42,28.08,25.78,28.99,29.96,28.83,25.85,22.48,24.92,26.96,25.22,28.17,29.56]},
+  {n:"Japan",   s:[23.23,23.76,24.71,27.34,27.78,29.41,29.89,30.85,32.23,30.20,30.16,30.46,27.63,22.67,25.95,27.48,27.27,23.11,23.29,25.65,24.62,9.16,1.45,0.84,0.00,0.89,1.69,3.05,6.09,6.14,3.81,6.75,5.51,8.38]},
+  {n:"Germany", s:[27.72,27.28,29.55,29.12,28.48,28.49,28.81,30.88,29.05,30.56,29.42,29.21,28.10,27.09,27.03,26.17,26.13,21.91,23.16,22.62,22.20,17.61,15.83,15.23,15.47,14.16,13.01,11.68,11.87,12.37,11.19,11.66,6.00,1.41]}
+];
+const COLORS = ["#4A90B8","#F29A44","#3D7A5A","#5B9E78","#C49A45","#B34B3B","#7A786F"];
+const Y0 = 1990, STEPS = 34;
+
+const W = 820, H = 460;
+const mg = { top: 30, right: 120, bottom: 36, left: 50 };
+const plotW = W - mg.left - mg.right;
+const plotH = H - mg.top - mg.bottom;
+
+const vMin = 0, vMax = 85;
+const yMin = Y0, yMax = Y0 + STEPS - 1;
+
+const xScale = y => mg.left + (y - yMin) / (yMax - yMin) * plotW;
+const yScale = v => mg.top + (vMax - v) / (vMax - vMin) * plotH;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: mg.left, y1: yScale(v), x2: W - mg.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: mg.left - 6, y: yScale(v) + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X axis ticks
+[1990, 1995, 2000, 2005, 2010, 2011, 2015, 2020, 2023].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mg.top + plotH, x2: x, y2: mg.top + plotH + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x, y: mg.top + plotH + 13, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+// Fukushima annotation
+const xFuku = xScale(2011);
+svg.appendChild(mkEl("line", {
+  x1: xFuku, y1: mg.top, x2: xFuku, y2: mg.top + plotH,
+  stroke: "#EA5E33", "stroke-width": "0.8", "stroke-dasharray": "3,3", opacity: "0.6"
+}));
+const fLabel = mkEl("text", { x: xFuku + 3, y: mg.top + 10,
+  "font-family": "'JetBrains Mono',monospace", "font-size": "8", fill: "#EA5E33" });
+fLabel.textContent = "Fukushima";
+svg.appendChild(fLabel);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y = Math.max(mg.top, sorted[i - 1].y - shift);
+        sorted[i].y = Math.min(mg.top + plotH, sorted[i].y + shift);
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const rows = [];
+
+const endLabels = data.map((d, i) => ({
+  i, n: d.n, y: yScale(d.s[d.s.length - 1] || 0), v: d.s[d.s.length - 1]
+}));
+resolveCollisions(endLabels, 11);
+
+data.forEach((d, i) => {
+  const col = COLORS[i];
+  const g = mkEl("g", {});
+
+  let pathD = "";
+  d.s.forEach((v, j) => {
+    if (v === null || v === undefined) return;
+    const x = xScale(Y0 + j), y = yScale(v);
+    pathD += (j === 0 || d.s[j-1] === null || d.s[j-1] === undefined) ? `M ${x} ${y}` : ` L ${x} ${y}`;
+  });
+
+  const line = mkEl("path", { d: pathD, stroke: col, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  const lastV = d.s[d.s.length - 1];
+  g.appendChild(mkEl("circle", { cx: xScale(Y0 + STEPS - 1), cy: yScale(lastV), r: "2.5", fill: col }));
+
+  const el = endLabels.find(l => l.i === i);
+  if (el) {
+    const lt = mkEl("text", { x: xScale(Y0 + STEPS - 1) + 6, y: el.y + 3.5,
+      "text-anchor": "start", "font-size": "9", fill: col, "font-weight": "500" });
+    lt.textContent = `${el.v}% ${d.n}`;
+    g.appendChild(lt);
+    const actualY = yScale(lastV);
+    if (Math.abs(el.y - actualY) > 3) {
+      g.appendChild(mkEl("line", { x1: xScale(Y0 + STEPS - 1) + 3, y1: el.y, x2: xScale(Y0 + STEPS - 1) + 2, y2: actualY,
+        stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+    }
+  }
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, i, col });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "1.5"); }
+    else if (i === idx) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "3"); }
+    else { row.g.style.opacity = "0.12"; row.line.setAttribute("stroke-width", "1"); }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+  const yearF = (sx - mg.left) / plotW * (yMax - yMin) + yMin;
+  const yearIdx = Math.max(0, Math.min(STEPS - 1, Math.round(yearF - yMin)));
+  const year = Y0 + yearIdx;
+
+  let best = -1, bestDist = 18;
+  rows.forEach((row, i) => {
+    const v = row.d.s[yearIdx];
+    if (v == null) return;
+    const dist = Math.abs(sy - yScale(v));
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  highlight(best);
+  if (best >= 0) {
+    const v = rows[best].d.s[yearIdx];
+    if (v != null) {
+      tip.textContent = `${rows[best].d.n}, ${year}: ${v.toFixed(1)}% of electricity from nuclear`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 14) + "px";
+      tip.style.top = (e.clientY - 22) + "px";
+    }
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body></html>
