@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 580px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.1s; z-index: 10; }
+</style></head><body>
+<h1>The Aging Divide</h1>
+<p class="subtitle">Old-age dependency ratio: elderly per 100 working-age people, 1960–2024. Japan now has one elderly person for every two workers. India barely changed. Korea is catching Japan fast.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SP.POP.DPND.OL</p>
+<script>
+const data = [
+  {n:"Japan",  s:[8.91,8.99,9.01,9.04,9.11,9.23,9.41,9.62,9.8,9.98,10.14,10.35,10.68,11.0,11.3,11.61,11.96,12.33,12.72,13.09,13.44,13.8,14.16,14.44,14.81,15.23,15.58,15.95,16.35,16.84,17.42,18.07,18.78,19.51,20.25,21.03,21.88,22.79,23.7,24.61,25.58,26.62,27.63,28.52,29.49,30.75,32.1,33.39,34.65,35.69,36.36,37.51,39.35,41.32,43.13,44.7,46.03,47.09,47.91,48.52,49.13,49.74,50.06,50.28,50.66]},
+  {n:"Italy",  s:[14.52,14.77,14.95,15.08,15.26,15.52,15.81,16.14,16.46,16.79,17.2,17.65,18.05,18.4,18.78,19.13,19.45,19.77,20.11,20.41,20.48,20.35,20.1,19.67,19.33,19.48,19.91,20.38,20.89,21.35,21.82,22.25,22.71,23.23,24.39,24.93,24.88,25.44,25.94,26.44,26.98,27.53,28.08,28.55,29.06,29.64,30.21,30.57,30.72,30.94,31.23,31.68,32.29,32.94,33.65,34.28,34.79,35.22,35.65,36.17,36.65,37.13,37.58,38.06,38.79]},
+  {n:"Germany",s:[17.07,17.54,18.02,18.43,18.89,19.33,19.82,20.44,20.95,21.25,21.63,22.03,22.34,22.63,22.96,23.3,23.53,23.74,23.91,23.93,23.65,22.97,22.14,21.35,20.89,20.92,21.14,21.35,21.48,21.49,21.53,21.65,21.75,21.93,22.23,22.53,22.75,22.92,23.2,23.65,24.25,24.91,25.59,26.34,27.27,28.3,29.41,30.28,30.8,31.23,31.28,31.14,31.28,31.56,31.82,32.03,32.25,32.63,33.01,33.42,33.92,34.58,35.3,36.01,36.88]},
+  {n:"France", s:[18.57,18.73,18.9,19.01,19.18,19.42,19.7,20.03,20.29,20.47,20.64,20.81,20.98,21.15,21.32,21.51,21.64,21.77,21.94,22.06,21.86,21.24,20.56,19.99,19.56,19.59,19.95,20.27,20.58,20.88,21.22,21.62,21.99,22.35,22.72,23.1,23.46,23.79,24.1,24.37,24.6,24.8,24.95,25.04,25.16,25.27,25.26,25.29,25.46,25.7,25.94,26.48,27.32,28.18,29.06,29.97,30.79,31.52,32.23,32.93,33.56,34.12,34.71,35.38,36.1]},
+  {n:"Korea",  s:[5.63,5.75,5.89,6.02,6.08,6.13,6.15,6.16,6.18,6.16,6.16,6.22,6.27,6.28,6.28,6.23,6.19,6.16,6.14,6.14,6.16,6.23,6.34,6.39,6.41,6.47,6.58,6.68,6.8,6.93,7.05,7.21,7.4,7.62,7.86,8.11,8.35,8.65,8.99,9.38,9.86,10.37,10.9,11.44,12.0,12.54,13.11,13.68,14.19,14.65,15.14,15.58,16.01,16.52,17.09,17.68,18.24,18.98,19.85,20.77,21.96,23.29,24.59,25.94,27.47]},
+  {n:"China",  s:[7.12,6.91,6.8,6.75,6.69,6.64,6.62,6.61,6.62,6.65,6.68,6.72,6.76,6.81,6.94,7.08,7.21,7.29,7.3,7.33,7.39,7.43,7.48,7.52,7.54,7.58,7.65,7.72,7.81,7.95,8.12,8.27,8.45,8.66,8.88,9.1,9.32,9.52,9.76,10.02,10.25,10.46,10.62,10.77,10.89,10.99,11.13,11.31,11.48,11.66,11.89,12.17,12.52,12.93,13.42,14.04,14.73,15.54,16.42,17.29,18.22,19.08,19.95,20.72,21.15]},
+  {n:"Brazil", s:[4.74,4.82,4.9,4.98,5.05,5.12,5.19,5.25,5.31,5.38,5.44,5.5,5.56,5.63,5.69,5.76,5.83,5.89,5.95,6.01,6.06,6.11,6.16,6.22,6.28,6.34,6.42,6.5,6.6,6.71,6.82,6.94,7.05,7.17,7.28,7.4,7.52,7.63,7.74,7.84,7.93,8.04,8.15,8.28,8.44,8.61,8.79,9.0,9.22,9.46,9.71,9.99,10.29,10.63,11.01,11.43,11.86,12.32,12.81,13.31,13.78,14.24,14.74,15.32,15.95]},
+  {n:"India",  s:[5.88,5.98,6.12,6.28,6.4,6.48,6.54,6.56,6.58,6.62,6.66,6.71,6.77,6.84,6.89,6.93,6.97,6.99,7.0,7.01,7.02,7.03,7.03,7.03,7.03,7.03,7.03,7.03,7.03,7.03,7.03,7.05,7.07,7.09,7.12,7.16,7.19,7.23,7.26,7.31,7.35,7.39,7.44,7.49,7.53,7.57,7.6,7.63,7.66,7.7,7.75,7.82,7.9,7.99,8.13,8.33,8.55,8.78,9.03,9.3,9.54,9.69,9.88,10.18,10.47]}
+];
+const COLORS = ["#EA5E33","#F29A44","#C49A45","#4A90B8","#B34B3B","#5B9E78","#8B6B42","#A6C4A2"];
+const Y0 = 1960, STEPS = 65;
+
+const W = 820, H = 460;
+const mg = { top: 30, right: 110, bottom: 36, left: 50 };
+const plotW = W - mg.left - mg.right;
+const plotH = H - mg.top - mg.bottom;
+
+const vMin = 0, vMax = 55;
+const yMin = Y0, yMax = Y0 + STEPS - 1;
+
+const xScale = y => mg.left + (y - yMin) / (yMax - yMin) * plotW;
+const yScale = v => mg.top + (vMax - v) / (vMax - vMin) * plotH;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: mg.left, y1: yScale(v), x2: W - mg.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: mg.left - 6, y: yScale(v) + 3.5, "text-anchor": "end",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v;
+  svg.appendChild(t);
+});
+
+[1960, 1970, 1980, 1990, 2000, 2010, 2020, 2024].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mg.top + plotH, x2: x, y2: mg.top + plotH + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x, y: mg.top + plotH + 13, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono',monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+// Reference line: 50 (one elderly per two workers)
+svg.appendChild(mkEl("line", {
+  x1: mg.left, y1: yScale(50), x2: W - mg.right, y2: yScale(50),
+  stroke: "#EA5E33", "stroke-width": "0.6", "stroke-dasharray": "4,3", opacity: "0.5"
+}));
+const refT = mkEl("text", { x: mg.left + 4, y: yScale(50) - 3,
+  "font-family": "'JetBrains Mono',monospace", "font-size": "8", fill: "#EA5E33" });
+refT.textContent = "1 elderly per 2 workers";
+svg.appendChild(refT);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y = Math.max(mg.top, sorted[i - 1].y - shift);
+        sorted[i].y = Math.min(mg.top + plotH, sorted[i].y + shift);
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const rows = [];
+const endLabels = data.map((d, i) => ({
+  i, n: d.n, y: yScale(d.s[d.s.length - 1]), v: d.s[d.s.length - 1]
+}));
+resolveCollisions(endLabels, 11);
+
+data.forEach((d, i) => {
+  const col = COLORS[i];
+  const g = mkEl("g", {});
+
+  let pathD = d.s.map((v, j) => `${j === 0 ? "M" : "L"} ${xScale(Y0 + j)} ${yScale(v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: col, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  const lastV = d.s[STEPS - 1];
+  g.appendChild(mkEl("circle", { cx: xScale(Y0 + STEPS - 1), cy: yScale(lastV), r: "2.5", fill: col }));
+
+  const el = endLabels.find(l => l.i === i);
+  if (el) {
+    const lt = mkEl("text", { x: xScale(Y0 + STEPS - 1) + 6, y: el.y + 3.5,
+      "text-anchor": "start", "font-size": "9", fill: col, "font-weight": "500" });
+    lt.textContent = `${el.v.toFixed(0)} ${d.n}`;
+    g.appendChild(lt);
+    const actualY = yScale(lastV);
+    if (Math.abs(el.y - actualY) > 3) {
+      g.appendChild(mkEl("line", { x1: xScale(Y0 + STEPS - 1) + 3, y1: el.y, x2: xScale(Y0 + STEPS - 1) + 2, y2: actualY,
+        stroke: col, "stroke-width": "0.5", opacity: "0.5" }));
+    }
+  }
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, i, col });
+});
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "1.5"); }
+    else if (i === idx) { row.g.style.opacity = "1"; row.line.setAttribute("stroke-width", "3"); }
+    else { row.g.style.opacity = "0.12"; row.line.setAttribute("stroke-width", "1"); }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+  const yearIdx = Math.max(0, Math.min(STEPS - 1, Math.round((sx - mg.left) / plotW * (STEPS - 1))));
+  const year = Y0 + yearIdx;
+
+  let best = -1, bestDist = 18;
+  rows.forEach((row, i) => {
+    const v = row.d.s[yearIdx];
+    if (v == null) return;
+    const dist = Math.abs(sy - yScale(v));
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  highlight(best);
+  if (best >= 0) {
+    const v = rows[best].d.s[yearIdx];
+    tip.textContent = `${rows[best].d.n}, ${year}: ${v.toFixed(1)} elderly per 100 workers`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body></html>
