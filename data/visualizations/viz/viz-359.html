@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend-swatch { width: 18px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>Intentional Homicides: 1990 vs 2022</h1>
+<p class="subtitle">Homicide rate per 100,000 people in ~1990 and ~2022. Colombia's dramatic decline (75 → 25) stands against steep rises in Ecuador, Jamaica, and Honduras. European and East Asian nations hover near 1 or below.</p>
+<div id="chart" style="position:relative;">
+  <div class="tooltip" id="tip"></div>
+</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A;"></div>Large decline</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#8BAD72;"></div>Modest decline</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C49A45;"></div>Modest rise</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#F29A44;"></div>Large rise</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#EA5E33;"></div>Surge (&gt;25)</div>
+</div>
+<p class="source">Source: World Bank &mdash; Intentional Homicides (VC.IHR.PSRC.P5), UNODC</p>
+<script>
+// Data from notebook: {n: name, a: ~1990 rate, b: ~2022 rate}
+const data = [
+  {"n":"Colombia","a":75.0,"b":24.91},
+  {"n":"Guatemala","a":28.03,"b":23.37},
+  {"n":"Jamaica","a":22.86,"b":49.44},
+  {"n":"Brazil","a":19.65,"b":19.28},
+  {"n":"Honduras","a":9.95,"b":31.44},
+  {"n":"Kazakhstan","a":8.6,"b":2.55},
+  {"n":"Ecuador","a":8.52,"b":45.72},
+  {"n":"India","a":5.11,"b":2.82},
+  {"n":"Costa Rica","a":4.45,"b":17.75},
+  {"n":"Italy","a":3.15,"b":0.57},
+  {"n":"Australia","a":2.18,"b":0.85},
+  {"n":"Germany","a":1.17,"b":0.91},
+  {"n":"Japan","a":0.55,"b":0.23}
+];
+
+function colorForChange(change) {
+  if (change <= -40) return "#3D7A5A";
+  if (change <= -5)  return "#8BAD72";
+  if (change < 5)    return "#C49A45";
+  if (change < 25)   return "#F29A44";
+  return "#EA5E33";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 700, H = 600;
+const pad = { left: 120, right: 145, top: 50, bottom: 24 };
+const xA = pad.left, xB = W - pad.right;
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0;
+const maxV = Math.ceil(Math.max(...allVals) / 5) * 5 + 3;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").prepend(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid lines
+[0, 10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  if (v > maxV) return;
+  svg.appendChild(mkEl("line", {
+    x1: xA, y1: scale(v), x2: xB, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xA - 6, y: scale(v) + 3.5,
+    "font-size": "9", "text-anchor": "end", fill: "#9A9890",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v;
+});
+
+// Column headers
+[["~1990", xA], ["~2022", xB]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 18, "text-anchor": "middle",
+    "font-size": "10", fill: "#7A786F", "font-family": "'JetBrains Mono', monospace",
+    "font-weight": "500"
+  })).textContent = label;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 12, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+const tip = document.getElementById("tip");
+
+const leftLabels = data.map(d => ({ y: scale(d.a), d }));
+const rightLabels = data.map(d => ({ y: scale(d.b), d }));
+const resolvedLeft = resolveCollisions(leftLabels, 13);
+const resolvedRight = resolveCollisions(rightLabels, 13);
+const leftYMap = new Map(resolvedLeft.map(l => [l.d.n, l.y]));
+const rightYMap = new Map(resolvedRight.map(l => [l.d.n, l.y]));
+
+const groups = [];
+data.forEach(d => {
+  const change = d.b - d.a;
+  const col = colorForChange(change);
+  const yA = scale(d.a), yB = scale(d.b);
+  const lyA = leftYMap.get(d.n), lyB = rightYMap.get(d.n);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  g.appendChild(mkEl("line", {
+    x1: xA, y1: yA, x2: xB, y2: yB,
+    stroke: col, "stroke-width": "1.5"
+  }));
+
+  if (Math.abs(lyA - yA) > 1) {
+    g.appendChild(mkEl("line", {
+      x1: xA - 4, y1: yA, x2: xA - 8, y2: lyA,
+      stroke: col, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+  if (Math.abs(lyB - yB) > 1) {
+    g.appendChild(mkEl("line", {
+      x1: xB + 4, y1: yB, x2: xB + 8, y2: lyB,
+      stroke: col, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+
+  g.appendChild(mkEl("circle", { cx: xA, cy: yA, r: "3", fill: col }));
+  g.appendChild(mkEl("circle", { cx: xB, cy: yB, r: "3", fill: col }));
+
+  const lLeft = mkEl("text", {
+    x: xA - 10, y: lyA + 3.5,
+    "font-size": "9.5", "text-anchor": "end", fill: "#2B2A27"
+  });
+  lLeft.textContent = `${d.n}  ${d.a.toFixed(1)}`;
+  g.appendChild(lLeft);
+
+  const lRight = mkEl("text", {
+    x: xB + 10, y: lyB + 3.5,
+    "font-size": "9.5", "text-anchor": "start", fill: "#2B2A27"
+  });
+  lRight.textContent = `${d.b.toFixed(1)}  ${d.n}`;
+  g.appendChild(lRight);
+
+  const hit = mkEl("line", {
+    x1: xA, y1: yA, x2: xB, y2: yB,
+    stroke: "transparent", "stroke-width": "14"
+  });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.12"; });
+    g.style.opacity = "1";
+    const sign = change >= 0 ? "+" : "";
+    tip.textContent = `${d.n}: ${d.a.toFixed(1)} → ${d.b.toFixed(1)}  (${sign}${change.toFixed(1)})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+</script>
+</body></html>

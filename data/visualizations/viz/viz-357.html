@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; letter-spacing: 0.3px; text-transform: uppercase; }
+  .legend-swatch { width: 18px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>Universal Health Coverage: Two Decades of Progress</h1>
+<p class="subtitle">UHC Service Coverage Index score (~2000 vs ~2023) for 15 countries. The index tracks essential health service coverage on a 0–100 scale. Lines sloping right show improvement; color encodes magnitude of gain.</p>
+<div id="chart" style="position:relative;">
+  <div class="tooltip" id="tip"></div>
+</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A;"></div>+30 pts or more</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#5B9E78;"></div>+20 to +29</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#8BAD72;"></div>+10 to +19</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C49A45;"></div>+5 to +9</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C4715A;"></div>0 to +4</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#B34B3B;"></div>Declined</div>
+</div>
+<p class="source">Source: WHO Global Health Observatory &mdash; UHC Service Coverage Index (SDG 3.8.1)</p>
+<script>
+// Data exported from notebook -- earlier year is ~2000 (2000-2002), later year is ~2022/2023
+const data = [
+  {"n":"Ethiopia","a":13,"b":33},
+  {"n":"Nepal","a":18,"b":58},
+  {"n":"Comoros","a":25,"b":52},
+  {"n":"India","a":36,"b":69},
+  {"n":"Pakistan","a":36,"b":56},
+  {"n":"China","a":65,"b":85},
+  {"n":"Mongolia","a":62,"b":70},
+  {"n":"Paraguay","a":62,"b":79},
+  {"n":"Ecuador","a":66,"b":78},
+  {"n":"Algeria","a":68,"b":70},
+  {"n":"Cuba","a":74,"b":86},
+  {"n":"Jordan","a":75,"b":71},
+  {"n":"Costa Rica","a":76,"b":84},
+  {"n":"Norway","a":76,"b":89},
+  {"n":"Netherlands","a":77,"b":85}
+];
+
+function colorForChange(change) {
+  if (change >= 30) return "#3D7A5A";
+  if (change >= 20) return "#5B9E78";
+  if (change >= 10) return "#8BAD72";
+  if (change >= 5)  return "#C49A45";
+  if (change >= 0)  return "#C4715A";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 700, H = 580;
+const pad = { left: 130, right: 150, top: 52, bottom: 24 };
+const xA = pad.left, xB = W - pad.right;
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = Math.floor(Math.min(...allVals) / 10) * 10 - 2;
+const maxV = Math.ceil(Math.max(...allVals) / 10) * 10 + 2;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").prepend(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid lines every 10 units
+for (let v = Math.ceil(minV / 10) * 10; v <= maxV; v += 10) {
+  svg.appendChild(mkEl("line", {
+    x1: xA, y1: scale(v), x2: xB, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xA - 6, y: scale(v) + 3.5,
+    "font-size": "9", "text-anchor": "end",
+    fill: "#9A9890", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v;
+}
+
+// Column headers
+[["~2000", xA], ["~2023", xB]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 18, "text-anchor": "middle",
+    "font-size": "10", fill: "#7A786F", "font-family": "'JetBrains Mono', monospace",
+    "font-weight": "500"
+  })).textContent = label;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 12, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+const tip = document.getElementById("tip");
+
+// Prepare collision-resolved labels for both sides
+const leftLabels = data.map(d => ({ y: scale(d.a), d }));
+const rightLabels = data.map(d => ({ y: scale(d.b), d }));
+const resolvedLeft = resolveCollisions(leftLabels, 13);
+const resolvedRight = resolveCollisions(rightLabels, 13);
+
+const leftYMap = new Map(resolvedLeft.map(l => [l.d.n, l.y]));
+const rightYMap = new Map(resolvedRight.map(l => [l.d.n, l.y]));
+
+const groups = [];
+data.forEach(d => {
+  const change = d.b - d.a;
+  const col = colorForChange(change);
+  const yA = scale(d.a), yB = scale(d.b);
+  const lyA = leftYMap.get(d.n), lyB = rightYMap.get(d.n);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Connecting line
+  const line = mkEl("line", {
+    x1: xA, y1: yA, x2: xB, y2: yB,
+    stroke: col, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+
+  // Leader lines to labels (faint, if displaced)
+  if (Math.abs(lyA - yA) > 1) {
+    g.appendChild(mkEl("line", {
+      x1: xA - 4, y1: yA, x2: xA - 8, y2: lyA,
+      stroke: col, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+  if (Math.abs(lyB - yB) > 1) {
+    g.appendChild(mkEl("line", {
+      x1: xB + 4, y1: yB, x2: xB + 8, y2: lyB,
+      stroke: col, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+
+  // Endpoint dots
+  g.appendChild(mkEl("circle", { cx: xA, cy: yA, r: "3", fill: col }));
+  g.appendChild(mkEl("circle", { cx: xB, cy: yB, r: "3", fill: col }));
+
+  // Left label: "Name  value"
+  const lLeft = mkEl("text", {
+    x: xA - 10, y: lyA + 3.5,
+    "font-size": "9.5", "text-anchor": "end", fill: "#2B2A27"
+  });
+  lLeft.textContent = `${d.n}  ${d.a}`;
+  g.appendChild(lLeft);
+
+  // Right label: "value  Name"
+  const lRight = mkEl("text", {
+    x: xB + 10, y: lyB + 3.5,
+    "font-size": "9.5", "text-anchor": "start", fill: "#2B2A27"
+  });
+  const sign = change >= 0 ? "+" : "";
+  lRight.textContent = `${d.b}  ${d.n}`;
+  g.appendChild(lRight);
+
+  // Wide invisible hit area
+  const hit = mkEl("line", {
+    x1: xA, y1: yA, x2: xB, y2: yB,
+    stroke: "transparent", "stroke-width": "14"
+  });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.12"; });
+    g.style.opacity = "1";
+    const chgStr = (change >= 0 ? "+" : "") + change + " pts";
+    tip.textContent = `${d.n}: ${d.a} → ${d.b}  (${chgStr})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+</script>
+</body></html>

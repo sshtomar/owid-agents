@@ -5858,7 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Universal Health Coverage: Two Decades of Progress",
+      "description": "Slope chart comparing WHO UHC Service Coverage Index scores (~2000 vs ~2023) for 15 countries. Nepal and India made the largest absolute gains (+40 and +33 points), while high-income nations advanced from already strong baselines. Jordan is the only country in the selection that slightly declined.",
+      "datasetIds": [
+        "who--UHC_INDEX_REPORTED"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Nepal jumped from 18 to 58 (+40 pts) \u2014 the largest gain in the selection",
+        "India rose from 36 to 69, China from 65 to 85",
+        "Jordan declined slightly (75 \u2192 71) while neighbours Algeria gained only 2 points"
+      ],
+      "createdAt": "2026-10-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "The Efficiency Decade: Energy Intensity of Major Economies",
+      "description": "Trend lines showing primary energy consumed per unit of GDP (MJ per 2021 PPP dollar) for 10 major economies, 2000\u20132022. China started as the most energy-intensive and cut intensity nearly in half. Kazakhstan and Canada remain high; Germany, France, and Japan lead in efficiency.",
+      "datasetIds": [
+        "wb--EG-EGY-PRIM-PP-KD"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-358.html",
+      "highlights": [
+        "China fell from 10.9 to 6.3 MJ/$ \u2014 the steepest absolute decline",
+        "Kazakhstan (9.7 \u2192 5.8) and Canada (8.3 \u2192 6.4) remain the most intensive",
+        "Germany leads European efficiency at 2.47 MJ/$ in 2022"
+      ],
+      "createdAt": "2026-10-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Intentional Homicides: 1990 vs 2022",
+      "description": "Slope chart comparing intentional homicide rates (per 100,000) around 1990 and 2022 across 13 countries. Colombia's extraordinary decline from 75 to 25 stands against sharp surges in Ecuador (+37), Jamaica (+26), and Honduras (+21). European and East Asian nations hover near 1 per 100,000.",
+      "datasetIds": [
+        "wb--VC-IHR-PSRC-P5"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-359.html",
+      "highlights": [
+        "Colombia fell from 75 to 25 per 100k \u2014 one of history's largest sustained homicide reductions",
+        "Ecuador surged from 8.5 to 45.7, overtaking most of Latin America",
+        "Japan and Germany remain below 1 per 100,000 throughout"
+      ],
+      "createdAt": "2026-10-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "The Demographic Divide: Age Dependency Ratio, 1960\u20132024",
+      "description": "Trend lines showing dependents (children + elderly) as a share of the working-age population for 8 countries from 1960 to 2024. Kenya and Ethiopia stay high driven by many children; Japan and Germany rise due to aging. India, China, and Bangladesh converge downward through demographic transition.",
+      "datasetIds": [
+        "wb--SP-POP-DPND"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-360.html",
+      "highlights": [
+        "Kenya peaked above 118% in the 1980s; still 66% in 2024",
+        "Japan rose from 55% to 70% as its population ages",
+        "China's ratio dipped to 37% after one-child policy, now rebounding as that generation ages"
+      ],
+      "createdAt": "2026-10-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "The Uneven War on Poverty: $3/day Poverty Rates Since 1981",
+      "description": "Trend lines showing the share of population below $3.00/day (2021 PPP) across world regions and key countries since 1981. East Asia & Pacific plunged from 77% to 2%, led by China's near-total poverty elimination. Sub-Saharan Africa remains stuck above 45%. South Asia tracked East Asia at a lag.",
+      "datasetIds": [
+        "wb--SI-POV-DDAY"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-361.html",
+      "highlights": [
+        "China dropped from 97% in 1981 to effectively 0% by 2022",
+        "Sub-Saharan Africa barely moved: 61.5% (1990) to 45.1% (2024)",
+        "Bangladesh fell from 41% (2000) to 6% (2022) \u2014 tracking China's path on a 20-year delay"
+      ],
+      "createdAt": "2026-10-01T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-10-01T00:00:00.000Z"
 }

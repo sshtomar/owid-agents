@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Demographic Divide: Age Dependency Ratio, 1960–2024</h1>
+<p class="subtitle">Dependents (children + elderly) as a share of the working-age population. Kenya and Ethiopia stay high due to many children; Japan and Germany rise due to aging. India, China, and Bangladesh converge downward through demographic transition.</p>
+<div id="chart" style="position:relative;">
+  <div class="tooltip" id="tip"></div>
+</div>
+<p class="source">Source: World Bank &mdash; Age Dependency Ratio (SP.POP.DPND)</p>
+<script>
+// Data from notebook: {n: name, s: values every 4 years, y0: 1960, step: 4}
+const data = [
+  {"n":"Kenya","s":[108,110.7,115.3,117.6,118,115.5,111.3,107.7,103.4,98.5,93.4,88.1,85.1,83,78.6,72.6,66.1],"y0":1960,"step":4},
+  {"n":"Ethiopia","s":[82,81.9,86.2,91.3,94.4,96.5,95.9,95.1,95.9,98.2,101.5,100.9,97.2,90.2,82.7,77.1,73.3],"y0":1960,"step":4},
+  {"n":"Bangladesh","s":[81.9,85.4,89,91.1,92.5,93.2,92.7,88.9,82.7,75.4,68.9,65.9,63.3,60,55.4,54.1,52.6],"y0":1960,"step":4},
+  {"n":"India","s":[78.2,82.3,82.3,81.3,79.7,77.8,76.5,75.2,73,70.2,66.6,62.9,58.9,55.1,51.6,48.7,46.6],"y0":1960,"step":4},
+  {"n":"China","s":[79.5,81.5,80.8,79.1,79.5,68,58.7,52.6,51.5,49.6,46.1,40.7,37.4,37.7,40.4,44.1,44.2],"y0":1960,"step":4},
+  {"n":"Japan","s":[55.2,47.1,43.6,44.5,47.1,48.2,47.6,44.6,42.9,44,46.7,50.3,55.7,60.5,67.3,69.9,70.1],"y0":1960,"step":4},
+  {"n":"Germany","s":[48.7,53.6,57.6,58.4,56.2,51.6,44.6,44.1,45.5,46.4,47.3,49.3,51.8,51.6,52.6,55.3,59],"y0":1960,"step":4},
+  {"n":"Italy","s":[52.7,52.6,54.5,56.5,57.3,55,49,46.6,44.7,46.1,48.1,50.3,52,53.8,55.9,56.8,57.5],"y0":1960,"step":4}
+];
+
+// Color by 2024 level
+const palette = ["#EA5E33","#F29A44","#F5D38A","#C49A45","#8BAD72","#5B9E78","#3D7A5A","#6690A0"];
+const sorted = data.slice().sort((a, b) => b.s[b.s.length-1] - a.s[a.s.length-1]);
+const colorMap = new Map(sorted.map((d, i) => [d.n, palette[i]]));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 760, H = 460;
+const margin = { top: 36, right: 120, bottom: 36, left: 52 };
+
+const allVals = data.flatMap(d => d.s);
+const valMin = Math.floor(Math.min(...allVals) / 10) * 10 - 2;
+const valMax = Math.ceil(Math.max(...allVals) / 10) * 10 + 2;
+const yearMin = 1960, yearMax = 2024;
+
+const xScale = year => margin.left + (year - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = val => margin.top + (valMax - val) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").prepend(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid
+[40,50,60,70,80,90,100,110,120].forEach(v => {
+  if (v < valMin || v > valMax) return;
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "font-size": "9", "text-anchor": "end", fill: "#9A9890",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v;
+});
+
+// X ticks
+for (let y = 1960; y <= 2024; y += 8) {
+  const x = xScale(y);
+  svg.appendChild(mkEl("text", {
+    x, y: H - margin.bottom + 14,
+    "font-size": "9", "text-anchor": "middle",
+    fill: "#9A9890", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = y;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+// Endpoint labels, collision-resolved
+const endLabels = data.map(d => ({
+  y: yScale(d.s[d.s.length - 1]),
+  d
+}));
+const resolved = resolveCollisions(endLabels, 12);
+const labelYMap = new Map(resolved.map(l => [l.d.n, l.y]));
+
+data.forEach(d => {
+  const col = colorMap.get(d.n);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i * d.step, value: v }));
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`
+  ).join(" ");
+
+  g.appendChild(mkEl("path", {
+    d: pathD, stroke: col, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round"
+  }));
+
+  // Endpoint label
+  const lastPt = pts[pts.length - 1];
+  const endX = xScale(lastPt.year);
+  const endY = yScale(lastPt.value);
+  const labelY = labelYMap.get(d.n);
+  if (Math.abs(labelY - endY) > 1) {
+    g.appendChild(mkEl("line", {
+      x1: endX + 3, y1: endY, x2: endX + 7, y2: labelY,
+      stroke: col, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const lbl = mkEl("text", {
+    x: endX + 10, y: labelY + 3.5,
+    "font-size": "9", "text-anchor": "start", fill: "#2B2A27"
+  });
+  lbl.textContent = `${lastPt.value.toFixed(0)}  ${d.n}`;
+  g.appendChild(lbl);
+
+  g.appendChild(mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+  }));
+
+  g.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    const rect = svg.getBoundingClientRect();
+    const scaleW = W / rect.width;
+    const mx = (e.clientX - rect.left) * scaleW;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const idx = Math.round(ratio * (d.s.length - 1));
+    const yr = d.y0 + idx * d.step;
+    const val = d.s[idx];
+    tip.textContent = `${d.n}  ${yr}: ${val.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  g.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+</script>
+</body></html>
