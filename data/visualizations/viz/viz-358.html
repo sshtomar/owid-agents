@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Efficiency Decade: Energy Intensity of Major Economies</h1>
+<p class="subtitle">Primary energy consumed per unit of GDP (MJ per 2021 PPP dollar), 2000–2022. Falling lines mean more economic output per unit of energy. China started highest and cut intensity nearly in half.</p>
+<div id="chart" style="position:relative;">
+  <div class="tooltip" id="tip"></div>
+</div>
+<p class="source">Source: World Bank &mdash; Energy intensity level of primary energy (EG.EGY.PRIM.PP.KD)</p>
+<script>
+// Data from notebook: {n: name, s: annual values 2000-2022, y0: start year}
+const data = [
+  {"n":"Australia","s":[6,5.71,5.54,5.57,5.45,5.33,5.4,5.31,5.38,5.28,5.17,5.06,4.82,4.79,4.64,4.53,4.4,4.46,4.37,4.36,4.44,4.1,4.12],"y0":2000},
+  {"n":"Brazil","s":[3.89,3.9,3.89,3.91,3.91,3.88,3.86,3.85,3.87,3.74,3.85,3.75,3.82,3.88,3.98,4.05,4.03,4.06,3.93,3.95,4,3.96,3.87],"y0":2000},
+  {"n":"Canada","s":[8.27,8.01,7.79,8.07,7.96,7.8,7.72,7.55,7.29,7.23,7.02,6.96,6.88,6.86,6.84,6.75,6.96,7.03,6.94,6.86,6.73,6.55,6.44],"y0":2000},
+  {"n":"China","s":[10.91,10.41,10.14,10.51,10.87,10.75,10.44,9.83,9.21,8.98,8.96,8.78,8.43,8.08,7.71,7.24,6.74,6.54,6.42,6.33,6.4,6.3,6.3],"y0":2000},
+  {"n":"France","s":[4.33,4.4,4.35,4.43,4.38,4.32,4.14,4,4.02,3.95,4,3.84,3.83,3.82,3.63,3.65,3.54,3.46,3.37,3.26,3.18,3.23,2.83],"y0":2000},
+  {"n":"Germany","s":[3.97,4.02,3.94,3.96,3.94,3.89,3.86,3.56,3.57,3.53,3.57,3.26,3.27,3.32,3.11,3.08,3.02,2.95,2.85,2.76,2.69,2.7,2.47],"y0":2000},
+  {"n":"India","s":[7.01,6.78,6.71,6.37,6.24,5.94,5.74,5.54,5.63,5.67,5.41,5.28,5.28,5.11,5.08,4.82,4.54,4.46,4.41,4.25,4.25,4.21,4.21],"y0":2000},
+  {"n":"Indonesia","s":[5.5,5.43,5.38,5.15,5.22,5.02,4.86,4.55,4.31,4.35,4.26,4.1,3.84,3.53,3.48,3.26,3.18,3.14,3.24,3.19,3.11,3.04,3.04],"y0":2000},
+  {"n":"Japan","s":[4.7,4.6,4.62,4.52,4.56,4.46,4.4,4.3,4.19,4.26,4.3,3.98,3.83,3.78,3.64,3.53,3.48,3.44,3.36,3.29,3.2,3.25,3.15],"y0":2000},
+  {"n":"Kazakhstan","s":[9.74,8.31,8.7,8.64,9.29,8.48,9.12,9.14,9.35,8.39,8.52,8.87,8.07,8.41,6.44,5.36,6.21,6.08,6.65,6.27,5.83,5.81,5.81],"y0":2000}
+];
+
+// Color by 2022 level: high = warm, low = cool
+const palette = ["#EA5E33","#F29A44","#F5D38A","#A6C4A2","#7BA5A0","#6690A0"];
+const sorted2022 = data.slice().sort((a, b) => b.s[b.s.length-1] - a.s[a.s.length-1]);
+const colorMap = new Map(sorted2022.map((d, i) => [d.n, palette[Math.min(i, palette.length-1)]]));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const W = 760, H = 460;
+const margin = { top: 36, right: 130, bottom: 36, left: 56 };
+
+const allVals = data.flatMap(d => d.s);
+const valMin = Math.floor(Math.min(...allVals) * 10) / 10 - 0.2;
+const valMax = Math.ceil(Math.max(...allVals) * 10) / 10 + 0.2;
+const yearMin = 2000, yearMax = 2022;
+
+const xScale = year => margin.left + (year - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = val => margin.top + (valMax - val) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").prepend(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Grid lines
+const ticks = [2,3,4,5,6,7,8,9,10,11];
+ticks.forEach(v => {
+  if (v < valMin || v > valMax) return;
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "font-size": "9", "text-anchor": "end",
+    fill: "#9A9890", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v;
+});
+
+// Y axis label
+const yLabel = mkEl("text", {
+  x: 10, y: margin.top + (H - margin.top - margin.bottom) / 2,
+  "font-size": "9", "text-anchor": "middle", fill: "#7A786F",
+  "font-family": "'JetBrains Mono', monospace",
+  transform: `rotate(-90, 10, ${margin.top + (H - margin.top - margin.bottom) / 2})`
+});
+yLabel.textContent = "MJ / $2021 PPP";
+svg.appendChild(yLabel);
+
+// X axis ticks every 5 years
+for (let y = 2000; y <= 2022; y += 5) {
+  const x = xScale(y);
+  svg.appendChild(mkEl("text", {
+    x, y: H - margin.bottom + 14,
+    "font-size": "9", "text-anchor": "middle",
+    fill: "#9A9890", "font-family": "'JetBrains Mono', monospace"
+  })).textContent = y;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+// Endpoint labels, collision-resolved
+const endLabels = data.map(d => ({
+  y: yScale(d.s[d.s.length - 1]),
+  d
+}));
+const resolved = resolveCollisions(endLabels, 12);
+const labelYMap = new Map(resolved.map(l => [l.d.n, l.y]));
+
+data.forEach(d => {
+  const col = colorMap.get(d.n);
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  const years = d.s.length;
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i, value: v }));
+
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`
+  ).join(" ");
+
+  g.appendChild(mkEl("path", {
+    d: pathD, stroke: col, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round"
+  }));
+
+  // Endpoint label with leader line if displaced
+  const endX = xScale(d.y0 + d.s.length - 1);
+  const endY = yScale(d.s[d.s.length - 1]);
+  const labelY = labelYMap.get(d.n);
+  if (Math.abs(labelY - endY) > 1) {
+    g.appendChild(mkEl("line", {
+      x1: endX + 3, y1: endY, x2: endX + 7, y2: labelY,
+      stroke: col, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const lbl = mkEl("text", {
+    x: endX + 10, y: labelY + 3.5,
+    "font-size": "9", "text-anchor": "start", fill: "#2B2A27"
+  });
+  lbl.textContent = `${d.s[d.s.length-1].toFixed(1)}  ${d.n}`;
+  g.appendChild(lbl);
+
+  // Wide invisible hit path for hover
+  g.appendChild(mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none"
+  }));
+
+  g.addEventListener("mousemove", e => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    const rect = svg.getBoundingClientRect();
+    const scaleW = W / rect.width;
+    const mx = (e.clientX - rect.left) * scaleW;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const idx = Math.round(ratio * (d.s.length - 1));
+    const yr = d.y0 + idx;
+    const val = d.s[idx];
+    tip.textContent = `${d.n}  ${yr}: ${val.toFixed(2)} MJ/$`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  g.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+</script>
+</body></html>
