@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Hypertension Treatment Coverage: A 20-fold Global Gap</h1>
+<p class="subtitle">Share of adults aged 30–79 with hypertension receiving treatment, most recent available year. Values range from under 5% in parts of sub-Saharan Africa to over 70% in high-income nations.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — NCD_HYP_TREATMENT_A (age-standardized)</p>
+<script>
+const data = [{"n":"Niger","v":4,"y":2000},{"n":"Vanuatu","v":10.1,"y":2014},{"n":"Tanzania","v":10.2,"y":2010},{"n":"Ethiopia","v":10.4,"y":2009},{"n":"Cameroon","v":11.2,"y":2004},{"n":"Indonesia","v":11.2,"y":2009},{"n":"Rwanda","v":11.4,"y":2019},{"n":"Kenya","v":11.5,"y":2010},{"n":"Gabon","v":11.9,"y":2004},{"n":"Guinea","v":12.3,"y":2013},{"n":"Mozambique","v":12.4,"y":2006},{"n":"Nigeria","v":12.5,"y":2004},{"n":"Uganda","v":13,"y":2019},{"n":"Gambia","v":19.3,"y":2016},{"n":"Armenia","v":21.9,"y":2017},{"n":"Bosnia","v":25.4,"y":2000},{"n":"Moldova","v":29.5,"y":2016},{"n":"Sri Lanka","v":35.4,"y":2018},{"n":"Uruguay","v":38.3,"y":2000},{"n":"Argentina","v":41,"y":2019},{"n":"Venezuela","v":43.5,"y":2004},{"n":"Portugal","v":46.4,"y":2009},{"n":"Kuwait","v":48.5,"y":2015},{"n":"Egypt","v":51.5,"y":2014},{"n":"Malta","v":55.5,"y":2009},{"n":"Dominican Rep.","v":60.6,"y":2011},{"n":"Singapore","v":61.9,"y":2016},{"n":"Slovakia","v":62.5,"y":2017},{"n":"Bahamas","v":63.8,"y":2016},{"n":"Mongolia","v":63.8,"y":2015},{"n":"Seychelles","v":63.9,"y":2018},{"n":"Jamaica","v":64.8,"y":2016},{"n":"Germany","v":65,"y":2019},{"n":"Romania","v":65.3,"y":2018},{"n":"Nicaragua","v":67.1,"y":2014},{"n":"USA","v":67.8,"y":2006},{"n":"Cuba","v":68.6,"y":2019},{"n":"Iceland","v":70.8,"y":2017},{"n":"Costa Rica","v":74.8,"y":2017},{"n":"South Korea","v":77.5,"y":2019}];
+
+const W = 680, barH = 14, gap = 5, rowH = barH + gap;
+const H = data.length * rowH + 60;
+const marginL = 130, marginR = 70, marginT = 20, marginB = 30;
+const chartW = W - marginL - marginR;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = 80;
+const xScale = v => marginL + (v / maxV) * chartW;
+
+function colorFor(v) {
+  if (v >= 60) return "#3D7A5A";
+  if (v >= 45) return "#5B9E78";
+  if (v >= 30) return "#8BAD72";
+  if (v >= 20) return "#C49A45";
+  if (v >= 12) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Grid lines
+[0,20,40,60,80].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line",{x1:x,y1:marginT,x2:x,y2:H-marginB,stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x,y:H-marginB+12,"text-anchor":"middle","font-size":"8","font-family":"JetBrains Mono,monospace",fill:"#9A9890"})).textContent = v + "%";
+});
+
+const tip = document.getElementById("tip");
+function showTip(text,e){ tip.textContent=text; tip.style.opacity="1"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; }
+function hideTip(){ tip.style.opacity="0"; }
+
+// Bars (data sorted lowest to highest already — reverse for top=highest)
+const sorted = [...data].reverse();
+sorted.forEach((d, i) => {
+  const y = marginT + i * rowH;
+  const barW = Math.max(1, (d.v / maxV) * chartW);
+  const col = colorFor(d.v);
+
+  const g = mkEl("g", {cursor:"pointer"});
+
+  // Hit area
+  const hit = mkEl("rect",{x:0,y,width:W,height:rowH,fill:"transparent"});
+  hit.addEventListener("mouseover",e => {
+    showTip(`${d.n}: ${d.v}% (${d.y})`, e);
+    bar.setAttribute("opacity","1");
+    g.querySelectorAll("text").forEach(t => t.setAttribute("fill","#2B2A27"));
+  });
+  hit.addEventListener("mousemove",e => { tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; });
+  hit.addEventListener("mouseout",()=>{ hideTip(); });
+
+  const bar = mkEl("rect",{x:marginL,y:y+1,width:barW,height:barH,fill:col,rx:"1.5",opacity:"0.85"});
+
+  const label = mkEl("text",{x:marginL-6,y:y+barH/2+4,"text-anchor":"end","font-size":"9","font-family":"Inter,sans-serif",fill:"#4A4845"});
+  label.textContent = d.n;
+
+  const val = mkEl("text",{x:marginL+barW+5,y:y+barH/2+4,"text-anchor":"start","font-size":"8.5","font-family":"JetBrains Mono,monospace",fill:"#7A786F"});
+  val.textContent = d.v + "%";
+
+  g.appendChild(hit);
+  g.appendChild(bar);
+  g.appendChild(label);
+  g.appendChild(val);
+  svg.appendChild(g);
+});
+
+// Axis label
+const ax = mkEl("text",{x:marginL+chartW/2,y:H,"text-anchor":"middle","font-size":"9","font-family":"JetBrains Mono,monospace",fill:"#9A9890"});
+ax.textContent = "TREATMENT COVERAGE (%)";
+svg.appendChild(ax);
+</script>
+</body></html>

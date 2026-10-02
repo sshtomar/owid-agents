@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Estimated Prevalence of Depression, 2015</h1>
+<p class="subtitle">Share of the population estimated to experience depression. Post-Soviet and high-income anglophone countries show the highest rates; Pacific island nations and parts of Asia the lowest. The range is narrow globally but the gap still doubles from bottom to top.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — GDO_q35 (population-based prevalence estimates, 2015)</p>
+<script>
+const data = [{"n":"Ukraine","v":6.31},{"n":"Australia","v":5.94},{"n":"Estonia","v":5.91},{"n":"Brazil","v":5.76},{"n":"Greece","v":5.74},{"n":"Portugal","v":5.67},{"n":"Lithuania","v":5.62},{"n":"Finland","v":5.61},{"n":"Belarus","v":5.57},{"n":"Russia","v":5.51},{"n":"Cuba","v":5.49},{"n":"Moldova","v":5.37},{"n":"New Zealand","v":5.35},{"n":"Barbados","v":5.35},{"n":"Paraguay","v":5.23},{"n":"Egypt","v":3.46},{"n":"Niger","v":3.42},{"n":"Cambodia","v":3.4},{"n":"Philippines","v":3.34},{"n":"Afghanistan","v":3.31},{"n":"Nepal","v":3.23},{"n":"Laos","v":3.21},{"n":"Tonga","v":3.18},{"n":"Samoa","v":3.17},{"n":"Micronesia","v":3.15},{"n":"Kiribati","v":3.14},{"n":"Vanuatu","v":3.09},{"n":"Timor-Leste","v":2.99},{"n":"Papua NG","v":2.98},{"n":"Solomon Isl.","v":2.9}];
+
+// Split: top half and bottom half
+const midpoint = 15; // first 15 = high, last 15 = low
+const topData = data.slice(0, midpoint);
+const bottomData = data.slice(midpoint);
+
+const W = 700, barH = 13, gap = 5, rowH = barH + gap;
+const sectionGap = 28;
+const H = (topData.length + bottomData.length) * rowH + sectionGap + 80;
+const marginL = 120, marginR = 60, marginT = 20, marginB = 30;
+const chartW = W - marginL - marginR;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const minVal = 2.5, maxVal = 6.5;
+const xScale = v => marginL + (v - minVal) / (maxVal - minVal) * chartW;
+
+function colorFor(v) {
+  if (v >= 5.5) return "#EA5E33";
+  if (v >= 5.0) return "#F29A44";
+  if (v >= 4.5) return "#F5D38A";
+  if (v >= 3.5) return "#A6C4A2";
+  return "#5B9E78";
+}
+
+// Grid lines
+[3,4,5,6].forEach(v=>{
+  const x = xScale(v);
+  svg.appendChild(mkEl("line",{x1:x,y1:marginT,x2:x,y2:H-marginB,stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x,y:H-marginB+12,"text-anchor":"middle","font-size":"8","font-family":"JetBrains Mono,monospace",fill:"#9A9890"})).textContent = v+"%";
+});
+
+const tip = document.getElementById("tip");
+function showTip(t,e){tip.textContent=t;tip.style.opacity="1";tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-20)+"px";}
+function hideTip(){tip.style.opacity="0";}
+
+function drawSection(items, startY, label) {
+  // Section label
+  const lbl = mkEl("text",{x:marginL,y:startY-6,"font-size":"8.5","font-family":"JetBrains Mono,monospace",fill:"#9A9890","letter-spacing":"0.3"});
+  lbl.textContent = label.toUpperCase();
+  svg.appendChild(lbl);
+
+  items.forEach((d, i) => {
+    const y = startY + i * rowH;
+    const bw = Math.max(1, xScale(d.v) - marginL);
+    const col = colorFor(d.v);
+
+    const g = mkEl("g",{cursor:"pointer"});
+    const hit = mkEl("rect",{x:0,y,width:W,height:rowH,fill:"transparent"});
+    hit.addEventListener("mouseover",e=>{
+      showTip(`${d.n}: ${d.v}%`,e);
+      bar.setAttribute("opacity","1");
+    });
+    hit.addEventListener("mousemove",e=>{tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-20)+"px";});
+    hit.addEventListener("mouseout",()=>hideTip());
+
+    const bar = mkEl("rect",{x:marginL,y:y+1,width:bw,height:barH,fill:col,rx:"1.5",opacity:"0.85"});
+    const lname = mkEl("text",{x:marginL-6,y:y+barH/2+4,"text-anchor":"end","font-size":"9","font-family":"Inter,sans-serif",fill:"#4A4845"});
+    lname.textContent = d.n;
+    const lval = mkEl("text",{x:marginL+bw+5,y:y+barH/2+4,"text-anchor":"start","font-size":"8","font-family":"JetBrains Mono,monospace",fill:"#7A786F"});
+    lval.textContent = d.v+"%";
+
+    g.appendChild(hit); g.appendChild(bar); g.appendChild(lname); g.appendChild(lval);
+    svg.appendChild(g);
+  });
+}
+
+drawSection(topData, marginT + 14, "Highest estimated prevalence");
+
+const secondStart = marginT + 14 + topData.length * rowH + sectionGap;
+// Draw divider
+svg.appendChild(mkEl("line",{x1:marginL,y1:secondStart-sectionGap/2,x2:W-marginR,y2:secondStart-sectionGap/2,stroke:"#E2E0D5","stroke-width":"0.8","stroke-dasharray":"4,4"}));
+
+drawSection(bottomData, secondStart, "Lowest estimated prevalence");
+
+// Axis label
+const ax = mkEl("text",{x:marginL+chartW/2,y:H,"text-anchor":"middle","font-size":"9","font-family":"JetBrains Mono,monospace",fill:"#9A9890"});
+ax.textContent = "PREVALENCE (%)";
+svg.appendChild(ax);
+</script>
+</body></html>

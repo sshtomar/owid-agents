@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Deaths from Non-Communicable Diseases: 2000 vs. 2021</h1>
+<p class="subtitle">NCDs (cardiovascular disease, cancer, diabetes, respiratory disease) as a share of all deaths. The global shift from infectious to chronic disease is visible — but sub-Saharan Africa remains largely behind, with infectious disease still dominating mortality.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.DTH.NCOM.ZS (WHO Global Health Estimates)</p>
+<script>
+const data = [{"n":"Finland","a":85.6,"b":92.3},{"n":"China","a":81.7,"b":90.7},{"n":"Iceland","a":87.8,"b":90},{"n":"Australia","a":89.7,"b":89.6},{"n":"Denmark","a":90.6,"b":87.7},{"n":"Canada","a":89.7,"b":86.1},{"n":"Japan","a":79.6,"b":85.3},{"n":"Germany","a":91.9,"b":85},{"n":"Austria","a":91.7,"b":83.5},{"n":"Estonia","a":87.4,"b":82.9},{"n":"Cyprus","a":89.7,"b":82.8},{"n":"Barbados","a":82.6,"b":79.2},{"n":"Bulgaria","a":92.8,"b":76.6},{"n":"Czechia","a":90.4,"b":73},{"n":"Albania","a":84,"b":66.9},{"n":"Iraq","a":55.2,"b":63.4},{"n":"Grenada","a":80.6,"b":59.1},{"n":"Jordan","a":72.1,"b":54.1},{"n":"Honduras","a":49.2,"b":47.7},{"n":"Ethiopia","a":19,"b":38.3},{"n":"Eswatini","a":20.3,"b":34.8},{"n":"Congo, Dem. Rep.","a":21.5,"b":34.6},{"n":"Afghanistan","a":29.5,"b":34.3},{"n":"Congo, Rep.","a":32.3,"b":34},{"n":"Guinea","a":22.5,"b":33},{"n":"Equatorial Guinea","a":27.2,"b":31.9},{"n":"Guinea-Bissau","a":26.1,"b":30.8},{"n":"Botswana","a":17,"b":28.3},{"n":"Chad","a":17.9,"b":23.5},{"n":"Central African Republic","a":19.3,"b":22.8}];
+
+const W = 720, H = 600;
+const pad = { left: 145, right: 160, top: 50, bottom: 30 };
+const innerH = H - pad.top - pad.bottom;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const minV = 15, maxV = 96;
+const xLeft = pad.left, xRight = W - pad.right;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * innerH;
+
+function colorFor(d) {
+  const chg = d.b - d.a;
+  if (d.b >= 75) return "#5B9E78";
+  if (d.b >= 50) return "#8BAD72";
+  if (d.b >= 35) return "#C49A45";
+  return "#C4715A";
+}
+
+// Column headers
+function lbl(x,y,text,anchor,size,col) {
+  const t = mkEl("text",{x,y,"text-anchor":anchor,"font-size":size,"font-family":"JetBrains Mono,monospace",fill:col||"#9A9890"});
+  t.textContent = text;
+  svg.appendChild(t);
+}
+lbl(xLeft, pad.top-16,"2000","middle","10","#7A786F");
+lbl(xRight, pad.top-16,"2021","middle","10","#7A786F");
+
+// Grid lines
+[20,40,60,80].forEach(v=>{
+  const y = scale(v);
+  svg.appendChild(mkEl("line",{x1:xLeft,y1:y,x2:xRight,y2:y,stroke:"#E2E0D5","stroke-width":"0.4","stroke-dasharray":"3,3"}));
+  lbl(xLeft-2,y+3,v+"%","end","7.5","#C2C0B5");
+});
+
+// 50% reference line
+const y50 = scale(50);
+svg.appendChild(mkEl("line",{x1:xLeft,y1:y50,x2:xRight,y2:y50,stroke:"#C2C0B5","stroke-width":"0.8","stroke-dasharray":"5,4"}));
+lbl(xLeft-2,y50+3,"50%","end","7.5","#7A786F");
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b)=>a.y-b.y);
+  for (let pass=0;pass<30;pass++) {
+    let moved=false;
+    for (let i=1;i<sorted.length;i++) {
+      const gap=sorted[i].y-sorted[i-1].y;
+      if(gap<minGap){ const sh=(minGap-gap)/2; sorted[i-1].y-=sh; sorted[i].y+=sh; moved=true; }
+    }
+    if(!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+function showTip(t,e){tip.textContent=t;tip.style.opacity="1";tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-20)+"px";}
+function hideTip(){tip.style.opacity="0";}
+
+const leftLabels = data.map(d=>({y:scale(d.a),orig:scale(d.a),name:d.n,va:d.a,vb:d.b}));
+const rightLabels = data.map(d=>({y:scale(d.b),orig:scale(d.b),name:d.n,va:d.a,vb:d.b}));
+const resolvedLeft = resolveCollisions(leftLabels, 12);
+const resolvedRight = resolveCollisions(rightLabels, 12);
+const leftMap = {}, rightMap = {};
+resolvedLeft.forEach(l=>leftMap[l.name]=l.y);
+resolvedRight.forEach(l=>rightMap[l.name]=l.y);
+
+data.forEach(d=>{
+  const ya = scale(d.a), yb = scale(d.b);
+  const col = colorFor(d);
+  const chg = d.b - d.a;
+
+  const g = mkEl("g",{cursor:"crosshair"});
+  const line = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:col,"stroke-width":"1.5","stroke-opacity":"0.8"});
+  line.setAttribute("data-row","1");
+  const dotA = mkEl("circle",{cx:xLeft,cy:ya,r:"3",fill:col});
+  dotA.setAttribute("data-row","1");
+  const dotB = mkEl("circle",{cx:xRight,cy:yb,r:"3",fill:col});
+  dotB.setAttribute("data-row","1");
+  const hit = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:"transparent","stroke-width":"12"});
+
+  hit.addEventListener("mouseover",e=>{
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${chg>=0?"+":""}${chg.toFixed(1)}pp)`,e);
+    svg.querySelectorAll("line[data-row]").forEach(el=>el.setAttribute("stroke-opacity","0.08"));
+    svg.querySelectorAll("circle[data-row]").forEach(el=>el.setAttribute("opacity","0.08"));
+    line.setAttribute("stroke-opacity","1"); line.setAttribute("stroke-width","2.5");
+    dotA.setAttribute("opacity","1"); dotB.setAttribute("opacity","1");
+  });
+  hit.addEventListener("mousemove",e=>{tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-20)+"px";});
+  hit.addEventListener("mouseout",()=>{
+    hideTip();
+    svg.querySelectorAll("line[data-row]").forEach(el=>el.setAttribute("stroke-opacity","0.8"));
+    svg.querySelectorAll("circle[data-row]").forEach(el=>el.setAttribute("opacity","1"));
+    line.setAttribute("stroke-width","1.5");
+  });
+
+  const lyA = leftMap[d.n], lyB = rightMap[d.n];
+  if (Math.abs(lyA-ya)>2) g.appendChild(mkEl("line",{x1:xLeft-3,y1:ya,x2:xLeft-18,y2:lyA,stroke:col,"stroke-width":"0.5","stroke-opacity":"0.4"}));
+  if (Math.abs(lyB-yb)>2) g.appendChild(mkEl("line",{x1:xRight+3,y1:yb,x2:xRight+18,y2:lyB,stroke:col,"stroke-width":"0.5","stroke-opacity":"0.4"}));
+
+  g.appendChild(line); g.appendChild(dotA); g.appendChild(dotB); g.appendChild(hit);
+  svg.appendChild(g);
+});
+
+// Labels
+resolvedLeft.forEach(l=>{
+  const t = mkEl("text",{x:xLeft-6,y:l.y+3.5,"text-anchor":"end","font-size":"8.5","font-family":"Inter,sans-serif",fill:"#4A4845"});
+  t.textContent = `${l.name}  ${l.va}%`;
+  svg.appendChild(t);
+});
+resolvedRight.forEach(l=>{
+  const t = mkEl("text",{x:xRight+6,y:l.y+3.5,"text-anchor":"start","font-size":"8.5","font-family":"Inter,sans-serif",fill:"#4A4845"});
+  t.textContent = `${l.vb}%  ${l.name}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
