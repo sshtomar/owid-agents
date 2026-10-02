@@ -5858,7 +5858,97 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "Hypertension Treatment Coverage: A 20-fold Global Gap",
+      "description": "Horizontal bar chart of most recent hypertension treatment coverage for 40 countries. Range spans from under 5% in Niger to over 77% in South Korea, exposing a massive gap in cardiovascular care access.",
+      "datasetIds": [
+        "who--NCD_HYP_TREATMENT_A"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-357.html",
+      "generatedCode": "",
+      "highlights": [
+        "Niger at 4% vs South Korea at 77.5% \u2014 a 20-fold treatment gap",
+        "Sub-Saharan Africa consistently below 15%; Caribbean islands above 60%",
+        "Cuba and Nicaragua outperform many high-income countries"
+      ],
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Terrestrial Protected Areas: 2013 vs. 2024",
+      "description": "Slope chart showing how protected land area percentages shifted over the decade for 20 countries. Bhutan, Croatia, and Japan are among the biggest expanders; Eritrea and Bahrain have shrunk protected zones.",
+      "datasetIds": [
+        "wb--ER-LND-PTLD-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-358.html",
+      "generatedCode": "",
+      "highlights": [
+        "Bhutan expanded from 28.8% to 51.6% \u2014 now more than half its land is protected",
+        "Croatia gained 24.6 percentage points, partly driven by EU biodiversity targets",
+        "Eritrea dropped from 4.9% to effectively 0% \u2014 complete collapse of protected status"
+      ],
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Energy Use Per Capita, 2000\u20132022",
+      "description": "Trend lines for 12 countries across the income spectrum. Iceland (geothermal industry) sits at 15,800 kgoe/person \u2014 50x Bangladesh. China's near-tripling since 2000 is the defining story of global energy demand growth.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "line",
+      "codeFilePath": "viz/viz-359.html",
+      "generatedCode": "",
+      "highlights": [
+        "China nearly tripled per-capita energy use from 898 to 2,676 kgoe/person",
+        "Germany, France, and Japan have each fallen 20\u201325% since 2000",
+        "Bangladesh's use doubled but remains 50x below Iceland"
+      ],
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Estimated Prevalence of Depression, 2015",
+      "description": "Bar chart of estimated depression prevalence for the highest and lowest 15 countries (of 183). Post-Soviet and high-income anglophone nations cluster near the top; Pacific Island and Southeast Asian countries at the bottom.",
+      "datasetIds": [
+        "who--GDO_q35"
+      ],
+      "chartType": "bar",
+      "codeFilePath": "viz/viz-360.html",
+      "generatedCode": "",
+      "highlights": [
+        "Ukraine (6.3%) and Australia (5.9%) lead \u2014 nearly double the rate of Solomon Islands (2.9%)",
+        "Eastern European nations dominate the high end, Pacific Islands the low end",
+        "Even the highest estimates are below 7%, reflecting diagnostic and reporting differences"
+      ],
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "Deaths from Non-Communicable Diseases: 2000 vs. 2021",
+      "description": "Slope chart comparing NCD share of total deaths for 30 countries. Shows the global epidemiological transition from infectious to chronic disease, and how sub-Saharan Africa still diverges sharply from the rest of the world.",
+      "datasetIds": [
+        "wb--SH-DTH-NCOM-ZS"
+      ],
+      "chartType": "slope-chart",
+      "codeFilePath": "viz/viz-361.html",
+      "generatedCode": "",
+      "highlights": [
+        "Finland, China, and Iceland now have over 90% of deaths from NCDs",
+        "Central African Republic and Chad remain below 25% \u2014 infectious disease still dominates",
+        "China's rapid rise (82% to 91%) reflects compressed epidemiological transition"
+      ],
+      "createdAt": "2026-10-02T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-10-02T00:00:00.000Z"
 }
