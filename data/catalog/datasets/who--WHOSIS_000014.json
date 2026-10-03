@@ -1,0 +1,6279 @@
+{
+  "meta": {
+    "id": "who--WHOSIS_000014",
+    "title": "Stillbirth Rate (per 1,000 total births)",
+    "description": "Stillbirth rate (per 1000 total births) from who-gho",
+    "source": {
+      "provider": "who-gho",
+      "indicatorId": "WHOSIS_000014",
+      "indicatorName": "Stillbirth rate (per 1000 total births)",
+      "sourceUrl": "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/WHOSIS_000014",
+      "lastFetched": "2026-10-03T01:06:46.238Z"
+    },
+    "topics": [
+      "maternal health",
+      "child health",
+      "neonatal",
+      "mortality",
+      "health"
+    ],
+    "countries": [
+      "HUN",
+      "AFG",
+      "DOM",
+      "UNSDG_SOUTHEASTERNASIA",
+      "HND",
+      "MOZ",
+      "URY",
+      "JAM",
+      "TTO",
+      "MNE",
+      "BLR",
+      "BRA",
+      "NIC",
+      "WB_HI",
+      "UNSDG_SIDS",
+      "MAR",
+      "EST",
+      "VUT",
+      "CHL",
+      "SWE",
+      "BEN",
+      "TCD",
+      "GBR",
+      "GNQ",
+      "USA",
+      "TJK",
+      "SUR",
+      "TUR",
+      "WB_LMI",
+      "KOR",
+      "ARE",
+      "PRY",
+      "UNSDG_EUROPE",
+      "GNB",
+      "MDV",
+      "SSD",
+      "GEO",
+      "ALB",
+      "KNA",
+      "AMR",
+      "ITA",
+      "PRK",
+      "UNSDG_OCEANIAexAUSNZL",
+      "AUS",
+      "MNG",
+      "GRD",
+      "NZL",
+      "CHE",
+      "UNSDG_WESTERNASIANORTHERNAFR",
+      "MMR",
+      "EMR",
+      "UNICEFREGIONEAP",
+      "LBN",
+      "PER",
+      "AZE",
+      "NGA",
+      "SOM",
+      "BWA",
+      "MLI",
+      "ZAF",
+      "ATG",
+      "UNSDG_SOUTHASIA",
+      "UNICEF_MENARO",
+      "HTI",
+      "THA",
+      "WPR",
+      "SLE",
+      "TCA",
+      "UNSDG_NORTHAFR",
+      "BOL",
+      "LSO",
+      "UNICEF_EAPRO",
+      "BGD",
+      "AND",
+      "UNSDG_EUROPENORTHERNAMR",
+      "UNICEFREGIONSSA",
+      "CYP",
+      "LKA",
+      "DMA",
+      "VEN",
+      "UNICEF_LACRO",
+      "DJI",
+      "KIR",
+      "MCO",
+      "BRN",
+      "BHR",
+      "LUX",
+      "VCT",
+      "MLT",
+      "KHM",
+      "EGY",
+      "AGO",
+      "UNICEFREGIONMENA",
+      "SDN",
+      "SEN",
+      "IRQ",
+      "IDN",
+      "UNSDG_CENTRALASIA",
+      "KGZ",
+      "UNSDG_AUSTRALIANEWZEALAND",
+      "LBY",
+      "GHA",
+      "GTM",
+      "PNG",
+      "MSR",
+      "FSM",
+      "MWI",
+      "AIA",
+      "AUT",
+      "BIH",
+      "BLZ",
+      "XKX",
+      "BFA",
+      "UNICEFREGIONEAC",
+      "UNICEFREGIONWE",
+      "QAT",
+      "CZE",
+      "IND",
+      "SWZ",
+      "UNSDG_EASTERNASIA",
+      "TLS",
+      "UKR",
+      "CAF",
+      "MYS",
+      "RUS",
+      "ESP",
+      "UNICEF_ROSA",
+      "MUS",
+      "BRB",
+      "ETH",
+      "UNICEFREGIONNA",
+      "NLD",
+      "NIU",
+      "UNICEFREGIONEECA",
+      "BTN",
+      "LCA",
+      "UZB",
+      "EUR",
+      "UNICEF_ESARO",
+      "SLB",
+      "MDA",
+      "SMR",
+      "CPV",
+      "NOR",
+      "NAM",
+      "COG",
+      "NER",
+      "ZWE",
+      "UNSDG_OCEANIA",
+      "COK",
+      "GUY",
+      "COM",
+      "CHN",
+      "UNICEFREGIONSA",
+      "YEM",
+      "MEX",
+      "SAU",
+      "UNSDG_LDC",
+      "IRL",
+      "STP",
+      "JOR",
+      "UNSDG_SUBSAHARANAFRICA",
+      "WB_LI",
+      "CAN",
+      "UNICEFREGIONWCA",
+      "FRA",
+      "TGO",
+      "SVN",
+      "KEN",
+      "FJI",
+      "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "MRT",
+      "LVA",
+      "BGR",
+      "TUN",
+      "NPL",
+      "UNICEF_ECARO",
+      "CMR",
+      "DNK",
+      "UNICEFREGIONESA",
+      "ERI",
+      "CIV",
+      "OMN",
+      "LBR",
+      "BHS",
+      "TKM",
+      "ECU",
+      "SEAR",
+      "ZMB",
+      "SLV",
+      "SRB",
+      "DZA",
+      "PSE",
+      "GLOBAL",
+      "POL",
+      "ISL",
+      "DEU",
+      "WB_UMI",
+      "PAK",
+      "SYC",
+      "WSM",
+      "UNSDG_WESTERNASIA",
+      "TON",
+      "SYR",
+      "BDI",
+      "GIN",
+      "LAO",
+      "VNM",
+      "ROU",
+      "FIN",
+      "KAZ",
+      "AFR",
+      "BEL",
+      "SGP",
+      "UNSDG_LLDC",
+      "UNSDG_LAC",
+      "UNICEFREGIONLAC",
+      "NRU",
+      "GRC",
+      "PRT",
+      "IRN",
+      "UNSDG_NORTHERNAMR",
+      "PHL",
+      "JPN",
+      "RWA",
+      "PAN",
+      "ARG",
+      "GAB",
+      "LTU",
+      "MDG",
+      "VGB",
+      "ISR",
+      "UNSDG_CENTRALASIASOUTHERNASIA",
+      "MKD",
+      "HRV",
+      "COL",
+      "UGA",
+      "PLW",
+      "TUV",
+      "GMB",
+      "MHL",
+      "SVK",
+      "TZA",
+      "CUB",
+      "UNICEF_WCARO",
+      "COD",
+      "CRI",
+      "ARM"
+    ],
+    "dateRange": {
+      "start": "2000",
+      "end": "2023"
+    },
+    "dataPointCount": 1000,
+    "dataFilePath": "datasets/who--WHOSIS_000014.json"
+  },
+  "data": [
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2000,
+      "value": 4.233032893
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2000,
+      "value": 45.39854421
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2000,
+      "value": 14.84688606
+    },
+    {
+      "country": "UNSDG_SOUTHEASTERNASIA",
+      "countryName": "UNSDG_SOUTHEASTERNASIA",
+      "year": 2000,
+      "value": 14.445628638
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2000,
+      "value": 13.95204611
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2000,
+      "value": 26.789112765
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2000,
+      "value": 7.369142893
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2000,
+      "value": 18.243176424
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2000,
+      "value": 12.011015198
+    },
+    {
+      "country": "MNE",
+      "countryName": "MNE",
+      "year": 2000,
+      "value": 5.153968157
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2000,
+      "value": 5.038117522
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2000,
+      "value": 9.69754775
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2000,
+      "value": 15.553185167
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2000,
+      "value": 4.112929122
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2000,
+      "value": 19.93708174
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2000,
+      "value": 21.545583254
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2000,
+      "value": 4.677778103
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2000,
+      "value": 14.418058757
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2000,
+      "value": 4.392590656
+    },
+    {
+      "country": "SWE",
+      "countryName": "SWE",
+      "year": 2000,
+      "value": 3.736261513
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2000,
+      "value": 28.672746409
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2000,
+      "value": 42.503801257
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2000,
+      "value": 4.469100097
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2000,
+      "value": 23.328152871
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2000,
+      "value": 3.317345493
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2000,
+      "value": 16.392421688
+    },
+    {
+      "country": "SUR",
+      "countryName": "SUR",
+      "year": 2000,
+      "value": 12.242819151
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2000,
+      "value": 12.019735922
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2000,
+      "value": 29.075043539
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2000,
+      "value": 3.148933643
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2000,
+      "value": 8.449570251
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2000,
+      "value": 17.575402834
+    },
+    {
+      "country": "UNSDG_EUROPE",
+      "countryName": "UNSDG_EUROPE",
+      "year": 2000,
+      "value": 4.821674617
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2000,
+      "value": 51.937406854
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2000,
+      "value": 13.394485472
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2000,
+      "value": 38.967627901
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2000,
+      "value": 14.912846396
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2000,
+      "value": 7.362873015
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2000,
+      "value": 10.246947395
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2001,
+      "value": 8.920820367
+    },
+    {
+      "country": "ITA",
+      "countryName": "ITA",
+      "year": 2001,
+      "value": 2.705113395
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2001,
+      "value": 15.433640285
+    },
+    {
+      "country": "UNSDG_OCEANIAexAUSNZL",
+      "countryName": "UNSDG_OCEANIAexAUSNZL",
+      "year": 2001,
+      "value": 22.190143554
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2001,
+      "value": 15.819117774
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2001,
+      "value": 3.447567424
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2001,
+      "value": 14.525483074
+    },
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2001,
+      "value": 4.197025339
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2001,
+      "value": 12.33337182
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2001,
+      "value": 9.83962338
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2001,
+      "value": 3.648290487
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2001,
+      "value": 2.748207683
+    },
+    {
+      "country": "UNSDG_WESTERNASIANORTHERNAFR",
+      "countryName": "UNSDG_WESTERNASIANORTHERNAFR",
+      "year": 2001,
+      "value": 16.936205966
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2001,
+      "value": 12.728957084
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2001,
+      "value": 17.144779574
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2001,
+      "value": 28.60563087
+    },
+    {
+      "country": "UNICEFREGIONEAP",
+      "countryName": "UNICEFREGIONEAP",
+      "year": 2001,
+      "value": 13.967175983
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2001,
+      "value": 11.430340302
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2001,
+      "value": 12.819047044
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2001,
+      "value": 19.473915392
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2001,
+      "value": 29.950760256
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2001,
+      "value": 41.512735459
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2001,
+      "value": 9.639500524
+    },
+    {
+      "country": "BWA",
+      "countryName": "BWA",
+      "year": 2001,
+      "value": 13.238960258
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2001,
+      "value": 35.891658812
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2001,
+      "value": 11.472198876
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2001,
+      "value": 20.116447673
+    },
+    {
+      "country": "ATG",
+      "countryName": "ATG",
+      "year": 2001,
+      "value": 10.213847911
+    },
+    {
+      "country": "UNSDG_SOUTHASIA",
+      "countryName": "UNSDG_SOUTHASIA",
+      "year": 2001,
+      "value": 31.548796425
+    },
+    {
+      "country": "UNICEF_MENARO",
+      "countryName": "UNICEF_MENARO",
+      "year": 2001,
+      "value": 17.3061115
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2001,
+      "value": 24.936652255
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2001,
+      "value": 6.458988973
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2001,
+      "value": 13.930437543
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2001,
+      "value": 34.725242201
+    },
+    {
+      "country": "TCA",
+      "countryName": "TCA",
+      "year": 2001,
+      "value": 9.901358685
+    },
+    {
+      "country": "UNSDG_NORTHAFR",
+      "countryName": "UNSDG_NORTHAFR",
+      "year": 2001,
+      "value": 19.527555127
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2001,
+      "value": 15.677571689
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2001,
+      "value": 23.547991913
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2001,
+      "value": 36.060913531
+    },
+    {
+      "country": "UNICEF_EAPRO",
+      "countryName": "UNICEF_EAPRO",
+      "year": 2001,
+      "value": 14.762962999
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2001,
+      "value": 39.636204805
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2001,
+      "value": 3.350400041
+    },
+    {
+      "country": "UNSDG_EUROPENORTHERNAMR",
+      "countryName": "UNSDG_EUROPENORTHERNAMR",
+      "year": 2001,
+      "value": 4.1942976
+    },
+    {
+      "country": "UNICEFREGIONSSA",
+      "countryName": "UNICEFREGIONSSA",
+      "year": 2001,
+      "value": 30.719047663
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2001,
+      "value": 4.06248649
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2002,
+      "value": 10.12052105
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2002,
+      "value": 11.253294496
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2002,
+      "value": 10.812717645
+    },
+    {
+      "country": "UNICEF_LACRO",
+      "countryName": "UNICEF_LACRO",
+      "year": 2002,
+      "value": 10.779214846
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2002,
+      "value": 39.695499991
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2002,
+      "value": 12.14912721
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2002,
+      "value": 13.347808434
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2002,
+      "value": 4.136375587
+    },
+    {
+      "country": "MCO",
+      "countryName": "MCO",
+      "year": 2002,
+      "value": 2.767371967
+    },
+    {
+      "country": "TCA",
+      "countryName": "TCA",
+      "year": 2002,
+      "value": 9.730954321
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2002,
+      "value": 4.992036304
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2002,
+      "value": 7.661488056
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2002,
+      "value": 6.933108482
+    },
+    {
+      "country": "LUX",
+      "countryName": "LUX",
+      "year": 2002,
+      "value": 3.35324119
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2002,
+      "value": 15.423550055
+    },
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2002,
+      "value": 4.174408604
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2002,
+      "value": 11.99022879
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2002,
+      "value": 10.878704095
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2002,
+      "value": 3.730815651
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2002,
+      "value": 28.609356869
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2002,
+      "value": 19.788604347
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2002,
+      "value": 15.61118684
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2002,
+      "value": 27.043814133
+    },
+    {
+      "country": "UNICEFREGIONMENA",
+      "countryName": "UNICEFREGIONMENA",
+      "year": 2002,
+      "value": 15.076457421
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2002,
+      "value": 27.145583789
+    },
+    {
+      "country": "SEN",
+      "countryName": "SEN",
+      "year": 2002,
+      "value": 26.084865298
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2002,
+      "value": 14.167772433
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2002,
+      "value": 14.522093832
+    },
+    {
+      "country": "BWA",
+      "countryName": "BWA",
+      "year": 2002,
+      "value": 13.609935795
+    },
+    {
+      "country": "UNSDG_CENTRALASIA",
+      "countryName": "UNSDG_CENTRALASIA",
+      "year": 2002,
+      "value": 12.760130128
+    },
+    {
+      "country": "KGZ",
+      "countryName": "KGZ",
+      "year": 2002,
+      "value": 10.391205733
+    },
+    {
+      "country": "UNSDG_AUSTRALIANEWZEALAND",
+      "countryName": "UNSDG_AUSTRALIANEWZEALAND",
+      "year": 2002,
+      "value": 3.3531309
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2002,
+      "value": 9.647337767
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2002,
+      "value": 11.046985164
+    },
+    {
+      "country": "UNICEF_MENARO",
+      "countryName": "UNICEF_MENARO",
+      "year": 2002,
+      "value": 16.899161544
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2002,
+      "value": 2.740425024
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2003,
+      "value": 16.717973861
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2003,
+      "value": 27.990288789
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2003,
+      "value": 18.968167546
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2003,
+      "value": 23.798503959
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2003,
+      "value": 16.256367686
+    },
+    {
+      "country": "BWA",
+      "countryName": "BWA",
+      "year": 2003,
+      "value": 14.059508378
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2003,
+      "value": 15.604347151
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2003,
+      "value": 6.904151659
+    },
+    {
+      "country": "UNSDG_NORTHAFR",
+      "countryName": "UNSDG_NORTHAFR",
+      "year": 2003,
+      "value": 18.591892161
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2003,
+      "value": 20.09120965
+    },
+    {
+      "country": "LUX",
+      "countryName": "LUX",
+      "year": 2003,
+      "value": 3.252950617
+    },
+    {
+      "country": "AIA",
+      "countryName": "AIA",
+      "year": 2003,
+      "value": 6.661790489
+    },
+    {
+      "country": "AUT",
+      "countryName": "AUT",
+      "year": 2003,
+      "value": 2.727789919
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2003,
+      "value": 3.572758385
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2003,
+      "value": 9.381046248
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2003,
+      "value": 47.292446075
+    },
+    {
+      "country": "XKX",
+      "countryName": "XKX",
+      "year": 2003,
+      "value": 10.20884735
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2003,
+      "value": 31.003831861
+    },
+    {
+      "country": "UNICEFREGIONEAC",
+      "countryName": "UNICEFREGIONEAC",
+      "year": 2003,
+      "value": 6.412263967
+    },
+    {
+      "country": "UNICEFREGIONWE",
+      "countryName": "UNICEFREGIONWE",
+      "year": 2003,
+      "value": 3.556897682
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2003,
+      "value": 6.13354277
+    },
+    {
+      "country": "CZE",
+      "countryName": "CZE",
+      "year": 2003,
+      "value": 2.758591062
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2003,
+      "value": 10.766146205
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2003,
+      "value": 27.736959277
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2003,
+      "value": 15.844523716
+    },
+    {
+      "country": "UNSDG_EASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIA",
+      "year": 2003,
+      "value": 13.471881466
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2003,
+      "value": 23.201018974
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2003,
+      "value": 24.54436002
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2003,
+      "value": 6.27491563
+    },
+    {
+      "country": "MNE",
+      "countryName": "MNE",
+      "year": 2003,
+      "value": 4.984600856
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2003,
+      "value": 37.506932422
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2003,
+      "value": 4.39671071
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2003,
+      "value": 6.083095583
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2003,
+      "value": 10.490946598
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2003,
+      "value": 9.599408257
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2003,
+      "value": 2.943454844
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2003,
+      "value": 9.562155967
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2003,
+      "value": 37.138648868
+    },
+    {
+      "country": "UNICEF_ROSA",
+      "countryName": "UNICEF_ROSA",
+      "year": 2003,
+      "value": 30.460205369
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2004,
+      "value": 12.825304432
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2004,
+      "value": 10.102937276
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2004,
+      "value": 6.723373809
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2004,
+      "value": 3.230850989
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2004,
+      "value": 6.080226196
+    },
+    {
+      "country": "UNSDG_NORTHAFR",
+      "countryName": "UNSDG_NORTHAFR",
+      "year": 2004,
+      "value": 18.125537601
+    },
+    {
+      "country": "UNSDG_EUROPE",
+      "countryName": "UNSDG_EUROPE",
+      "year": 2004,
+      "value": 4.329478221
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2004,
+      "value": 8.248473469
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2004,
+      "value": 41.817468155
+    },
+    {
+      "country": "UNICEFREGIONNA",
+      "countryName": "UNICEFREGIONNA",
+      "year": 2004,
+      "value": 3.087075882
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2004,
+      "value": 4.329335158
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2004,
+      "value": 13.165401574
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2004,
+      "value": 12.807682807
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2004,
+      "value": 29.798423127
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2004,
+      "value": 19.232000458
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2004,
+      "value": 35.052996044
+    },
+    {
+      "country": "UNICEF_ROSA",
+      "countryName": "UNICEF_ROSA",
+      "year": 2004,
+      "value": 29.661595792
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2004,
+      "value": 8.668572997
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2004,
+      "value": 15.169841229
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2004,
+      "value": 37.48115369
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2004,
+      "value": 13.149705294
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2004,
+      "value": 11.150659345
+    },
+    {
+      "country": "UZB",
+      "countryName": "UZB",
+      "year": 2004,
+      "value": 12.109388169
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2004,
+      "value": 6.143880656
+    },
+    {
+      "country": "UNICEF_ESARO",
+      "countryName": "UNICEF_ESARO",
+      "year": 2004,
+      "value": 27.6905614
+    },
+    {
+      "country": "SLB",
+      "countryName": "SLB",
+      "year": 2004,
+      "value": 14.896160959
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2004,
+      "value": 11.83653006
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2004,
+      "value": 3.024227132
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2004,
+      "value": 12.639835144
+    },
+    {
+      "country": "UNSDG_EUROPENORTHERNAMR",
+      "countryName": "UNSDG_EUROPENORTHERNAMR",
+      "year": 2004,
+      "value": 3.876571034
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2004,
+      "value": 19.826955975
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2004,
+      "value": 10.451495777
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2004,
+      "value": 3.918062112
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2004,
+      "value": 23.277992444
+    },
+    {
+      "country": "CPV",
+      "countryName": "CPV",
+      "year": 2004,
+      "value": 11.928929632
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2004,
+      "value": 36.148253584
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2004,
+      "value": 3.160765995
+    },
+    {
+      "country": "UNSDG_EUROPE",
+      "countryName": "UNSDG_EUROPE",
+      "year": 2005,
+      "value": 4.183570665
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2005,
+      "value": 22.860363173
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2005,
+      "value": 15.578127577
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2005,
+      "value": 9.167119207
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2005,
+      "value": 18.348857313
+    },
+    {
+      "country": "UNICEFREGIONSSA",
+      "countryName": "UNICEFREGIONSSA",
+      "year": 2005,
+      "value": 27.797942806
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2005,
+      "value": 10.102087527
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2005,
+      "value": 15.798335094
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2005,
+      "value": 2.572659317
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2005,
+      "value": 8.342097276
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2005,
+      "value": 2.570974555
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2005,
+      "value": 11.881795896
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2005,
+      "value": 17.115394084
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2005,
+      "value": 2.981299892
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2005,
+      "value": 3.17360023
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2005,
+      "value": 18.442244419
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2005,
+      "value": 3.514106226
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2005,
+      "value": 26.182552773
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2005,
+      "value": 14.207841185
+    },
+    {
+      "country": "ZWE",
+      "countryName": "ZWE",
+      "year": 2005,
+      "value": 23.507889683
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2005,
+      "value": 3.423641495
+    },
+    {
+      "country": "UNSDG_OCEANIA",
+      "countryName": "UNSDG_OCEANIA",
+      "year": 2005,
+      "value": 11.293529381
+    },
+    {
+      "country": "COK",
+      "countryName": "COK",
+      "year": 2005,
+      "value": 9.173872521
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2005,
+      "value": 16.187889217
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2005,
+      "value": 28.902996646
+    },
+    {
+      "country": "AIA",
+      "countryName": "AIA",
+      "year": 2005,
+      "value": 6.338689004
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2005,
+      "value": 25.812132115
+    },
+    {
+      "country": "UNSDG_CENTRALASIA",
+      "countryName": "UNSDG_CENTRALASIA",
+      "year": 2005,
+      "value": 11.705788186
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2005,
+      "value": 3.640499788
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2005,
+      "value": 13.322816136
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2005,
+      "value": 9.417671484
+    },
+    {
+      "country": "UNICEFREGIONSA",
+      "countryName": "UNICEFREGIONSA",
+      "year": 2005,
+      "value": 28.732631011
+    },
+    {
+      "country": "YEM",
+      "countryName": "YEM",
+      "year": 2005,
+      "value": 24.468650671
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2005,
+      "value": 7.770779264
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2005,
+      "value": 12.861525821
+    },
+    {
+      "country": "UNSDG_EASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIA",
+      "year": 2005,
+      "value": 12.382954441
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2005,
+      "value": 9.759455837
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2005,
+      "value": 2.907502866
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2005,
+      "value": 10.115943109
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2005,
+      "value": 6.781017466
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2005,
+      "value": 6.263169805
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2005,
+      "value": 12.81170398
+    },
+    {
+      "country": "UNSDG_LDC",
+      "countryName": "UNSDG_LDC",
+      "year": 2005,
+      "value": 29.458101001
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2005,
+      "value": 10.227559703
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2005,
+      "value": 28.757344755
+    },
+    {
+      "country": "UNICEF_ROSA",
+      "countryName": "UNICEF_ROSA",
+      "year": 2006,
+      "value": 27.83080338
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2006,
+      "value": 32.063038488
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2006,
+      "value": 4.183032628
+    },
+    {
+      "country": "STP",
+      "countryName": "STP",
+      "year": 2006,
+      "value": 13.640033493
+    },
+    {
+      "country": "UNSDG_AUSTRALIANEWZEALAND",
+      "countryName": "UNSDG_AUSTRALIANEWZEALAND",
+      "year": 2006,
+      "value": 3.176211892
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2006,
+      "value": 2.809559138
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2006,
+      "value": 10.389697552
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2006,
+      "value": 27.50751404
+    },
+    {
+      "country": "UNSDG_SUBSAHARANAFRICA",
+      "countryName": "UNSDG_SUBSAHARANAFRICA",
+      "year": 2006,
+      "value": 27.254794902
+    },
+    {
+      "country": "BWA",
+      "countryName": "BWA",
+      "year": 2006,
+      "value": 15.383427131
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2006,
+      "value": 12.665447006
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2006,
+      "value": 29.156096311
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2006,
+      "value": 10.805547395
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2006,
+      "value": 3.037097859
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2006,
+      "value": 5.5674596
+    },
+    {
+      "country": "UNICEFREGIONMENA",
+      "countryName": "UNICEFREGIONMENA",
+      "year": 2006,
+      "value": 13.678587391
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2006,
+      "value": 9.977242929
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2006,
+      "value": 9.00381433
+    },
+    {
+      "country": "UNICEFREGIONWCA",
+      "countryName": "UNICEFREGIONWCA",
+      "year": 2006,
+      "value": 27.942548818
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2006,
+      "value": 3.73445858
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2006,
+      "value": 7.591778179
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2006,
+      "value": 28.122368208
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2006,
+      "value": 24.504596207
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2006,
+      "value": 13.248600983
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2006,
+      "value": 12.697053364
+    },
+    {
+      "country": "SVN",
+      "countryName": "SVN",
+      "year": 2006,
+      "value": 3.314316371
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2006,
+      "value": 25.779949244
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2006,
+      "value": 14.76768236
+    },
+    {
+      "country": "UNICEFREGIONSA",
+      "countryName": "UNICEFREGIONSA",
+      "year": 2006,
+      "value": 27.83080338
+    },
+    {
+      "country": "CZE",
+      "countryName": "CZE",
+      "year": 2006,
+      "value": 2.675017241
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2006,
+      "value": 12.123003166
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2006,
+      "value": 34.021855239
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2006,
+      "value": 19.076165609
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2006,
+      "value": 12.947777912
+    },
+    {
+      "country": "FJI",
+      "countryName": "FJI",
+      "year": 2006,
+      "value": 10.947262705
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2007,
+      "value": 17.216415193
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2007,
+      "value": 17.814334371
+    },
+    {
+      "country": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "year": 2007,
+      "value": 11.620443985
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2007,
+      "value": 2.716947014
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2007,
+      "value": 21.123066937
+    },
+    {
+      "country": "MCO",
+      "countryName": "MCO",
+      "year": 2007,
+      "value": 2.219954241
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2007,
+      "value": 9.07516537
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2007,
+      "value": 23.443317562
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2007,
+      "value": 4.286376565
+    },
+    {
+      "country": "BGR",
+      "countryName": "BGR",
+      "year": 2007,
+      "value": 7.145949984
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2007,
+      "value": 3.104193682
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2007,
+      "value": 11.806144918
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2007,
+      "value": 3.537537188
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2007,
+      "value": 26.396412411
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2007,
+      "value": 26.027770822
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2007,
+      "value": 34.102962269
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2007,
+      "value": 39.753727135
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2007,
+      "value": 8.867473997
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2007,
+      "value": 17.218655581
+    },
+    {
+      "country": "UNICEF_ECARO",
+      "countryName": "UNICEF_ECARO",
+      "year": 2007,
+      "value": 8.408002379
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2007,
+      "value": 21.249325429
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2007,
+      "value": 27.146578256
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2007,
+      "value": 25.25470476
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2007,
+      "value": 2.448799834
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2007,
+      "value": 9.535833532
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2007,
+      "value": 2.758981557
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2007,
+      "value": 11.784478082
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2007,
+      "value": 23.764492738
+    },
+    {
+      "country": "UNICEFREGIONESA",
+      "countryName": "UNICEFREGIONESA",
+      "year": 2007,
+      "value": 25.96289759
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2007,
+      "value": 11.932891335
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2007,
+      "value": 14.308021199
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2007,
+      "value": 19.552056997
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2007,
+      "value": 8.659498144
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2007,
+      "value": 22.165289858
+    },
+    {
+      "country": "COK",
+      "countryName": "COK",
+      "year": 2007,
+      "value": 8.557969629
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2007,
+      "value": 24.079822676
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2007,
+      "value": 26.584815907
+    },
+    {
+      "country": "UNICEFREGIONNA",
+      "countryName": "UNICEFREGIONNA",
+      "year": 2007,
+      "value": 2.997320206
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2007,
+      "value": 5.378875932
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2007,
+      "value": 14.460601497
+    },
+    {
+      "country": "HUN",
+      "countryName": "HUN",
+      "year": 2007,
+      "value": 3.762920217
+    },
+    {
+      "country": "UNSDG_SUBSAHARANAFRICA",
+      "countryName": "UNSDG_SUBSAHARANAFRICA",
+      "year": 2007,
+      "value": 26.721099809
+    },
+    {
+      "country": "OMN",
+      "countryName": "OMN",
+      "year": 2007,
+      "value": 6.609192877
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2007,
+      "value": 31.339204956
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2007,
+      "value": 3.759405767
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2007,
+      "value": 7.630928924
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2007,
+      "value": 12.473654675
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2007,
+      "value": 10.501548557
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2008,
+      "value": 28.047852378
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2008,
+      "value": 3.456577084
+    },
+    {
+      "country": "UNICEFREGIONEAP",
+      "countryName": "UNICEFREGIONEAP",
+      "year": 2008,
+      "value": 11.155810753
+    },
+    {
+      "country": "UNSDG_AUSTRALIANEWZEALAND",
+      "countryName": "UNSDG_AUSTRALIANEWZEALAND",
+      "year": 2008,
+      "value": 3.127516117
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2008,
+      "value": 2.645643922
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2008,
+      "value": 13.69627664
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2008,
+      "value": 8.771778073
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2008,
+      "value": 8.927768021
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2008,
+      "value": 38.124998958
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2008,
+      "value": 12.32119213
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2008,
+      "value": 40.425263355
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2008,
+      "value": 16.738555382
+    },
+    {
+      "country": "UNSDG_SUBSAHARANAFRICA",
+      "countryName": "UNSDG_SUBSAHARANAFRICA",
+      "year": 2008,
+      "value": 26.22443676
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2008,
+      "value": 21.575633173
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2008,
+      "value": 12.321064758
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2008,
+      "value": 33.207602399
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2008,
+      "value": 12.172096758
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2008,
+      "value": 9.573204398
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2008,
+      "value": 18.41181468
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2008,
+      "value": 14.578193738
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2008,
+      "value": 2.666218261
+    },
+    {
+      "country": "GNQ",
+      "countryName": "GNQ",
+      "year": 2008,
+      "value": 20.154193901
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2008,
+      "value": 12.996229992
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2008,
+      "value": 5.07307332
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2008,
+      "value": 13.657523614
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2008,
+      "value": 4.575698476
+    },
+    {
+      "country": "UNSDG_CENTRALASIA",
+      "countryName": "UNSDG_CENTRALASIA",
+      "year": 2008,
+      "value": 10.648754915
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2008,
+      "value": 12.68479783
+    },
+    {
+      "country": "OMN",
+      "countryName": "OMN",
+      "year": 2008,
+      "value": 6.540253872
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2008,
+      "value": 10.90657236
+    },
+    {
+      "country": "PSE",
+      "countryName": "PSE",
+      "year": 2008,
+      "value": 12.15200106
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2008,
+      "value": 33.930855001
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2008,
+      "value": 18.267391666
+    },
+    {
+      "country": "UNSDG_EUROPENORTHERNAMR",
+      "countryName": "UNSDG_EUROPENORTHERNAMR",
+      "year": 2008,
+      "value": 3.553415694
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2008,
+      "value": 4.261555164
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2008,
+      "value": 25.376374668
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2008,
+      "value": 7.242175547
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2009,
+      "value": 20.716279893
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2009,
+      "value": 24.902783075
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2009,
+      "value": 12.173718121
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2009,
+      "value": 5.068209465
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2009,
+      "value": 12.526067567
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2009,
+      "value": 2.984292943
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2009,
+      "value": 24.830401772
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2009,
+      "value": 18.601640658
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2009,
+      "value": 4.417135707
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2009,
+      "value": 2.845815444
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2009,
+      "value": 20.688011327
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2009,
+      "value": 2.089102602
+    },
+    {
+      "country": "DEU",
+      "countryName": "DEU",
+      "year": 2009,
+      "value": 2.276779444
+    },
+    {
+      "country": "UNSDG_EUROPE",
+      "countryName": "UNSDG_EUROPE",
+      "year": 2009,
+      "value": 3.700025575
+    },
+    {
+      "country": "WB_UMI",
+      "countryName": "WB_UMI",
+      "year": 2009,
+      "value": 10.282473773
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2009,
+      "value": 2.315197104
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2009,
+      "value": 37.246266847
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2009,
+      "value": 34.046227092
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2009,
+      "value": 32.192530478
+    },
+    {
+      "country": "LUX",
+      "countryName": "LUX",
+      "year": 2009,
+      "value": 3.357796107
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2009,
+      "value": 6.842197426
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2009,
+      "value": 2.706676061
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2009,
+      "value": 11.688187674
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2009,
+      "value": 8.874858401
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2009,
+      "value": 33.943003501
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2009,
+      "value": 3.868653247
+    },
+    {
+      "country": "WSM",
+      "countryName": "WSM",
+      "year": 2009,
+      "value": 9.796529193
+    },
+    {
+      "country": "UNSDG_WESTERNASIA",
+      "countryName": "UNSDG_WESTERNASIA",
+      "year": 2009,
+      "value": 11.74324618
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2009,
+      "value": 8.292691856
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2009,
+      "value": 7.538623631
+    },
+    {
+      "country": "AIA",
+      "countryName": "AIA",
+      "year": 2009,
+      "value": 5.803666957
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2009,
+      "value": 16.31235551
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2009,
+      "value": 3.319177995
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2009,
+      "value": 12.112247209
+    },
+    {
+      "country": "BDI",
+      "countryName": "BDI",
+      "year": 2009,
+      "value": 26.020701222
+    },
+    {
+      "country": "GIN",
+      "countryName": "GIN",
+      "year": 2009,
+      "value": 23.972589969
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2009,
+      "value": 5.982458543
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2009,
+      "value": 22.226206585
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2009,
+      "value": 11.867133649
+    },
+    {
+      "country": "UNSDG_EASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIA",
+      "year": 2010,
+      "value": 9.517513286
+    },
+    {
+      "country": "VNM",
+      "countryName": "VNM",
+      "year": 2010,
+      "value": 8.788947265
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2010,
+      "value": 13.52432418
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2010,
+      "value": 24.372269194
+    },
+    {
+      "country": "UNICEF_ROSA",
+      "countryName": "UNICEF_ROSA",
+      "year": 2010,
+      "value": 24.59231681
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2010,
+      "value": 9.06883343
+    },
+    {
+      "country": "SWE",
+      "countryName": "SWE",
+      "year": 2010,
+      "value": 2.948094829
+    },
+    {
+      "country": "UNSDG_SOUTHASIA",
+      "countryName": "UNSDG_SOUTHASIA",
+      "year": 2010,
+      "value": 24.03299019
+    },
+    {
+      "country": "LUX",
+      "countryName": "LUX",
+      "year": 2010,
+      "value": 3.431092958
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2010,
+      "value": 28.810672459
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2010,
+      "value": 11.914444561
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2010,
+      "value": 7.205916177
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2010,
+      "value": 11.445591954
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2010,
+      "value": 15.201888725
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2010,
+      "value": 10.837758206
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2010,
+      "value": 20.884960942
+    },
+    {
+      "country": "UNICEF_ESARO",
+      "countryName": "UNICEF_ESARO",
+      "year": 2010,
+      "value": 24.915999606
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2010,
+      "value": 4.094653268
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2010,
+      "value": 21.427459609
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2010,
+      "value": 27.146495225
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2010,
+      "value": 2.921109498
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2010,
+      "value": 27.873059809
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2010,
+      "value": 11.735451887
+    },
+    {
+      "country": "ATG",
+      "countryName": "ATG",
+      "year": 2010,
+      "value": 8.583520233
+    },
+    {
+      "country": "UNSDG_NORTHAFR",
+      "countryName": "UNSDG_NORTHAFR",
+      "year": 2010,
+      "value": 15.364611153
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2010,
+      "value": 2.066168968
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2010,
+      "value": 15.919673155
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2010,
+      "value": 9.399669797
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2010,
+      "value": 4.237508026
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2010,
+      "value": 11.414919167
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2010,
+      "value": 12.029329764
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2010,
+      "value": 7.679658535
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2010,
+      "value": 9.67321309
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2010,
+      "value": 25.014565686
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2010,
+      "value": 5.104933729
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2010,
+      "value": 3.080205278
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2011,
+      "value": 3.075010159
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2011,
+      "value": 16.129137316
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2011,
+      "value": 15.540035759
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2011,
+      "value": 4.783560411
+    },
+    {
+      "country": "SUR",
+      "countryName": "SUR",
+      "year": 2011,
+      "value": 11.607030003
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2011,
+      "value": 9.994607851
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2011,
+      "value": 7.213270402
+    },
+    {
+      "country": "NIU",
+      "countryName": "NIU",
+      "year": 2011,
+      "value": 11.834314496
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2011,
+      "value": 11.928317947
+    },
+    {
+      "country": "UNSDG_EUROPE",
+      "countryName": "UNSDG_EUROPE",
+      "year": 2011,
+      "value": 3.560099958
+    },
+    {
+      "country": "BLZ",
+      "countryName": "BLZ",
+      "year": 2011,
+      "value": 8.580564298
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2011,
+      "value": 3.692456072
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2011,
+      "value": 14.624264366
+    },
+    {
+      "country": "KGZ",
+      "countryName": "KGZ",
+      "year": 2011,
+      "value": 8.573927365
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2011,
+      "value": 2.391483235
+    },
+    {
+      "country": "UNSDG_EASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIA",
+      "year": 2011,
+      "value": 9.013489143
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2011,
+      "value": 2.852947508
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2011,
+      "value": 4.174551768
+    },
+    {
+      "country": "UNICEFREGIONESA",
+      "countryName": "UNICEFREGIONESA",
+      "year": 2011,
+      "value": 24.695715032
+    },
+    {
+      "country": "KEN",
+      "countryName": "KEN",
+      "year": 2011,
+      "value": 18.920883722
+    },
+    {
+      "country": "UNICEFREGIONSA",
+      "countryName": "UNICEFREGIONSA",
+      "year": 2011,
+      "value": 23.857836807
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2011,
+      "value": 7.08999624
+    },
+    {
+      "country": "UNSDG_LLDC",
+      "countryName": "UNSDG_LLDC",
+      "year": 2011,
+      "value": 25.09935863
+    },
+    {
+      "country": "UNSDG_LAC",
+      "countryName": "UNSDG_LAC",
+      "year": 2011,
+      "value": 8.765508305
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2011,
+      "value": 13.045721075
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2011,
+      "value": 2.332643502
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2011,
+      "value": 8.280186443
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2011,
+      "value": 5.689825744
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2011,
+      "value": 23.913391845
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2011,
+      "value": 19.783187048
+    },
+    {
+      "country": "UNICEFREGIONNA",
+      "countryName": "UNICEFREGIONNA",
+      "year": 2011,
+      "value": 2.961237892
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2011,
+      "value": 12.124180807
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2011,
+      "value": 20.026180952
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2011,
+      "value": 4.803297982
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2011,
+      "value": 17.821315902
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2011,
+      "value": 21.791191819
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2011,
+      "value": 16.077460745
+    },
+    {
+      "country": "UNICEFREGIONLAC",
+      "countryName": "UNICEFREGIONLAC",
+      "year": 2011,
+      "value": 8.765508305
+    },
+    {
+      "country": "UNSDG_OCEANIA",
+      "countryName": "UNSDG_OCEANIA",
+      "year": 2011,
+      "value": 10.373601394
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2011,
+      "value": 19.020688748
+    },
+    {
+      "country": "SEN",
+      "countryName": "SEN",
+      "year": 2011,
+      "value": 21.861007642
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2011,
+      "value": 33.579415895
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2011,
+      "value": 9.590914889
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2011,
+      "value": 9.495515563
+    },
+    {
+      "country": "UNSDG_SOUTHEASTERNASIA",
+      "countryName": "UNSDG_SOUTHEASTERNASIA",
+      "year": 2012,
+      "value": 10.763707127
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2012,
+      "value": 21.464959551
+    },
+    {
+      "country": "NLD",
+      "countryName": "NLD",
+      "year": 2012,
+      "value": 2.644479173
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2012,
+      "value": 35.590553821
+    },
+    {
+      "country": "UNICEFREGIONWE",
+      "countryName": "UNICEFREGIONWE",
+      "year": 2012,
+      "value": 2.851364109
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2012,
+      "value": 17.229938015
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2012,
+      "value": 14.727982452
+    },
+    {
+      "country": "UNICEF_ROSA",
+      "countryName": "UNICEF_ROSA",
+      "year": 2012,
+      "value": 23.362659054
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2012,
+      "value": 7.930641521
+    },
+    {
+      "country": "UNICEF_MENARO",
+      "countryName": "UNICEF_MENARO",
+      "year": 2012,
+      "value": 13.052365201
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2012,
+      "value": 6.993852305
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2012,
+      "value": 25.226790947
+    },
+    {
+      "country": "GRC",
+      "countryName": "GRC",
+      "year": 2012,
+      "value": 3.301844445
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2012,
+      "value": 20.79196831
+    },
+    {
+      "country": "PRT",
+      "countryName": "PRT",
+      "year": 2012,
+      "value": 2.599257507
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2012,
+      "value": 5.291839389
+    },
+    {
+      "country": "UNSDG_OCEANIAexAUSNZL",
+      "countryName": "UNSDG_OCEANIAexAUSNZL",
+      "year": 2012,
+      "value": 18.801281701
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2012,
+      "value": 18.888845501
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2012,
+      "value": 15.841625049
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2012,
+      "value": 8.652651856
+    },
+    {
+      "country": "SGP",
+      "countryName": "SGP",
+      "year": 2012,
+      "value": 2.339262977
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2012,
+      "value": 8.18277473
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2012,
+      "value": 23.634399328
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2012,
+      "value": 19.15805645
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2012,
+      "value": 10.490685298
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2012,
+      "value": 2.938429692
+    },
+    {
+      "country": "UNICEF_LACRO",
+      "countryName": "UNICEF_LACRO",
+      "year": 2012,
+      "value": 8.617396403
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2012,
+      "value": 12.120609721
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2012,
+      "value": 8.235550215
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2012,
+      "value": 9.11087826
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2012,
+      "value": 6.565083131
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2012,
+      "value": 23.537460743
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2012,
+      "value": 16.644479753
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2012,
+      "value": 2.782986461
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2012,
+      "value": 9.445695054
+    },
+    {
+      "country": "UNSDG_NORTHERNAMR",
+      "countryName": "UNSDG_NORTHERNAMR",
+      "year": 2012,
+      "value": 2.966262652
+    },
+    {
+      "country": "UNICEFREGIONEAC",
+      "countryName": "UNICEFREGIONEAC",
+      "year": 2012,
+      "value": 4.739790355
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2012,
+      "value": 10.153365483
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2013,
+      "value": 6.026918611
+    },
+    {
+      "country": "UNSDG_NORTHERNAMR",
+      "countryName": "UNSDG_NORTHERNAMR",
+      "year": 2013,
+      "value": 2.941992951
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2013,
+      "value": 21.489418752
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2013,
+      "value": 14.815443783
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2013,
+      "value": 16.416290137
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2013,
+      "value": 15.70355618
+    },
+    {
+      "country": "AUT",
+      "countryName": "AUT",
+      "year": 2013,
+      "value": 2.452931641
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2013,
+      "value": 2.060782511
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2013,
+      "value": 24.945683383
+    },
+    {
+      "country": "SLV",
+      "countryName": "SLV",
+      "year": 2013,
+      "value": 10.773679597
+    },
+    {
+      "country": "XKX",
+      "countryName": "XKX",
+      "year": 2013,
+      "value": 6.944354159
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2013,
+      "value": 11.774176143
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2013,
+      "value": 2.908554225
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2013,
+      "value": 23.506409185
+    },
+    {
+      "country": "BLR",
+      "countryName": "BLR",
+      "year": 2013,
+      "value": 2.245120158
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2013,
+      "value": 9.486741085
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2013,
+      "value": 6.588581699
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2013,
+      "value": 23.077330578
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2013,
+      "value": 12.002221951
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2013,
+      "value": 4.588997972
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2013,
+      "value": 16.542411478
+    },
+    {
+      "country": "JOR",
+      "countryName": "JOR",
+      "year": 2013,
+      "value": 8.501740792
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2013,
+      "value": 2.717654896
+    },
+    {
+      "country": "UNICEFREGIONWCA",
+      "countryName": "UNICEFREGIONWCA",
+      "year": 2013,
+      "value": 25.809032252
+    },
+    {
+      "country": "UNICEFREGIONNA",
+      "countryName": "UNICEFREGIONNA",
+      "year": 2013,
+      "value": 2.941992951
+    },
+    {
+      "country": "SVN",
+      "countryName": "SVN",
+      "year": 2013,
+      "value": 2.728658404
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2013,
+      "value": 23.971604972
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2013,
+      "value": 32.738283367
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2013,
+      "value": 8.619951358
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2013,
+      "value": 35.183647042
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2013,
+      "value": 5.373063226
+    },
+    {
+      "country": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "year": 2013,
+      "value": 9.009183186
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2013,
+      "value": 3.993686488
+    },
+    {
+      "country": "EST",
+      "countryName": "EST",
+      "year": 2013,
+      "value": 2.700885795
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2013,
+      "value": 13.438240786
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2013,
+      "value": 8.195612011
+    },
+    {
+      "country": "UNICEFREGIONMENA",
+      "countryName": "UNICEFREGIONMENA",
+      "year": 2013,
+      "value": 11.129514087
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2013,
+      "value": 1.843156373
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2013,
+      "value": 16.715763241
+    },
+    {
+      "country": "RWA",
+      "countryName": "RWA",
+      "year": 2013,
+      "value": 18.225146922
+    },
+    {
+      "country": "UNICEFREGIONEAP",
+      "countryName": "UNICEFREGIONEAP",
+      "year": 2013,
+      "value": 9.031295981
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2013,
+      "value": 8.199114144
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2013,
+      "value": 19.026363551
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2013,
+      "value": 20.272889969
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2013,
+      "value": 2.949907942
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2013,
+      "value": 18.774838358
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2014,
+      "value": 18.755928475
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2014,
+      "value": 12.992100557
+    },
+    {
+      "country": "GIN",
+      "countryName": "GIN",
+      "year": 2014,
+      "value": 24.477876326
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2014,
+      "value": 25.689646426
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2014,
+      "value": 5.65459832
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2014,
+      "value": 4.734772904
+    },
+    {
+      "country": "UNSDG_LAC",
+      "countryName": "UNSDG_LAC",
+      "year": 2014,
+      "value": 8.292055033
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2014,
+      "value": 8.044087204
+    },
+    {
+      "country": "SYR",
+      "countryName": "SYR",
+      "year": 2014,
+      "value": 12.170309044
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2014,
+      "value": 14.883477811
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2014,
+      "value": 8.125474582
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2014,
+      "value": 14.270806526
+    },
+    {
+      "country": "CHL",
+      "countryName": "CHL",
+      "year": 2014,
+      "value": 3.200471641
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2014,
+      "value": 6.187750213
+    },
+    {
+      "country": "UNICEFREGIONESA",
+      "countryName": "UNICEFREGIONESA",
+      "year": 2014,
+      "value": 23.586126465
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2014,
+      "value": 20.037777609
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2014,
+      "value": 17.26613821
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2014,
+      "value": 5.098568296
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2014,
+      "value": 34.371221525
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2014,
+      "value": 6.447621152
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2014,
+      "value": 5.20611467
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2014,
+      "value": 7.024273661
+    },
+    {
+      "country": "ATG",
+      "countryName": "ATG",
+      "year": 2014,
+      "value": 8.102431703
+    },
+    {
+      "country": "UNSDG_NORTHAFR",
+      "countryName": "UNSDG_NORTHAFR",
+      "year": 2014,
+      "value": 13.67171903
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2014,
+      "value": 6.348519933
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2014,
+      "value": 14.053250771
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2014,
+      "value": 10.212969456
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2014,
+      "value": 24.114887
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2014,
+      "value": 4.511657283
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2014,
+      "value": 4.084116188
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2014,
+      "value": 16.782877983
+    },
+    {
+      "country": "GLOBAL",
+      "countryName": "GLOBAL",
+      "year": 2014,
+      "value": 16.012153562
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2014,
+      "value": 26.268715
+    },
+    {
+      "country": "UNSDG_WESTERNASIA",
+      "countryName": "UNSDG_WESTERNASIA",
+      "year": 2014,
+      "value": 10.862470507
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2014,
+      "value": 10.45084999
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2014,
+      "value": 11.7074587
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2014,
+      "value": 11.525360208
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2014,
+      "value": 6.324020977
+    },
+    {
+      "country": "SLB",
+      "countryName": "SLB",
+      "year": 2014,
+      "value": 12.492900146
+    },
+    {
+      "country": "UNSDG_LLDC",
+      "countryName": "UNSDG_LLDC",
+      "year": 2014,
+      "value": 23.627992602
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2015,
+      "value": 2.628608291
+    },
+    {
+      "country": "NZL",
+      "countryName": "NZL",
+      "year": 2015,
+      "value": 2.804495613
+    },
+    {
+      "country": "POL",
+      "countryName": "POL",
+      "year": 2015,
+      "value": 2.380798736
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2015,
+      "value": 29.090131362
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2015,
+      "value": 12.248518076
+    },
+    {
+      "country": "UNSDG_CENTRALASIA",
+      "countryName": "UNSDG_CENTRALASIA",
+      "year": 2015,
+      "value": 8.204706956
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2015,
+      "value": 25.662506508
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2015,
+      "value": 9.926466209
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2015,
+      "value": 14.538979679
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2015,
+      "value": 27.037079893
+    },
+    {
+      "country": "PSE",
+      "countryName": "PSE",
+      "year": 2015,
+      "value": 10.342143744
+    },
+    {
+      "country": "JPN",
+      "countryName": "JPN",
+      "year": 2015,
+      "value": 1.793007095
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2015,
+      "value": 9.812371942
+    },
+    {
+      "country": "UNICEFREGIONESA",
+      "countryName": "UNICEFREGIONESA",
+      "year": 2015,
+      "value": 23.108070209
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2015,
+      "value": 26.866458907
+    },
+    {
+      "country": "TUR",
+      "countryName": "TUR",
+      "year": 2015,
+      "value": 4.796886762
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2015,
+      "value": 4.584381746
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2015,
+      "value": 12.983500654
+    },
+    {
+      "country": "UNSDG_LLDC",
+      "countryName": "UNSDG_LLDC",
+      "year": 2015,
+      "value": 22.974503277
+    },
+    {
+      "country": "AUT",
+      "countryName": "AUT",
+      "year": 2015,
+      "value": 2.367898968
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2015,
+      "value": 4.425546337
+    },
+    {
+      "country": "ALB",
+      "countryName": "ALB",
+      "year": 2015,
+      "value": 3.98255837
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2015,
+      "value": 21.226081407
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2015,
+      "value": 13.799314076
+    },
+    {
+      "country": "LTU",
+      "countryName": "LTU",
+      "year": 2015,
+      "value": 3.046577673
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2015,
+      "value": 2.304510617
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2015,
+      "value": 11.374307432
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2015,
+      "value": 4.922690443
+    },
+    {
+      "country": "UNSDG_LAC",
+      "countryName": "UNSDG_LAC",
+      "year": 2015,
+      "value": 8.172202784
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2015,
+      "value": 5.641475611
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2015,
+      "value": 9.61377496
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2015,
+      "value": 11.371845128
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2015,
+      "value": 11.556399543
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2015,
+      "value": 4.974125262
+    },
+    {
+      "country": "FJI",
+      "countryName": "FJI",
+      "year": 2015,
+      "value": 7.882138059
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2015,
+      "value": 16.682517209
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2015,
+      "value": 5.473567484
+    },
+    {
+      "country": "UNICEF_MENARO",
+      "countryName": "UNICEF_MENARO",
+      "year": 2015,
+      "value": 12.412095176
+    },
+    {
+      "country": "SMR",
+      "countryName": "SMR",
+      "year": 2015,
+      "value": 2.373719002
+    },
+    {
+      "country": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "year": 2015,
+      "value": 8.165545687
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2015,
+      "value": 26.37716433
+    },
+    {
+      "country": "AND",
+      "countryName": "AND",
+      "year": 2015,
+      "value": 2.584809171
+    },
+    {
+      "country": "COK",
+      "countryName": "COK",
+      "year": 2016,
+      "value": 7.003781
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2016,
+      "value": 4.126869957
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2016,
+      "value": 3.162308567
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2016,
+      "value": 10.512302917
+    },
+    {
+      "country": "VEN",
+      "countryName": "VEN",
+      "year": 2016,
+      "value": 9.903651707
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2016,
+      "value": 18.092757395
+    },
+    {
+      "country": "VGB",
+      "countryName": "VGB",
+      "year": 2016,
+      "value": 7.261814044
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2016,
+      "value": 3.058563943
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2016,
+      "value": 32.5232066
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2016,
+      "value": 2.800976572
+    },
+    {
+      "country": "VUT",
+      "countryName": "VUT",
+      "year": 2016,
+      "value": 12.89811059
+    },
+    {
+      "country": "YEM",
+      "countryName": "YEM",
+      "year": 2016,
+      "value": 22.588900612
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2016,
+      "value": 12.458531457
+    },
+    {
+      "country": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "year": 2016,
+      "value": 7.595396646
+    },
+    {
+      "country": "BDI",
+      "countryName": "BDI",
+      "year": 2016,
+      "value": 25.432598417
+    },
+    {
+      "country": "WSM",
+      "countryName": "WSM",
+      "year": 2016,
+      "value": 9.167724142
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2016,
+      "value": 2.801815716
+    },
+    {
+      "country": "UNSDG_CENTRALASIASOUTHERNASIA",
+      "countryName": "UNSDG_CENTRALASIASOUTHERNASIA",
+      "year": 2016,
+      "value": 19.506606392
+    },
+    {
+      "country": "UNSDG_AUSTRALIANEWZEALAND",
+      "countryName": "UNSDG_AUSTRALIANEWZEALAND",
+      "year": 2016,
+      "value": 2.581522475
+    },
+    {
+      "country": "IDN",
+      "countryName": "IDN",
+      "year": 2016,
+      "value": 9.764821144
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2016,
+      "value": 6.238299739
+    },
+    {
+      "country": "PHL",
+      "countryName": "PHL",
+      "year": 2016,
+      "value": 11.488943097
+    },
+    {
+      "country": "UNICEFREGIONMENA",
+      "countryName": "UNICEFREGIONMENA",
+      "year": 2016,
+      "value": 10.611748131
+    },
+    {
+      "country": "MKD",
+      "countryName": "MKD",
+      "year": 2016,
+      "value": 5.963009235
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2016,
+      "value": 5.345275912
+    },
+    {
+      "country": "UNSDG_LAC",
+      "countryName": "UNSDG_LAC",
+      "year": 2016,
+      "value": 8.090551913
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2016,
+      "value": 25.125252135
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2016,
+      "value": 2.024002672
+    },
+    {
+      "country": "TKM",
+      "countryName": "TKM",
+      "year": 2016,
+      "value": 8.028958087
+    },
+    {
+      "country": "HRV",
+      "countryName": "HRV",
+      "year": 2016,
+      "value": 3.109959456
+    },
+    {
+      "country": "NRU",
+      "countryName": "NRU",
+      "year": 2016,
+      "value": 6.629652758
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2016,
+      "value": 22.453765481
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2016,
+      "value": 13.558400571
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2016,
+      "value": 5.26946804
+    },
+    {
+      "country": "COL",
+      "countryName": "COL",
+      "year": 2016,
+      "value": 7.513845644
+    },
+    {
+      "country": "UNICEFREGIONNA",
+      "countryName": "UNICEFREGIONNA",
+      "year": 2016,
+      "value": 2.866274333
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2016,
+      "value": 16.130270305
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2016,
+      "value": 9.767996691
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2016,
+      "value": 2.296384519
+    },
+    {
+      "country": "SRB",
+      "countryName": "SRB",
+      "year": 2016,
+      "value": 4.362670902
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2016,
+      "value": 5.74872116
+    },
+    {
+      "country": "GTM",
+      "countryName": "GTM",
+      "year": 2016,
+      "value": 13.932500765
+    },
+    {
+      "country": "KAZ",
+      "countryName": "KAZ",
+      "year": 2016,
+      "value": 6.124352812
+    },
+    {
+      "country": "UNSDG_OCEANIA",
+      "countryName": "UNSDG_OCEANIA",
+      "year": 2016,
+      "value": 9.757865213
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2016,
+      "value": 2.754579886
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2016,
+      "value": 19.232520171
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2016,
+      "value": 6.0957108
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2016,
+      "value": 9.349102174
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2017,
+      "value": 21.44335324
+    },
+    {
+      "country": "COG",
+      "countryName": "COG",
+      "year": 2017,
+      "value": 14.882740289
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2017,
+      "value": 9.817448863
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2017,
+      "value": 10.532300685
+    },
+    {
+      "country": "UNICEF_ECARO",
+      "countryName": "UNICEF_ECARO",
+      "year": 2017,
+      "value": 6.085598072
+    },
+    {
+      "country": "UNSDG_LLDC",
+      "countryName": "UNSDG_LLDC",
+      "year": 2017,
+      "value": 21.900438066
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2017,
+      "value": 11.687999574
+    },
+    {
+      "country": "HRV",
+      "countryName": "HRV",
+      "year": 2017,
+      "value": 3.033577492
+    },
+    {
+      "country": "MMR",
+      "countryName": "MMR",
+      "year": 2017,
+      "value": 13.706603983
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2017,
+      "value": 16.344485027
+    },
+    {
+      "country": "TLS",
+      "countryName": "TLS",
+      "year": 2017,
+      "value": 15.594726094
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2017,
+      "value": 9.928838329
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2017,
+      "value": 7.653906566
+    },
+    {
+      "country": "BRA",
+      "countryName": "BRA",
+      "year": 2017,
+      "value": 7.142895536
+    },
+    {
+      "country": "MCO",
+      "countryName": "MCO",
+      "year": 2017,
+      "value": 1.351356689
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2017,
+      "value": 18.309546711
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2017,
+      "value": 2.712865681
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2017,
+      "value": 6.689315175
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2017,
+      "value": 8.647491282
+    },
+    {
+      "country": "UNSDG_OCEANIAexAUSNZL",
+      "countryName": "UNSDG_OCEANIAexAUSNZL",
+      "year": 2017,
+      "value": 17.877744711
+    },
+    {
+      "country": "COL",
+      "countryName": "COL",
+      "year": 2017,
+      "value": 7.320330923
+    },
+    {
+      "country": "RWA",
+      "countryName": "RWA",
+      "year": 2017,
+      "value": 17.558544004
+    },
+    {
+      "country": "UNSDG_NORTHAFR",
+      "countryName": "UNSDG_NORTHAFR",
+      "year": 2017,
+      "value": 13.012226667
+    },
+    {
+      "country": "STP",
+      "countryName": "STP",
+      "year": 2017,
+      "value": 10.439583422
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2017,
+      "value": 2.727758304
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2017,
+      "value": 16.367853165
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2017,
+      "value": 25.45374092
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2017,
+      "value": 20.04027452
+    },
+    {
+      "country": "UNSDG_SOUTHASIA",
+      "countryName": "UNSDG_SOUTHASIA",
+      "year": 2017,
+      "value": 19.373412963
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2017,
+      "value": 4.751985995
+    },
+    {
+      "country": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "year": 2017,
+      "value": 7.223217949
+    },
+    {
+      "country": "UNSDG_CENTRALASIA",
+      "countryName": "UNSDG_CENTRALASIA",
+      "year": 2017,
+      "value": 7.971694972
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2017,
+      "value": 7.50973669
+    },
+    {
+      "country": "UNSDG_EUROPENORTHERNAMR",
+      "countryName": "UNSDG_EUROPENORTHERNAMR",
+      "year": 2017,
+      "value": 3.07854737
+    },
+    {
+      "country": "UNICEFREGIONSSA",
+      "countryName": "UNICEFREGIONSSA",
+      "year": 2017,
+      "value": 23.616530749
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2017,
+      "value": 9.185817646
+    },
+    {
+      "country": "MWI",
+      "countryName": "MWI",
+      "year": 2017,
+      "value": 16.862178628
+    },
+    {
+      "country": "CIV",
+      "countryName": "CIV",
+      "year": 2017,
+      "value": 23.939467312
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2017,
+      "value": 19.28519571
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2017,
+      "value": 5.378718254
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2017,
+      "value": 7.132694418
+    },
+    {
+      "country": "ROU",
+      "countryName": "ROU",
+      "year": 2017,
+      "value": 3.258853793
+    },
+    {
+      "country": "UNICEFREGIONEECA",
+      "countryName": "UNICEFREGIONEECA",
+      "year": 2017,
+      "value": 5.598139989
+    },
+    {
+      "country": "AZE",
+      "countryName": "AZE",
+      "year": 2017,
+      "value": 11.044806277
+    },
+    {
+      "country": "PRT",
+      "countryName": "PRT",
+      "year": 2017,
+      "value": 2.441966301
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2017,
+      "value": 11.131945575
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2017,
+      "value": 2.970980588
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2017,
+      "value": 18.864521779
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2017,
+      "value": 12.578965263
+    },
+    {
+      "country": "HRV",
+      "countryName": "HRV",
+      "year": 2018,
+      "value": 3.011859958
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2018,
+      "value": 24.07948303
+    },
+    {
+      "country": "LVA",
+      "countryName": "LVA",
+      "year": 2018,
+      "value": 3.565871359
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2018,
+      "value": 18.208535628
+    },
+    {
+      "country": "PRK",
+      "countryName": "PRK",
+      "year": 2018,
+      "value": 8.344624588
+    },
+    {
+      "country": "KHM",
+      "countryName": "KHM",
+      "year": 2018,
+      "value": 14.986704242
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2018,
+      "value": 29.039877856
+    },
+    {
+      "country": "TCA",
+      "countryName": "TCA",
+      "year": 2018,
+      "value": 6.681775958
+    },
+    {
+      "country": "UNICEFREGIONLAC",
+      "countryName": "UNICEFREGIONLAC",
+      "year": 2018,
+      "value": 7.854172891
+    },
+    {
+      "country": "GUY",
+      "countryName": "GUY",
+      "year": 2018,
+      "value": 13.208185938
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2018,
+      "value": 15.441143731
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2018,
+      "value": 17.79831991
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2018,
+      "value": 15.489777057
+    },
+    {
+      "country": "UNSDG_AUSTRALIANEWZEALAND",
+      "countryName": "UNSDG_AUSTRALIANEWZEALAND",
+      "year": 2018,
+      "value": 2.522064709
+    },
+    {
+      "country": "UNSDG_NORTHERNAMR",
+      "countryName": "UNSDG_NORTHERNAMR",
+      "year": 2018,
+      "value": 2.79717617
+    },
+    {
+      "country": "MDA",
+      "countryName": "MDA",
+      "year": 2018,
+      "value": 8.062499893
+    },
+    {
+      "country": "TUV",
+      "countryName": "TUV",
+      "year": 2018,
+      "value": 9.548154282
+    },
+    {
+      "country": "ARE",
+      "countryName": "ARE",
+      "year": 2018,
+      "value": 4.905742033
+    },
+    {
+      "country": "UNSDG_LAC",
+      "countryName": "UNSDG_LAC",
+      "year": 2018,
+      "value": 7.854172891
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2018,
+      "value": 19.516769297
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2018,
+      "value": 31.325797129
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2018,
+      "value": 6.516297907
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2018,
+      "value": 9.772971102
+    },
+    {
+      "country": "DMA",
+      "countryName": "DMA",
+      "year": 2018,
+      "value": 12.603540708
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2018,
+      "value": 18.019913626
+    },
+    {
+      "country": "ARG",
+      "countryName": "ARG",
+      "year": 2018,
+      "value": 5.283553982
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2018,
+      "value": 11.503913531
+    },
+    {
+      "country": "PRT",
+      "countryName": "PRT",
+      "year": 2018,
+      "value": 2.447075938
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2018,
+      "value": 2.484519869
+    },
+    {
+      "country": "AMR",
+      "countryName": "AMR",
+      "year": 2018,
+      "value": 6.379651728
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2018,
+      "value": 24.369451101
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2018,
+      "value": 7.467747341
+    },
+    {
+      "country": "UNSDG_EUROPENORTHERNAMR",
+      "countryName": "UNSDG_EUROPENORTHERNAMR",
+      "year": 2018,
+      "value": 3.030639965
+    },
+    {
+      "country": "LUX",
+      "countryName": "LUX",
+      "year": 2018,
+      "value": 3.460486661
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2018,
+      "value": 34.976320913
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2018,
+      "value": 10.301843298
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2018,
+      "value": 3.152191125
+    },
+    {
+      "country": "SEN",
+      "countryName": "SEN",
+      "year": 2018,
+      "value": 19.87341899
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2018,
+      "value": 21.13452129
+    },
+    {
+      "country": "VGB",
+      "countryName": "VGB",
+      "year": 2018,
+      "value": 7.049579134
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2018,
+      "value": 15.020661006
+    },
+    {
+      "country": "CMR",
+      "countryName": "CMR",
+      "year": 2018,
+      "value": 19.063240959
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2019,
+      "value": 5.775104757
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2019,
+      "value": 10.308308287
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2019,
+      "value": 2.732694007
+    },
+    {
+      "country": "MLT",
+      "countryName": "MLT",
+      "year": 2019,
+      "value": 2.996291929
+    },
+    {
+      "country": "UNICEF_MENARO",
+      "countryName": "UNICEF_MENARO",
+      "year": 2019,
+      "value": 12.237144066
+    },
+    {
+      "country": "UKR",
+      "countryName": "UKR",
+      "year": 2019,
+      "value": 4.680035105
+    },
+    {
+      "country": "UNSDG_SUBSAHARANAFRICA",
+      "countryName": "UNSDG_SUBSAHARANAFRICA",
+      "year": 2019,
+      "value": 23.061192195
+    },
+    {
+      "country": "EGY",
+      "countryName": "EGY",
+      "year": 2019,
+      "value": 9.098451749
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2019,
+      "value": 2.451319973
+    },
+    {
+      "country": "TTO",
+      "countryName": "TTO",
+      "year": 2019,
+      "value": 9.612701802
+    },
+    {
+      "country": "TJK",
+      "countryName": "TJK",
+      "year": 2019,
+      "value": 8.661175506
+    },
+    {
+      "country": "UNSDG_SOUTHASIA",
+      "countryName": "UNSDG_SOUTHASIA",
+      "year": 2019,
+      "value": 18.08753297
+    },
+    {
+      "country": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "countryName": "UNSDG_EASTERNASIASOUTHEASTERNASIA",
+      "year": 2019,
+      "value": 6.91140878
+    },
+    {
+      "country": "ISL",
+      "countryName": "ISL",
+      "year": 2019,
+      "value": 2.06473702
+    },
+    {
+      "country": "VCT",
+      "countryName": "VCT",
+      "year": 2019,
+      "value": 11.771464167
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2019,
+      "value": 25.044879537
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2019,
+      "value": 27.84944694
+    },
+    {
+      "country": "CHN",
+      "countryName": "CHN",
+      "year": 2019,
+      "value": 5.455758054
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2019,
+      "value": 20.658598111
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2019,
+      "value": 2.543106118
+    },
+    {
+      "country": "BFA",
+      "countryName": "BFA",
+      "year": 2019,
+      "value": 20.387143201
+    },
+    {
+      "country": "MAR",
+      "countryName": "MAR",
+      "year": 2019,
+      "value": 13.207014822
+    },
+    {
+      "country": "ESP",
+      "countryName": "ESP",
+      "year": 2019,
+      "value": 2.221304
+    },
+    {
+      "country": "CZE",
+      "countryName": "CZE",
+      "year": 2019,
+      "value": 2.700832345
+    },
+    {
+      "country": "MDG",
+      "countryName": "MDG",
+      "year": 2019,
+      "value": 18.311491783
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2019,
+      "value": 22.035290056
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2019,
+      "value": 10.124367083
+    },
+    {
+      "country": "PER",
+      "countryName": "PER",
+      "year": 2019,
+      "value": 6.802978674
+    },
+    {
+      "country": "COL",
+      "countryName": "COL",
+      "year": 2019,
+      "value": 7.050120875
+    },
+    {
+      "country": "GMB",
+      "countryName": "GMB",
+      "year": 2019,
+      "value": 19.635390196
+    },
+    {
+      "country": "GBR",
+      "countryName": "GBR",
+      "year": 2019,
+      "value": 2.657401033
+    },
+    {
+      "country": "RWA",
+      "countryName": "RWA",
+      "year": 2019,
+      "value": 16.902496805
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2019,
+      "value": 9.074325687
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2019,
+      "value": 4.467083653
+    },
+    {
+      "country": "EUR",
+      "countryName": "EUR",
+      "year": 2020,
+      "value": 4.183021375
+    },
+    {
+      "country": "LAO",
+      "countryName": "LAO",
+      "year": 2020,
+      "value": 14.880553637
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2020,
+      "value": 8.843773881
+    },
+    {
+      "country": "UNICEFREGIONEAC",
+      "countryName": "UNICEFREGIONEAC",
+      "year": 2020,
+      "value": 4.205816849
+    },
+    {
+      "country": "RUS",
+      "countryName": "RUS",
+      "year": 2020,
+      "value": 3.605815394
+    },
+    {
+      "country": "UNICEFREGIONSA",
+      "countryName": "UNICEFREGIONSA",
+      "year": 2020,
+      "value": 17.91729369
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2020,
+      "value": 5.442421936
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2020,
+      "value": 3.41954408
+    },
+    {
+      "country": "GEO",
+      "countryName": "GEO",
+      "year": 2020,
+      "value": 5.563940203
+    },
+    {
+      "country": "MHL",
+      "countryName": "MHL",
+      "year": 2020,
+      "value": 10.543667478
+    },
+    {
+      "country": "SVK",
+      "countryName": "SVK",
+      "year": 2020,
+      "value": 3.098955534
+    },
+    {
+      "country": "OMN",
+      "countryName": "OMN",
+      "year": 2020,
+      "value": 5.569034404
+    },
+    {
+      "country": "UZB",
+      "countryName": "UZB",
+      "year": 2020,
+      "value": 8.404114205
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2020,
+      "value": 8.066643026
+    },
+    {
+      "country": "SOM",
+      "countryName": "SOM",
+      "year": 2020,
+      "value": 34.875434899
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2020,
+      "value": 18.129900236
+    },
+    {
+      "country": "NAM",
+      "countryName": "NAM",
+      "year": 2020,
+      "value": 17.476243324
+    },
+    {
+      "country": "IND",
+      "countryName": "IND",
+      "year": 2020,
+      "value": 13.620154079
+    },
+    {
+      "country": "GRD",
+      "countryName": "GRD",
+      "year": 2020,
+      "value": 9.726692977
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2020,
+      "value": 9.457180853
+    },
+    {
+      "country": "PNG",
+      "countryName": "PNG",
+      "year": 2020,
+      "value": 19.612048226
+    },
+    {
+      "country": "ZMB",
+      "countryName": "ZMB",
+      "year": 2020,
+      "value": 14.313832782
+    },
+    {
+      "country": "EMR",
+      "countryName": "EMR",
+      "year": 2020,
+      "value": 20.475254107
+    },
+    {
+      "country": "UNICEFREGIONWE",
+      "countryName": "UNICEFREGIONWE",
+      "year": 2020,
+      "value": 2.678463907
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2020,
+      "value": 2.452540009
+    },
+    {
+      "country": "DOM",
+      "countryName": "DOM",
+      "year": 2020,
+      "value": 10.493614921
+    },
+    {
+      "country": "VGB",
+      "countryName": "VGB",
+      "year": 2020,
+      "value": 6.839796343
+    },
+    {
+      "country": "CAF",
+      "countryName": "CAF",
+      "year": 2020,
+      "value": 33.067288101
+    },
+    {
+      "country": "URY",
+      "countryName": "URY",
+      "year": 2020,
+      "value": 4.246364735
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2020,
+      "value": 20.751690543
+    },
+    {
+      "country": "BDI",
+      "countryName": "BDI",
+      "year": 2020,
+      "value": 18.765637803
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2020,
+      "value": 14.30602388
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2020,
+      "value": 21.872447283
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2020,
+      "value": 4.317631495
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2020,
+      "value": 4.581104614
+    },
+    {
+      "country": "AIA",
+      "countryName": "AIA",
+      "year": 2020,
+      "value": 4.817724521
+    },
+    {
+      "country": "UNICEF_ECARO",
+      "countryName": "UNICEF_ECARO",
+      "year": 2020,
+      "value": 6.004106331
+    },
+    {
+      "country": "MKD",
+      "countryName": "MKD",
+      "year": 2020,
+      "value": 4.686903656
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2020,
+      "value": 2.268916511
+    },
+    {
+      "country": "MSR",
+      "countryName": "MSR",
+      "year": 2020,
+      "value": 9.914415442
+    },
+    {
+      "country": "UNSDG_CENTRALASIASOUTHERNASIA",
+      "countryName": "UNSDG_CENTRALASIASOUTHERNASIA",
+      "year": 2020,
+      "value": 17.038111108
+    },
+    {
+      "country": "UNSDG_NORTHERNAMR",
+      "countryName": "UNSDG_NORTHERNAMR",
+      "year": 2020,
+      "value": 2.791471431
+    },
+    {
+      "country": "DNK",
+      "countryName": "DNK",
+      "year": 2020,
+      "value": 2.18070516
+    },
+    {
+      "country": "LCA",
+      "countryName": "LCA",
+      "year": 2021,
+      "value": 10.505774193
+    },
+    {
+      "country": "UNICEFREGIONLAC",
+      "countryName": "UNICEFREGIONLAC",
+      "year": 2021,
+      "value": 7.640762179
+    },
+    {
+      "country": "ECU",
+      "countryName": "ECU",
+      "year": 2021,
+      "value": 9.462385002
+    },
+    {
+      "country": "UNSDG_LAC",
+      "countryName": "UNSDG_LAC",
+      "year": 2021,
+      "value": 7.640762179
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2021,
+      "value": 2.817758581
+    },
+    {
+      "country": "UNSDG_SUBSAHARANAFRICA",
+      "countryName": "UNSDG_SUBSAHARANAFRICA",
+      "year": 2021,
+      "value": 22.660540198
+    },
+    {
+      "country": "TZA",
+      "countryName": "TZA",
+      "year": 2021,
+      "value": 19.77954981
+    },
+    {
+      "country": "UNSDG_OCEANIA",
+      "countryName": "UNSDG_OCEANIA",
+      "year": 2021,
+      "value": 9.624356937
+    },
+    {
+      "country": "BRB",
+      "countryName": "BRB",
+      "year": 2021,
+      "value": 4.440691149
+    },
+    {
+      "country": "MLI",
+      "countryName": "MLI",
+      "year": 2021,
+      "value": 23.138941044
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2021,
+      "value": 8.558084074
+    },
+    {
+      "country": "LSO",
+      "countryName": "LSO",
+      "year": 2021,
+      "value": 23.077264236
+    },
+    {
+      "country": "MEX",
+      "countryName": "MEX",
+      "year": 2021,
+      "value": 6.539552182
+    },
+    {
+      "country": "QAT",
+      "countryName": "QAT",
+      "year": 2021,
+      "value": 3.218013618
+    },
+    {
+      "country": "DEU",
+      "countryName": "DEU",
+      "year": 2021,
+      "value": 2.790718735
+    },
+    {
+      "country": "THA",
+      "countryName": "THA",
+      "year": 2021,
+      "value": 3.911754047
+    },
+    {
+      "country": "WB_LI",
+      "countryName": "WB_LI",
+      "year": 2021,
+      "value": 23.643207219
+    },
+    {
+      "country": "SDN",
+      "countryName": "SDN",
+      "year": 2021,
+      "value": 21.772045863
+    },
+    {
+      "country": "BEL",
+      "countryName": "BEL",
+      "year": 2021,
+      "value": 3.075103594
+    },
+    {
+      "country": "MHL",
+      "countryName": "MHL",
+      "year": 2021,
+      "value": 10.35636261
+    },
+    {
+      "country": "UNICEF_LACRO",
+      "countryName": "UNICEF_LACRO",
+      "year": 2021,
+      "value": 7.639376695
+    },
+    {
+      "country": "UNICEFREGIONESA",
+      "countryName": "UNICEFREGIONESA",
+      "year": 2021,
+      "value": 21.542787716
+    },
+    {
+      "country": "MOZ",
+      "countryName": "MOZ",
+      "year": 2021,
+      "value": 18.266947431
+    },
+    {
+      "country": "CPV",
+      "countryName": "CPV",
+      "year": 2021,
+      "value": 8.33685972
+    },
+    {
+      "country": "COM",
+      "countryName": "COM",
+      "year": 2021,
+      "value": 21.411539946
+    },
+    {
+      "country": "UNICEF_WCARO",
+      "countryName": "UNICEF_WCARO",
+      "year": 2021,
+      "value": 23.66003145
+    },
+    {
+      "country": "WB_LMI",
+      "countryName": "WB_LMI",
+      "year": 2021,
+      "value": 17.069684661
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2021,
+      "value": 5.579534309
+    },
+    {
+      "country": "BIH",
+      "countryName": "BIH",
+      "year": 2021,
+      "value": 2.616736014
+    },
+    {
+      "country": "UNSDG_OCEANIAexAUSNZL",
+      "countryName": "UNSDG_OCEANIAexAUSNZL",
+      "year": 2021,
+      "value": 17.600511746
+    },
+    {
+      "country": "COD",
+      "countryName": "COD",
+      "year": 2021,
+      "value": 26.427072916
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2021,
+      "value": 13.980614129
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2021,
+      "value": 29.819004135
+    },
+    {
+      "country": "MYS",
+      "countryName": "MYS",
+      "year": 2021,
+      "value": 5.040233782
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2021,
+      "value": 24.53186415
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2021,
+      "value": 13.220201739
+    },
+    {
+      "country": "SEAR",
+      "countryName": "SEAR",
+      "year": 2021,
+      "value": 12.969771824
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2021,
+      "value": 22.086464076
+    },
+    {
+      "country": "AGO",
+      "countryName": "AGO",
+      "year": 2021,
+      "value": 19.940959232
+    },
+    {
+      "country": "FSM",
+      "countryName": "FSM",
+      "year": 2021,
+      "value": 11.61044811
+    },
+    {
+      "country": "UNICEF_ROSA",
+      "countryName": "UNICEF_ROSA",
+      "year": 2021,
+      "value": 17.337830679
+    },
+    {
+      "country": "CAN",
+      "countryName": "CAN",
+      "year": 2021,
+      "value": 2.888138223
+    },
+    {
+      "country": "SLE",
+      "countryName": "SLE",
+      "year": 2021,
+      "value": 20.525167788
+    },
+    {
+      "country": "STP",
+      "countryName": "STP",
+      "year": 2021,
+      "value": 9.425969949
+    },
+    {
+      "country": "WB_UMI",
+      "countryName": "WB_UMI",
+      "year": 2021,
+      "value": 7.028614947
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2021,
+      "value": 14.968818431
+    },
+    {
+      "country": "UNICEFREGIONEAP",
+      "countryName": "UNICEFREGIONEAP",
+      "year": 2021,
+      "value": 6.903476766
+    },
+    {
+      "country": "UNSDG_SOUTHASIA",
+      "countryName": "UNSDG_SOUTHASIA",
+      "year": 2021,
+      "value": 16.958818681
+    },
+    {
+      "country": "BHS",
+      "countryName": "BHS",
+      "year": 2021,
+      "value": 10.537744604
+    },
+    {
+      "country": "CZE",
+      "countryName": "CZE",
+      "year": 2022,
+      "value": 2.614833466
+    },
+    {
+      "country": "JAM",
+      "countryName": "JAM",
+      "year": 2022,
+      "value": 13.679393827
+    },
+    {
+      "country": "CUB",
+      "countryName": "CUB",
+      "year": 2022,
+      "value": 8.878665136
+    },
+    {
+      "country": "AIA",
+      "countryName": "AIA",
+      "year": 2022,
+      "value": 4.656401873
+    },
+    {
+      "country": "HTI",
+      "countryName": "HTI",
+      "year": 2022,
+      "value": 17.850407957
+    },
+    {
+      "country": "WB_HI",
+      "countryName": "WB_HI",
+      "year": 2022,
+      "value": 2.831918317
+    },
+    {
+      "country": "BHR",
+      "countryName": "BHR",
+      "year": 2022,
+      "value": 5.383163656
+    },
+    {
+      "country": "UNSDG_WESTERNASIANORTHERNAFR",
+      "countryName": "UNSDG_WESTERNASIANORTHERNAFR",
+      "year": 2022,
+      "value": 11.775589699
+    },
+    {
+      "country": "MNG",
+      "countryName": "MNG",
+      "year": 2022,
+      "value": 4.439910154
+    },
+    {
+      "country": "GHA",
+      "countryName": "GHA",
+      "year": 2022,
+      "value": 19.619704146
+    },
+    {
+      "country": "PLW",
+      "countryName": "PLW",
+      "year": 2022,
+      "value": 8.485531873
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2022,
+      "value": 28.556030492
+    },
+    {
+      "country": "NGA",
+      "countryName": "NGA",
+      "year": 2022,
+      "value": 24.245260842
+    },
+    {
+      "country": "LBR",
+      "countryName": "LBR",
+      "year": 2022,
+      "value": 24.286896156
+    },
+    {
+      "country": "LBN",
+      "countryName": "LBN",
+      "year": 2022,
+      "value": 9.252845077
+    },
+    {
+      "country": "SYC",
+      "countryName": "SYC",
+      "year": 2022,
+      "value": 7.544656538
+    },
+    {
+      "country": "CRI",
+      "countryName": "CRI",
+      "year": 2022,
+      "value": 4.433552524
+    },
+    {
+      "country": "NPL",
+      "countryName": "NPL",
+      "year": 2022,
+      "value": 13.709074228
+    },
+    {
+      "country": "KNA",
+      "countryName": "KNA",
+      "year": 2022,
+      "value": 7.801682875
+    },
+    {
+      "country": "TUV",
+      "countryName": "TUV",
+      "year": 2022,
+      "value": 8.830728787
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2022,
+      "value": 17.026077583
+    },
+    {
+      "country": "FRA",
+      "countryName": "FRA",
+      "year": 2022,
+      "value": 3.047594023
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2022,
+      "value": 8.760351378
+    },
+    {
+      "country": "NIC",
+      "countryName": "NIC",
+      "year": 2022,
+      "value": 9.701243739
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2022,
+      "value": 2.3456452
+    },
+    {
+      "country": "GNB",
+      "countryName": "GNB",
+      "year": 2022,
+      "value": 29.478249576
+    },
+    {
+      "country": "UNICEFREGIONESA",
+      "countryName": "UNICEFREGIONESA",
+      "year": 2022,
+      "value": 21.393316983
+    },
+    {
+      "country": "TUN",
+      "countryName": "TUN",
+      "year": 2022,
+      "value": 9.448577902
+    },
+    {
+      "country": "ERI",
+      "countryName": "ERI",
+      "year": 2022,
+      "value": 15.365955032
+    },
+    {
+      "country": "FIN",
+      "countryName": "FIN",
+      "year": 2022,
+      "value": 1.973824118
+    },
+    {
+      "country": "UNICEF_LACRO",
+      "countryName": "UNICEF_LACRO",
+      "year": 2022,
+      "value": 7.501219614
+    },
+    {
+      "country": "UNICEFREGIONLAC",
+      "countryName": "UNICEFREGIONLAC",
+      "year": 2022,
+      "value": 7.502595196
+    },
+    {
+      "country": "PSE",
+      "countryName": "PSE",
+      "year": 2022,
+      "value": 9.169500874
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2022,
+      "value": 13.828283119
+    },
+    {
+      "country": "TON",
+      "countryName": "TON",
+      "year": 2022,
+      "value": 7.057313826
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2022,
+      "value": 2.33600693
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2022,
+      "value": 21.881610063
+    },
+    {
+      "country": "ETH",
+      "countryName": "ETH",
+      "year": 2022,
+      "value": 29.917467443
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2022,
+      "value": 27.627737281
+    },
+    {
+      "country": "UNICEF_MENARO",
+      "countryName": "UNICEF_MENARO",
+      "year": 2022,
+      "value": 12.053894671
+    },
+    {
+      "country": "ISR",
+      "countryName": "ISR",
+      "year": 2022,
+      "value": 2.868743665
+    },
+    {
+      "country": "SAU",
+      "countryName": "SAU",
+      "year": 2023,
+      "value": 4.033082292
+    },
+    {
+      "country": "LKA",
+      "countryName": "LKA",
+      "year": 2023,
+      "value": 5.926854921
+    },
+    {
+      "country": "PRY",
+      "countryName": "PRY",
+      "year": 2023,
+      "value": 9.021518892
+    },
+    {
+      "country": "BOL",
+      "countryName": "BOL",
+      "year": 2023,
+      "value": 8.265932657
+    },
+    {
+      "country": "BEN",
+      "countryName": "BEN",
+      "year": 2023,
+      "value": 18.600500451
+    },
+    {
+      "country": "UGA",
+      "countryName": "UGA",
+      "year": 2023,
+      "value": 14.548722428
+    },
+    {
+      "country": "SVK",
+      "countryName": "SVK",
+      "year": 2023,
+      "value": 3.46886944
+    },
+    {
+      "country": "UNICEFREGIONLAC",
+      "countryName": "UNICEFREGIONLAC",
+      "year": 2023,
+      "value": 7.380370291
+    },
+    {
+      "country": "UNSDG_SIDS",
+      "countryName": "UNSDG_SIDS",
+      "year": 2023,
+      "value": 14.783847694
+    },
+    {
+      "country": "PAK",
+      "countryName": "PAK",
+      "year": 2023,
+      "value": 27.554781454
+    },
+    {
+      "country": "GAB",
+      "countryName": "GAB",
+      "year": 2023,
+      "value": 12.94301959
+    },
+    {
+      "country": "IRQ",
+      "countryName": "IRQ",
+      "year": 2023,
+      "value": 10.842387545
+    },
+    {
+      "country": "SSD",
+      "countryName": "SSD",
+      "year": 2023,
+      "value": 27.647205679
+    },
+    {
+      "country": "AFR",
+      "countryName": "AFR",
+      "year": 2023,
+      "value": 21.669935288
+    },
+    {
+      "country": "PAN",
+      "countryName": "PAN",
+      "year": 2023,
+      "value": 6.628540192
+    },
+    {
+      "country": "CHE",
+      "countryName": "CHE",
+      "year": 2023,
+      "value": 2.304390003
+    },
+    {
+      "country": "UNSDG_EUROPENORTHERNAMR",
+      "countryName": "UNSDG_EUROPENORTHERNAMR",
+      "year": 2023,
+      "value": 2.826460691
+    },
+    {
+      "country": "KIR",
+      "countryName": "KIR",
+      "year": 2023,
+      "value": 8.5795736
+    },
+    {
+      "country": "USA",
+      "countryName": "USA",
+      "year": 2023,
+      "value": 2.680521343
+    },
+    {
+      "country": "VGB",
+      "countryName": "VGB",
+      "year": 2023,
+      "value": 6.501814083
+    },
+    {
+      "country": "AFG",
+      "countryName": "AFG",
+      "year": 2023,
+      "value": 28.021869841
+    },
+    {
+      "country": "BRN",
+      "countryName": "BRN",
+      "year": 2023,
+      "value": 4.306048882
+    },
+    {
+      "country": "DZA",
+      "countryName": "DZA",
+      "year": 2023,
+      "value": 8.807107183
+    },
+    {
+      "country": "MUS",
+      "countryName": "MUS",
+      "year": 2023,
+      "value": 8.900633767
+    },
+    {
+      "country": "DJI",
+      "countryName": "DJI",
+      "year": 2023,
+      "value": 29.749693439
+    },
+    {
+      "country": "HND",
+      "countryName": "HND",
+      "year": 2023,
+      "value": 8.002468207
+    },
+    {
+      "country": "BTN",
+      "countryName": "BTN",
+      "year": 2023,
+      "value": 8.436545101
+    },
+    {
+      "country": "MDV",
+      "countryName": "MDV",
+      "year": 2023,
+      "value": 5.14654942
+    },
+    {
+      "country": "ZAF",
+      "countryName": "ZAF",
+      "year": 2023,
+      "value": 18.718184747
+    },
+    {
+      "country": "BGR",
+      "countryName": "BGR",
+      "year": 2023,
+      "value": 4.89382178
+    },
+    {
+      "country": "LBY",
+      "countryName": "LBY",
+      "year": 2023,
+      "value": 6.95516671
+    },
+    {
+      "country": "IRN",
+      "countryName": "IRN",
+      "year": 2023,
+      "value": 5.421502461
+    },
+    {
+      "country": "KOR",
+      "countryName": "KOR",
+      "year": 2023,
+      "value": 1.687643825
+    },
+    {
+      "country": "MRT",
+      "countryName": "MRT",
+      "year": 2023,
+      "value": 16.857021836
+    },
+    {
+      "country": "SWZ",
+      "countryName": "SWZ",
+      "year": 2023,
+      "value": 13.644956619
+    },
+    {
+      "country": "IRL",
+      "countryName": "IRL",
+      "year": 2023,
+      "value": 2.351263368
+    },
+    {
+      "country": "WPR",
+      "countryName": "WPR",
+      "year": 2023,
+      "value": 6.048918673
+    },
+    {
+      "country": "UNICEFREGIONMENA",
+      "countryName": "UNICEFREGIONMENA",
+      "year": 2023,
+      "value": 10.084283761
+    },
+    {
+      "country": "CYP",
+      "countryName": "CYP",
+      "year": 2023,
+      "value": 2.870024198
+    },
+    {
+      "country": "TGO",
+      "countryName": "TGO",
+      "year": 2023,
+      "value": 19.619989523
+    },
+    {
+      "country": "YEM",
+      "countryName": "YEM",
+      "year": 2023,
+      "value": 20.797937598
+    },
+    {
+      "country": "UNSDG_LDC",
+      "countryName": "UNSDG_LDC",
+      "year": 2023,
+      "value": 21.978077746
+    },
+    {
+      "country": "TCD",
+      "countryName": "TCD",
+      "year": 2023,
+      "value": 28.441582042
+    },
+    {
+      "country": "AUS",
+      "countryName": "AUS",
+      "year": 2023,
+      "value": 2.579210104
+    },
+    {
+      "country": "BGD",
+      "countryName": "BGD",
+      "year": 2023,
+      "value": 20.36948237
+    },
+    {
+      "country": "NOR",
+      "countryName": "NOR",
+      "year": 2023,
+      "value": 2.015857777
+    },
+    {
+      "country": "NER",
+      "countryName": "NER",
+      "year": 2023,
+      "value": 21.44179447
+    },
+    {
+      "country": "ARM",
+      "countryName": "ARM",
+      "year": 2023,
+      "value": 9.430606151
+    }
+  ]
+}

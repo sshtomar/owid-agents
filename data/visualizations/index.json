@@ -5858,7 +5858,93 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "International Tourist Arrivals, 1995\u20132020",
+      "description": "Trend lines for top tourist destinations from 1995 to 2020. France and China lead, with the dramatic COVID-19 collapse in 2020 visible across all countries.",
+      "datasetIds": [
+        "wb--ST-INT-ARVL"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "France leads with 218M arrivals in 2019, followed by China at 163M",
+        "COVID-19 caused a 50-80% collapse in arrivals in 2020",
+        "Japan grew from 3M (1995) to 32M (2019) \u2014 a 9x increase",
+        "Hong Kong crashed from 56M to 3.6M in a single year"
+      ],
+      "createdAt": "2026-10-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Scientific and Technical Journal Articles, 1996\u20132023",
+      "description": "Annual count of scientific publications for major research nations. China's output grew more than 27-fold since 1996, overtaking Japan by 2004 and all European nations by 2010.",
+      "datasetIds": [
+        "wb--IP-JRN-ARTC-SC"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China grew from 34k articles (1996) to 933k (2023) \u2014 a 27x increase",
+        "India surpassed Japan around 2019 and reached 228k articles by 2023",
+        "Japan peaked in 2006 and has slowly declined since",
+        "Iran grew from fewer than 1,000 to 55,000 articles over 27 years"
+      ],
+      "createdAt": "2026-10-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "Stillbirth Rate: 2000 vs. Recent Year",
+      "description": "Slope chart showing stillbirths per 1,000 births for 16 countries. Every country reduced its rate, but the gap between Guinea-Bissau (29.5) and South Korea (1.7) remains 17-fold.",
+      "datasetIds": [
+        "who--WHOSIS_000014"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Guinea-Bissau reduced from 51.9 to 29.5 \u2014 largest absolute drop",
+        "Maldives fell from 13.4 to 5.1 \u2014 nearly 62% reduction",
+        "South Korea has the lowest rate at 1.7 per 1,000 births",
+        "High-burden countries remain 15-17x higher than low-burden ones"
+      ],
+      "createdAt": "2026-10-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Population Growth Rate by Country, 1961\u20132024",
+      "description": "Annual population growth (%) for 8 countries spanning the demographic spectrum \u2014 from high-growth Sub-Saharan Africa to declining Eastern Europe and East Asia.",
+      "datasetIds": [
+        "wb--SP-POP-GROW"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "China entered negative population growth in 2023 for the first time",
+        "Chad and Angola remain above 3% annual growth \u2014 the fastest in the dataset",
+        "Bulgaria has been in decline since 1989 following communism's fall",
+        "India's growth rate fell from 2.4% (1961) to under 1% by 2021"
+      ],
+      "createdAt": "2026-10-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "DPT Immunization Coverage, 1980\u20132024",
+      "description": "Percentage of children ages 12\u201323 months immunized against diphtheria, pertussis and tetanus. Bangladesh's scale-up from under 2% to 97% in 25 years is one of the fastest vaccination expansions ever recorded.",
+      "datasetIds": [
+        "wb--SH-IMM-IDPT"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Bangladesh rose from 2% (1985) to 97% (2009) in just 24 years",
+        "India climbed from 6% to 94%, despite serving over a billion people",
+        "Chad reached only 68% by 2024 after 40 years of effort",
+        "China and Japan both reached 99% coverage and sustained it"
+      ],
+      "createdAt": "2026-10-03T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00.000Z"
+  "lastUpdated": "2026-10-03T00:00:00.000Z"
 }
