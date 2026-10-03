@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Scientific and Technical Journal Articles, 1996–2023</h1>
+<p class="subtitle">Number of scientific articles published per year. China's output has grown more than 27-fold since 1996, overtaking all other nations by a wide margin.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Scientific and Technical Journal Articles (IP.JRN.ARTC.SC)</p>
+<script>
+const data = [{"n":"China","pts":[{"y":1996,"v":33621},{"y":1997,"v":37425},{"y":1998,"v":43775},{"y":1999,"v":45192},{"y":2000,"v":53285},{"y":2001,"v":70676},{"y":2002,"v":74940},{"y":2003,"v":87586},{"y":2004,"v":120909},{"y":2005,"v":165262},{"y":2006,"v":192021},{"y":2007,"v":212955},{"y":2008,"v":246970},{"y":2009,"v":284471},{"y":2010,"v":307848},{"y":2011,"v":320967},{"y":2012,"v":326401},{"y":2013,"v":351526},{"y":2014,"v":379466},{"y":2015,"v":401136},{"y":2016,"v":430350},{"y":2017,"v":464154},{"y":2018,"v":513575},{"y":2019,"v":608625},{"y":2020,"v":671731},{"y":2021,"v":756203},{"y":2022,"v":885962},{"y":2023,"v":932712}]},{"n":"India","pts":[{"y":1996,"v":18905},{"y":1997,"v":19348},{"y":1998,"v":19718},{"y":1999,"v":20838},{"y":2000,"v":21409},{"y":2001,"v":22533},{"y":2002,"v":23697},{"y":2003,"v":26124},{"y":2004,"v":28041},{"y":2005,"v":32138},{"y":2006,"v":37022},{"y":2007,"v":41304},{"y":2008,"v":46505},{"y":2009,"v":51851},{"y":2010,"v":58296},{"y":2011,"v":69056},{"y":2012,"v":75559},{"y":2013,"v":80195},{"y":2014,"v":88316},{"y":2015,"v":94794},{"y":2016,"v":104740},{"y":2017,"v":115045},{"y":2018,"v":123053},{"y":2019,"v":128580},{"y":2020,"v":145711},{"y":2021,"v":173096},{"y":2022,"v":200488},{"y":2023,"v":228174}]},{"n":"Germany","pts":[{"y":1996,"v":64230},{"y":1997,"v":68275},{"y":1998,"v":69448},{"y":1999,"v":67534},{"y":2000,"v":69739},{"y":2001,"v":71531},{"y":2002,"v":71323},{"y":2003,"v":72707},{"y":2004,"v":75360},{"y":2005,"v":83685},{"y":2006,"v":85557},{"y":2007,"v":88428},{"y":2008,"v":91146},{"y":2009,"v":94183},{"y":2010,"v":96129},{"y":2011,"v":99233},{"y":2012,"v":103761},{"y":2013,"v":104396},{"y":2014,"v":105532},{"y":2015,"v":106776},{"y":2016,"v":108937},{"y":2017,"v":109775},{"y":2018,"v":109110},{"y":2019,"v":110382},{"y":2020,"v":109198},{"y":2021,"v":117127},{"y":2022,"v":112301},{"y":2023,"v":108782}]},{"n":"Japan","pts":[{"y":1996,"v":88807},{"y":1997,"v":91890},{"y":1998,"v":92246},{"y":1999,"v":94195},{"y":2000,"v":96607},{"y":2001,"v":96103},{"y":2002,"v":98708},{"y":2003,"v":101128},{"y":2004,"v":103608},{"y":2005,"v":111936},{"y":2006,"v":112743},{"y":2007,"v":108598},{"y":2008,"v":106637},{"y":2009,"v":107477},{"y":2010,"v":107213},{"y":2011,"v":109048},{"y":2012,"v":107470},{"y":2013,"v":106968},{"y":2014,"v":103354},{"y":2015,"v":100597},{"y":2016,"v":101167},{"y":2017,"v":101854},{"y":2018,"v":101999},{"y":2019,"v":100156},{"y":2020,"v":100403},{"y":2021,"v":106310},{"y":2022,"v":102423},{"y":2023,"v":96543}]},{"n":"Italy","pts":[{"y":1996,"v":34244},{"y":2023,"v":82771}]},{"n":"S. Korea","pts":[{"y":1996,"v":8867},{"y":2023,"v":71724}]},{"n":"France","pts":[{"y":1996,"v":46611},{"y":2023,"v":62180}]},{"n":"Brazil","pts":[{"y":1996,"v":7646},{"y":2023,"v":58292}]},{"n":"Iran","pts":[{"y":1996,"v":649},{"y":2023,"v":55085}]}];
+
+// Full data for all series
+const fullData = [{"n":"China","pts":[{"y":1996,"v":33621},{"y":1997,"v":37425},{"y":1998,"v":43775},{"y":1999,"v":45192},{"y":2000,"v":53285},{"y":2001,"v":70676},{"y":2002,"v":74940},{"y":2003,"v":87586},{"y":2004,"v":120909},{"y":2005,"v":165262},{"y":2006,"v":192021},{"y":2007,"v":212955},{"y":2008,"v":246970},{"y":2009,"v":284471},{"y":2010,"v":307848},{"y":2011,"v":320967},{"y":2012,"v":326401},{"y":2013,"v":351526},{"y":2014,"v":379466},{"y":2015,"v":401136},{"y":2016,"v":430350},{"y":2017,"v":464154},{"y":2018,"v":513575},{"y":2019,"v":608625},{"y":2020,"v":671731},{"y":2021,"v":756203},{"y":2022,"v":885962},{"y":2023,"v":932712}]},{"n":"India","pts":[{"y":1996,"v":18905},{"y":1997,"v":19348},{"y":1998,"v":19718},{"y":1999,"v":20838},{"y":2000,"v":21409},{"y":2001,"v":22533},{"y":2002,"v":23697},{"y":2003,"v":26124},{"y":2004,"v":28041},{"y":2005,"v":32138},{"y":2006,"v":37022},{"y":2007,"v":41304},{"y":2008,"v":46505},{"y":2009,"v":51851},{"y":2010,"v":58296},{"y":2011,"v":69056},{"y":2012,"v":75559},{"y":2013,"v":80195},{"y":2014,"v":88316},{"y":2015,"v":94794},{"y":2016,"v":104740},{"y":2017,"v":115045},{"y":2018,"v":123053},{"y":2019,"v":128580},{"y":2020,"v":145711},{"y":2021,"v":173096},{"y":2022,"v":200488},{"y":2023,"v":228174}]},{"n":"Germany","pts":[{"y":1996,"v":64230},{"y":1997,"v":68275},{"y":1998,"v":69448},{"y":1999,"v":67534},{"y":2000,"v":69739},{"y":2001,"v":71531},{"y":2002,"v":71323},{"y":2003,"v":72707},{"y":2004,"v":75360},{"y":2005,"v":83685},{"y":2006,"v":85557},{"y":2007,"v":88428},{"y":2008,"v":91146},{"y":2009,"v":94183},{"y":2010,"v":96129},{"y":2011,"v":99233},{"y":2012,"v":103761},{"y":2013,"v":104396},{"y":2014,"v":105532},{"y":2015,"v":106776},{"y":2016,"v":108937},{"y":2017,"v":109775},{"y":2018,"v":109110},{"y":2019,"v":110382},{"y":2020,"v":109198},{"y":2021,"v":117127},{"y":2022,"v":112301},{"y":2023,"v":108782}]},{"n":"Japan","pts":[{"y":1996,"v":88807},{"y":1997,"v":91890},{"y":1998,"v":92246},{"y":1999,"v":94195},{"y":2000,"v":96607},{"y":2001,"v":96103},{"y":2002,"v":98708},{"y":2003,"v":101128},{"y":2004,"v":103608},{"y":2005,"v":111936},{"y":2006,"v":112743},{"y":2007,"v":108598},{"y":2008,"v":106637},{"y":2009,"v":107477},{"y":2010,"v":107213},{"y":2011,"v":109048},{"y":2012,"v":107470},{"y":2013,"v":106968},{"y":2014,"v":103354},{"y":2015,"v":100597},{"y":2016,"v":101167},{"y":2017,"v":101854},{"y":2018,"v":101999},{"y":2019,"v":100156},{"y":2020,"v":100403},{"y":2021,"v":106310},{"y":2022,"v":102423},{"y":2023,"v":96543}]},{"n":"Italy","pts":[{"y":1996,"v":34244},{"y":1997,"v":35158},{"y":1998,"v":34128},{"y":1999,"v":34282},{"y":2000,"v":36210},{"y":2001,"v":37420},{"y":2002,"v":38986},{"y":2003,"v":42293},{"y":2004,"v":44324},{"y":2005,"v":47758},{"y":2006,"v":50511},{"y":2007,"v":53840},{"y":2008,"v":55718},{"y":2009,"v":57761},{"y":2010,"v":57849},{"y":2011,"v":59652},{"y":2012,"v":63136},{"y":2013,"v":66221},{"y":2014,"v":67444},{"y":2015,"v":69383},{"y":2016,"v":69301},{"y":2017,"v":70101},{"y":2018,"v":71038},{"y":2019,"v":73936},{"y":2020,"v":80142},{"y":2021,"v":85700},{"y":2022,"v":83237},{"y":2023,"v":82771}]},{"n":"S. Korea","pts":[{"y":1996,"v":8867},{"y":1997,"v":11238},{"y":1998,"v":12158},{"y":1999,"v":14683},{"y":2000,"v":15875},{"y":2001,"v":18436},{"y":2002,"v":20151},{"y":2003,"v":23773},{"y":2004,"v":27626},{"y":2005,"v":32033},{"y":2006,"v":37086},{"y":2007,"v":41129},{"y":2008,"v":43712},{"y":2009,"v":45735},{"y":2010,"v":50065},{"y":2011,"v":53292},{"y":2012,"v":55712},{"y":2013,"v":56751},{"y":2014,"v":59379},{"y":2015,"v":61888},{"y":2016,"v":61915},{"y":2017,"v":62978},{"y":2018,"v":64793},{"y":2019,"v":67688},{"y":2020,"v":69090},{"y":2021,"v":72352},{"y":2022,"v":71998},{"y":2023,"v":71724}]},{"n":"France","pts":[{"y":1996,"v":46611},{"y":1997,"v":49417},{"y":1998,"v":49672},{"y":1999,"v":49211},{"y":2000,"v":50007},{"y":2001,"v":50802},{"y":2002,"v":50708},{"y":2003,"v":52092},{"y":2004,"v":53583},{"y":2005,"v":57905},{"y":2006,"v":60693},{"y":2007,"v":61455},{"y":2008,"v":64067},{"y":2009,"v":66256},{"y":2010,"v":66841},{"y":2011,"v":68819},{"y":2012,"v":70407},{"y":2013,"v":71475},{"y":2014,"v":71223},{"y":2015,"v":70877},{"y":2016,"v":70242},{"y":2017,"v":69138},{"y":2018,"v":67118},{"y":2019,"v":66168},{"y":2020,"v":65601},{"y":2021,"v":67690},{"y":2022,"v":65198},{"y":2023,"v":62180}]},{"n":"Brazil","pts":[{"y":1996,"v":7646},{"y":1997,"v":9303},{"y":1998,"v":10498},{"y":1999,"v":11424},{"y":2000,"v":12800},{"y":2001,"v":13915},{"y":2002,"v":15816},{"y":2003,"v":17304},{"y":2004,"v":19381},{"y":2005,"v":21751},{"y":2006,"v":26768},{"y":2007,"v":28727},{"y":2008,"v":32726},{"y":2009,"v":35386},{"y":2010,"v":38170},{"y":2011,"v":40317},{"y":2012,"v":44295},{"y":2013,"v":45991},{"y":2014,"v":48188},{"y":2015,"v":49342},{"y":2016,"v":51745},{"y":2017,"v":55049},{"y":2018,"v":58874},{"y":2019,"v":62581},{"y":2020,"v":66901},{"y":2021,"v":69591},{"y":2022,"v":62660},{"y":2023,"v":58292}]},{"n":"Iran","pts":[{"y":1996,"v":649},{"y":1997,"v":861},{"y":1998,"v":969},{"y":1999,"v":1181},{"y":2000,"v":1559},{"y":2001,"v":1910},{"y":2002,"v":2763},{"y":2003,"v":3896},{"y":2004,"v":5117},{"y":2005,"v":7046},{"y":2006,"v":9806},{"y":2007,"v":12669},{"y":2008,"v":16474},{"y":2009,"v":19982},{"y":2010,"v":24288},{"y":2011,"v":30244},{"y":2012,"v":30314},{"y":2013,"v":31025},{"y":2014,"v":33763},{"y":2015,"v":35452},{"y":2016,"v":40053},{"y":2017,"v":44578},{"y":2018,"v":46576},{"y":2019,"v":53364},{"y":2020,"v":56585},{"y":2021,"v":58049},{"y":2022,"v":58271},{"y":2023,"v":55085}]}];
+
+const COLORS = ["#EA5E33","#5B9E78","#C49A45","#3D7A5A","#F29A44","#C4715A","#8BAD72","#B34B3B","#A6C4A2"];
+
+const W = 760, H = 440;
+const margin = { top: 30, right: 110, bottom: 36, left: 66 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const yearMin = 1996, yearMax = 2023;
+const valMax = 950000;
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v) / valMax * (H - margin.top - margin.bottom);
+
+// Grid lines with k/M labels
+[0,200000,400000,600000,800000].forEach(v => {
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(v),x2:W-margin.right,y2:yS(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  const label = v === 0 ? "0" : (v/1000).toFixed(0)+"k";
+  svg.appendChild(mkEl("text",{x:margin.left-5,y:yS(v)+3,"text-anchor":"end","font-family":"JetBrains Mono,monospace","font-size":"8","fill":"#9A9890"},label));
+});
+
+// X axis ticks
+[1996,2000,2005,2010,2015,2020,2023].forEach(y => {
+  svg.appendChild(mkEl("line",{x1:xS(y),y1:H-margin.bottom,x2:xS(y),y2:H-margin.bottom+4,stroke:"#C2C0B5","stroke-width":"0.7"}));
+  svg.appendChild(mkEl("text",{x:xS(y),y:H-margin.bottom+13,"text-anchor":"middle","font-family":"JetBrains Mono,monospace","font-size":"8","fill":"#7A786F"},y));
+});
+
+svg.appendChild(mkEl("text",{x:10,y:H/2,"text-anchor":"middle","font-family":"JetBrains Mono,monospace","font-size":"8","fill":"#7A786F",transform:`rotate(-90,10,${H/2})`},"ARTICLES PER YEAR"));
+
+const tip = document.getElementById("tip");
+function showTip(html, e){ tip.innerHTML = html; tip.style.opacity="1"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; }
+function hideTip(){ tip.style.opacity="0"; }
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 20; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+
+fullData.forEach((series, si) => {
+  const color = COLORS[si % COLORS.length];
+  const pts = series.pts;
+  if (pts.length === 0) return;
+
+  const pathD = pts.map((p,i) => `${i===0?"M":"L"} ${xS(p.y).toFixed(1)} ${yS(p.v).toFixed(1)}`).join(" ");
+  const g = mkEl("g",{});
+
+  const sw = series.n === "China" ? "2" : "1.5";
+  const path = mkEl("path",{d:pathD,stroke:color,"stroke-width":sw,fill:"none","stroke-linejoin":"round","stroke-linecap":"round"});
+  g.appendChild(path);
+
+  const hit = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none","cursor":"pointer"});
+  g.appendChild(hit);
+
+  const lastPt = pts[pts.length - 1];
+  groups.push({ g, path, hit, color, series, lastPt, si });
+  svg.appendChild(g);
+});
+
+const labelItems = groups.map(({series, lastPt}) => ({
+  name: series.n,
+  y: yS(lastPt.v),
+  v: lastPt.v
+}));
+const resolved = resolveCollisions(labelItems, 11);
+const yMap = {};
+resolved.forEach(r => { yMap[r.name] = r.y; });
+
+groups.forEach(({g, series, lastPt, color, path, hit}) => {
+  const lx = xS(lastPt.y);
+  const ly = yMap[series.n];
+  const origY = yS(lastPt.v);
+
+  if (Math.abs(ly - origY) > 2) {
+    g.appendChild(mkEl("line",{x1:lx+3,y1:origY,x2:lx+8,y2:ly,stroke:color,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  g.appendChild(mkEl("text",{x:lx+10,y:ly+3,"font-size":"8.5","font-weight":"500","fill":color},series.n));
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    let closest = series.pts[0], minD = Infinity;
+    series.pts.forEach(p => {
+      const d = Math.abs(xS(p.y) - mx);
+      if (d < minD) { minD = d; closest = p; }
+    });
+    const vFmt = closest.v >= 1000 ? (closest.v/1000).toFixed(0)+"k" : closest.v;
+    showTip(`<b>${series.n}</b> ${closest.y}: <b>${vFmt}</b> articles`, e);
+    groups.forEach(({g: og, path: op}) => { og.style.opacity = (og === g) ? "1" : "0.1"; op.setAttribute("stroke-width","1.5"); });
+    path.setAttribute("stroke-width","2.5");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    groups.forEach(({g: og, path: op}) => { og.style.opacity = "1"; op.setAttribute("stroke-width", og.dataset.main ? "2" : "1.5"); });
+  });
+});
+</script>
+</body></html>

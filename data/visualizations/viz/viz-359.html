@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Stillbirth Rate: 2000 vs. Recent Year</h1>
+<p class="subtitle">Stillbirths per 1,000 total births. Every country shown has reduced its rate, but the gap between high-burden and low-burden nations remains stark.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — Stillbirth Rate (WHOSIS_000014)</p>
+<script>
+const data = [{"n":"Guinea-Bissau","a":51.9,"b":29.5},{"n":"Afghanistan","a":45.4,"b":28.0},{"n":"Chad","a":42.5,"b":28.4},{"n":"South Sudan","a":39.0,"b":27.6},{"n":"Benin","a":28.7,"b":18.6},{"n":"Mozambique","a":26.8,"b":18.3},{"n":"Jamaica","a":18.2,"b":13.7},{"n":"Paraguay","a":17.6,"b":9.0},{"n":"Nicaragua","a":15.6,"b":9.7},{"n":"Georgia","a":14.9,"b":5.6},{"n":"Dom. Rep.","a":14.8,"b":10.5},{"n":"Honduras","a":14.0,"b":8.0},{"n":"Maldives","a":13.4,"b":5.1},{"n":"Uruguay","a":7.4,"b":4.2},{"n":"USA","a":3.3,"b":2.7},{"n":"S. Korea","a":3.1,"b":1.7}];
+
+const W = 660, H = 520;
+const pad = { left: 130, right: 140, top: 50, bottom: 30 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = Math.ceil(Math.max(...allVals) / 5) * 5 + 2;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Color by magnitude of 2000 value (improvement needed)
+function colorFor(val2000) {
+  if (val2000 > 40) return "#EA5E33";
+  if (val2000 > 25) return "#F29A44";
+  if (val2000 > 15) return "#C49A45";
+  if (val2000 > 8)  return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Column headers
+svg.appendChild(mkEl("text",{x:xLeft,y:pad.top-18,"text-anchor":"middle","font-family":"JetBrains Mono,monospace","font-size":"9","fill":"#7A786F","font-weight":"500"},"2000"));
+svg.appendChild(mkEl("text",{x:xRight,y:pad.top-18,"text-anchor":"middle","font-family":"JetBrains Mono,monospace","font-size":"9","fill":"#7A786F","font-weight":"500"},"2022 / 2023"));
+
+// Axis lines
+svg.appendChild(mkEl("line",{x1:xLeft,y1:pad.top-10,x2:xLeft,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+svg.appendChild(mkEl("line",{x1:xRight,y1:pad.top-10,x2:xRight,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+
+// Grid labels
+[0,10,20,30,40,50].forEach(v => {
+  if (v > maxV) return;
+  const y = scale(v);
+  svg.appendChild(mkEl("line",{x1:xLeft,y1:y,x2:xRight,y2:y,stroke:"#E2E0D5","stroke-width":"0.4"}));
+});
+
+const tip = document.getElementById("tip");
+function showTip(html, e){ tip.innerHTML = html; tip.style.opacity="1"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; }
+function hideTip(){ tip.style.opacity="0"; }
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 20; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ name: d.n, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ name: d.n, y: scale(d.b) }));
+const resolvedLeft = resolveCollisions(leftLabels, 12);
+const resolvedRight = resolveCollisions(rightLabels, 12);
+const yLeftMap = {}; resolvedLeft.forEach(r => yLeftMap[r.name] = r.y);
+const yRightMap = {}; resolvedRight.forEach(r => yRightMap[r.name] = r.y);
+
+const rows = [];
+
+data.forEach(d => {
+  const color = colorFor(d.a);
+  const ya = scale(d.a), yb = scale(d.b);
+
+  const g = mkEl("g",{});
+
+  // Connecting line
+  const line = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:color,"stroke-width":"1.3",opacity:"0.8"});
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle",{cx:xLeft,cy:ya,r:"3",fill:color}));
+  g.appendChild(mkEl("circle",{cx:xRight,cy:yb,r:"3",fill:color}));
+
+  // Hit area
+  const hit = mkEl("line",{x1:xLeft,y1:ya,x2:xRight,y2:yb,stroke:"transparent","stroke-width":"14","cursor":"pointer"});
+  g.appendChild(hit);
+
+  const lyLeft = yLeftMap[d.n];
+  const lyRight = yRightMap[d.n];
+
+  // Leader lines for left labels
+  if (Math.abs(lyLeft - ya) > 2) {
+    g.appendChild(mkEl("line",{x1:xLeft-4,y1:ya,x2:xLeft-12,y2:lyLeft,stroke:color,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  // Left label: "Name  val"
+  svg.appendChild(mkEl("text",{x:xLeft-14,y:lyLeft+3,"text-anchor":"end","font-size":"8.5","font-weight":"500","fill":color},`${d.n}  ${d.a}`));
+
+  // Leader lines for right labels
+  if (Math.abs(lyRight - yb) > 2) {
+    g.appendChild(mkEl("line",{x1:xRight+4,y1:yb,x2:xRight+10,y2:lyRight,stroke:color,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  // Right label: "val"
+  svg.appendChild(mkEl("text",{x:xRight+13,y:lyRight+3,"text-anchor":"start","font-size":"8.5","font-weight":"500","fill":color},d.b));
+
+  hit.addEventListener("mouseenter", e => {
+    const pct = ((d.a - d.b) / d.a * 100).toFixed(0);
+    showTip(`<b>${d.n}</b>: ${d.a} → ${d.b} (−${pct}%)`, e);
+    rows.forEach(({g: og}) => og.style.opacity = og === g ? "1" : "0.12");
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY-20)+"px"; });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    rows.forEach(({g: og}) => og.style.opacity = "1");
+  });
+
+  rows.push({ g, d });
+  svg.appendChild(g);
+});
+
+// Legend
+const legX = pad.left + 10, legY = pad.top - 8;
+const legItems = [
+  {color:"#EA5E33",label:">40 stillbirths/1k (2000)"},
+  {color:"#F29A44",label:"25–40"},
+  {color:"#C49A45",label:"15–25"},
+  {color:"#5B9E78",label:"<15"},
+];
+legItems.forEach((li, i) => {
+  svg.appendChild(mkEl("rect",{x:legX+i*110,y:legY-6,width:8,height:8,fill:li.color,rx:"1"}));
+  svg.appendChild(mkEl("text",{x:legX+i*110+11,y:legY+1.5,"font-size":"7.5","fill":"#7A786F"},li.label));
+});
+</script>
+</body></html>
