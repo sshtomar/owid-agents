@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Breastfeeding Revolution</h1>
+<p class="subtitle">Exclusive breastfeeding rates (% of infants under 6 months) rose sharply across developing countries from the 1990s onward, driven by WHO guidance and national health campaigns.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — NUT_BF_EBF</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [{"n":"Rwanda","pts":[{"y":1992,"v":85.3},{"y":2000,"v":83},{"y":2005,"v":88.4},{"y":2010,"v":83.8},{"y":2015,"v":86.9},{"y":2018,"v":85.3},{"y":2020,"v":80.9}]},{"n":"Peru","pts":[{"y":1986,"v":28},{"y":1996,"v":53},{"y":2005,"v":63.3},{"y":2009,"v":68.3},{"y":2011,"v":70.1},{"y":2013,"v":72.3},{"y":2015,"v":62.7},{"y":2017,"v":64.1},{"y":2019,"v":67.2},{"y":2021,"v":64.6},{"y":2024,"v":70.1}]},{"n":"Uganda","pts":[{"y":1988,"v":67.6},{"y":1995,"v":57.4},{"y":2000,"v":62.5},{"y":2006,"v":59},{"y":2011,"v":62.2},{"y":2016,"v":65.5}]},{"n":"Tanzania","pts":[{"y":1991,"v":25.5},{"y":1996,"v":29},{"y":1999,"v":31.8},{"y":2004,"v":41.3},{"y":2010,"v":48.7},{"y":2014,"v":41.1},{"y":2015,"v":59},{"y":2018,"v":57.8},{"y":2022,"v":64.3}]},{"n":"Malawi","pts":[{"y":2000,"v":44},{"y":2004,"v":52.3},{"y":2006,"v":56.7},{"y":2010,"v":70.8},{"y":2014,"v":69},{"y":2015,"v":59.4},{"y":2020,"v":64.1}]},{"n":"Zambia","pts":[{"y":1992,"v":10.2},{"y":1996,"v":18.8},{"y":1999,"v":18.5},{"y":2002,"v":39.7},{"y":2007,"v":59.9},{"y":2013,"v":72},{"y":2018,"v":69.9},{"y":2024,"v":64.1}]},{"n":"India","pts":[{"y":1992,"v":46},{"y":1999,"v":46.8},{"y":2006,"v":46.4},{"y":2015,"v":54.9},{"y":2017,"v":58},{"y":2020,"v":63.7}]},{"n":"Kenya","pts":[{"y":1989,"v":23},{"y":1993,"v":17},{"y":1998,"v":12.6},{"y":2003,"v":12.2},{"y":2008,"v":31.9},{"y":2014,"v":61.4},{"y":2022,"v":59.7}]},{"n":"Ethiopia","pts":[{"y":2000,"v":54.1},{"y":2005,"v":48.8},{"y":2011,"v":52},{"y":2016,"v":56.5},{"y":2019,"v":58.8}]},{"n":"Bolivia","pts":[{"y":1989,"v":50.6},{"y":1994,"v":43.3},{"y":1998,"v":50.6},{"y":2003,"v":53.5},{"y":2008,"v":56.8},{"y":2012,"v":64.3},{"y":2016,"v":55.7}]},{"n":"Mozambique","pts":[{"y":1997,"v":30.3},{"y":2003,"v":28.7},{"y":2008,"v":36.7},{"y":2011,"v":40},{"y":2013,"v":41},{"y":2022,"v":55.5}]},{"n":"Madagascar","pts":[{"y":1992,"v":49.4},{"y":1997,"v":47.9},{"y":2000,"v":40.7},{"y":2004,"v":67.2},{"y":2009,"v":50.1},{"y":2012,"v":41.9},{"y":2018,"v":50.6},{"y":2021,"v":54.4}]},{"n":"Bangladesh","pts":[{"y":1994,"v":46},{"y":1997,"v":45.2},{"y":2004,"v":38.9},{"y":2007,"v":42.9},{"y":2011,"v":64.1},{"y":2014,"v":55.3},{"y":2018,"v":65},{"y":2022,"v":53.3}]},{"n":"Ghana","pts":[{"y":1988,"v":2.2},{"y":1993,"v":7.4},{"y":1998,"v":31.5},{"y":2003,"v":53},{"y":2008,"v":62.1},{"y":2011,"v":45.7},{"y":2014,"v":52.1},{"y":2017,"v":42.9},{"y":2022,"v":52.6}]},{"n":"D.R. Congo","pts":[{"y":1995,"v":23.8},{"y":2001,"v":23.8},{"y":2007,"v":35.8},{"y":2010,"v":36.4},{"y":2013,"v":47.3},{"y":2017,"v":53.6},{"y":2023,"v":52.3}]}];
+
+const W = 740, H = 460;
+const margin = { top: 40, right: 130, bottom: 40, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Compute global year and value ranges
+let yearMin = Infinity, yearMax = -Infinity, valMin = 0, valMax = 100;
+for (const s of data) {
+  for (const pt of s.pts) {
+    yearMin = Math.min(yearMin, pt.y);
+    yearMax = Math.max(yearMax, pt.y);
+  }
+}
+
+const xScale = year => margin.left + (year - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = val => margin.top + (valMax - val) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9",
+    fill: "#7A786F"
+  })).textContent = v + "%";
+});
+
+// X axis ticks (every 5 years)
+for (let yr = Math.ceil(yearMin / 5) * 5; yr <= yearMax; yr += 5) {
+  svg.appendChild(mkEl("text", {
+    x: xScale(yr), y: H - margin.bottom + 14,
+    "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9",
+    fill: "#7A786F"
+  })).textContent = yr;
+}
+
+// Color by change magnitude
+function colorForSeries(s) {
+  const first = s.pts[0].v;
+  const last = s.pts[s.pts.length - 1].v;
+  const change = last - first;
+  if (change > 40) return "#EA5E33";
+  if (change > 25) return "#F29A44";
+  if (change > 10) return "#C49A45";
+  return "#5B9E78";
+}
+
+// Endpoint label collision resolution
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Build endpoint label positions
+const endLabels = data.map(s => {
+  const last = s.pts[s.pts.length - 1];
+  return { name: s.name || s.n, raw: yScale(last.v), y: yScale(last.v), color: colorForSeries(s), val: last.v };
+});
+const resolved = resolveCollisions(endLabels, 12);
+const yForLabel = {};
+resolved.forEach(item => { yForLabel[item.name] = item.y; });
+
+// Draw lines
+const groups = [];
+for (const s of data) {
+  const color = colorForSeries(s);
+  const g = mkEl("g", {});
+  const pathPts = s.pts.map((pt, i) => `${i === 0 ? "M" : "L"} ${xScale(pt.y)} ${yScale(pt.v)}`).join(" ");
+
+  const line = mkEl("path", {
+    d: pathPts, stroke: color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  // Invisible hit path
+  const hit = mkEl("path", {
+    d: pathPts, stroke: "transparent", "stroke-width": "12",
+    fill: "none", cursor: "pointer"
+  });
+  g.appendChild(hit);
+
+  // Endpoint label
+  const lastPt = s.pts[s.pts.length - 1];
+  const labelY = yForLabel[s.n];
+  const rawY = yScale(lastPt.v);
+
+  // Leader line if label was moved
+  if (Math.abs(labelY - rawY) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xScale(lastPt.y) + 4, y1: rawY,
+      x2: xScale(lastPt.y) + 10, y2: labelY,
+      stroke: color, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+
+  const txt = mkEl("text", {
+    x: xScale(lastPt.y) + 12, y: labelY + 3.5,
+    "font-size": "9", fill: "#2B2A27", "font-weight": "500"
+  });
+  txt.textContent = s.n;
+  g.appendChild(txt);
+
+  groups.push({ g, s, color, line });
+  svg.appendChild(g);
+}
+
+// Interactivity
+const tip = document.getElementById("tip");
+groups.forEach(({ g, s, line }) => {
+  const hitPath = g.children[1];
+  hitPath.addEventListener("mouseenter", () => {
+    groups.forEach(other => { other.g.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const year = yearMin + ratio * (yearMax - yearMin);
+    // Find nearest data point
+    let best = s.pts[0], bestDist = Infinity;
+    for (const pt of s.pts) {
+      const d = Math.abs(pt.y - year);
+      if (d < bestDist) { bestDist = d; best = pt; }
+    }
+    tip.textContent = `${s.n} (${best.y}): ${best.v.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    groups.forEach(other => { other.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+// WHO target line at 50%
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: yScale(50),
+  x2: W - margin.right, y2: yScale(50),
+  stroke: "#C2C0B5", "stroke-dasharray": "5,3", "stroke-width": "0.8"
+}));
+const targetLabel = mkEl("text", {
+  x: W - margin.right + 4, y: yScale(50) + 3.5,
+  "font-family": "'JetBrains Mono', monospace",
+  "font-size": "8", fill: "#9A9890"
+});
+targetLabel.textContent = "50% target";
+svg.appendChild(targetLabel);
+
+</script>
+</body></html>
