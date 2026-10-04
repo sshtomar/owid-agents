@@ -5858,6 +5858,92 @@
       ],
       "createdAt": "2026-06-28T00:00:00.000Z",
       "notebookPath": "notebooks/viz-356.py"
+    },
+    {
+      "id": "viz-357",
+      "title": "The Breastfeeding Revolution",
+      "description": "Exclusive breastfeeding rates (% of infants under 6 months) for 14 developing countries from the late 1980s to 2024. Ghana rose from 2% to 53%; Zambia from 10% to 64%; Kenya from 23% to 60%.",
+      "datasetIds": [
+        "who--NUT_BF_EBF"
+      ],
+      "chartType": "trend-lines",
+      "codeFilePath": "viz/viz-357.html",
+      "highlights": [
+        "Ghana went from 2% in 1988 to 53% in 2022 \u2014 one of the most dramatic rises",
+        "Rwanda maintained the highest rates (80\u201388%) throughout the entire period",
+        "Kenya declined through the 1990s before recovering sharply after 2008",
+        "Global rates are still below the WHO 50% target for many African countries"
+      ],
+      "createdAt": "2026-10-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-357.py"
+    },
+    {
+      "id": "viz-358",
+      "title": "Severe Wasting in Young Children Has Fallen \u2014 But Not in India",
+      "description": "Slope chart comparing severe wasting prevalence (% of children under 5) in the early 2000s versus the most recent survey for 20 high-burden countries. Most improved; India is the notable outlier.",
+      "datasetIds": [
+        "wb--SH-SVR-WAST-ZS"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Cambodia fell from 7.5% to 2.4% \u2014 the largest absolute decline in the set",
+        "India rose from 6.8% to 7.5%, making it the only major country to worsen",
+        "Azerbaijan dropped from 4.1% to 0.6%, among the biggest proportional gains",
+        "Comoros cut severe wasting from 7.2% to just 1.2%"
+      ],
+      "createdAt": "2026-10-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-358.py"
+    },
+    {
+      "id": "viz-359",
+      "title": "The Energy Chasm",
+      "description": "Energy use per capita (kg of oil equivalent) from 1990 to 2020 for 10 countries spanning the full income range. Iceland and Canada use 50\u201380x more energy than Chad or Bangladesh.",
+      "datasetIds": [
+        "wb--EG-USE-PCAP-KG-OE"
+      ],
+      "chartType": "trend-lines",
+      "highlights": [
+        "Iceland consumes more energy per person than any other country shown (~16,000 kg oe) due to geothermal and aluminum smelting",
+        "China's energy use tripled from 773 to 2,466 kg oe between 1990 and 2020",
+        "Germany steadily declined from 4,422 to 3,349 kg oe through efficiency gains",
+        "Chad's energy use actually fell from 297 to 198 kg oe \u2014 partly reflecting economic stagnation"
+      ],
+      "createdAt": "2026-10-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-359.py"
+    },
+    {
+      "id": "viz-360",
+      "title": "Drinking More or Less? Alcohol Consumption, 2000 vs 2019",
+      "description": "Slope chart comparing total alcohol consumption per capita (liters of pure alcohol) between 2000 and 2019 for the world's top-consuming countries. Most Western Europeans drank less; Georgia and some others drank more.",
+      "datasetIds": [
+        "wb--SH-ALC-PCAP-LI"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Ireland led the biggest drop: from 15L to 11.7L, a 22% decline in two decades",
+        "Georgia rose from 10.6L to 14.3L, overtaking Czechia as the highest consumer",
+        "France fell from 13.7L to 11.3L, while Germany dropped from 13.8L to 12.2L",
+        "Burkina Faso rose from 7.9L to 9.8L \u2014 a 25% increase from a low base"
+      ],
+      "createdAt": "2026-10-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-360.py"
+    },
+    {
+      "id": "viz-361",
+      "title": "From Near-Zero to Near-Universal: Polio Vaccination's 40-Year Rise",
+      "description": "Slope chart showing Pol3 immunization coverage (% of one-year-olds) from the early 1980s to 2024 for 18 countries with the biggest absolute gains. Bangladesh went from 1% to 97%; Bhutan from 4% to 99%.",
+      "datasetIds": [
+        "wb--SH-IMM-POL3"
+      ],
+      "chartType": "slope-chart",
+      "highlights": [
+        "Bangladesh achieved the largest gain in the set: from 1% (1981) to 97% (2024)",
+        "Bhutan reached 99% coverage from just 4% in 1980 \u2014 a near-perfect result",
+        "India went from 2% to 93%, covering over a billion children today",
+        "Ethiopia climbed from 3% to 73% \u2014 still short of 90% but a transformative rise"
+      ],
+      "createdAt": "2026-10-04T00:00:00.000Z",
+      "notebookPath": "notebooks/viz-361.py"
     }
   ],
   "lastUpdated": "2026-06-28T00:00:00.000Z"

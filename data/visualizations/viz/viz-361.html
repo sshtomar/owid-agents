@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>From Near-Zero to Near-Universal: Polio Vaccination's 40-Year Rise</h1>
+<p class="subtitle">Pol3 immunization coverage (% of one-year-olds) in the early 1980s versus 2024 for countries with the biggest absolute gains. Bangladesh rose from 1% to 97%; Bhutan from 4% to 99%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.IMM.POL3</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [{"n":"Bangladesh","a":1,"b":97},{"n":"Bhutan","a":4,"b":99},{"n":"India","a":2,"b":93},{"n":"Indonesia","a":1,"b":87},{"n":"Ghana","a":7,"b":91},{"n":"Burkina Faso","a":10,"b":91},{"n":"Australia","a":17,"b":94},{"n":"Iraq","a":16,"b":91},{"n":"Colombia","a":16,"b":89},{"n":"Cabo Verde","a":22,"b":94},{"n":"Cameroon","a":5,"b":76},{"n":"Djibouti","a":6,"b":77},{"n":"Ethiopia","a":3,"b":73},{"n":"Cambodia","a":18,"b":84},{"n":"Guinea-Bissau","a":3,"b":68},{"n":"Jamaica","a":34,"b":98},{"n":"Iran","a":38,"b":99},{"n":"Jordan","a":32,"b":94}];
+
+// Fix Iran name
+data[16].n = "Iran";
+
+const W = 700, H = 560;
+const pad = { left: 130, right: 140, top: 44, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "default";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 0, maxV = 100;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Column headers
+[{x: xLeft, t: "Early 1980s"}, {x: xRight, t: "2024"}].forEach(h => {
+  const el = mkEl("text", {
+    x: h.x, y: pad.top - 16,
+    "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "10", fill: "#7A786F"
+  });
+  el.textContent = h.t;
+  svg.appendChild(el);
+});
+
+// Background band for "near-universal" (90%+)
+svg.appendChild(mkEl("rect", {
+  x: xLeft, y: scale(100),
+  width: xRight - xLeft,
+  height: scale(90) - scale(100),
+  fill: "#3D7A5A", opacity: "0.06"
+}));
+const bandLbl = mkEl("text", {
+  x: xRight + 10, y: scale(95) + 3.5,
+  "font-family": "'JetBrains Mono', monospace",
+  "font-size": "8", fill: "#3D7A5A", opacity: "0.7"
+});
+bandLbl.textContent = "90%+ target";
+svg.appendChild(bandLbl);
+
+// Y axis ticks
+[xLeft, xRight].forEach(x => {
+  [0, 20, 40, 60, 80, 100].forEach(v => {
+    svg.appendChild(mkEl("line", {
+      x1: x - 3, y1: scale(v), x2: x + 3, y2: scale(v),
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+    const lbl = mkEl("text", {
+      x: x + (x === xLeft ? -8 : 8),
+      y: scale(v) + 3.5,
+      "text-anchor": x === xLeft ? "end" : "start",
+      "font-family": "'JetBrains Mono', monospace",
+      "font-size": "9", fill: "#7A786F"
+    });
+    lbl.textContent = v + "%";
+    svg.appendChild(lbl);
+  });
+});
+
+// Resolve endpoint collisions
+const leftLabels = data.map(d => ({ name: d.n, raw: scale(d.a), y: scale(d.a) }));
+const leftResolved = resolveCollisions(leftLabels, 13);
+const leftYFor = {};
+leftResolved.forEach(item => { leftYFor[item.name] = item.y; });
+
+const rightLabels = data.map(d => ({ name: d.n, raw: scale(d.b), y: scale(d.b) }));
+const rightResolved = resolveCollisions(rightLabels, 13);
+const rightYFor = {};
+rightResolved.forEach(item => { rightYFor[item.name] = item.y; });
+
+function colorForGain(d) {
+  const gain = d.b - d.a;
+  if (gain > 90) return "#EA5E33";
+  if (gain > 80) return "#F29A44";
+  if (gain > 70) return "#C49A45";
+  if (gain > 60) return "#8BAD72";
+  return "#5B9E78";
+}
+
+const groups = [];
+for (const d of data) {
+  const color = colorForGain(d);
+  const yA = scale(d.a);
+  const yB = scale(d.b);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", {
+    x1: xLeft, y1: yA, x2: xRight, y2: yB,
+    stroke: color, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+
+  g.appendChild(mkEl("circle", { cx: xLeft, cy: yA, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xRight, cy: yB, r: "2.5", fill: color }));
+
+  const hit = mkEl("line", {
+    x1: xLeft, y1: yA, x2: xRight, y2: yB,
+    stroke: "transparent", "stroke-width": "12", cursor: "pointer"
+  });
+  g.appendChild(hit);
+
+  // Left label (country name)
+  const leftY = leftYFor[d.n];
+  if (Math.abs(leftY - yA) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xLeft - 2, y1: yA, x2: xLeft - 8, y2: leftY,
+      stroke: color, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+  const lTxt = mkEl("text", {
+    x: xLeft - 10, y: leftY + 3.5,
+    "text-anchor": "end",
+    "font-size": "9.5", fill: "#2B2A27"
+  });
+  lTxt.textContent = d.n;
+  g.appendChild(lTxt);
+
+  // Right label (value + name for clarity)
+  const rightY = rightYFor[d.n];
+  if (Math.abs(rightY - yB) > 2) {
+    g.appendChild(mkEl("line", {
+      x1: xRight + 2, y1: yB, x2: xRight + 8, y2: rightY,
+      stroke: color, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+  const rTxt = mkEl("text", {
+    x: xRight + 10, y: rightY + 3.5,
+    "text-anchor": "start",
+    "font-size": "9.5", fill: "#2B2A27"
+  });
+  rTxt.textContent = d.b + "%";
+  g.appendChild(rTxt);
+
+  groups.push({ g, d, hit });
+  svg.appendChild(g);
+}
+
+const tip = document.getElementById("tip");
+groups.forEach(({ g, d, hit }) => {
+  hit.addEventListener("mouseenter", () => {
+    groups.forEach(other => { other.g.style.opacity = "0.12"; });
+    g.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    const gain = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (+${gain.toFixed(0)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(other => { other.g.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+});
+
+</script>
+</body></html>
