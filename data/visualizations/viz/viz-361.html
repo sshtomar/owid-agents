@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Electricity from Natural Gas, 1990–2024</h1>
+<p class="subtitle">Share of electricity generated from natural gas sources (% of total). Algeria, Iran, and Egypt rely on gas for 78–99% of electricity. Israel built gas generation almost from scratch. China and India remain below 5%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EG.ELC.NGAS.ZS</p>
+<script>
+// Data from wb--EG-ELC-NGAS-ZS, sampled every 2 years 1990-2024
+const data = [{"n":"Italy","s":[18.3,15.7,17.6,20.5,27.3,36.6,34.8,42.8,50.3,54.1,50.6,43.1,33.5,43.5,44.4,47.7,49.8,43.7],"y0":1990,"step":2},{"n":"Japan","s":[19.3,19.8,19.8,20.6,22.1,23.8,24.2,23.6,24.1,26.5,28.4,39.2,42.2,41.0,38.1,38.8,33.8,29.8],"y0":1990,"step":2},{"n":"Germany","s":[7.4,6.1,7.6,8.6,9.7,9.1,9.3,10.4,12.0,14.1,14.3,12.4,9.9,12.7,13.0,16.7,14.4,17.5],"y0":1990,"step":2},{"n":"France","s":[0.7,0.7,0.8,0.8,1.0,2.1,3.3,3.7,3.8,3.8,4.2,4.0,2.3,6.2,5.2,6.6,9.3,3.1],"y0":1990,"step":2},{"n":"Greece","s":[0.3,0.2,0.2,0.2,3.7,11.0,12.9,15.2,17.5,21.6,17.1,21.9,13.4,27.3,26.4,39.8,36.3,37.4],"y0":1990,"step":2},{"n":"China","s":[0.4,0.3,0.3,0.3,0.5,0.4,0.3,0.3,0.8,1.0,1.9,2.0,2.0,2.7,2.9,3.0,3.0],"y0":1990,"step":2},{"n":"Algeria","s":[93.7,94.7,95.4,95.7,95.6,96.7,97.6,97.0,97.3,97.3,97.5,97.1,98.6,98.2,98.5,98.8,99.0],"y0":1990,"step":2},{"n":"Iran","s":[52.5,52.1,61.0,60.1,74.0,75.7,75.3,77.1,70.3,78.0,75.9,66.9,71.3,80.7,82.6,76.8,78.2],"y0":1990,"step":2},{"n":"Egypt","s":[45.5,53.4,61.9,59.1,50.6,72.6,77.7,71.7,74.4,72.8,78.4,76.0,71.7,76.2,86.5,86.6,78.9],"y0":1990,"step":2},{"n":"Bangladesh","s":[84.3,86.6,84.6,87.1,84.6,88.7,89.2,91.0,90.9,89.6,92.5,83.8,81.8,80.3,75.3,82.8,67.5],"y0":1990,"step":2},{"n":"Israel","s":[0,0,0,0.1,0.0,0.0,0.1,9.2,18.0,27.0,37.5,16.8,48.4,61.0,66.8,67.1,69.0,69.8],"y0":1990,"step":2},{"n":"India","s":[3.4,4.9,5.7,7.3,10.1,10.0,10.4,11.3,10.3,10.3,11.0,7.4,4.6,4.9,4.2,4.3,3.0],"y0":1990,"step":2}];
+
+const W = 760, H = 500;
+const margin = { top: 30, right: 108, bottom: 40, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const yearMin = Math.min(...data.map(d => d.y0));
+const yearMax = Math.max(...data.map(d => d.y0 + (d.s.length - 1) * d.step));
+const valMax = 100;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / valMax * (H - margin.top - margin.bottom);
+
+// Color by 2024 value
+function lineColor(last) {
+  if (last > 80) return "#EA5E33";
+  if (last > 60) return "#F29A44";
+  if (last > 30) return "#C49A45";
+  if (last > 10) return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Grid lines
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "9" });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// X-axis years
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "9" });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+// Draw lines
+const groups = [];
+data.forEach(series => {
+  const color = lineColor(series.s[series.s.length - 1]);
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i * series.step, value: v }));
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, series, pts, color });
+});
+
+// Endpoint labels with collision resolution
+const labelItems = groups.map(({ series, pts, color }) => {
+  const last = pts[pts.length - 1];
+  return { y: yScale(last.value), n: series.n, v: last.value, color };
+});
+const resolved = resolveCollisions(labelItems, 11);
+resolved.forEach(item => {
+  const origY = yScale(item.v);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: W - margin.right, y1: origY,
+      x2: W - margin.right + 4, y2: item.y + 2,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const lbl = mkEl("text", { x: W - margin.right + 6, y: item.y + 3.5, fill: item.color, "font-size": "9.5", "font-weight": "500" });
+  lbl.textContent = `${item.n}`;
+  svg.appendChild(lbl);
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+groups.forEach(({ g, line, series, pts }) => {
+  const hit = g.querySelectorAll("path")[1];
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(obj => { obj.line.setAttribute("opacity", "0.1"); obj.line.setAttribute("stroke-width", "1.5"); });
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "2.5");
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(pts.length - 1, Math.round(ratio * (pts.length - 1))));
+    const pt = pts[idx];
+    tip.textContent = `${series.n}  ${pt.year}: ${pt.value.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(obj => { obj.line.setAttribute("opacity", "1"); obj.line.setAttribute("stroke-width", "1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

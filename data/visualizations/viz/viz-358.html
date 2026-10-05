@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Youth Population Share: 1990 vs 2024</h1>
+<p class="subtitle">Share of population under age 14 (%). South Korea fell from 25.8% to 10.6% in 34 years. Sub-Saharan Africa barely moved — Chad and DR Congo remain above 45%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SP.POP.0014.TO.ZS</p>
+<script>
+// Data from wb--SP-POP-0014-TO-ZS, 1990 vs 2024
+// v1990 = share under 14 in 1990, v2024 = share under 14 in 2024
+const data = [{"n":"Chad","v1990":47.1,"v2024":46.1},{"n":"Congo, Dem. Rep.","v1990":44.4,"v2024":46.0},{"n":"Angola","v1990":45.2,"v2024":44.4},{"n":"Afghanistan","v1990":47.7,"v2024":42.9},{"n":"Ethiopia","v1990":46.2,"v2024":39.1},{"n":"Kenya","v1990":49.2,"v2024":36.8},{"n":"Ghana","v1990":45.3,"v2024":35.8},{"n":"Haiti","v1990":41.9,"v2024":31.2},{"n":"Cambodia","v1990":43.7,"v2024":29.8},{"n":"Bolivia","v1990":40.3,"v2024":29.8},{"n":"Bangladesh","v1990":42.7,"v2024":28.0},{"n":"India","v1990":38.6,"v2024":24.6},{"n":"Indonesia","v1990":35.9,"v2024":24.6},{"n":"Brazil","v1990":35.5,"v2024":19.7},{"n":"France","v1990":20.1,"v2024":16.5},{"n":"China","v1990":28.8,"v2024":16.0},{"n":"Germany","v1990":16.1,"v2024":13.9},{"n":"Croatia","v1990":19.8,"v2024":13.9},{"n":"Greece","v1990":19.4,"v2024":13.2},{"n":"Italy","v1990":16.5,"v2024":11.9},{"n":"Japan","v1990":18.0,"v2024":11.4},{"n":"Korea, Rep.","v1990":25.8,"v2024":10.6}];
+
+const W = 680, H = 600;
+const pad = { left: 130, right: 130, top: 44, bottom: 20 };
+const innerH = H - pad.top - pad.bottom;
+const minV = 8, maxV = 52;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * innerH;
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "default";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Color by 2024 value
+function colorFor(v2024) {
+  if (v2024 > 40) return "#EA5E33";
+  if (v2024 > 30) return "#F29A44";
+  if (v2024 > 20) return "#C49A45";
+  if (v2024 > 15) return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Column headers
+["1990", "2024"].forEach((lbl, i) => {
+  const x = i === 0 ? xLeft : xRight;
+  const t = mkEl("text", { x, y: pad.top - 16, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "10", "font-weight": "500" });
+  t.textContent = lbl;
+  svg.appendChild(t);
+  svg.appendChild(mkEl("line", { x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+});
+
+// Draw rows
+const rows = [];
+data.forEach(d => {
+  const color = colorFor(d.v2024);
+  const ya = scale(d.v1990), yb = scale(d.v2024);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: color, "stroke-width": "1.5" });
+  const dot1 = mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color });
+  const dot2 = mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color });
+  const hit = mkEl("line", { x1: xLeft, y1: ya, x2: xRight, y2: yb, stroke: "transparent", "stroke-width": "14" });
+
+  g.appendChild(line);
+  g.appendChild(dot1);
+  g.appendChild(dot2);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  rows.push({ g, line, dot1, dot2, d, color });
+});
+
+// Build left labels (right-aligned at xLeft)
+const leftLabels = data.map(d => ({ y: scale(d.v1990), n: d.n, a: d.v1990, b: d.v2024, color: colorFor(d.v2024) }));
+const resolvedLeft = resolveCollisions(leftLabels, 12);
+resolvedLeft.forEach(item => {
+  const origY = scale(item.a);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xLeft - 4, y1: origY, x2: xLeft - 22, y2: item.y + 3, stroke: item.color, "stroke-width": "0.5", opacity: "0.6" }));
+  }
+  const valT = mkEl("text", { x: xLeft - 6, y: item.y + 3.5, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "8.5" });
+  valT.textContent = item.a.toFixed(1) + "%";
+  svg.appendChild(valT);
+  const nameT = mkEl("text", { x: xLeft - 36, y: item.y + 3.5, "text-anchor": "end", fill: item.color, "font-size": "9.5", "font-weight": "500" });
+  nameT.textContent = item.n === "Korea, Rep." ? "S. Korea" : item.n === "Congo, Dem. Rep." ? "DR Congo" : item.n;
+  svg.appendChild(nameT);
+});
+
+// Build right labels (left-aligned at xRight)
+const rightLabels = data.map(d => ({ y: scale(d.v2024), n: d.n, a: d.v1990, b: d.v2024, color: colorFor(d.v2024) }));
+const resolvedRight = resolveCollisions(rightLabels, 12);
+resolvedRight.forEach(item => {
+  const origY = scale(item.b);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xRight + 4, y1: origY, x2: xRight + 22, y2: item.y + 3, stroke: item.color, "stroke-width": "0.5", opacity: "0.6" }));
+  }
+  const valT = mkEl("text", { x: xRight + 6, y: item.y + 3.5, "text-anchor": "start", fill: "#7A786F", "font-family": "JetBrains Mono, monospace", "font-size": "8.5" });
+  valT.textContent = item.b.toFixed(1) + "%";
+  svg.appendChild(valT);
+  const nameT = mkEl("text", { x: xRight + 34, y: item.y + 3.5, "text-anchor": "start", fill: item.color, "font-size": "9.5", "font-weight": "500" });
+  nameT.textContent = item.n === "Korea, Rep." ? "S. Korea" : item.n === "Congo, Dem. Rep." ? "DR Congo" : item.n;
+  svg.appendChild(nameT);
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+rows.forEach(({ g, line, dot1, dot2, d }) => {
+  const hit = g.querySelectorAll("line")[1];
+  const enter = e => {
+    rows.forEach(r => { [r.line, r.dot1, r.dot2].forEach(el => el.setAttribute("opacity", "0.1")); });
+    [line, dot1, dot2].forEach(el => el.setAttribute("opacity", "1"));
+    line.setAttribute("stroke-width", "2.5");
+    const change = d.v2024 - d.v1990;
+    tip.textContent = `${d.n}: ${d.v1990}% → ${d.v2024}%  (${change > 0 ? "+" : ""}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  };
+  const leave = () => {
+    rows.forEach(r => { [r.line, r.dot1, r.dot2].forEach(el => el.setAttribute("opacity", "1")); line.setAttribute("stroke-width", "1.5"); });
+    tip.style.opacity = "0";
+  };
+  hit.addEventListener("mousemove", enter);
+  hit.addEventListener("mouseout", leave);
+});
+</script>
+</body></html>

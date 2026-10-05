@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Population Growth Rate, 1961–2024</h1>
+<p class="subtitle">Annual population growth (%) for selected countries and regions. Most of the world has slowed sharply — but sub-Saharan Africa remains above 2.4%, while Japan, South Korea, and China have turned negative.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SP.POP.GROW</p>
+<script>
+// Data from wb--SP-POP-GROW, sampled every 4 years 1961-2024
+const data = [{"n":"Sub-Saharan Africa","s":[2.4,2.55,2.66,2.76,2.78,2.99,2.9,2.8,2.74,2.63,2.67,2.73,2.76,2.74,2.63,2.53,2.44],"y0":1961,"step":4},{"n":"South Asia","s":[2.43,2.32,2.2,2.31,2.36,2.36,2.31,2.19,2.08,1.96,1.84,1.57,1.36,1.21,1.11,0.84,0.89],"y0":1961,"step":4},{"n":"India","s":[2.4,2.25,2.11,2.25,2.36,2.35,2.33,2.23,2.1,1.97,1.87,1.63,1.45,1.33,1.16,0.82,0.89],"y0":1961,"step":4},{"n":"Brazil","s":[3.02,2.82,2.51,2.42,2.39,2.33,2.13,1.84,1.62,1.49,1.3,1.1,0.9,0.81,0.73,0.43,0.41],"y0":1961,"step":4},{"n":"World","s":[1.36,2.06,2.08,1.98,1.75,1.77,1.76,1.75,1.59,1.46,1.34,1.27,1.25,1.23,1.13,0.83,0.96],"y0":1961,"step":4},{"n":"China","s":[-1.02,2.38,2.74,2.28,1.36,1.28,1.36,1.53,1.15,1.02,0.73,0.59,0.5,0.67,0.61,0.09,-0.12],"y0":1961,"step":4},{"n":"Germany","s":[0.77,0.85,0.79,0.31,-0.23,0.15,-0.22,0.77,0.66,0.15,0.17,-0.06,-0.25,0.27,0.37,0.04,0.27],"y0":1961,"step":4},{"n":"Japan","s":[0.9,1.08,1.19,1.41,0.97,0.73,0.63,0.4,0.32,0.24,0.24,0.01,-0.01,-0.14,-0.08,-0.46,-0.44],"y0":1961,"step":4},{"n":"Korea, Rep.","s":[2.97,2.54,2.26,1.77,1.56,1.56,0.98,0.99,1.02,0.94,0.77,0.21,0.51,0.46,0.28,-0.13,0.07],"y0":1961,"step":4},{"n":"France","s":[1.03,0.96,0.82,0.81,0.47,0.59,0.5,0.6,0.43,0.36,0.73,0.75,0.51,0.52,0.29,0.36,0.26],"y0":1961,"step":4},{"n":"Ethiopia","s":[2.45,2.69,2.75,2.66,1.93,2.51,2.82,3.84,3.52,3.21,3.03,2.97,2.84,2.72,2.73,2.67,2.58],"y0":1961,"step":4},{"n":"Kenya","s":[3.73,3.98,3.92,3.45,3.32,3.58,3.64,3.51,2.97,2.73,3.14,3.07,3.02,2.47,2.17,1.9,1.96],"y0":1961,"step":4},{"n":"Ghana","s":[2.85,2.4,2.5,2.89,2.95,2.81,2.15,2.5,2.47,2.38,2.66,2.62,2.5,2.41,2.2,1.96,1.88],"y0":1961,"step":4},{"n":"Bangladesh","s":[2.82,2.92,2.84,2.86,2.49,2.56,2.46,2.05,1.86,1.85,1.67,1.26,0.93,0.94,0.85,0.81,1.21],"y0":1961,"step":4}];
+
+const W = 760, H = 480;
+const margin = { top: 30, right: 140, bottom: 40, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Compute year range and value range
+const yearMin = Math.min(...data.map(d => d.y0));
+const yearMax = Math.max(...data.map(d => d.y0 + (d.s.length - 1) * d.step));
+const allVals = data.flatMap(d => d.s);
+const valMin = Math.min(...allVals);
+const valMax = Math.max(...allVals);
+const padVal = 0.3;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax + padVal - v) / (valMax - valMin + 2 * padVal) * (H - margin.top - margin.bottom);
+
+// Color by 2024 value (last point)
+function lineColor(series) {
+  const last = series[series.length - 1];
+  if (last > 2.5) return "#EA5E33";
+  if (last > 1.5) return "#F29A44";
+  if (last > 0.5) return "#C49A45";
+  if (last > 0) return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Grid lines
+[-1, 0, 1, 2, 3, 4].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: v === 0 ? "#C2C0B5" : "#E2E0D5",
+    "stroke-width": v === 0 ? "1" : "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3,
+    "text-anchor": "end",
+    fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9"
+  });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// X-axis labels
+[1970, 1980, 1990, 2000, 2010, 2020].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", {
+    x, y: H - margin.bottom + 14,
+    "text-anchor": "middle",
+    fill: "#7A786F",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "9"
+  });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+// Build endpoint label positions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Draw lines
+const groups = [];
+data.forEach(series => {
+  const color = lineColor(series.s);
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i * series.step, value: v }));
+  const lastPt = pts[pts.length - 1];
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, series, pts });
+});
+
+// Endpoint labels with collision resolution
+const labelItems = groups.map(({ series, pts }) => {
+  const lastPt = pts[pts.length - 1];
+  return { y: yScale(lastPt.value), n: series.n, color: lineColor(series.s), lastVal: lastPt.value };
+});
+const resolved = resolveCollisions(labelItems, 11);
+const labelX = W - margin.right + 6;
+
+resolved.forEach(item => {
+  const lbl = mkEl("text", {
+    x: labelX,
+    y: item.y + 3,
+    fill: item.color,
+    "font-size": "9",
+    "font-weight": "500"
+  });
+  lbl.textContent = item.n;
+  svg.appendChild(lbl);
+
+  // Leader line if label was moved
+  const originalY = yScale(item.lastVal);
+  if (Math.abs(item.y - originalY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: W - margin.right, y1: originalY,
+      x2: labelX - 2, y2: item.y + 2,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+groups.forEach(({ g, line, series, pts }) => {
+  const hit = g.querySelectorAll("path")[1];
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(obj => { obj.line.setAttribute("opacity", "0.12"); obj.line.setAttribute("stroke-width", "1.5"); });
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "2.5");
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(pts.length - 1, Math.round(ratio * (pts.length - 1))));
+    const pt = pts[idx];
+    tip.textContent = `${series.n}  ${pt.year}: ${pt.value > 0 ? "+" : ""}${pt.value.toFixed(2)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(obj => { obj.line.setAttribute("opacity", "1"); obj.line.setAttribute("stroke-width", "1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>
