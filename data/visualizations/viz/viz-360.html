@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; max-width: 700px; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; background: #F6F5EE; }
+  .cell:hover { background: #EFEEE7; }
+  .cell-name { font-size: 9px; font-weight: 600; color: #2B2A27; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-vals { font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #7A786F; display: flex; justify-content: space-between; margin-top: 4px; }
+</style></head><body>
+<h1>DPT Immunization Coverage, 1980–2024</h1>
+<p class="subtitle">% of children ages 12–23 months immunized against diphtheria, pertussis, and tetanus. Sorted from lowest to highest 2024 coverage. Almost every country improved dramatically since 1980.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.IMM.IDPT</p>
+<script>
+// Data from wb--SH-IMM-IDPT, sampled every 4 years
+const data = [{"n":"Bolivia","s":[11,6,28,45,61,75,84,88,93,87,68,59],"y0":1980,"e":11,"l":59},{"n":"Afghanistan","s":[4,16,35,21,31,24,50,64,67,66,61,59],"y0":1980,"e":4,"l":59},{"n":"Haiti","s":[3,14,48,38,42,44,57,64,66,59,58,60],"y0":1980,"e":3,"l":60},{"n":"Angola","s":[8,12,21,28,31,47,45,52,59,59,64],"y0":1984,"e":8,"l":64},{"n":"Congo, Dem. Rep.","s":[27,41,23,18,30,54,68,71,70,70,65],"y0":1984,"e":27,"l":65},{"n":"Chad","s":[3,14,10,20,38,22,19,40,41,55,68],"y0":1984,"e":3,"l":68},{"n":"Ethiopia","s":[4,16,13,55,30,39,54,61,64,62,73],"y0":1984,"e":4,"l":73},{"n":"Indonesia","s":[13,54,64,72,75,71,77,87,84,77,78],"y0":1984,"e":13,"l":78},{"n":"Cambodia","s":[17,45,32,43,59,85,91,90,91,86,83],"y0":1984,"e":17,"l":83},{"n":"Germany","s":[94,80,85,84,90,96,96,95,91,91,89],"y0":1984,"e":94,"l":89},{"n":"Kenya","s":[58,82,87,87,82,73,88,94,88,93,91],"y0":1984,"e":58,"l":91},{"n":"Brazil","s":[37,68,58,71,77,98,99,99,95,89,77,91],"y0":1980,"e":37,"l":91},{"n":"Croatia","s":[83,91,93,96,96,96,93,94,92],"y0":1992,"e":83,"l":92},{"n":"India","s":[6,16,40,56,66,58,63,70,82,88,85,94],"y0":1980,"e":6,"l":94},{"n":"Ghana","s":[7,19,47,62,71,88,80,93,92,93,94,95],"y0":1980,"e":7,"l":95},{"n":"Greece","s":[72,60,83,89,90,89,95,99,99,99,99,95],"y0":1980,"e":72,"l":95},{"n":"France","s":[79,94,79,94,97,97,98,99,99,95,96,96],"y0":1980,"e":79,"l":96},{"n":"Bangladesh","s":[1,16,66,77,82,99,96,94,98,97,97],"y0":1984,"e":1,"l":97},{"n":"China","s":[73,95,91,83,85,87,97,99,99,99,97],"y0":1984,"e":73,"l":97},{"n":"Japan","s":[60,82,86,87,99,85,99,98,97,99,96,99],"y0":1980,"e":60,"l":99}];
+
+const COLS = 5;
+const cellW = 130, cellH = 52;
+const dpr = window.devicePixelRatio || 1;
+
+const grid = document.createElement("div");
+grid.className = "grid";
+grid.style.gridTemplateColumns = `repeat(${COLS}, ${cellW}px)`;
+document.getElementById("chart").appendChild(grid);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.style.width = cellW + "px";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "cell-name";
+  nameDiv.textContent = d.n === "Congo, Dem. Rep." ? "DR Congo" : d.n;
+  cell.appendChild(nameDiv);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = (cellW - 20) * dpr;
+  canvas.height = cellH * dpr;
+  canvas.style.width = (cellW - 20) + "px";
+  canvas.style.height = cellH + "px";
+  canvas.style.display = "block";
+  cell.appendChild(canvas);
+
+  const valsDiv = document.createElement("div");
+  valsDiv.className = "cell-vals";
+  valsDiv.innerHTML = `<span>${d.y0}</span><span style="color:#2B2A27;font-weight:500">${d.l}%</span>`;
+  cell.appendChild(valsDiv);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const w = cellW - 20, h = cellH;
+  const min = 0, max = 100;
+  const norm = v => h - (v - min) / (max - min) * h;
+
+  // Draw fill under line
+  ctx.beginPath();
+  d.s.forEach((v, j) => {
+    const x = j / (d.s.length - 1) * w;
+    const y = norm(v);
+    j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(234,94,51,0.08)";
+  ctx.fill();
+
+  // Draw line
+  ctx.strokeStyle = d.l >= 90 ? "#5B9E78" : d.l >= 70 ? "#C49A45" : "#EA5E33";
+  ctx.lineWidth = 1.3 * dpr / dpr;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  d.s.forEach((v, j) => {
+    const x = j / (d.s.length - 1) * w;
+    const y = norm(v);
+    j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Hover
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = mx / w;
+    const idx = Math.max(0, Math.min(d.s.length - 1, Math.round(ratio * (d.s.length - 1))));
+    const year = d.y0 + idx * 4;
+
+    // Crosshair
+    const cw = (cellW - 20) * dpr, ch = cellH * dpr;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.scale(dpr, dpr);
+
+    // Redraw fill
+    ctx.beginPath();
+    d.s.forEach((v, j) => { const x = j/(d.s.length-1)*w, y=norm(v); j===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+    ctx.fillStyle="rgba(234,94,51,0.08)"; ctx.fill();
+
+    // Redraw line
+    ctx.strokeStyle = d.l >= 90 ? "#5B9E78" : d.l >= 70 ? "#C49A45" : "#EA5E33";
+    ctx.lineWidth = 1.3; ctx.lineJoin = "round";
+    ctx.beginPath();
+    d.s.forEach((v, j) => { const x=j/(d.s.length-1)*w, y=norm(v); j===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.stroke();
+
+    // Crosshair
+    const cx = idx / (d.s.length - 1) * w;
+    ctx.strokeStyle = "#2B2A27"; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.4;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+    ctx.globalAlpha = 1;
+    // Dot
+    ctx.fillStyle = "#2B2A27"; ctx.beginPath(); ctx.arc(cx, norm(d.s[idx]), 2.5, 0, Math.PI*2); ctx.fill();
+
+    tip.textContent = `${d.n}  ${year}: ${d.s[idx]}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+
+  cell.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    // Redraw without crosshair
+    ctx.clearRect(0, 0, (cellW-20)*dpr, cellH*dpr);
+    ctx.save(); ctx.scale(dpr, dpr);
+    ctx.beginPath();
+    d.s.forEach((v, j) => { const x=j/(d.s.length-1)*w,y=norm(v); j===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+    ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+    ctx.fillStyle="rgba(234,94,51,0.08)"; ctx.fill();
+    ctx.strokeStyle = d.l>=90?"#5B9E78":d.l>=70?"#C49A45":"#EA5E33";
+    ctx.lineWidth=1.3; ctx.lineJoin="round";
+    ctx.beginPath();
+    d.s.forEach((v,j)=>{const x=j/(d.s.length-1)*w,y=norm(v);j===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke(); ctx.restore();
+  });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>
