@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Expanding Protected Land: Terrestrial Protected Areas, 2013 vs 2022</h1>
+<p class="subtitle">Protected areas as % of total land area. Countries like Croatia, Cyprus, and Japan roughly doubled their protected land in under a decade.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Terrestrial Protected Areas (ER.LND.PTLD.ZS)</p>
+<script>
+const data = [
+  {"n":"Croatia","a":13.8,"b":38.5},
+  {"n":"Comoros","a":10.2,"b":33.8},
+  {"n":"Bahamas","a":13.3,"b":36.6},
+  {"n":"Bhutan","a":28.8,"b":49.7},
+  {"n":"Cyprus","a":20.6,"b":38.7},
+  {"n":"Andorra","a":9.2,"b":26.9},
+  {"n":"Cambodia","a":26.3,"b":39.7},
+  {"n":"Japan","a":16.4,"b":29.7},
+  {"n":"Guinea-Bissau","a":16.2,"b":27.1},
+  {"n":"Korea, Rep.","a":6.6,"b":17.0},
+  {"n":"Bolivia","a":21.4,"b":30.9},
+  {"n":"Albania","a":10.1,"b":18.6},
+  {"n":"Australia","a":12.9,"b":20.4},
+  {"n":"Austria","a":24.0,"b":29.5},
+  {"n":"Brazil","a":26.4,"b":30.3},
+  {"n":"France","a":25.4,"b":28.4},
+  {"n":"Germany","a":37.9,"b":37.6},
+  {"n":"Brunei","a":46.9,"b":46.9},
+  {"n":"Bhutan","a":28.8,"b":49.7}
+];
+
+// Deduplicate
+const seen = new Set();
+const dedupData = data.filter(d => { if (seen.has(d.n)) return false; seen.add(d.n); return true; });
+
+const W = 700, H = 580;
+const pad = { left: 128, right: 138, top: 48, bottom: 24 };
+
+function svgEl(tag, attrs) {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+const allVals = dedupData.flatMap(d => [d.a, d.b]);
+const minV = 0, maxV = 55;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xL = pad.left, xR = W - pad.right;
+
+function colorForChange(d) {
+  const ch = d.b - d.a;
+  if (ch > 20) return "#EA5E33";
+  if (ch > 12) return "#F29A44";
+  if (ch > 6) return "#C49A45";
+  if (ch > 2) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:${W}px;` });
+document.getElementById("chart").appendChild(svg);
+
+[["2013", xL], ["2022", xR]].forEach(([label, x]) => {
+  const t = svgEl("text", { x, y: pad.top - 16, "text-anchor": "middle", "font-size": "10", fill: "#7A786F", style: "font-family:'JetBrains Mono',monospace" });
+  t.textContent = label;
+  svg.appendChild(t);
+  svg.appendChild(svgEl("line", { x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+});
+
+[10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(svgEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.4", "stroke-dasharray": "2,3" }));
+});
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+dedupData.forEach((d, di) => {
+  const color = colorForChange(d);
+  const yA = scale(d.a), yB = scale(d.b);
+  const g = svgEl("g", {});
+  svg.appendChild(g);
+
+  g.appendChild(svgEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: color, "stroke-width": "1.5" }));
+  g.appendChild(svgEl("circle", { cx: xL, cy: yA, r: "2.5", fill: color }));
+  g.appendChild(svgEl("circle", { cx: xR, cy: yB, r: "2.5", fill: color }));
+
+  const hit = svgEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: "transparent", "stroke-width": "12", cursor: "crosshair" });
+  g.appendChild(hit);
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach((gg, gi) => gg.setAttribute("opacity", gi === di ? "1" : "0.1"));
+    const ch = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${ch >= 0 ? "+" : ""}${ch.toFixed(1)})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => { groups.forEach(gg => gg.setAttribute("opacity", "1")); tip.style.opacity = "0"; });
+
+  groups.push(g);
+});
+
+const leftItems = dedupData.map(d => ({ name: d.n, val: d.a, y: scale(d.a), color: colorForChange(d) }));
+resolveCollisions(leftItems, 13).forEach(item => {
+  const origY = scale(item.val);
+  const t = svgEl("text", { x: xL - 8, y: item.y + 4, "text-anchor": "end", "font-size": "9", fill: item.color, style: "font-family:'Inter',sans-serif" });
+  t.textContent = `${item.name}  ${item.val}%`;
+  svg.appendChild(t);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(svgEl("line", { x1: xL - 5, y1: origY, x2: xL - 5, y2: item.y, stroke: item.color, "stroke-width": "0.4", opacity: "0.4" }));
+  }
+});
+
+const rightItems = dedupData.map(d => ({ name: d.n, val: d.b, y: scale(d.b), color: colorForChange(d) }));
+resolveCollisions(rightItems, 13).forEach(item => {
+  const origY = scale(item.val);
+  const t = svgEl("text", { x: xR + 8, y: item.y + 4, "text-anchor": "start", "font-size": "9", fill: item.color, style: "font-family:'Inter',sans-serif" });
+  t.textContent = `${item.val}%  ${item.name}`;
+  svg.appendChild(t);
+  if (Math.abs(item.y - origY) > 3) {
+    svg.appendChild(svgEl("line", { x1: xR + 5, y1: origY, x2: xR + 5, y2: item.y, stroke: item.color, "stroke-width": "0.4", opacity: "0.4" }));
+  }
+});
+
+// Legend
+const legend = [["#EA5E33",">20% gain"],["#F29A44","12–20%"],["#C49A45","6–12%"],["#8BAD72","2–6%"],["#A6C4A2","<2%"]];
+let lx = pad.left;
+legend.forEach(([c, label]) => {
+  svg.appendChild(svgEl("rect", { x: lx, y: 6, width: 10, height: 10, fill: c }));
+  const t = svgEl("text", { x: lx + 14, y: 15, "font-size": "8.5", fill: "#7A786F", style: "font-family:'Inter',sans-serif" });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 14 + label.length * 5 + 12;
+});
+</script>
+</body></html>

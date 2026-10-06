@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Who Saves? Gross Savings Rate by Country, 1990–2021</h1>
+<p class="subtitle">Gross savings as % of Gross National Income. China and Korea consistently save 35–50%, while France and Brazil save below 25%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Gross Savings (NY.GNS.ICTR.GN.ZS)</p>
+<script>
+const data = [
+  {"n":"China","s":[36.5,41.7,39.1,36.9,39.1,45.9,51.0,49.1,47.2,44.4,43.8],"y0":1990,"step":3},
+  {"n":"Korea, Rep.","s":[39.6,38.6,36.2,36.0,31.8,34.1,33.2,34.2,34.4,36.3,35.5],"y0":1990,"step":3},
+  {"n":"India","s":[21.5,24.4,27.3,25.8,28.3,34.7,36.5,35.4,33.9,32.1,29.1],"y0":1990,"step":3},
+  {"n":"Japan","s":[34.5,31.3,29.3,29.8,28.9,25.7,26.1,29.6,28.7],"y0":1996,"step":3},
+  {"n":"Germany","s":[24.5,22.5,22.1,22.9,26.0,26.7,26.8,27.9,27.3],"y0":1990,"step":3},
+  {"n":"France","s":[23.5,21.2,21.6,23.8,22.3,22.0,22.7,21.3,20.6,21.2,20.4],"y0":1990,"step":3},
+  {"n":"Brazil","s":[19.5,20.8,14.2,13.1,15.9,18.7,19.7,19.1,16.4,13.8,15.2],"y0":1990,"step":3}
+];
+
+const COLORS = {
+  "China": "#EA5E33",
+  "Korea, Rep.": "#F29A44",
+  "India": "#C49A45",
+  "Japan": "#4A7FAA",
+  "Germany": "#5B9E78",
+  "France": "#8BAD72",
+  "Brazil": "#A89B7A"
+};
+
+const W = 780, H = 420;
+const margin = { top: 36, right: 130, bottom: 36, left: 52 };
+
+function svgEl(tag, attrs) {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+const yearMin = 1990, yearMax = 2021;
+const valMin = 0, valMax = 56;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:${W}px; cursor:crosshair;` });
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[10, 20, 30, 40, 50].forEach(v => {
+  svg.appendChild(svgEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = svgEl("text", { x: margin.left - 6, y: yScale(v) + 4, "text-anchor": "end", "font-size": "9", fill: "#7A786F", style: "font-family:'JetBrains Mono',monospace" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X ticks
+for (let yr = 1990; yr <= 2020; yr += 5) {
+  const x = xScale(yr);
+  svg.appendChild(svgEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  const t = svgEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", style: "font-family:'JetBrains Mono',monospace" });
+  t.textContent = yr;
+  svg.appendChild(t);
+}
+
+svg.appendChild(svgEl("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+data.forEach((d, di) => {
+  const color = COLORS[d.n] || "#A89B7A";
+  const g = svgEl("g", {});
+  svg.appendChild(g);
+
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i * d.step, value: v }));
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+
+  g.appendChild(svgEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" }));
+
+  const hit = svgEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "crosshair" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach((gg, gi) => gg.setAttribute("opacity", gi === di ? "1" : "0.1"));
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(d.s.length - 1, Math.round(ratio * (d.s.length - 1))));
+    const yr = d.y0 + idx * d.step;
+    tip.textContent = `${d.n} ${yr}: ${d.s[idx].toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => { groups.forEach(gg => gg.setAttribute("opacity", "1")); tip.style.opacity = "0"; });
+
+  groups.push(g);
+});
+
+const labelItems = data.map(d => ({
+  name: d.n,
+  val: d.s[d.s.length - 1],
+  y: yScale(d.s[d.s.length - 1]),
+  color: COLORS[d.n] || "#A89B7A",
+  x: xScale(d.y0 + (d.s.length - 1) * d.step)
+}));
+resolveCollisions(labelItems, 13).forEach(item => {
+  const origY = yScale(item.val);
+  const t = svgEl("text", {
+    x: item.x + 8,
+    y: item.y + 4,
+    "font-size": "9",
+    fill: item.color,
+    style: "font-family:'JetBrains Mono',monospace"
+  });
+  t.textContent = `${item.val.toFixed(0)}%  ${item.name}`;
+  svg.appendChild(t);
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(svgEl("line", { x1: item.x + 4, y1: origY, x2: item.x + 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+});
+</script>
+</body></html>
