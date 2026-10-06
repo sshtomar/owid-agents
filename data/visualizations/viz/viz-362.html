@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Rise of Asian Science: Scientific Publications by Country</h1>
+<p class="subtitle">Annual scientific and technical journal articles (thousands), 2000–2022. China grew 11.8× from 53K to 886K papers, overtaking every other country.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Scientific and Technical Journal Articles (IP.JRN.ARTC.SC)</p>
+<script>
+const data = [
+  {"n":"China","s":[53.3,74.9,120.9,192.0,247.0,307.8,326.4,379.5,430.3,513.6,671.7,886.0],"y0":2000,"step":2},
+  {"n":"India","s":[21.4,23.7,28.0,37.0,46.5,58.3,75.6,88.3,104.7,123.1,145.7,200.5],"y0":2000,"step":2},
+  {"n":"Germany","s":[69.7,71.3,75.4,85.6,91.1,96.1,103.8,105.5,108.9,109.1,109.2,112.3],"y0":2000,"step":2},
+  {"n":"Japan","s":[96.6,98.7,103.6,112.7,106.6,107.2,107.5,103.4,101.2,102.0,100.4,102.4],"y0":2000,"step":2},
+  {"n":"Italy","s":[36.2,39.0,44.3,50.5,55.7,57.8,63.1,67.4,69.3,71.0,80.1,83.2],"y0":2000,"step":2},
+  {"n":"Korea, Rep.","s":[15.9,20.2,27.6,37.1,43.7,50.1,55.7,59.4,61.9,64.8,69.1,72.0],"y0":2000,"step":2},
+  {"n":"Canada","s":[34.3,36.4,42.3,50.0,53.1,56.0,59.0,60.0,60.5,62.5,64.5,66.8],"y0":2000,"step":2},
+  {"n":"France","s":[50.0,50.7,53.6,60.7,64.1,66.8,70.4,71.2,70.2,67.1,65.6,65.2],"y0":2000,"step":2}
+];
+
+const COLORS = {
+  "China": "#EA5E33",
+  "India": "#F29A44",
+  "Germany": "#5B9E78",
+  "Japan": "#4A7FAA",
+  "Italy": "#8BAD72",
+  "Korea, Rep.": "#C49A45",
+  "Canada": "#A89B7A",
+  "France": "#9A7B9A"
+};
+
+const W = 780, H = 460;
+const margin = { top: 36, right: 130, bottom: 36, left: 56 };
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", "svg" === tag ? tag : tag);
+  if (tag === "svg" || tag.includes(":") || ["path","line","text","rect","circle","g"].includes(tag)) {
+    const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+  return el;
+}
+function svgEl(tag, attrs) {
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+const yearMin = 2000, yearMax = 2022;
+const valMin = 0, valMax = 920;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: `max-width:${W}px; cursor:crosshair;` });
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[0, 200, 400, 600, 800].forEach(v => {
+  svg.appendChild(svgEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(svgEl("text", { x: margin.left - 6, y: yScale(v) + 4, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F", style: "font-family:'JetBrains Mono',monospace" })).textContent = v + "k";
+});
+
+// X axis ticks
+for (let yr = 2000; yr <= 2022; yr += 4) {
+  const x = xScale(yr);
+  svg.appendChild(svgEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  const t = svgEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", style: "font-family:'JetBrains Mono',monospace" });
+  t.textContent = yr;
+  svg.appendChild(t);
+}
+
+// Baseline
+svg.appendChild(svgEl("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+data.forEach((d, di) => {
+  const color = COLORS[d.n] || "#A89B7A";
+  const g = svgEl("g", {});
+  svg.appendChild(g);
+
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i * d.step, value: v }));
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+
+  g.appendChild(svgEl("path", { d: pathD, stroke: color, "stroke-width": d.n === "China" ? "2.5" : "1.5", fill: "none", "stroke-linejoin": "round" }));
+
+  // Invisible hit path
+  const hit = svgEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "crosshair" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    groups.forEach((gg, gi) => gg.setAttribute("opacity", gi === di ? "1" : "0.1"));
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const idx = Math.max(0, Math.min(d.s.length - 1, Math.round(ratio * (d.s.length - 1))));
+    const yr = d.y0 + idx * d.step;
+    tip.textContent = `${d.n} ${yr}: ${d.s[idx].toFixed(1)}k articles`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(gg => gg.setAttribute("opacity", "1"));
+    tip.style.opacity = "0";
+  });
+
+  groups.push(g);
+});
+
+// Endpoint labels (collision-resolved)
+const labelItems = data.map(d => ({
+  name: d.n,
+  val: d.s[d.s.length - 1],
+  y: yScale(d.s[d.s.length - 1]),
+  color: COLORS[d.n] || "#A89B7A"
+}));
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const t = svgEl("text", {
+    x: xScale(yearMax) + 8,
+    y: item.y + 4,
+    "font-size": "9",
+    fill: item.color,
+    style: "font-family:'JetBrains Mono',monospace"
+  });
+  t.textContent = `${item.val.toFixed(0)}k  ${item.name}`;
+  svg.appendChild(t);
+  // Leader line if label moved
+  const origY = yScale(item.val);
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(svgEl("line", { x1: xScale(yearMax) + 3, y1: origY, x2: xScale(yearMax) + 6, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+});
+</script>
+</body></html>
