@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Tuberculosis Treatment Success: Progress With a Paradox</h1>
+<p class="subtitle">% of new TB cases successfully treated: 2005 vs. 2022. Most high-burden developing countries have improved dramatically. Paradoxically, some European countries have seen success rates plummet—likely due to treating increasingly complex MDR cases and loss-to-follow-up in low-incidence settings.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Tuberculosis Treatment Success Rate (SH.TBS.CURE.ZS) · WHO</p>
+<script>
+// Data: {n, y: year of 'a' value, a: 2005 rate, b: 2022 rate}
+const data = [
+  {"n":"Congo, Rep.","y":2005,"a":28,"b":82},
+  {"n":"Eswatini","y":2005,"a":36,"b":83},
+  {"n":"Bahamas, The","y":2005,"a":52,"b":87},
+  {"n":"Ghana","y":2005,"a":61,"b":87},
+  {"n":"Congo, Dem. Rep.","y":2005,"a":85,"b":95},
+  {"n":"Central African Republic","y":2005,"a":68,"b":90},
+  {"n":"Burundi","y":2005,"a":71,"b":94},
+  {"n":"Cambodia","y":2005,"a":91,"b":96},
+  {"n":"Bangladesh","y":2005,"a":90,"b":95},
+  {"n":"China","y":2005,"a":92,"b":95},
+  {"n":"Ethiopia","y":2005,"a":78,"b":86},
+  {"n":"Kenya","y":2005,"a":81,"b":89},
+  {"n":"India","y":2005,"a":87,"b":89},
+  {"n":"Indonesia","y":2005,"a":89,"b":87},
+  {"n":"Brazil","y":2005,"a":72,"b":66},
+  {"n":"Ecuador","y":2005,"a":82,"b":71},
+  {"n":"Iceland","y":2005,"a":100,"b":71},
+  {"n":"Germany","y":2005,"a":73,"b":62},
+  {"n":"Bosnia and Herzegovina","y":2005,"a":97,"b":47},
+  {"n":"Bahrain","y":2005,"a":94,"b":44},
+  {"n":"Denmark","y":2005,"a":85,"b":18}
+];
+
+const W = 720, H = 580;
+const pad = { left: 148, right: 155, top: 48, bottom: 28 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 0, maxV = 100;
+const chartH = H - pad.top - pad.bottom;
+const xL = pad.left, xR = W - pad.right;
+
+function yScale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * chartH;
+}
+
+function colorForChange(d) {
+  const ch = d.b - d.a;
+  if (ch > 30) return "#3D7A5A";
+  if (ch > 10) return "#5B9E78";
+  if (ch > -5) return "#8BAD72";
+  if (ch > -20) return "#C49A45";
+  if (ch > -40) return "#C4715A";
+  return "#EA5E33";
+}
+
+// Grid lines
+[0, 25, 50, 75, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xL, y1: yScale(v), x2: xR, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xL - 6, y: yScale(v) + 3.5, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "8", fill: "#9A9890"
+  })).textContent = v + "%";
+});
+
+// Axis lines
+[xL, xR].forEach(x => {
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.8"
+  }));
+});
+
+// Year headers
+[["2005", xL], ["2022", xR]].forEach(([label, x]) => {
+  svg.appendChild(mkEl("text", {
+    x, y: pad.top - 16, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F"
+  })).textContent = label;
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topBound = pad.top;
+  const botBound = H - pad.bottom;
+  sorted[0].y = Math.max(sorted[0].y, topBound);
+  sorted[sorted.length - 1].y = Math.min(sorted[sorted.length - 1].y, botBound);
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: yScale(d.a), orig: yScale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: yScale(d.b), orig: yScale(d.b) }));
+resolveCollisions(leftLabels, 11);
+resolveCollisions(rightLabels, 11);
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top = (e.clientY - 22) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+data.forEach((d, i) => {
+  const color = colorForChange(d);
+  const g = mkEl("g");
+  const y1 = yScale(d.a), y2 = yScale(d.b);
+
+  g.appendChild(mkEl("line", {
+    x1: xL, y1, x2: xR, y2,
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: y1, r: "2.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: y2, r: "2.5", fill: color }));
+
+  const hit = mkEl("line", {
+    x1: xL, y1, x2: xR, y2,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  hit.style.cursor = "pointer";
+
+  const change = d.b - d.a;
+  const sign = change >= 0 ? "+" : "";
+  hit.addEventListener("mouseover", e => {
+    groups.forEach((gg, j) => { gg.style.opacity = j === i ? "1" : "0.12"; });
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${change})`, e);
+  });
+  hit.addEventListener("mousemove", e => {
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${sign}${change})`, e);
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    hideTip();
+  });
+
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Labels
+leftLabels.forEach(({ d, y, orig }) => {
+  svg.appendChild(mkEl("text", {
+    x: xL - 8, y: y + 3.5, "text-anchor": "end",
+    "font-size": "9", fill: "#2B2A27"
+  })).textContent = `${d.n}  ${d.a}`;
+  if (Math.abs(y - orig) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: xL - 5, y1: orig, x2: xL - 5, y2: y,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+});
+
+rightLabels.forEach(({ d, y, orig }) => {
+  svg.appendChild(mkEl("text", {
+    x: xR + 8, y: y + 3.5, "text-anchor": "start",
+    "font-size": "9", fill: "#2B2A27"
+  })).textContent = `${d.b}  ${d.n}`;
+  if (Math.abs(y - orig) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: xR + 5, y1: orig, x2: xR + 5, y2: y,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+});
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "Large improvement" },
+  { color: "#8BAD72", label: "Stable/small change" },
+  { color: "#C49A45", label: "Moderate decline" },
+  { color: "#EA5E33", label: "Large decline" }
+];
+let lx = xL;
+legendItems.forEach(({ color, label }) => {
+  svg.appendChild(mkEl("rect", { x: lx, y: H - 14, width: 8, height: 8, fill: color, rx: "1" }));
+  const t = mkEl("text", {
+    x: lx + 11, y: H - 7.5, "font-size": "8",
+    "font-family": "JetBrains Mono, monospace", fill: "#7A786F"
+  });
+  t.textContent = label;
+  svg.appendChild(t);
+  lx += 112;
+});
+</script>
+</body></html>
