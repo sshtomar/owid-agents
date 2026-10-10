@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Countries with the Most Threatened Bird Species, 2022</h1>
+<p class="subtitle">Number of bird species classified as threatened (vulnerable, endangered, or critically endangered) per country by the IUCN. Indonesia and Brazil — home to vast tropical forests — face by far the highest counts.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank / IUCN Red List — EN.BIR.THRD.NO</p>
+<script>
+// Data from wb--EN-BIR-THRD-NO, top 20 countries by threatened bird species count (2022)
+// n = source country name for validation, l = display label, v = value, y = year
+const data = [{"n":"Indonesia","l":"Indonesia","v":161,"y":2022},{"n":"Brazil","l":"Brazil","v":155,"y":2022},{"n":"Colombia","l":"Colombia","v":102,"y":2022},{"n":"China","l":"China","v":94,"y":2022},{"n":"India","l":"India","v":92,"y":2022},{"n":"Ecuador","l":"Ecuador","v":86,"y":2022},{"n":"Australia","l":"Australia","v":66,"y":2022},{"n":"Argentina","l":"Argentina","v":54,"y":2022},{"n":"Japan","l":"Japan","v":50,"y":2022},{"n":"Bolivia","l":"Bolivia","v":47,"y":2022},{"n":"Kenya","l":"Kenya","v":45,"y":2022},{"n":"DR Congo","l":"DR Congo","v":40,"y":2022},{"n":"Brunei Darussalam","l":"Brunei","v":39,"y":2022},{"n":"Bangladesh","l":"Bangladesh","v":36,"y":2022},{"n":"Ethiopia","l":"Ethiopia","v":35,"y":2022},{"n":"Chile","l":"Chile","v":34,"y":2022},{"n":"French Polynesia","l":"French Polynesia","v":34,"y":2022},{"n":"Korea, Rep.","l":"South Korea","v":34,"y":2022},{"n":"Angola","l":"Angola","v":33,"y":2022},{"n":"Cambodia","l":"Cambodia","v":32,"y":2022}];
+
+const W = 660, H = 540;
+const margin = { top: 16, right: 60, bottom: 34, left: 140 };
+const barH = 19, barGap = 7;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 12) + "px";
+  tip.style.top = (e.clientY - 20) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const maxVal = 180;
+const xScale = v => margin.left + v / maxVal * (W - margin.left - margin.right);
+
+// Biodiversity color: deep green to light green
+function colorForRank(i) {
+  const t = i / 19; // 0 = worst, 1 = best
+  // From dark teal (#3D7A5A) through medium (#8BAD72) to light (#A6C4A2)
+  if (t < 0.3) return "#3D7A5A";
+  if (t < 0.5) return "#5B9E78";
+  if (t < 0.7) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+// Grid lines
+[25, 50, 75, 100, 125, 150, 175].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top,
+    x2: xScale(v), y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(v), y: H - margin.bottom + 14,
+    "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v;
+});
+
+const xlabel = mkEl("text", {
+  x: xScale(90), y: H - margin.bottom + 27,
+  "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+  "font-family": "'JetBrains Mono', monospace", "letter-spacing": "0.3"
+});
+xlabel.textContent = "NUMBER OF THREATENED BIRD SPECIES";
+svg.appendChild(xlabel);
+
+// Bars
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const bw = xScale(d.v) - margin.left;
+  const color = colorForRank(i);
+
+  const g = mkEl("g", {});
+  const bar = mkEl("rect", {
+    x: margin.left, y, width: bw, height: barH,
+    fill: color, rx: "2", style: "cursor:pointer"
+  });
+  bar.addEventListener("mousemove", e => showTip(`${d.l}: ${d.v} threatened bird species (2022)`, e));
+  bar.addEventListener("mouseleave", hideTip);
+
+  const label = mkEl("text", {
+    x: margin.left - 6, y: y + barH / 2 + 4,
+    "text-anchor": "end", "font-size": "10", fill: "#2B2A27"
+  });
+  label.textContent = d.l;
+
+  const valLabel = mkEl("text", {
+    x: xScale(d.v) + 5, y: y + barH / 2 + 4,
+    "text-anchor": "start", "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  });
+  valLabel.textContent = d.v;
+
+  g.appendChild(bar);
+  g.appendChild(label);
+  g.appendChild(valLabel);
+  svg.appendChild(g);
+});
+</script>
+</body></html>

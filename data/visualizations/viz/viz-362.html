@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Food Waste per Capita, 2022</h1>
+<p class="subtitle">Kilograms of food wasted per person per year at the retail and consumer level. Countries spanning Africa, the Middle East, and the Americas top the list — high waste is not just a rich-country problem.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: UN SDG — 12.3.1 / AG_FOOD_WST_PC</p>
+<script>
+// Data from sdg--12-3-1--AG_FOOD_WST_PC, top 20 countries by food waste per capita (2022)
+// n = source country name (for validation), l = display label, v = value, y = year
+const data = [{"n":"Cyprus","l":"Cyprus","v":294,"y":2022},{"n":"Denmark","l":"Denmark","v":254,"y":2022},{"n":"Dominican Republic","l":"Dominican Republic","v":226.8,"y":2022},{"n":"Mexico","l":"Mexico","v":214.7,"y":2022},{"n":"Tunisia","l":"Tunisia","v":212.5,"y":2022},{"n":"Malaysia","l":"Malaysia","v":209.5,"y":2022},{"n":"Iraq","l":"Iraq","v":205,"y":2022},{"n":"Egypt","l":"Egypt","v":203.8,"y":2022},{"n":"United Republic of Tanzania","l":"Tanzania","v":192.9,"y":2022},{"n":"Canada","l":"Canada","v":188.1,"y":2022},{"n":"Portugal","l":"Portugal","v":184,"y":2022},{"n":"Bahrain","l":"Bahrain","v":183.3,"y":2022},{"n":"Lebanon","l":"Lebanon","v":183.2,"y":2022},{"n":"Rwanda","l":"Rwanda","v":181.5,"y":2022},{"n":"Romania","l":"Romania","v":181,"y":2022},{"n":"Australia","l":"Australia","v":176.9,"y":2022},{"n":"Thailand","l":"Thailand","v":176.3,"y":2022},{"n":"Lao People's Democratic Republic","l":"Laos","v":174.1,"y":2022},{"n":"Pakistan","l":"Pakistan","v":172.6,"y":2022},{"n":"Israel","l":"Israel","v":170.9,"y":2022}];
+
+const W = 680, H = 540;
+const margin = { top: 16, right: 60, bottom: 30, left: 140 };
+const barH = 19, barGap = 7;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) {
+  tip.textContent = text;
+  tip.style.opacity = "1";
+  tip.style.left = (e.clientX + 12) + "px";
+  tip.style.top = (e.clientY - 20) + "px";
+}
+function hideTip() { tip.style.opacity = "0"; }
+
+const maxVal = 320;
+const xScale = v => margin.left + v / maxVal * (W - margin.left - margin.right);
+
+// Warm color ramp: accent → accent-mid → accent-light → cool
+const colors = [
+  "#EA5E33","#EA5E33","#EC6F3F","#EE804A","#F09155","#F29A44",
+  "#F3A250","#F4AB5B","#F5B466","#F5BD72","#F5C67D","#F5CF89",
+  "#F5D38A","#EDD08A","#E5CD8A","#DECA8A","#D6C789","#CEC488",
+  "#C6C187","#A6C4A2"
+];
+
+// Subtle grid lines
+[50, 100, 150, 200, 250, 300].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top,
+    x2: xScale(v), y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(v), y: H - margin.bottom + 14,
+    "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v;
+});
+
+// X-axis label
+const xlabel = mkEl("text", {
+  x: xScale(160), y: H - margin.bottom + 26,
+  "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+  "font-family": "'JetBrains Mono', monospace", "letter-spacing": "0.3"
+});
+xlabel.textContent = "KG PER PERSON PER YEAR";
+svg.appendChild(xlabel);
+
+// Bars
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const bw = xScale(d.v) - margin.left;
+  const color = colors[i] || "#A6C4A2";
+
+  const g = mkEl("g", {});
+  const bar = mkEl("rect", {
+    x: margin.left, y, width: bw, height: barH,
+    fill: color, rx: "2", style: "cursor:pointer"
+  });
+  bar.addEventListener("mousemove", e => showTip(`${d.l}: ${d.v} kg/person/year`, e));
+  bar.addEventListener("mouseleave", hideTip);
+
+  // Country label
+  const label = mkEl("text", {
+    x: margin.left - 6, y: y + barH / 2 + 4,
+    "text-anchor": "end", "font-size": "10", fill: "#2B2A27"
+  });
+  label.textContent = d.l;
+
+  // Value label
+  const valLabel = mkEl("text", {
+    x: xScale(d.v) + 5, y: y + barH / 2 + 4,
+    "text-anchor": "start", "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  });
+  valLabel.textContent = d.v;
+
+  g.appendChild(bar);
+  g.appendChild(label);
+  g.appendChild(valLabel);
+  svg.appendChild(g);
+});
+</script>
+</body></html>

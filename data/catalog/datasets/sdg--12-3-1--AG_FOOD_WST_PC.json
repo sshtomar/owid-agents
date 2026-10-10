@@ -1,0 +1,3971 @@
+{
+  "meta": {
+    "id": "sdg--12-3-1--AG_FOOD_WST_PC",
+    "title": "Food Waste per Capita",
+    "description": "Food waste per capita (KG) from un-sdg",
+    "source": {
+      "provider": "un-sdg",
+      "indicatorId": "12.3.1::AG_FOOD_WST_PC",
+      "indicatorName": "Food waste per capita (KG)",
+      "sourceUrl": "https://unstats.un.org/sdgs/dataportal/database",
+      "lastFetched": "2026-10-10T01:14:40.247Z"
+    },
+    "topics": [
+      "food",
+      "waste",
+      "sustainability",
+      "food security",
+      "sdg-12",
+      "circular economy"
+    ],
+    "countries": [
+      "275",
+      "392",
+      "32",
+      "484",
+      "4",
+      "2",
+      "8",
+      "12",
+      "16",
+      "19",
+      "20",
+      "24",
+      "28",
+      "51",
+      "533",
+      "142",
+      "36",
+      "53",
+      "40",
+      "31",
+      "44",
+      "48",
+      "50",
+      "52",
+      "112",
+      "56",
+      "84",
+      "204",
+      "60",
+      "64",
+      "68",
+      "70",
+      "72",
+      "76",
+      "92",
+      "96",
+      "100",
+      "854",
+      "108",
+      "132",
+      "116",
+      "120",
+      "124",
+      "29",
+      "136",
+      "140",
+      "13",
+      "62",
+      "143",
+      "148",
+      "152",
+      "156",
+      "344",
+      "446",
+      "170",
+      "174",
+      "178",
+      "188",
+      "384",
+      "191",
+      "192",
+      "531",
+      "196",
+      "203",
+      "408",
+      "180",
+      "208",
+      "514",
+      "515",
+      "262",
+      "212",
+      "214",
+      "14",
+      "753",
+      "30",
+      "151",
+      "218",
+      "818",
+      "222",
+      "226",
+      "232",
+      "233",
+      "748",
+      "231",
+      "150",
+      "513",
+      "234",
+      "242",
+      "246",
+      "250",
+      "258",
+      "266",
+      "270",
+      "268",
+      "276",
+      "288",
+      "292",
+      "300",
+      "304",
+      "308",
+      "316",
+      "320",
+      "324",
+      "624",
+      "328",
+      "332",
+      "340",
+      "348",
+      "352",
+      "356",
+      "360",
+      "364",
+      "368",
+      "372",
+      "833",
+      "376",
+      "380",
+      "388",
+      "400",
+      "398",
+      "404",
+      "296",
+      "414",
+      "417",
+      "432",
+      "418",
+      "419",
+      "428",
+      "199",
+      "422",
+      "426",
+      "430",
+      "434",
+      "438",
+      "440",
+      "442",
+      "450",
+      "454",
+      "458",
+      "462",
+      "466",
+      "470",
+      "584",
+      "478",
+      "480",
+      "54",
+      "57",
+      "583",
+      "17",
+      "492",
+      "496",
+      "499",
+      "504",
+      "508",
+      "104",
+      "516",
+      "520",
+      "524",
+      "528",
+      "540",
+      "554",
+      "558",
+      "562",
+      "566",
+      "807",
+      "15",
+      "747",
+      "21",
+      "154",
+      "580",
+      "578",
+      "9",
+      "543",
+      "512",
+      "586",
+      "585",
+      "591",
+      "598",
+      "600",
+      "604",
+      "608",
+      "616",
+      "61",
+      "620",
+      "630",
+      "634",
+      "410",
+      "498",
+      "642",
+      "643",
+      "646",
+      "659",
+      "662",
+      "663",
+      "670",
+      "882",
+      "674",
+      "678",
+      "682",
+      "686",
+      "688",
+      "690",
+      "694",
+      "702",
+      "534",
+      "703",
+      "705",
+      "722",
+      "90",
+      "706",
+      "710",
+      "5",
+      "728",
+      "35",
+      "18",
+      "34",
+      "39",
+      "724",
+      "144",
+      "202",
+      "729",
+      "740",
+      "752",
+      "756",
+      "760",
+      "762",
+      "764",
+      "626",
+      "768",
+      "776",
+      "780",
+      "788",
+      "792",
+      "795",
+      "796",
+      "798",
+      "800",
+      "804",
+      "784",
+      "826",
+      "834",
+      "840",
+      "850",
+      "858",
+      "860",
+      "548",
+      "862",
+      "704",
+      "11",
+      "145",
+      "155",
+      "1",
+      "887",
+      "894",
+      "716",
+      "660",
+      "535",
+      "184",
+      "238",
+      "254",
+      "312",
+      "336",
+      "474",
+      "175",
+      "500",
+      "570",
+      "638",
+      "652",
+      "654",
+      "666",
+      "772",
+      "876",
+      "732"
+    ],
+    "dateRange": {
+      "start": "2005",
+      "end": "2022"
+    },
+    "dataPointCount": 611,
+    "dataFilePath": "datasets/sdg--12-3-1--AG_FOOD_WST_PC.json"
+  },
+  "data": [
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2005,
+      "value": 205.59738
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2006,
+      "value": 206.71407
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2007,
+      "value": 207.72871
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2008,
+      "value": 10.22036
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2008,
+      "value": 208.81019
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2009,
+      "value": 80.55134
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2009,
+      "value": 209.55799
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2010,
+      "value": 83.68107
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2010,
+      "value": 210.74184
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2011,
+      "value": 14.65542
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2011,
+      "value": 211.88215
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2012,
+      "value": 69.18064
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2012,
+      "value": 213.34504
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2013,
+      "value": 14.75576
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2013,
+      "value": 214.65348
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2014,
+      "value": 64.51373
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2014,
+      "value": 216.02703
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2015,
+      "value": 15.67768
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2015,
+      "value": 217.19394
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2016,
+      "value": 62.12112
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2016,
+      "value": 218.15567
+    },
+    {
+      "country": "32",
+      "countryName": "Argentina",
+      "year": 2017,
+      "value": 0.21564
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2017,
+      "value": 16.27949
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2017,
+      "value": 200.8106
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2018,
+      "value": 60.68629
+    },
+    {
+      "country": "484",
+      "countryName": "Mexico",
+      "year": 2018,
+      "value": 88.69976
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2018,
+      "value": 218.53912
+    },
+    {
+      "country": "4",
+      "countryName": "Afghanistan",
+      "year": 2019,
+      "value": 15.75299
+    },
+    {
+      "country": "2",
+      "countryName": "Africa",
+      "year": 2019,
+      "value": 15.42847
+    },
+    {
+      "country": "8",
+      "countryName": "Albania",
+      "year": 2019,
+      "value": 27.71558
+    },
+    {
+      "country": "12",
+      "countryName": "Algeria",
+      "year": 2019,
+      "value": 15.76758
+    },
+    {
+      "country": "16",
+      "countryName": "American Samoa",
+      "year": 2019,
+      "value": 32.30994
+    },
+    {
+      "country": "19",
+      "countryName": "Americas",
+      "year": 2019,
+      "value": 15.43242
+    },
+    {
+      "country": "20",
+      "countryName": "Andorra",
+      "year": 2019,
+      "value": 12.93834
+    },
+    {
+      "country": "24",
+      "countryName": "Angola",
+      "year": 2019,
+      "value": 27.19662
+    },
+    {
+      "country": "28",
+      "countryName": "Antigua and Barbuda",
+      "year": 2019,
+      "value": 26.95363
+    },
+    {
+      "country": "32",
+      "countryName": "Argentina",
+      "year": 2019,
+      "value": 27.66981
+    },
+    {
+      "country": "51",
+      "countryName": "Armenia",
+      "year": 2019,
+      "value": 16.40044
+    },
+    {
+      "country": "533",
+      "countryName": "Aruba",
+      "year": 2019,
+      "value": 12.79422
+    },
+    {
+      "country": "142",
+      "countryName": "Asia",
+      "year": 2019,
+      "value": 32.0624
+    },
+    {
+      "country": "36",
+      "countryName": "Australia",
+      "year": 2019,
+      "value": 21.54577
+    },
+    {
+      "country": "53",
+      "countryName": "Australia and New Zealand",
+      "year": 2019,
+      "value": 124.5768
+    },
+    {
+      "country": "40",
+      "countryName": "Austria",
+      "year": 2019,
+      "value": 8.70377
+    },
+    {
+      "country": "31",
+      "countryName": "Azerbaijan",
+      "year": 2019,
+      "value": 15.35738
+    },
+    {
+      "country": "44",
+      "countryName": "Bahamas",
+      "year": 2019,
+      "value": 24.61873
+    },
+    {
+      "country": "48",
+      "countryName": "Bahrain",
+      "year": 2019,
+      "value": 14.0718
+    },
+    {
+      "country": "50",
+      "countryName": "Bangladesh",
+      "year": 2019,
+      "value": 15.40683
+    },
+    {
+      "country": "52",
+      "countryName": "Barbados",
+      "year": 2019,
+      "value": 26.19284
+    },
+    {
+      "country": "112",
+      "countryName": "Belarus",
+      "year": 2019,
+      "value": 109.11074
+    },
+    {
+      "country": "56",
+      "countryName": "Belgium",
+      "year": 2019,
+      "value": 9.73889
+    },
+    {
+      "country": "84",
+      "countryName": "Belize",
+      "year": 2019,
+      "value": 15.69268
+    },
+    {
+      "country": "204",
+      "countryName": "Benin",
+      "year": 2019,
+      "value": 26.54749
+    },
+    {
+      "country": "60",
+      "countryName": "Bermuda",
+      "year": 2019,
+      "value": 12.5479
+    },
+    {
+      "country": "64",
+      "countryName": "Bhutan",
+      "year": 2019,
+      "value": 15.5514
+    },
+    {
+      "country": "68",
+      "countryName": "Bolivia (Plurinational State of)",
+      "year": 2019,
+      "value": 27.02781
+    },
+    {
+      "country": "70",
+      "countryName": "Bosnia and Herzegovina",
+      "year": 2019,
+      "value": 27.15684
+    },
+    {
+      "country": "72",
+      "countryName": "Botswana",
+      "year": 2019,
+      "value": 14.41388
+    },
+    {
+      "country": "76",
+      "countryName": "Brazil",
+      "year": 2019,
+      "value": 27.55233
+    },
+    {
+      "country": "92",
+      "countryName": "British Virgin Islands",
+      "year": 2019,
+      "value": 25.06085
+    },
+    {
+      "country": "96",
+      "countryName": "Brunei Darussalam",
+      "year": 2019,
+      "value": 25.29326
+    },
+    {
+      "country": "100",
+      "countryName": "Bulgaria",
+      "year": 2019,
+      "value": 67.87169
+    },
+    {
+      "country": "854",
+      "countryName": "Burkina Faso",
+      "year": 2019,
+      "value": 15.16976
+    },
+    {
+      "country": "108",
+      "countryName": "Burundi",
+      "year": 2019,
+      "value": 15.18684
+    },
+    {
+      "country": "132",
+      "countryName": "Cabo Verde",
+      "year": 2019,
+      "value": 14.90488
+    },
+    {
+      "country": "116",
+      "countryName": "Cambodia",
+      "year": 2019,
+      "value": 28.12359
+    },
+    {
+      "country": "120",
+      "countryName": "Cameroon",
+      "year": 2019,
+      "value": 15.69729
+    },
+    {
+      "country": "124",
+      "countryName": "Canada",
+      "year": 2019,
+      "value": 12.77321
+    },
+    {
+      "country": "29",
+      "countryName": "Caribbean",
+      "year": 2019,
+      "value": 26.60124
+    },
+    {
+      "country": "136",
+      "countryName": "Cayman Islands",
+      "year": 2019,
+      "value": 12.57226
+    },
+    {
+      "country": "140",
+      "countryName": "Central African Republic",
+      "year": 2019,
+      "value": 14.24676
+    },
+    {
+      "country": "13",
+      "countryName": "Central America",
+      "year": 2019,
+      "value": 28.03823
+    },
+    {
+      "country": "62",
+      "countryName": "Central and Southern Asia",
+      "year": 2019,
+      "value": 15.64023
+    },
+    {
+      "country": "143",
+      "countryName": "Central Asia",
+      "year": 2019,
+      "value": 27.52095
+    },
+    {
+      "country": "148",
+      "countryName": "Chad",
+      "year": 2019,
+      "value": 27.33954
+    },
+    {
+      "country": "152",
+      "countryName": "Chile",
+      "year": 2019,
+      "value": 25.45292
+    },
+    {
+      "country": "156",
+      "countryName": "China",
+      "year": 2019,
+      "value": 15.77134
+    },
+    {
+      "country": "344",
+      "countryName": "China, Hong Kong Special Administrative Region",
+      "year": 2019,
+      "value": 25.36601
+    },
+    {
+      "country": "446",
+      "countryName": "China, Macao Special Administrative Region",
+      "year": 2019,
+      "value": 12.36243
+    },
+    {
+      "country": "170",
+      "countryName": "Colombia",
+      "year": 2019,
+      "value": 27.73181
+    },
+    {
+      "country": "174",
+      "countryName": "Comoros",
+      "year": 2019,
+      "value": 29.7423
+    },
+    {
+      "country": "178",
+      "countryName": "Congo",
+      "year": 2019,
+      "value": 15.10614
+    },
+    {
+      "country": "188",
+      "countryName": "Costa Rica",
+      "year": 2019,
+      "value": 15.52662
+    },
+    {
+      "country": "384",
+      "countryName": "Côte d'Ivoire",
+      "year": 2019,
+      "value": 15.38239
+    },
+    {
+      "country": "191",
+      "countryName": "Croatia",
+      "year": 2019,
+      "value": 12.81301
+    },
+    {
+      "country": "192",
+      "countryName": "Cuba",
+      "year": 2019,
+      "value": 15.66345
+    },
+    {
+      "country": "531",
+      "countryName": "Curaçao",
+      "year": 2019,
+      "value": 21.63674
+    },
+    {
+      "country": "196",
+      "countryName": "Cyprus",
+      "year": 2019,
+      "value": 12.49608
+    },
+    {
+      "country": "203",
+      "countryName": "Czechia",
+      "year": 2019,
+      "value": 25.94008
+    },
+    {
+      "country": "408",
+      "countryName": "Democratic People's Republic of Korea",
+      "year": 2019,
+      "value": 15.58604
+    },
+    {
+      "country": "180",
+      "countryName": "Democratic Republic of the Congo",
+      "year": 2019,
+      "value": 26.68976
+    },
+    {
+      "country": "208",
+      "countryName": "Denmark",
+      "year": 2019,
+      "value": 29.67672
+    },
+    {
+      "country": "514",
+      "countryName": "Developed regions (Europe, Cyprus, Israel, Northern America, Japan, Australia & New Zealand)",
+      "year": 2019,
+      "value": 33.52557
+    },
+    {
+      "country": "515",
+      "countryName": "Developing regions",
+      "year": 2019,
+      "value": 30.96698
+    },
+    {
+      "country": "262",
+      "countryName": "Djibouti",
+      "year": 2019,
+      "value": 25.06361
+    },
+    {
+      "country": "212",
+      "countryName": "Dominica",
+      "year": 2019,
+      "value": 27.79207
+    },
+    {
+      "country": "214",
+      "countryName": "Dominican Republic",
+      "year": 2019,
+      "value": 27.28505
+    },
+    {
+      "country": "14",
+      "countryName": "Eastern Africa",
+      "year": 2019,
+      "value": 143.9297
+    },
+    {
+      "country": "753",
+      "countryName": "Eastern and South-Eastern Asia",
+      "year": 2019,
+      "value": 15.88543
+    },
+    {
+      "country": "30",
+      "countryName": "Eastern Asia",
+      "year": 2019,
+      "value": 41.89609
+    },
+    {
+      "country": "151",
+      "countryName": "Eastern Europe",
+      "year": 2019,
+      "value": 13.88369
+    },
+    {
+      "country": "218",
+      "countryName": "Ecuador",
+      "year": 2019,
+      "value": 27.69583
+    },
+    {
+      "country": "818",
+      "countryName": "Egypt",
+      "year": 2019,
+      "value": 26.27885
+    },
+    {
+      "country": "222",
+      "countryName": "El Salvador",
+      "year": 2019,
+      "value": 28.41138
+    },
+    {
+      "country": "226",
+      "countryName": "Equatorial Guinea",
+      "year": 2019,
+      "value": 24.1404
+    },
+    {
+      "country": "232",
+      "countryName": "Eritrea",
+      "year": 2019,
+      "value": 27.6345
+    },
+    {
+      "country": "233",
+      "countryName": "Estonia",
+      "year": 2019,
+      "value": 4.7043
+    },
+    {
+      "country": "748",
+      "countryName": "Eswatini",
+      "year": 2019,
+      "value": 15.35255
+    },
+    {
+      "country": "231",
+      "countryName": "Ethiopia",
+      "year": 2019,
+      "value": 15.36039
+    },
+    {
+      "country": "150",
+      "countryName": "Europe",
+      "year": 2019,
+      "value": 11.97258
+    },
+    {
+      "country": "513",
+      "countryName": "Europe and Northern America",
+      "year": 2019,
+      "value": 13.08856
+    },
+    {
+      "country": "234",
+      "countryName": "Faroe Islands",
+      "year": 2019,
+      "value": 71.79104
+    },
+    {
+      "country": "242",
+      "countryName": "Fiji",
+      "year": 2019,
+      "value": 26.79121
+    },
+    {
+      "country": "246",
+      "countryName": "Finland",
+      "year": 2019,
+      "value": 12.83605
+    },
+    {
+      "country": "250",
+      "countryName": "France",
+      "year": 2019,
+      "value": 25.89401
+    },
+    {
+      "country": "258",
+      "countryName": "French Polynesia",
+      "year": 2019,
+      "value": 11.93859
+    },
+    {
+      "country": "266",
+      "countryName": "Gabon",
+      "year": 2019,
+      "value": 26.78286
+    },
+    {
+      "country": "270",
+      "countryName": "Gambia",
+      "year": 2019,
+      "value": 25.87183
+    },
+    {
+      "country": "268",
+      "countryName": "Georgia",
+      "year": 2019,
+      "value": 16.57757
+    },
+    {
+      "country": "276",
+      "countryName": "Germany",
+      "year": 2019,
+      "value": 20.66712
+    },
+    {
+      "country": "288",
+      "countryName": "Ghana",
+      "year": 2019,
+      "value": 81.06428
+    },
+    {
+      "country": "292",
+      "countryName": "Gibraltar",
+      "year": 2019,
+      "value": 26.36448
+    },
+    {
+      "country": "300",
+      "countryName": "Greece",
+      "year": 2019,
+      "value": 7.31335
+    },
+    {
+      "country": "304",
+      "countryName": "Greenland",
+      "year": 2019,
+      "value": 12.98745
+    },
+    {
+      "country": "308",
+      "countryName": "Grenada",
+      "year": 2019,
+      "value": 14.27354
+    },
+    {
+      "country": "316",
+      "countryName": "Guam",
+      "year": 2019,
+      "value": 12.71072
+    },
+    {
+      "country": "320",
+      "countryName": "Guatemala",
+      "year": 2019,
+      "value": 28.41605
+    },
+    {
+      "country": "324",
+      "countryName": "Guinea",
+      "year": 2019,
+      "value": 27.41976
+    },
+    {
+      "country": "624",
+      "countryName": "Guinea-Bissau",
+      "year": 2019,
+      "value": 26.95273
+    },
+    {
+      "country": "328",
+      "countryName": "Guyana",
+      "year": 2019,
+      "value": 27.09588
+    },
+    {
+      "country": "332",
+      "countryName": "Haiti",
+      "year": 2019,
+      "value": 27.9024
+    },
+    {
+      "country": "340",
+      "countryName": "Honduras",
+      "year": 2019,
+      "value": 15.30614
+    },
+    {
+      "country": "348",
+      "countryName": "Hungary",
+      "year": 2019,
+      "value": 12.69712
+    },
+    {
+      "country": "352",
+      "countryName": "Iceland",
+      "year": 2019,
+      "value": 24.02715
+    },
+    {
+      "country": "356",
+      "countryName": "India",
+      "year": 2019,
+      "value": 15.45145
+    },
+    {
+      "country": "360",
+      "countryName": "Indonesia",
+      "year": 2019,
+      "value": 27.75501
+    },
+    {
+      "country": "364",
+      "countryName": "Iran (Islamic Republic of)",
+      "year": 2019,
+      "value": 26.48219
+    },
+    {
+      "country": "368",
+      "countryName": "Iraq",
+      "year": 2019,
+      "value": 26.1489
+    },
+    {
+      "country": "372",
+      "countryName": "Ireland",
+      "year": 2019,
+      "value": 55.99139
+    },
+    {
+      "country": "833",
+      "countryName": "Isle of Man",
+      "year": 2019,
+      "value": 25.77362
+    },
+    {
+      "country": "376",
+      "countryName": "Israel",
+      "year": 2019,
+      "value": 27.15547
+    },
+    {
+      "country": "380",
+      "countryName": "Italy",
+      "year": 2019,
+      "value": 3.67587
+    },
+    {
+      "country": "388",
+      "countryName": "Jamaica",
+      "year": 2019,
+      "value": 16.38799
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2019,
+      "value": 15.10434
+    },
+    {
+      "country": "400",
+      "countryName": "Jordan",
+      "year": 2019,
+      "value": 14.76751
+    },
+    {
+      "country": "398",
+      "countryName": "Kazakhstan",
+      "year": 2019,
+      "value": 117.71423
+    },
+    {
+      "country": "404",
+      "countryName": "Kenya",
+      "year": 2019,
+      "value": 11.31294
+    },
+    {
+      "country": "296",
+      "countryName": "Kiribati",
+      "year": 2019,
+      "value": 86.15113
+    },
+    {
+      "country": "414",
+      "countryName": "Kuwait",
+      "year": 2019,
+      "value": 12.13629
+    },
+    {
+      "country": "417",
+      "countryName": "Kyrgyzstan",
+      "year": 2019,
+      "value": 15.86841
+    },
+    {
+      "country": "432",
+      "countryName": "Landlocked developing countries (LLDCs)",
+      "year": 2019,
+      "value": 27.43746
+    },
+    {
+      "country": "418",
+      "countryName": "Lao People's Democratic Republic",
+      "year": 2019,
+      "value": 15.54795
+    },
+    {
+      "country": "419",
+      "countryName": "Latin America and the Caribbean",
+      "year": 2019,
+      "value": 15.47164
+    },
+    {
+      "country": "428",
+      "countryName": "Latvia",
+      "year": 2019,
+      "value": 12.74543
+    },
+    {
+      "country": "199",
+      "countryName": "Least Developed Countries (LDCs)",
+      "year": 2019,
+      "value": 23.5121
+    },
+    {
+      "country": "422",
+      "countryName": "Lebanon",
+      "year": 2019,
+      "value": 18.54487
+    },
+    {
+      "country": "426",
+      "countryName": "Lesotho",
+      "year": 2019,
+      "value": 14.93469
+    },
+    {
+      "country": "430",
+      "countryName": "Liberia",
+      "year": 2019,
+      "value": 15.48999
+    },
+    {
+      "country": "434",
+      "countryName": "Libya",
+      "year": 2019,
+      "value": 28.52524
+    },
+    {
+      "country": "438",
+      "countryName": "Liechtenstein",
+      "year": 2019,
+      "value": 12.65084
+    },
+    {
+      "country": "440",
+      "countryName": "Lithuania",
+      "year": 2019,
+      "value": 12.40894
+    },
+    {
+      "country": "442",
+      "countryName": "Luxembourg",
+      "year": 2019,
+      "value": 20.75595
+    },
+    {
+      "country": "450",
+      "countryName": "Madagascar",
+      "year": 2019,
+      "value": 15.31994
+    },
+    {
+      "country": "454",
+      "countryName": "Malawi",
+      "year": 2019,
+      "value": 15.44241
+    },
+    {
+      "country": "458",
+      "countryName": "Malaysia",
+      "year": 2019,
+      "value": 76.76496
+    },
+    {
+      "country": "462",
+      "countryName": "Maldives",
+      "year": 2019,
+      "value": 16.46151
+    },
+    {
+      "country": "466",
+      "countryName": "Mali",
+      "year": 2019,
+      "value": 14.94867
+    },
+    {
+      "country": "470",
+      "countryName": "Malta",
+      "year": 2019,
+      "value": 11.20276
+    },
+    {
+      "country": "584",
+      "countryName": "Marshall Islands",
+      "year": 2019,
+      "value": 20.56084
+    },
+    {
+      "country": "478",
+      "countryName": "Mauritania",
+      "year": 2019,
+      "value": 28.5427
+    },
+    {
+      "country": "480",
+      "countryName": "Mauritius",
+      "year": 2019,
+      "value": 12.54863
+    },
+    {
+      "country": "54",
+      "countryName": "Melanesia",
+      "year": 2019,
+      "value": 25.69485
+    },
+    {
+      "country": "484",
+      "countryName": "Mexico",
+      "year": 2019,
+      "value": 87.93998
+    },
+    {
+      "country": "57",
+      "countryName": "Micronesia",
+      "year": 2019,
+      "value": 14.32225
+    },
+    {
+      "country": "583",
+      "countryName": "Micronesia (Federated States of)",
+      "year": 2019,
+      "value": 28.24905
+    },
+    {
+      "country": "17",
+      "countryName": "Middle Africa",
+      "year": 2019,
+      "value": 140.87866
+    },
+    {
+      "country": "492",
+      "countryName": "Monaco",
+      "year": 2019,
+      "value": 13.49142
+    },
+    {
+      "country": "496",
+      "countryName": "Mongolia",
+      "year": 2019,
+      "value": 15.60525
+    },
+    {
+      "country": "499",
+      "countryName": "Montenegro",
+      "year": 2019,
+      "value": 15.58078
+    },
+    {
+      "country": "504",
+      "countryName": "Morocco",
+      "year": 2019,
+      "value": 15.71234
+    },
+    {
+      "country": "508",
+      "countryName": "Mozambique",
+      "year": 2019,
+      "value": 27.72148
+    },
+    {
+      "country": "104",
+      "countryName": "Myanmar",
+      "year": 2019,
+      "value": 132.08202
+    },
+    {
+      "country": "516",
+      "countryName": "Namibia",
+      "year": 2019,
+      "value": 15.94615
+    },
+    {
+      "country": "520",
+      "countryName": "Naoero",
+      "year": 2019,
+      "value": 22.76298
+    },
+    {
+      "country": "524",
+      "countryName": "Nepal",
+      "year": 2019,
+      "value": 27.43347
+    },
+    {
+      "country": "528",
+      "countryName": "Netherlands (Kingdom of the)",
+      "year": 2019,
+      "value": 25.17845
+    },
+    {
+      "country": "540",
+      "countryName": "New Caledonia",
+      "year": 2019,
+      "value": 25.33978
+    },
+    {
+      "country": "554",
+      "countryName": "New Zealand",
+      "year": 2019,
+      "value": 24.66324
+    },
+    {
+      "country": "558",
+      "countryName": "Nicaragua",
+      "year": 2019,
+      "value": 15.36229
+    },
+    {
+      "country": "562",
+      "countryName": "Niger",
+      "year": 2019,
+      "value": 145.15635
+    },
+    {
+      "country": "566",
+      "countryName": "Nigeria",
+      "year": 2019,
+      "value": 27.32973
+    },
+    {
+      "country": "807",
+      "countryName": "North Macedonia",
+      "year": 2019,
+      "value": 81.58261
+    },
+    {
+      "country": "15",
+      "countryName": "Northern Africa",
+      "year": 2019,
+      "value": 15.60256
+    },
+    {
+      "country": "747",
+      "countryName": "Northern Africa and Western Asia",
+      "year": 2019,
+      "value": 26.70326
+    },
+    {
+      "country": "21",
+      "countryName": "Northern America",
+      "year": 2019,
+      "value": 15.36309
+    },
+    {
+      "country": "154",
+      "countryName": "Northern Europe",
+      "year": 2019,
+      "value": 19.19282
+    },
+    {
+      "country": "580",
+      "countryName": "Northern Mariana Islands",
+      "year": 2019,
+      "value": 14.69788
+    },
+    {
+      "country": "578",
+      "countryName": "Norway",
+      "year": 2019,
+      "value": 98.09333
+    },
+    {
+      "country": "9",
+      "countryName": "Oceania",
+      "year": 2019,
+      "value": 23.14717
+    },
+    {
+      "country": "543",
+      "countryName": "Oceania (exc. Australia and New Zealand)",
+      "year": 2019,
+      "value": 122.83679
+    },
+    {
+      "country": "512",
+      "countryName": "Oman",
+      "year": 2019,
+      "value": 143.66266
+    },
+    {
+      "country": "586",
+      "countryName": "Pakistan",
+      "year": 2019,
+      "value": 15.16898
+    },
+    {
+      "country": "585",
+      "countryName": "Palau",
+      "year": 2019,
+      "value": 25.69031
+    },
+    {
+      "country": "591",
+      "countryName": "Panama",
+      "year": 2019,
+      "value": 12.85329
+    },
+    {
+      "country": "598",
+      "countryName": "Papua New Guinea",
+      "year": 2019,
+      "value": 14.38411
+    },
+    {
+      "country": "600",
+      "countryName": "Paraguay",
+      "year": 2019,
+      "value": 16.8727
+    },
+    {
+      "country": "604",
+      "countryName": "Peru",
+      "year": 2019,
+      "value": 15.49044
+    },
+    {
+      "country": "608",
+      "countryName": "Philippines",
+      "year": 2019,
+      "value": 15.31941
+    },
+    {
+      "country": "616",
+      "countryName": "Poland",
+      "year": 2019,
+      "value": 12.60969
+    },
+    {
+      "country": "61",
+      "countryName": "Polynesia",
+      "year": 2019,
+      "value": 13.74235
+    },
+    {
+      "country": "620",
+      "countryName": "Portugal",
+      "year": 2019,
+      "value": 12.73197
+    },
+    {
+      "country": "630",
+      "countryName": "Puerto Rico",
+      "year": 2019,
+      "value": 22.77888
+    },
+    {
+      "country": "634",
+      "countryName": "Qatar",
+      "year": 2019,
+      "value": 25.79691
+    },
+    {
+      "country": "410",
+      "countryName": "Republic of Korea",
+      "year": 2019,
+      "value": 108.56108
+    },
+    {
+      "country": "498",
+      "countryName": "Republic of Moldova",
+      "year": 2019,
+      "value": 35.95105
+    },
+    {
+      "country": "642",
+      "countryName": "Romania",
+      "year": 2019,
+      "value": 12.70658
+    },
+    {
+      "country": "643",
+      "countryName": "Russian Federation",
+      "year": 2019,
+      "value": 13.73014
+    },
+    {
+      "country": "646",
+      "countryName": "Rwanda",
+      "year": 2019,
+      "value": 27.19996
+    },
+    {
+      "country": "659",
+      "countryName": "Saint Kitts and Nevis",
+      "year": 2019,
+      "value": 14.17751
+    },
+    {
+      "country": "662",
+      "countryName": "Saint Lucia",
+      "year": 2019,
+      "value": 28.30095
+    },
+    {
+      "country": "663",
+      "countryName": "Saint Martin (French Part)",
+      "year": 2019,
+      "value": 29.33715
+    },
+    {
+      "country": "670",
+      "countryName": "Saint Vincent and the Grenadines",
+      "year": 2019,
+      "value": 29.14373
+    },
+    {
+      "country": "882",
+      "countryName": "Samoa",
+      "year": 2019,
+      "value": 70.42333
+    },
+    {
+      "country": "674",
+      "countryName": "San Marino",
+      "year": 2019,
+      "value": 25.36243
+    },
+    {
+      "country": "678",
+      "countryName": "Sao Tome and Principe",
+      "year": 2019,
+      "value": 15.67674
+    },
+    {
+      "country": "682",
+      "countryName": "Saudi Arabia",
+      "year": 2019,
+      "value": 24.45784
+    },
+    {
+      "country": "686",
+      "countryName": "Senegal",
+      "year": 2019,
+      "value": 28.15888
+    },
+    {
+      "country": "688",
+      "countryName": "Serbia",
+      "year": 2019,
+      "value": 7.11158
+    },
+    {
+      "country": "690",
+      "countryName": "Seychelles",
+      "year": 2019,
+      "value": 23.93559
+    },
+    {
+      "country": "694",
+      "countryName": "Sierra Leone",
+      "year": 2019,
+      "value": 15.18614
+    },
+    {
+      "country": "702",
+      "countryName": "Singapore",
+      "year": 2019,
+      "value": 25.29972
+    },
+    {
+      "country": "534",
+      "countryName": "Sint Maarten (Dutch part)",
+      "year": 2019,
+      "value": 110.78701
+    },
+    {
+      "country": "703",
+      "countryName": "Slovakia",
+      "year": 2019,
+      "value": 12.81853
+    },
+    {
+      "country": "705",
+      "countryName": "Slovenia",
+      "year": 2019,
+      "value": 6.58345
+    },
+    {
+      "country": "722",
+      "countryName": "Small island developing States (SIDS)",
+      "year": 2019,
+      "value": 14.48071
+    },
+    {
+      "country": "90",
+      "countryName": "Solomon Islands",
+      "year": 2019,
+      "value": 15.5199
+    },
+    {
+      "country": "706",
+      "countryName": "Somalia",
+      "year": 2019,
+      "value": 26.71663
+    },
+    {
+      "country": "710",
+      "countryName": "South Africa",
+      "year": 2019,
+      "value": 15.76711
+    },
+    {
+      "country": "5",
+      "countryName": "South America",
+      "year": 2019,
+      "value": 15.48103
+    },
+    {
+      "country": "728",
+      "countryName": "South Sudan",
+      "year": 2019,
+      "value": 29.27408
+    },
+    {
+      "country": "35",
+      "countryName": "South-Eastern Asia",
+      "year": 2019,
+      "value": 18.66261
+    },
+    {
+      "country": "18",
+      "countryName": "Southern Africa",
+      "year": 2019,
+      "value": 15.64023
+    },
+    {
+      "country": "34",
+      "countryName": "Southern Asia",
+      "year": 2019,
+      "value": 96.17896
+    },
+    {
+      "country": "39",
+      "countryName": "Southern Europe",
+      "year": 2019,
+      "value": 24.45308
+    },
+    {
+      "country": "724",
+      "countryName": "Spain",
+      "year": 2019,
+      "value": 12.70406
+    },
+    {
+      "country": "144",
+      "countryName": "Sri Lanka",
+      "year": 2019,
+      "value": 117.36
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2019,
+      "value": 102.16391
+    },
+    {
+      "country": "202",
+      "countryName": "Sub-Saharan Africa",
+      "year": 2019,
+      "value": 155.32036
+    },
+    {
+      "country": "729",
+      "countryName": "Sudan",
+      "year": 2019,
+      "value": 27.38018
+    },
+    {
+      "country": "740",
+      "countryName": "Suriname",
+      "year": 2019,
+      "value": 15.14778
+    },
+    {
+      "country": "752",
+      "countryName": "Sweden",
+      "year": 2019,
+      "value": 9.77452
+    },
+    {
+      "country": "756",
+      "countryName": "Switzerland",
+      "year": 2019,
+      "value": 12.83493
+    },
+    {
+      "country": "760",
+      "countryName": "Syrian Arab Republic",
+      "year": 2019,
+      "value": 23.48241
+    },
+    {
+      "country": "762",
+      "countryName": "Tajikistan",
+      "year": 2019,
+      "value": 27.60069
+    },
+    {
+      "country": "764",
+      "countryName": "Thailand",
+      "year": 2019,
+      "value": 26.99585
+    },
+    {
+      "country": "626",
+      "countryName": "Timor-Leste",
+      "year": 2019,
+      "value": 130.90727
+    },
+    {
+      "country": "768",
+      "countryName": "Togo",
+      "year": 2019,
+      "value": 27.10909
+    },
+    {
+      "country": "776",
+      "countryName": "Tonga",
+      "year": 2019,
+      "value": 27.52926
+    },
+    {
+      "country": "780",
+      "countryName": "Trinidad and Tobago",
+      "year": 2019,
+      "value": 23.46828
+    },
+    {
+      "country": "788",
+      "countryName": "Tunisia",
+      "year": 2019,
+      "value": 26.83439
+    },
+    {
+      "country": "792",
+      "countryName": "Türkiye",
+      "year": 2019,
+      "value": 27.63083
+    },
+    {
+      "country": "795",
+      "countryName": "Turkmenistan",
+      "year": 2019,
+      "value": 26.67691
+    },
+    {
+      "country": "796",
+      "countryName": "Turks and Caicos Islands",
+      "year": 2019,
+      "value": 22.67386
+    },
+    {
+      "country": "798",
+      "countryName": "Tuvalu",
+      "year": 2019,
+      "value": 16.55957
+    },
+    {
+      "country": "800",
+      "countryName": "Uganda",
+      "year": 2019,
+      "value": 28.49815
+    },
+    {
+      "country": "804",
+      "countryName": "Ukraine",
+      "year": 2019,
+      "value": 15.56329
+    },
+    {
+      "country": "784",
+      "countryName": "United Arab Emirates",
+      "year": 2019,
+      "value": 100.26699
+    },
+    {
+      "country": "826",
+      "countryName": "United Kingdom of Great Britain and Northern Ireland",
+      "year": 2019,
+      "value": 4.24727
+    },
+    {
+      "country": "834",
+      "countryName": "United Republic of Tanzania",
+      "year": 2019,
+      "value": 15.1525
+    },
+    {
+      "country": "840",
+      "countryName": "United States of America",
+      "year": 2019,
+      "value": 17.09075
+    },
+    {
+      "country": "850",
+      "countryName": "United States Virgin Islands",
+      "year": 2019,
+      "value": 13.29085
+    },
+    {
+      "country": "858",
+      "countryName": "Uruguay",
+      "year": 2019,
+      "value": 12.93571
+    },
+    {
+      "country": "860",
+      "countryName": "Uzbekistan",
+      "year": 2019,
+      "value": 15.64248
+    },
+    {
+      "country": "548",
+      "countryName": "Vanuatu",
+      "year": 2019,
+      "value": 15.40881
+    },
+    {
+      "country": "862",
+      "countryName": "Venezuela (Bolivarian Republic of)",
+      "year": 2019,
+      "value": 15.39412
+    },
+    {
+      "country": "704",
+      "countryName": "Viet Nam",
+      "year": 2019,
+      "value": 76.70671
+    },
+    {
+      "country": "11",
+      "countryName": "Western Africa",
+      "year": 2019,
+      "value": 27.20382
+    },
+    {
+      "country": "145",
+      "countryName": "Western Asia",
+      "year": 2019,
+      "value": 16.99363
+    },
+    {
+      "country": "155",
+      "countryName": "Western Europe",
+      "year": 2019,
+      "value": 13.59821
+    },
+    {
+      "country": "1",
+      "countryName": "World",
+      "year": 2019,
+      "value": 15.31588
+    },
+    {
+      "country": "887",
+      "countryName": "Yemen",
+      "year": 2019,
+      "value": 25.558
+    },
+    {
+      "country": "894",
+      "countryName": "Zambia",
+      "year": 2019,
+      "value": 15.1982
+    },
+    {
+      "country": "716",
+      "countryName": "Zimbabwe",
+      "year": 2019,
+      "value": 14.91793
+    },
+    {
+      "country": "40",
+      "countryName": "Austria",
+      "year": 2020,
+      "value": 136
+    },
+    {
+      "country": "56",
+      "countryName": "Belgium",
+      "year": 2020,
+      "value": 146
+    },
+    {
+      "country": "100",
+      "countryName": "Bulgaria",
+      "year": 2020,
+      "value": 19
+    },
+    {
+      "country": "191",
+      "countryName": "Croatia",
+      "year": 2020,
+      "value": 73
+    },
+    {
+      "country": "196",
+      "countryName": "Cyprus",
+      "year": 2020,
+      "value": 273
+    },
+    {
+      "country": "203",
+      "countryName": "Czechia",
+      "year": 2020,
+      "value": 6
+    },
+    {
+      "country": "208",
+      "countryName": "Denmark",
+      "year": 2020,
+      "value": 221
+    },
+    {
+      "country": "233",
+      "countryName": "Estonia",
+      "year": 2020,
+      "value": 125
+    },
+    {
+      "country": "246",
+      "countryName": "Finland",
+      "year": 2020,
+      "value": 113
+    },
+    {
+      "country": "250",
+      "countryName": "France",
+      "year": 2020,
+      "value": 129
+    },
+    {
+      "country": "276",
+      "countryName": "Germany",
+      "year": 2020,
+      "value": 131
+    },
+    {
+      "country": "300",
+      "countryName": "Greece",
+      "year": 2020,
+      "value": 191
+    },
+    {
+      "country": "348",
+      "countryName": "Hungary",
+      "year": 2020,
+      "value": 94
+    },
+    {
+      "country": "372",
+      "countryName": "Ireland",
+      "year": 2020,
+      "value": 152
+    },
+    {
+      "country": "380",
+      "countryName": "Italy",
+      "year": 2020,
+      "value": 136
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2020,
+      "value": 59.68314
+    },
+    {
+      "country": "428",
+      "countryName": "Latvia",
+      "year": 2020,
+      "value": 145
+    },
+    {
+      "country": "440",
+      "countryName": "Lithuania",
+      "year": 2020,
+      "value": 137
+    },
+    {
+      "country": "442",
+      "countryName": "Luxembourg",
+      "year": 2020,
+      "value": 14
+    },
+    {
+      "country": "470",
+      "countryName": "Malta",
+      "year": 2020,
+      "value": 160
+    },
+    {
+      "country": "528",
+      "countryName": "Netherlands (Kingdom of the)",
+      "year": 2020,
+      "value": 161
+    },
+    {
+      "country": "578",
+      "countryName": "Norway",
+      "year": 2020,
+      "value": 78
+    },
+    {
+      "country": "616",
+      "countryName": "Poland",
+      "year": 2020,
+      "value": 120
+    },
+    {
+      "country": "620",
+      "countryName": "Portugal",
+      "year": 2020,
+      "value": 175
+    },
+    {
+      "country": "642",
+      "countryName": "Romania",
+      "year": 2020,
+      "value": 166
+    },
+    {
+      "country": "703",
+      "countryName": "Slovakia",
+      "year": 2020,
+      "value": 107
+    },
+    {
+      "country": "705",
+      "countryName": "Slovenia",
+      "year": 2020,
+      "value": 74
+    },
+    {
+      "country": "724",
+      "countryName": "Spain",
+      "year": 2020,
+      "value": 69
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2020,
+      "value": 191.35749
+    },
+    {
+      "country": "752",
+      "countryName": "Sweden",
+      "year": 2020,
+      "value": 121
+    },
+    {
+      "country": "32",
+      "countryName": "Argentina",
+      "year": 2021,
+      "value": 1.44533
+    },
+    {
+      "country": "40",
+      "countryName": "Austria",
+      "year": 2021,
+      "value": 9
+    },
+    {
+      "country": "56",
+      "countryName": "Belgium",
+      "year": 2021,
+      "value": 10
+    },
+    {
+      "country": "100",
+      "countryName": "Bulgaria",
+      "year": 2021,
+      "value": 56
+    },
+    {
+      "country": "191",
+      "countryName": "Croatia",
+      "year": 2021,
+      "value": 1
+    },
+    {
+      "country": "196",
+      "countryName": "Cyprus",
+      "year": 2021,
+      "value": 59
+    },
+    {
+      "country": "203",
+      "countryName": "Czechia",
+      "year": 2021,
+      "value": 15
+    },
+    {
+      "country": "208",
+      "countryName": "Denmark",
+      "year": 2021,
+      "value": 17
+    },
+    {
+      "country": "233",
+      "countryName": "Estonia",
+      "year": 2021,
+      "value": 10
+    },
+    {
+      "country": "246",
+      "countryName": "Finland",
+      "year": 2021,
+      "value": 10
+    },
+    {
+      "country": "250",
+      "countryName": "France",
+      "year": 2021,
+      "value": 9
+    },
+    {
+      "country": "276",
+      "countryName": "Germany",
+      "year": 2021,
+      "value": 22
+    },
+    {
+      "country": "300",
+      "countryName": "Greece",
+      "year": 2021,
+      "value": 14
+    },
+    {
+      "country": "348",
+      "countryName": "Hungary",
+      "year": 2021,
+      "value": 6
+    },
+    {
+      "country": "372",
+      "countryName": "Ireland",
+      "year": 2021,
+      "value": 37
+    },
+    {
+      "country": "380",
+      "countryName": "Italy",
+      "year": 2021,
+      "value": 8
+    },
+    {
+      "country": "428",
+      "countryName": "Latvia",
+      "year": 2021,
+      "value": 130
+    },
+    {
+      "country": "440",
+      "countryName": "Lithuania",
+      "year": 2021,
+      "value": 12
+    },
+    {
+      "country": "442",
+      "countryName": "Luxembourg",
+      "year": 2021,
+      "value": 14
+    },
+    {
+      "country": "470",
+      "countryName": "Malta",
+      "year": 2021,
+      "value": 7
+    },
+    {
+      "country": "528",
+      "countryName": "Netherlands (Kingdom of the)",
+      "year": 2021,
+      "value": 5
+    },
+    {
+      "country": "578",
+      "countryName": "Norway",
+      "year": 2021,
+      "value": 159
+    },
+    {
+      "country": "616",
+      "countryName": "Poland",
+      "year": 2021,
+      "value": 14
+    },
+    {
+      "country": "620",
+      "countryName": "Portugal",
+      "year": 2021,
+      "value": 22
+    },
+    {
+      "country": "642",
+      "countryName": "Romania",
+      "year": 2021,
+      "value": 2
+    },
+    {
+      "country": "703",
+      "countryName": "Slovakia",
+      "year": 2021,
+      "value": 5
+    },
+    {
+      "country": "705",
+      "countryName": "Slovenia",
+      "year": 2021,
+      "value": 7
+    },
+    {
+      "country": "724",
+      "countryName": "Spain",
+      "year": 2021,
+      "value": 6
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2021,
+      "value": 194.51076
+    },
+    {
+      "country": "752",
+      "countryName": "Sweden",
+      "year": 2021,
+      "value": 10
+    },
+    {
+      "country": "4",
+      "countryName": "Afghanistan",
+      "year": 2022,
+      "value": 169.3177
+    },
+    {
+      "country": "2",
+      "countryName": "Africa",
+      "year": 2022,
+      "value": 140.65613
+    },
+    {
+      "country": "8",
+      "countryName": "Albania",
+      "year": 2022,
+      "value": 124.94552
+    },
+    {
+      "country": "12",
+      "countryName": "Algeria",
+      "year": 2022,
+      "value": 153.45259
+    },
+    {
+      "country": "16",
+      "countryName": "American Samoa",
+      "year": 2022,
+      "value": 104.07799
+    },
+    {
+      "country": "20",
+      "countryName": "Andorra",
+      "year": 2022,
+      "value": 112.97667
+    },
+    {
+      "country": "24",
+      "countryName": "Angola",
+      "year": 2022,
+      "value": 129.94378
+    },
+    {
+      "country": "660",
+      "countryName": "Anguilla",
+      "year": 2022,
+      "value": 18.16005
+    },
+    {
+      "country": "28",
+      "countryName": "Antigua and Barbuda",
+      "year": 2022,
+      "value": 139.72848
+    },
+    {
+      "country": "32",
+      "countryName": "Argentina",
+      "year": 2022,
+      "value": 47.54663
+    },
+    {
+      "country": "51",
+      "countryName": "Armenia",
+      "year": 2022,
+      "value": 162.71664
+    },
+    {
+      "country": "533",
+      "countryName": "Aruba",
+      "year": 2022,
+      "value": 150.43239
+    },
+    {
+      "country": "142",
+      "countryName": "Asia",
+      "year": 2022,
+      "value": 129.3983
+    },
+    {
+      "country": "36",
+      "countryName": "Australia",
+      "year": 2022,
+      "value": 176.89934
+    },
+    {
+      "country": "53",
+      "countryName": "Australia and New Zealand",
+      "year": 2022,
+      "value": 91.69028
+    },
+    {
+      "country": "40",
+      "countryName": "Austria",
+      "year": 2022,
+      "value": 131
+    },
+    {
+      "country": "31",
+      "countryName": "Azerbaijan",
+      "year": 2022,
+      "value": 29.40736
+    },
+    {
+      "country": "44",
+      "countryName": "Bahamas",
+      "year": 2022,
+      "value": 145.57637
+    },
+    {
+      "country": "48",
+      "countryName": "Bahrain",
+      "year": 2022,
+      "value": 183.2931
+    },
+    {
+      "country": "50",
+      "countryName": "Bangladesh",
+      "year": 2022,
+      "value": 124.54196
+    },
+    {
+      "country": "52",
+      "countryName": "Barbados",
+      "year": 2022,
+      "value": 144.72559
+    },
+    {
+      "country": "112",
+      "countryName": "Belarus",
+      "year": 2022,
+      "value": 70.69816
+    },
+    {
+      "country": "56",
+      "countryName": "Belgium",
+      "year": 2022,
+      "value": 151
+    },
+    {
+      "country": "84",
+      "countryName": "Belize",
+      "year": 2022,
+      "value": 120.61688
+    },
+    {
+      "country": "204",
+      "countryName": "Benin",
+      "year": 2022,
+      "value": 129.91221
+    },
+    {
+      "country": "60",
+      "countryName": "Bermuda",
+      "year": 2022,
+      "value": 134.87294
+    },
+    {
+      "country": "64",
+      "countryName": "Bhutan",
+      "year": 2022,
+      "value": 61.29403
+    },
+    {
+      "country": "68",
+      "countryName": "Bolivia (Plurinational State of)",
+      "year": 2022,
+      "value": 151.18677
+    },
+    {
+      "country": "535",
+      "countryName": "Bonaire, Sint Eustatius and Saba",
+      "year": 2022,
+      "value": 15.98261
+    },
+    {
+      "country": "70",
+      "countryName": "Bosnia and Herzegovina",
+      "year": 2022,
+      "value": 124.91127
+    },
+    {
+      "country": "72",
+      "countryName": "Botswana",
+      "year": 2022,
+      "value": 96.68434
+    },
+    {
+      "country": "76",
+      "countryName": "Brazil",
+      "year": 2022,
+      "value": 144.44579
+    },
+    {
+      "country": "92",
+      "countryName": "British Virgin Islands",
+      "year": 2022,
+      "value": 139.50233
+    },
+    {
+      "country": "96",
+      "countryName": "Brunei Darussalam",
+      "year": 2022,
+      "value": 157.18745
+    },
+    {
+      "country": "100",
+      "countryName": "Bulgaria",
+      "year": 2022,
+      "value": 15
+    },
+    {
+      "country": "854",
+      "countryName": "Burkina Faso",
+      "year": 2022,
+      "value": 132.79198
+    },
+    {
+      "country": "108",
+      "countryName": "Burundi",
+      "year": 2022,
+      "value": 132.81838
+    },
+    {
+      "country": "132",
+      "countryName": "Cabo Verde",
+      "year": 2022,
+      "value": 129.25023
+    },
+    {
+      "country": "116",
+      "countryName": "Cambodia",
+      "year": 2022,
+      "value": 169.26809
+    },
+    {
+      "country": "120",
+      "countryName": "Cameroon",
+      "year": 2022,
+      "value": 129.91896
+    },
+    {
+      "country": "124",
+      "countryName": "Canada",
+      "year": 2022,
+      "value": 188.05412
+    },
+    {
+      "country": "29",
+      "countryName": "Caribbean",
+      "year": 2022,
+      "value": 171.0554
+    },
+    {
+      "country": "136",
+      "countryName": "Cayman Islands",
+      "year": 2022,
+      "value": 148.31234
+    },
+    {
+      "country": "140",
+      "countryName": "Central African Republic",
+      "year": 2022,
+      "value": 132.83439
+    },
+    {
+      "country": "13",
+      "countryName": "Central America",
+      "year": 2022,
+      "value": 197.63994
+    },
+    {
+      "country": "62",
+      "countryName": "Central and Southern Asia",
+      "year": 2022,
+      "value": 113.13529
+    },
+    {
+      "country": "143",
+      "countryName": "Central Asia",
+      "year": 2022,
+      "value": 130.99123
+    },
+    {
+      "country": "148",
+      "countryName": "Chad",
+      "year": 2022,
+      "value": 132.78917
+    },
+    {
+      "country": "152",
+      "countryName": "Chile",
+      "year": 2022,
+      "value": 145.54297
+    },
+    {
+      "country": "156",
+      "countryName": "China",
+      "year": 2022,
+      "value": 141.64263
+    },
+    {
+      "country": "344",
+      "countryName": "China, Hong Kong Special Administrative Region",
+      "year": 2022,
+      "value": 139.92784
+    },
+    {
+      "country": "446",
+      "countryName": "China, Macao Special Administrative Region",
+      "year": 2022,
+      "value": 114.97907
+    },
+    {
+      "country": "170",
+      "countryName": "Colombia",
+      "year": 2022,
+      "value": 136.97333
+    },
+    {
+      "country": "174",
+      "countryName": "Comoros",
+      "year": 2022,
+      "value": 130.44103
+    },
+    {
+      "country": "178",
+      "countryName": "Congo",
+      "year": 2022,
+      "value": 129.93085
+    },
+    {
+      "country": "184",
+      "countryName": "Cook Islands",
+      "year": 2022,
+      "value": 16.9281
+    },
+    {
+      "country": "188",
+      "countryName": "Costa Rica",
+      "year": 2022,
+      "value": 157.86492
+    },
+    {
+      "country": "384",
+      "countryName": "Côte d'Ivoire",
+      "year": 2022,
+      "value": 9.67769
+    },
+    {
+      "country": "191",
+      "countryName": "Croatia",
+      "year": 2022,
+      "value": 72
+    },
+    {
+      "country": "192",
+      "countryName": "Cuba",
+      "year": 2022,
+      "value": 157.85933
+    },
+    {
+      "country": "531",
+      "countryName": "Curaçao",
+      "year": 2022,
+      "value": 144.68506
+    },
+    {
+      "country": "196",
+      "countryName": "Cyprus",
+      "year": 2022,
+      "value": 294
+    },
+    {
+      "country": "203",
+      "countryName": "Czechia",
+      "year": 2022,
+      "value": 6
+    },
+    {
+      "country": "408",
+      "countryName": "Democratic People's Republic of Korea",
+      "year": 2022,
+      "value": 122.729
+    },
+    {
+      "country": "180",
+      "countryName": "Democratic Republic of the Congo",
+      "year": 2022,
+      "value": 9.67786
+    },
+    {
+      "country": "208",
+      "countryName": "Denmark",
+      "year": 2022,
+      "value": 254
+    },
+    {
+      "country": "262",
+      "countryName": "Djibouti",
+      "year": 2022,
+      "value": 129.84165
+    },
+    {
+      "country": "212",
+      "countryName": "Dominica",
+      "year": 2022,
+      "value": 151.94898
+    },
+    {
+      "country": "214",
+      "countryName": "Dominican Republic",
+      "year": 2022,
+      "value": 226.82019
+    },
+    {
+      "country": "14",
+      "countryName": "Eastern Africa",
+      "year": 2022,
+      "value": 94.2228
+    },
+    {
+      "country": "753",
+      "countryName": "Eastern and South-Eastern Asia",
+      "year": 2022,
+      "value": 41.20732
+    },
+    {
+      "country": "30",
+      "countryName": "Eastern Asia",
+      "year": 2022,
+      "value": 134.31782
+    },
+    {
+      "country": "151",
+      "countryName": "Eastern Europe",
+      "year": 2022,
+      "value": 68.70975
+    },
+    {
+      "country": "218",
+      "countryName": "Ecuador",
+      "year": 2022,
+      "value": 162.51723
+    },
+    {
+      "country": "818",
+      "countryName": "Egypt",
+      "year": 2022,
+      "value": 203.76167
+    },
+    {
+      "country": "222",
+      "countryName": "El Salvador",
+      "year": 2022,
+      "value": 157.98009
+    },
+    {
+      "country": "226",
+      "countryName": "Equatorial Guinea",
+      "year": 2022,
+      "value": 136.19239
+    },
+    {
+      "country": "232",
+      "countryName": "Eritrea",
+      "year": 2022,
+      "value": 132.66865
+    },
+    {
+      "country": "233",
+      "countryName": "Estonia",
+      "year": 2022,
+      "value": 134
+    },
+    {
+      "country": "748",
+      "countryName": "Eswatini",
+      "year": 2022,
+      "value": 129.7595
+    },
+    {
+      "country": "231",
+      "countryName": "Ethiopia",
+      "year": 2022,
+      "value": 110.05984
+    },
+    {
+      "country": "150",
+      "countryName": "Europe",
+      "year": 2022,
+      "value": 89.21536
+    },
+    {
+      "country": "513",
+      "countryName": "Europe and Northern America",
+      "year": 2022,
+      "value": 68.70924
+    },
+    {
+      "country": "238",
+      "countryName": "Falkland Islands (Malvinas)",
+      "year": 2022,
+      "value": 0
+    },
+    {
+      "country": "234",
+      "countryName": "Faroe Islands",
+      "year": 2022,
+      "value": 16.66387
+    },
+    {
+      "country": "242",
+      "countryName": "Fiji",
+      "year": 2022,
+      "value": 142.04164
+    },
+    {
+      "country": "246",
+      "countryName": "Finland",
+      "year": 2022,
+      "value": 109
+    },
+    {
+      "country": "250",
+      "countryName": "France",
+      "year": 2022,
+      "value": 139
+    },
+    {
+      "country": "254",
+      "countryName": "French Guiana",
+      "year": 2022,
+      "value": 14.18276
+    },
+    {
+      "country": "258",
+      "countryName": "French Polynesia",
+      "year": 2022,
+      "value": 116.59565
+    },
+    {
+      "country": "266",
+      "countryName": "Gabon",
+      "year": 2022,
+      "value": 136.65028
+    },
+    {
+      "country": "270",
+      "countryName": "Gambia",
+      "year": 2022,
+      "value": 9.69221
+    },
+    {
+      "country": "268",
+      "countryName": "Georgia",
+      "year": 2022,
+      "value": 161.64998
+    },
+    {
+      "country": "276",
+      "countryName": "Germany",
+      "year": 2022,
+      "value": 129
+    },
+    {
+      "country": "288",
+      "countryName": "Ghana",
+      "year": 2022,
+      "value": 31.14128
+    },
+    {
+      "country": "292",
+      "countryName": "Gibraltar",
+      "year": 2022,
+      "value": 103.58185
+    },
+    {
+      "country": "300",
+      "countryName": "Greece",
+      "year": 2022,
+      "value": 122.05908
+    },
+    {
+      "country": "304",
+      "countryName": "Greenland",
+      "year": 2022,
+      "value": 153.30792
+    },
+    {
+      "country": "308",
+      "countryName": "Grenada",
+      "year": 2022,
+      "value": 163.63243
+    },
+    {
+      "country": "312",
+      "countryName": "Guadeloupe",
+      "year": 2022,
+      "value": 14.55275
+    },
+    {
+      "country": "316",
+      "countryName": "Guam",
+      "year": 2022,
+      "value": 92.61416
+    },
+    {
+      "country": "320",
+      "countryName": "Guatemala",
+      "year": 2022,
+      "value": 157.85561
+    },
+    {
+      "country": "324",
+      "countryName": "Guinea",
+      "year": 2022,
+      "value": 129.94626
+    },
+    {
+      "country": "624",
+      "countryName": "Guinea-Bissau",
+      "year": 2022,
+      "value": 133.0937
+    },
+    {
+      "country": "328",
+      "countryName": "Guyana",
+      "year": 2022,
+      "value": 145.80001
+    },
+    {
+      "country": "332",
+      "countryName": "Haiti",
+      "year": 2022,
+      "value": 151.30295
+    },
+    {
+      "country": "336",
+      "countryName": "Holy See",
+      "year": 2022,
+      "value": 0
+    },
+    {
+      "country": "340",
+      "countryName": "Honduras",
+      "year": 2022,
+      "value": 151.19616
+    },
+    {
+      "country": "348",
+      "countryName": "Hungary",
+      "year": 2022,
+      "value": 84
+    },
+    {
+      "country": "352",
+      "countryName": "Iceland",
+      "year": 2022,
+      "value": 159
+    },
+    {
+      "country": "356",
+      "countryName": "India",
+      "year": 2022,
+      "value": 97.33804
+    },
+    {
+      "country": "360",
+      "countryName": "Indonesia",
+      "year": 2022,
+      "value": 143.50491
+    },
+    {
+      "country": "364",
+      "countryName": "Iran (Islamic Republic of)",
+      "year": 2022,
+      "value": 134.85985
+    },
+    {
+      "country": "368",
+      "countryName": "Iraq",
+      "year": 2022,
+      "value": 204.96531
+    },
+    {
+      "country": "372",
+      "countryName": "Ireland",
+      "year": 2022,
+      "value": 144
+    },
+    {
+      "country": "833",
+      "countryName": "Isle of Man",
+      "year": 2022,
+      "value": 99.33152
+    },
+    {
+      "country": "376",
+      "countryName": "Israel",
+      "year": 2022,
+      "value": 170.91859
+    },
+    {
+      "country": "380",
+      "countryName": "Italy",
+      "year": 2022,
+      "value": 139
+    },
+    {
+      "country": "388",
+      "countryName": "Jamaica",
+      "year": 2022,
+      "value": 152.68805
+    },
+    {
+      "country": "392",
+      "countryName": "Japan",
+      "year": 2022,
+      "value": 80.5722
+    },
+    {
+      "country": "400",
+      "countryName": "Jordan",
+      "year": 2022,
+      "value": 156.14866
+    },
+    {
+      "country": "398",
+      "countryName": "Kazakhstan",
+      "year": 2022,
+      "value": 21.04484
+    },
+    {
+      "country": "404",
+      "countryName": "Kenya",
+      "year": 2022,
+      "value": 122.63937
+    },
+    {
+      "country": "296",
+      "countryName": "Kiribati",
+      "year": 2022,
+      "value": 30.84512
+    },
+    {
+      "country": "414",
+      "countryName": "Kuwait",
+      "year": 2022,
+      "value": 150.4643
+    },
+    {
+      "country": "417",
+      "countryName": "Kyrgyzstan",
+      "year": 2022,
+      "value": 126.51811
+    },
+    {
+      "country": "432",
+      "countryName": "Landlocked developing countries (LLDCs)",
+      "year": 2022,
+      "value": 132.29176
+    },
+    {
+      "country": "418",
+      "countryName": "Lao People's Democratic Republic",
+      "year": 2022,
+      "value": 174.07974
+    },
+    {
+      "country": "419",
+      "countryName": "Latin America and the Caribbean",
+      "year": 2022,
+      "value": 160.56478
+    },
+    {
+      "country": "428",
+      "countryName": "Latvia",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "199",
+      "countryName": "Least Developed Countries (LDCs)",
+      "year": 2022,
+      "value": 136.37703
+    },
+    {
+      "country": "422",
+      "countryName": "Lebanon",
+      "year": 2022,
+      "value": 183.24795
+    },
+    {
+      "country": "426",
+      "countryName": "Lesotho",
+      "year": 2022,
+      "value": 130.17535
+    },
+    {
+      "country": "430",
+      "countryName": "Liberia",
+      "year": 2022,
+      "value": 91.95218
+    },
+    {
+      "country": "434",
+      "countryName": "Libya",
+      "year": 2022,
+      "value": 135.82784
+    },
+    {
+      "country": "438",
+      "countryName": "Liechtenstein",
+      "year": 2022,
+      "value": 113.83178
+    },
+    {
+      "country": "440",
+      "countryName": "Lithuania",
+      "year": 2022,
+      "value": 97.99804
+    },
+    {
+      "country": "442",
+      "countryName": "Luxembourg",
+      "year": 2022,
+      "value": 13
+    },
+    {
+      "country": "450",
+      "countryName": "Madagascar",
+      "year": 2022,
+      "value": 132.80632
+    },
+    {
+      "country": "454",
+      "countryName": "Malawi",
+      "year": 2022,
+      "value": 132.84449
+    },
+    {
+      "country": "458",
+      "countryName": "Malaysia",
+      "year": 2022,
+      "value": 209.52537
+    },
+    {
+      "country": "462",
+      "countryName": "Maldives",
+      "year": 2022,
+      "value": 260.43505
+    },
+    {
+      "country": "466",
+      "countryName": "Mali",
+      "year": 2022,
+      "value": 132.79291
+    },
+    {
+      "country": "470",
+      "countryName": "Malta",
+      "year": 2022,
+      "value": 162
+    },
+    {
+      "country": "584",
+      "countryName": "Marshall Islands",
+      "year": 2022,
+      "value": 110.56629
+    },
+    {
+      "country": "474",
+      "countryName": "Martinique",
+      "year": 2022,
+      "value": 14.49587
+    },
+    {
+      "country": "478",
+      "countryName": "Mauritania",
+      "year": 2022,
+      "value": 130.04601
+    },
+    {
+      "country": "480",
+      "countryName": "Mauritius",
+      "year": 2022,
+      "value": 136.64846
+    },
+    {
+      "country": "175",
+      "countryName": "Mayotte",
+      "year": 2022,
+      "value": 14.57035
+    },
+    {
+      "country": "54",
+      "countryName": "Melanesia",
+      "year": 2022,
+      "value": 129.29058
+    },
+    {
+      "country": "484",
+      "countryName": "Mexico",
+      "year": 2022,
+      "value": 214.71691
+    },
+    {
+      "country": "583",
+      "countryName": "Micronesia (Federated States of)",
+      "year": 2022,
+      "value": 9.32489
+    },
+    {
+      "country": "17",
+      "countryName": "Middle Africa",
+      "year": 2022,
+      "value": 9.79515
+    },
+    {
+      "country": "492",
+      "countryName": "Monaco",
+      "year": 2022,
+      "value": 122.75255
+    },
+    {
+      "country": "496",
+      "countryName": "Mongolia",
+      "year": 2022,
+      "value": 59.77051
+    },
+    {
+      "country": "499",
+      "countryName": "Montenegro",
+      "year": 2022,
+      "value": 125.62951
+    },
+    {
+      "country": "500",
+      "countryName": "Montserrat",
+      "year": 2022,
+      "value": 0
+    },
+    {
+      "country": "504",
+      "countryName": "Morocco",
+      "year": 2022,
+      "value": 153.47192
+    },
+    {
+      "country": "508",
+      "countryName": "Mozambique",
+      "year": 2022,
+      "value": 132.81595
+    },
+    {
+      "country": "104",
+      "countryName": "Myanmar",
+      "year": 2022,
+      "value": 44.24819
+    },
+    {
+      "country": "516",
+      "countryName": "Namibia",
+      "year": 2022,
+      "value": 136.75164
+    },
+    {
+      "country": "520",
+      "countryName": "Naoero",
+      "year": 2022,
+      "value": 73.87166
+    },
+    {
+      "country": "524",
+      "countryName": "Nepal",
+      "year": 2022,
+      "value": 134.87141
+    },
+    {
+      "country": "528",
+      "countryName": "Netherlands (Kingdom of the)",
+      "year": 2022,
+      "value": 129
+    },
+    {
+      "country": "540",
+      "countryName": "New Caledonia",
+      "year": 2022,
+      "value": 120.70407
+    },
+    {
+      "country": "554",
+      "countryName": "New Zealand",
+      "year": 2022,
+      "value": 103.62674
+    },
+    {
+      "country": "558",
+      "countryName": "Nicaragua",
+      "year": 2022,
+      "value": 151.27262
+    },
+    {
+      "country": "562",
+      "countryName": "Niger",
+      "year": 2022,
+      "value": 92.0058
+    },
+    {
+      "country": "566",
+      "countryName": "Nigeria",
+      "year": 2022,
+      "value": 154.25743
+    },
+    {
+      "country": "570",
+      "countryName": "Niue",
+      "year": 2022,
+      "value": 0
+    },
+    {
+      "country": "807",
+      "countryName": "North Macedonia",
+      "year": 2022,
+      "value": 24.49528
+    },
+    {
+      "country": "15",
+      "countryName": "Northern Africa",
+      "year": 2022,
+      "value": 177.85313
+    },
+    {
+      "country": "747",
+      "countryName": "Northern Africa and Western Asia",
+      "year": 2022,
+      "value": 20.05672
+    },
+    {
+      "country": "21",
+      "countryName": "Northern America",
+      "year": 2022,
+      "value": 161.64135
+    },
+    {
+      "country": "154",
+      "countryName": "Northern Europe",
+      "year": 2022,
+      "value": 93.98786
+    },
+    {
+      "country": "580",
+      "countryName": "Northern Mariana Islands",
+      "year": 2022,
+      "value": 94.42858
+    },
+    {
+      "country": "578",
+      "countryName": "Norway",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "9",
+      "countryName": "Oceania",
+      "year": 2022,
+      "value": 153.47171
+    },
+    {
+      "country": "543",
+      "countryName": "Oceania (exc. Australia and New Zealand)",
+      "year": 2022,
+      "value": 86.33038
+    },
+    {
+      "country": "512",
+      "countryName": "Oman",
+      "year": 2022,
+      "value": 27.53913
+    },
+    {
+      "country": "586",
+      "countryName": "Pakistan",
+      "year": 2022,
+      "value": 172.57581
+    },
+    {
+      "country": "585",
+      "countryName": "Palau",
+      "year": 2022,
+      "value": 23.30952
+    },
+    {
+      "country": "591",
+      "countryName": "Panama",
+      "year": 2022,
+      "value": 158.58577
+    },
+    {
+      "country": "598",
+      "countryName": "Papua New Guinea",
+      "year": 2022,
+      "value": 129.85603
+    },
+    {
+      "country": "600",
+      "countryName": "Paraguay",
+      "year": 2022,
+      "value": 157.87286
+    },
+    {
+      "country": "604",
+      "countryName": "Peru",
+      "year": 2022,
+      "value": 154.18198
+    },
+    {
+      "country": "608",
+      "countryName": "Philippines",
+      "year": 2022,
+      "value": 110.1498
+    },
+    {
+      "country": "616",
+      "countryName": "Poland",
+      "year": 2022,
+      "value": 123
+    },
+    {
+      "country": "61",
+      "countryName": "Polynesia",
+      "year": 2022,
+      "value": 122.51434
+    },
+    {
+      "country": "620",
+      "countryName": "Portugal",
+      "year": 2022,
+      "value": 184
+    },
+    {
+      "country": "630",
+      "countryName": "Puerto Rico",
+      "year": 2022,
+      "value": 145.46295
+    },
+    {
+      "country": "634",
+      "countryName": "Qatar",
+      "year": 2022,
+      "value": 145.02438
+    },
+    {
+      "country": "410",
+      "countryName": "Republic of Korea",
+      "year": 2022,
+      "value": 133.42409
+    },
+    {
+      "country": "498",
+      "countryName": "Republic of Moldova",
+      "year": 2022,
+      "value": 13.56873
+    },
+    {
+      "country": "638",
+      "countryName": "Réunion",
+      "year": 2022,
+      "value": 14.3383
+    },
+    {
+      "country": "642",
+      "countryName": "Romania",
+      "year": 2022,
+      "value": 181
+    },
+    {
+      "country": "643",
+      "countryName": "Russian Federation",
+      "year": 2022,
+      "value": 55.52419
+    },
+    {
+      "country": "646",
+      "countryName": "Rwanda",
+      "year": 2022,
+      "value": 181.48005
+    },
+    {
+      "country": "652",
+      "countryName": "Saint Barthélemy",
+      "year": 2022,
+      "value": 13.12866
+    },
+    {
+      "country": "654",
+      "countryName": "Saint Helena",
+      "year": 2022,
+      "value": 26.79233
+    },
+    {
+      "country": "659",
+      "countryName": "Saint Kitts and Nevis",
+      "year": 2022,
+      "value": 152.7275
+    },
+    {
+      "country": "662",
+      "countryName": "Saint Lucia",
+      "year": 2022,
+      "value": 91.41074
+    },
+    {
+      "country": "663",
+      "countryName": "Saint Martin (French Part)",
+      "year": 2022,
+      "value": 137.36971
+    },
+    {
+      "country": "666",
+      "countryName": "Saint Pierre and Miquelon",
+      "year": 2022,
+      "value": 24.56192
+    },
+    {
+      "country": "670",
+      "countryName": "Saint Vincent and the Grenadines",
+      "year": 2022,
+      "value": 151.89343
+    },
+    {
+      "country": "882",
+      "countryName": "Samoa",
+      "year": 2022,
+      "value": 9.57422
+    },
+    {
+      "country": "674",
+      "countryName": "San Marino",
+      "year": 2022,
+      "value": 100.4707
+    },
+    {
+      "country": "678",
+      "countryName": "Sao Tome and Principe",
+      "year": 2022,
+      "value": 131.43732
+    },
+    {
+      "country": "682",
+      "countryName": "Saudi Arabia",
+      "year": 2022,
+      "value": 148.88399
+    },
+    {
+      "country": "686",
+      "countryName": "Senegal",
+      "year": 2022,
+      "value": 117.54191
+    },
+    {
+      "country": "688",
+      "countryName": "Serbia",
+      "year": 2022,
+      "value": 122.80684
+    },
+    {
+      "country": "690",
+      "countryName": "Seychelles",
+      "year": 2022,
+      "value": 225.81736
+    },
+    {
+      "country": "694",
+      "countryName": "Sierra Leone",
+      "year": 2022,
+      "value": 132.8801
+    },
+    {
+      "country": "702",
+      "countryName": "Singapore",
+      "year": 2022,
+      "value": 149.57485
+    },
+    {
+      "country": "534",
+      "countryName": "Sint Maarten (Dutch part)",
+      "year": 2022,
+      "value": 13.63519
+    },
+    {
+      "country": "703",
+      "countryName": "Slovakia",
+      "year": 2022,
+      "value": 106
+    },
+    {
+      "country": "705",
+      "countryName": "Slovenia",
+      "year": 2022,
+      "value": 71
+    },
+    {
+      "country": "722",
+      "countryName": "Small island developing States (SIDS)",
+      "year": 2022,
+      "value": 153.09424
+    },
+    {
+      "country": "90",
+      "countryName": "Solomon Islands",
+      "year": 2022,
+      "value": 83.71022
+    },
+    {
+      "country": "706",
+      "countryName": "Somalia",
+      "year": 2022,
+      "value": 9.67925
+    },
+    {
+      "country": "710",
+      "countryName": "South Africa",
+      "year": 2022,
+      "value": 93.35904
+    },
+    {
+      "country": "5",
+      "countryName": "South America",
+      "year": 2022,
+      "value": 144.30077
+    },
+    {
+      "country": "728",
+      "countryName": "South Sudan",
+      "year": 2022,
+      "value": 132.77551
+    },
+    {
+      "country": "35",
+      "countryName": "South-Eastern Asia",
+      "year": 2022,
+      "value": 149.06627
+    },
+    {
+      "country": "18",
+      "countryName": "Southern Africa",
+      "year": 2022,
+      "value": 96.98548
+    },
+    {
+      "country": "34",
+      "countryName": "Southern Asia",
+      "year": 2022,
+      "value": 32.48558
+    },
+    {
+      "country": "39",
+      "countryName": "Southern Europe",
+      "year": 2022,
+      "value": 8.06992
+    },
+    {
+      "country": "724",
+      "countryName": "Spain",
+      "year": 2022,
+      "value": 65
+    },
+    {
+      "country": "144",
+      "countryName": "Sri Lanka",
+      "year": 2022,
+      "value": 75.85827
+    },
+    {
+      "country": "275",
+      "countryName": "State of Palestine",
+      "year": 2022,
+      "value": 29.40149
+    },
+    {
+      "country": "202",
+      "countryName": "Sub-Saharan Africa",
+      "year": 2022,
+      "value": 10.0682
+    },
+    {
+      "country": "729",
+      "countryName": "Sudan",
+      "year": 2022,
+      "value": 156.32352
+    },
+    {
+      "country": "740",
+      "countryName": "Suriname",
+      "year": 2022,
+      "value": 158.39091
+    },
+    {
+      "country": "752",
+      "countryName": "Sweden",
+      "year": 2022,
+      "value": 117
+    },
+    {
+      "country": "756",
+      "countryName": "Switzerland",
+      "year": 2022,
+      "value": 167.44998
+    },
+    {
+      "country": "760",
+      "countryName": "Syrian Arab Republic",
+      "year": 2022,
+      "value": 227.07416
+    },
+    {
+      "country": "762",
+      "countryName": "Tajikistan",
+      "year": 2022,
+      "value": 126.49457
+    },
+    {
+      "country": "764",
+      "countryName": "Thailand",
+      "year": 2022,
+      "value": 176.25142
+    },
+    {
+      "country": "626",
+      "countryName": "Timor-Leste",
+      "year": 2022,
+      "value": 77.84914
+    },
+    {
+      "country": "768",
+      "countryName": "Togo",
+      "year": 2022,
+      "value": 132.83354
+    },
+    {
+      "country": "772",
+      "countryName": "Tokelau",
+      "year": 2022,
+      "value": 0
+    },
+    {
+      "country": "776",
+      "countryName": "Tonga",
+      "year": 2022,
+      "value": 143.94677
+    },
+    {
+      "country": "780",
+      "countryName": "Trinidad and Tobago",
+      "year": 2022,
+      "value": 145.47142
+    },
+    {
+      "country": "788",
+      "countryName": "Tunisia",
+      "year": 2022,
+      "value": 212.54959
+    },
+    {
+      "country": "792",
+      "countryName": "Türkiye",
+      "year": 2022,
+      "value": 162.74172
+    },
+    {
+      "country": "795",
+      "countryName": "Turkmenistan",
+      "year": 2022,
+      "value": 139.81839
+    },
+    {
+      "country": "796",
+      "countryName": "Turks and Caicos Islands",
+      "year": 2022,
+      "value": 159.25725
+    },
+    {
+      "country": "798",
+      "countryName": "Tuvalu",
+      "year": 2022,
+      "value": 123.61663
+    },
+    {
+      "country": "800",
+      "countryName": "Uganda",
+      "year": 2022,
+      "value": 151.06164
+    },
+    {
+      "country": "804",
+      "countryName": "Ukraine",
+      "year": 2022,
+      "value": 94.80463
+    },
+    {
+      "country": "784",
+      "countryName": "United Arab Emirates",
+      "year": 2022,
+      "value": 24.34259
+    },
+    {
+      "country": "826",
+      "countryName": "United Kingdom of Great Britain and Northern Ireland",
+      "year": 2022,
+      "value": 95.2015
+    },
+    {
+      "country": "834",
+      "countryName": "United Republic of Tanzania",
+      "year": 2022,
+      "value": 192.89059
+    },
+    {
+      "country": "840",
+      "countryName": "United States of America",
+      "year": 2022,
+      "value": 158.64487
+    },
+    {
+      "country": "850",
+      "countryName": "United States Virgin Islands",
+      "year": 2022,
+      "value": 146.35368
+    },
+    {
+      "country": "858",
+      "countryName": "Uruguay",
+      "year": 2022,
+      "value": 145.45186
+    },
+    {
+      "country": "860",
+      "countryName": "Uzbekistan",
+      "year": 2022,
+      "value": 126.53858
+    },
+    {
+      "country": "548",
+      "countryName": "Vanuatu",
+      "year": 2022,
+      "value": 184.11003
+    },
+    {
+      "country": "862",
+      "countryName": "Venezuela (Bolivarian Republic of)",
+      "year": 2022,
+      "value": 130.0302
+    },
+    {
+      "country": "704",
+      "countryName": "Viet Nam",
+      "year": 2022,
+      "value": 40.33502
+    },
+    {
+      "country": "876",
+      "countryName": "Wallis and Futuna Islands",
+      "year": 2022,
+      "value": 12.44227
+    },
+    {
+      "country": "11",
+      "countryName": "Western Africa",
+      "year": 2022,
+      "value": 142.09301
+    },
+    {
+      "country": "145",
+      "countryName": "Western Asia",
+      "year": 2022,
+      "value": 171.35388
+    },
+    {
+      "country": "155",
+      "countryName": "Western Europe",
+      "year": 2022,
+      "value": 100.9256
+    },
+    {
+      "country": "732",
+      "countryName": "Western Sahara",
+      "year": 2022,
+      "value": 14.49854
+    },
+    {
+      "country": "1",
+      "countryName": "World",
+      "year": 2022,
+      "value": 131.90581
+    },
+    {
+      "country": "887",
+      "countryName": "Yemen",
+      "year": 2022,
+      "value": 158.98143
+    },
+    {
+      "country": "894",
+      "countryName": "Zambia",
+      "year": 2022,
+      "value": 118.74911
+    },
+    {
+      "country": "716",
+      "countryName": "Zimbabwe",
+      "year": 2022,
+      "value": 88.00992
+    }
+  ]
+}
