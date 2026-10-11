@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Energy Use per Capita, 1990–2024</h1>
+<p class="subtitle">Kilograms of oil equivalent per person. Rich nations are declining as efficiency improves; China has nearly quadrupled its energy use; South Asia remains far below the global average.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EG.USE.PCAP.KG.OE</p>
+<script>
+const data = [{"n":"South Korea","s":[2088.0,2259.9,2545.9,2824.9,2969.0,3234.3,3460.9,3675.5,3374.3,3665.8,3952.4,3923.1,4093.5,4137.6,4255.2,4324.5,4337.6,4488.0,4513.0,4557.7,5008.5,5217.7,5216.1,5200.0,5231.7,5341.2,5486.8,5571.4,5646.4,5443.9,5293.9,5624.5,5521.4,5461.1,5564.3],"y0":1990},{"n":"Germany","s":[4421.8,4303.2,4191.1,4123.1,4089.2,4119.9,4247.3,4203.6,4177.5,4080.1,4094.3,4210.0,4108.6,4096.5,4131.6,4109.9,4235.9,4023.7,4081.9,3821.6,4029.8,3891.9,3913.4,3986.2,3794.4,3780.9,3765.2,3763.2,3659.2,3570.9,3349.2,3467.0,3261.0,2927.8,2874.4],"y0":1990},{"n":"Japan","s":[3538.4,3560.9,3626.5,3636.5,3823.9,3915.7,3990.5,4022.1,3938.3,3994.2,4067.0,3990.1,3992.9,3956.9,4085.5,4066.4,4064.4,4020.8,3867.1,3709.0,3900.2,3620.2,3536.7,3567.3,3445.8,3400.6,3370.9,3391.0,3343.1,3261.6,3046.8,3196.4,3131.3,3039.4,3004.2],"y0":1990},{"n":"Australia","s":[5048.0,5097.5,5157.0,5244.2,5340.4,5429.7,5518.1,5532.6,5547.9,5571.1,5567.8,5578.3,5622.7,5601.0,5640.6,5570.8,5684.3,5607.3,5622.4,5597.4,5561.3,5553.3,5582.3,5574.0,5544.6,5478.6,5395.8,5422.5,5440.3,5344.0,5148.4,5258.1,5130.0,5063.0,5000.5],"y0":1990},{"n":"France","s":[3840.0,3857.3,3935.5,3925.8,3980.2,4028.0,4093.5,4072.3,4068.1,4030.4,4073.9,4033.3,4026.8,3985.1,3981.6,4014.9,3929.1,3919.3,3810.2,3760.3,3836.0,3825.8,3786.5,3823.1,3665.5,3550.0,3476.7,3425.0,3352.1,3289.6,3011.8,3138.8,3070.4,3066.5,3183.0],"y0":1990},{"n":"China","s":[773.3,740.6,756.6,792.6,821.3,872.8,884.9,876.5,872.4,880.7,898.1,921.5,976.2,1105.1,1249.0,1369.8,1490.2,1595.5,1630.0,1728.6,1899.8,2027.5,2085.2,2137.3,2177.5,2175.2,2149.2,2215.9,2310.9,2399.5,2466.9,2631.0,2679.7,2858.7,2946.8],"y0":1990},{"n":"Brazil","s":[942.3,943.3,937.4,945.5,980.1,998.8,1035.8,1072.3,1082.2,1091.3,1081.4,1087.0,1103.4,1108.0,1157.2,1173.7,1202.1,1259.9,1317.2,1262.1,1384.4,1390.0,1433.2,1487.5,1522.4,1482.0,1414.9,1432.0,1403.4,1415.8,1379.2,1430.4,1440.5,1495.2,1528.2],"y0":1990},{"n":"India","s":[323.5,331.2,336.2,339.0,347.8,361.6,367.7,376.2,378.3,393.0,394.9,393.4,397.3,399.7,415.5,424.9,441.3,460.6,479.5,510.9,533.6,546.9,574.0,578.4,611.4,621.4,626.6,646.6,665.9,663.7,627.9,677.2,725.9,764.8,776.5],"y0":1990},{"n":"Bangladesh","s":[114.3,110.6,114.4,117.1,121.6,128.9,127.7,130.8,132.3,134.9,136.0,148.3,148.0,153.2,154.3,159.9,168.4,174.0,180.6,187.7,195.6,200.3,208.1,216.7,222.2,236.8,255.3,262.5,260.3,276.9,278.6,298.4,308.1,288.4,288.3],"y0":1990}];
+
+const COLORS = {
+  "South Korea": "#EA5E33",
+  "Australia":   "#F29A44",
+  "Germany":     "#9A9890",
+  "Japan":       "#C2C0B5",
+  "France":      "#B0AEA6",
+  "China":       "#C49A45",
+  "Brazil":      "#8BAD72",
+  "India":       "#5B9E78",
+  "Bangladesh":  "#3D7A5A"
+};
+
+const W = 760, H = 460;
+const margin = { top: 30, right: 140, bottom: 36, left: 62 };
+const innerW = W - margin.left - margin.right;
+const innerH = H - margin.top - margin.bottom;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 28) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// Log scale
+const yMin = 80, yMax = 6500;
+const logY = v => margin.top + (Math.log(yMax) - Math.log(Math.max(v, yMin))) / (Math.log(yMax) - Math.log(yMin)) * innerH;
+
+const yearMin = 1990, yearMax = 2024;
+const xScale = yr => margin.left + (yr - yearMin) / (yearMax - yearMin) * innerW;
+
+// Grid lines + y axis ticks
+const yTicks = [100, 200, 500, 1000, 2000, 5000];
+yTicks.forEach(v => {
+  const y = logY(v);
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const label = mkEl("text", { x: margin.left - 6, y: y + 3.5, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  label.textContent = v >= 1000 ? (v/1000).toFixed(0) + "k" : v;
+  svg.appendChild(label);
+});
+
+// X axis ticks
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  const x = xScale(yr);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.4" }));
+  const label = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  label.textContent = yr;
+  svg.appendChild(label);
+});
+
+// Y axis unit label
+const unitLbl = mkEl("text", { x: margin.left - 6, y: margin.top - 8, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "8" });
+unitLbl.textContent = "kg oil eq.";
+svg.appendChild(unitLbl);
+
+// Build series
+const allGroups = [];
+data.forEach(series => {
+  const color = COLORS[series.n] || "#999";
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i, value: v })).filter(p => p.value != null);
+  if (!pts.length) return;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${logY(p.value).toFixed(1)}`).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+    const idx = Math.round(ratio * (pts.length - 1));
+    const p = pts[idx];
+    showTip(`${series.n}  ${p.year}: ${p.value.toLocaleString()} kg`, e);
+    allGroups.forEach(gg => gg.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    allGroups.forEach(gg => gg.style.opacity = "1");
+    line.setAttribute("stroke-width", "1.5");
+  });
+
+  allGroups.push(g);
+  svg.appendChild(g);
+});
+
+// Endpoint labels (right side)
+const labelItems = data.map(s => {
+  const pts = s.s.map((v, i) => ({ year: s.y0 + i, value: v })).filter(p => p.value != null);
+  if (!pts.length) return null;
+  const last = pts[pts.length - 1];
+  return { n: s.n, y: logY(last.value), val: last.value };
+}).filter(Boolean);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const color = COLORS[item.n] || "#999";
+  const lbl = mkEl("text", {
+    x: W - margin.right + 8,
+    y: item.y + 3.5,
+    fill: color,
+    "font-size": "9",
+    "font-weight": "500"
+  });
+  lbl.textContent = item.n;
+  svg.appendChild(lbl);
+});
+</script>
+</body></html>

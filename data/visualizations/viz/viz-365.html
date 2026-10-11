@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Child Wasting: Countries with the Highest Prevalence</h1>
+<p class="subtitle">Share of children under 5 who are wasted (low weight-for-height), a measure of acute undernutrition. India alone accounts for roughly half of all wasted children worldwide. Most affected countries are in South Asia and Sub-Saharan Africa. Global average: 6.6%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.STA.WAST.ZS · Most recent year per country</p>
+<script>
+const data = [{"n":"India","v":18.7,"y":2020},{"n":"Djibouti","v":12.1,"y":2023},{"n":"Bangladesh","v":10.7,"y":2022},{"n":"Cambodia","v":9.6,"y":2021},{"n":"Burkina Faso","v":9.3,"y":2021},{"n":"Indonesia","v":8.4,"y":2023},{"n":"Benin","v":8.3,"y":2021},{"n":"Cote d'Ivoire","v":8.1,"y":2021},{"n":"Burundi","v":7.8,"y":2024},{"n":"Chad","v":7.8,"y":2022},{"n":"Guinea-Bissau","v":7.8,"y":2019},{"n":"Congo, Dem. Rep.","v":7.2,"y":2023}];
+const WORLD_AVG = 6.6;
+
+const W = 700, H = 420;
+const margin = { top: 30, right: 80, bottom: 30, left: 130 };
+const innerW = W - margin.left - margin.right;
+const innerH = H - margin.top - margin.bottom;
+const barH = Math.floor(innerH / data.length) - 4;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 28) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const xMax = 22;
+const xScale = v => margin.left + v / xMax * innerW;
+
+// Region assignment for color
+const SOUTH_ASIA = new Set(["India","Bangladesh","Cambodia","Indonesia"]);
+function barColor(name, val) {
+  if (val >= 15) return "#EA5E33";
+  if (val >= 10) return "#F29A44";
+  if (val >= 8)  return "#C49A45";
+  return "#8BAD72";
+}
+
+// X grid lines
+[5, 10, 15, 20].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// World average line
+const avgX = xScale(WORLD_AVG);
+svg.appendChild(mkEl("line", { x1: avgX, y1: margin.top, x2: avgX, y2: H - margin.bottom, stroke: "#C2C0B5", "stroke-dasharray": "3,3", "stroke-width": "1" }));
+const avgLbl = mkEl("text", { x: avgX + 4, y: margin.top - 6, fill: "#7A786F", "font-size": "8", "font-family": "JetBrains Mono,monospace" });
+avgLbl.textContent = "World avg 6.6%";
+svg.appendChild(avgLbl);
+
+// Bars
+data.forEach((d, i) => {
+  const y = margin.top + i * (innerH / data.length) + 2;
+  const w = xScale(d.v) - margin.left;
+  const color = barColor(d.n, d.v);
+
+  const bar = mkEl("rect", { x: margin.left, y, width: w, height: barH, fill: color, rx: "2", cursor: "pointer" });
+  bar.addEventListener("mouseenter", e => {
+    showTip(`${d.n}: ${d.v}% (${d.y})`, e);
+    bar.style.opacity = "0.8";
+  });
+  bar.addEventListener("mouseleave", () => { hideTip(); bar.style.opacity = "1"; });
+  svg.appendChild(bar);
+
+  // Country label
+  const lbl = mkEl("text", { x: margin.left - 6, y: y + barH / 2 + 3.5, "text-anchor": "end", fill: "#2B2A27", "font-size": "10" });
+  lbl.textContent = d.n;
+  svg.appendChild(lbl);
+
+  // Value label
+  const valLbl = mkEl("text", { x: margin.left + w + 5, y: y + barH / 2 + 3.5, fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono,monospace" });
+  valLbl.textContent = d.v + "%";
+  svg.appendChild(valLbl);
+});
+</script>
+</body></html>

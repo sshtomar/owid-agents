@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>HIV New Infections in Sub-Saharan Africa, 1990–2024</h1>
+<p class="subtitle">New HIV infections per 1,000 uninfected people ages 15–49. The crisis peaked in the early 1990s; sustained treatment and prevention efforts have cut incidence by over 85% in most countries, though Eswatini and Botswana remain far above the global average.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.HIV.INCD.ZS</p>
+<script>
+const data = [{"n":"Eswatini","s":[6.8,12.4,20,29.4,39.3,46.2,49.5,50.4,48.5,47,44.1,41.4,39,37.5,36.5,34.1,33.6,32.7,32.1,31.1,29,29.1,28.6,28.2,26.4,21.9,17.4,14.6,14.1,12.7,10.2,10.1,7.9,8.1,7.5],"y0":1990},{"n":"Botswana","s":[27.9,35.6,42.1,47.1,50.1,49.7,47.3,43,38.6,34.4,30.7,27.5,24.4,22.2,19.9,17.7,16,15.2,14.2,13.5,12.9,13,12.2,11.2,10.6,10,9.1,8.1,7.1,6.1,5.5,4.4,3.6,3.3,3.1],"y0":1990},{"n":"Kenya","s":[17.7,19.5,19.7,18.4,15.6,12.8,10.7,9,7.9,6.9,6,5.4,4.9,4.5,4.1,3.8,3.6,3.3,3.1,2.8,2.6,2.3,2,1.8,1.6,1.4,1.1,0.96,0.83,0.79,0.74,0.69,0.66,0.56,0.53],"y0":1990},{"n":"Central African Rep.","s":[11.8,12.7,12.5,12.7,12.5,11.8,10.2,9.4,8.6,7.7,6.8,6.4,5.7,5.3,5.1,4.7,4.4,4.2,3.8,3.6,3.4,3.2,3.1,3,2.7,2.6,2.2,2,1.8,1.6,1.5,1.4,1.2,0.97,0.95],"y0":1990},{"n":"Burundi","s":[9.3,8,6.9,3.9,7.7,1.6,3.4,3.2,2.6,1.9,1.6,1.5,1.2,1.2,1,0.87,0.88,0.8,0.8,0.58,0.72,0.57,0.53,0.47,0.46,0.44,0.35,0.29,0.22,0.21,0.18,0.17,0.15,0.13,0.14],"y0":1990},{"n":"Ethiopia","s":[6.3,6.5,6,5.3,4.3,3.6,2.9,2.4,2.1,1.8,1.5,1.3,1.2,1,0.88,0.79,0.7,0.64,0.59,0.52,0.47,0.42,0.38,0.33,0.29,0.24,0.25,0.22,0.21,0.19,0.16,0.19,0.14,0.13,0.12],"y0":1990},{"n":"Sub-Saharan Africa","s":[6.55,7.07,7.32,7.35,7.2,6.9,6.66,6.38,6.04,5.66,5.29,4.9,4.56,4.25,4.0,3.76,3.56,3.36,3.18,3.01,2.88,2.71,2.55,2.38,2.2,2.05,1.89,1.7,1.56,1.44,1.29,1.19,1.06,0.98,0.88],"y0":1990}];
+
+const COLORS = {
+  "Eswatini":           "#EA5E33",
+  "Botswana":           "#F29A44",
+  "Kenya":              "#C49A45",
+  "Central African Rep.":"#B34B3B",
+  "Burundi":            "#8BAD72",
+  "Ethiopia":           "#5B9E78",
+  "Sub-Saharan Africa": "#2B2A27"
+};
+const DASH = { "Sub-Saharan Africa": "4,3" };
+
+const W = 760, H = 460;
+const margin = { top: 30, right: 150, bottom: 36, left: 58 };
+const innerW = W - margin.left - margin.right;
+const innerH = H - margin.top - margin.bottom;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 28) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const yMax = 55, yMin = 0;
+const yScale = v => margin.top + (yMax - v) / (yMax - yMin) * innerH;
+const yearMin = 1990, yearMax = 2024;
+const xScale = yr => margin.left + (yr - yearMin) / (yearMax - yearMin) * innerW;
+
+const yTicks = [0, 10, 20, 30, 40, 50];
+yTicks.forEach(v => {
+  const y = yScale(v);
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: y + 3.5, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  lbl.textContent = v;
+  svg.appendChild(lbl);
+});
+
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  const x = xScale(yr);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.4" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  lbl.textContent = yr;
+  svg.appendChild(lbl);
+});
+
+const unitLbl = mkEl("text", { x: margin.left - 6, y: margin.top - 8, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "8" });
+unitLbl.textContent = "per 1,000";
+svg.appendChild(unitLbl);
+
+const allGroups = [];
+data.forEach(series => {
+  const color = COLORS[series.n] || "#999";
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i, value: v }));
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${yScale(p.value).toFixed(1)}`).join(" ");
+
+  const g = mkEl("g", {});
+  const lineAttrs = { d: pathD, stroke: color, "stroke-width": series.n === "Sub-Saharan Africa" ? "2" : "1.5", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" };
+  if (DASH[series.n]) lineAttrs["stroke-dasharray"] = DASH[series.n];
+  const line = mkEl("path", lineAttrs);
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+    const idx = Math.round(ratio * (pts.length - 1));
+    const p = pts[idx];
+    showTip(`${series.n}  ${p.year}: ${p.value.toFixed(2)} per 1,000`, e);
+    allGroups.forEach(gg => gg.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    allGroups.forEach(gg => gg.style.opacity = "1");
+    line.setAttribute("stroke-width", series.n === "Sub-Saharan Africa" ? "2" : "1.5");
+  });
+
+  allGroups.push(g);
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+const labelItems = data.map(s => {
+  const pts = s.s;
+  const last = pts[pts.length - 1];
+  return { n: s.n, y: yScale(last), val: last };
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const color = COLORS[item.n] || "#999";
+  const lbl = mkEl("text", { x: W - margin.right + 8, y: item.y + 3.5, fill: color, "font-size": "9", "font-weight": item.n === "Sub-Saharan Africa" ? "600" : "500" });
+  lbl.textContent = item.n;
+  svg.appendChild(lbl);
+});
+</script>
+</body></html>
