@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Patent Applications by Residents, 1990–2024</h1>
+<p class="subtitle">Number of patents filed by a country's own residents. China grew from 5,832 applications in 1990 to over 1.6 million in 2024 — a 287-fold increase that dwarfs all other countries combined.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — IP.PAT.RESD</p>
+<script>
+const data = [{"n":"China","s":[5832,7372,10022,12084,11191,10011,11628,12672,13751,15626,25346,30038,39806,56769,65786,93485,122318,153060,194579,229096,293066,415829,535313,704936,801135,968252,1204981,1245709,1393815,1243568,1344817,1427845,1464605,1522292,1672001],"y0":1990},{"n":"Japan","s":[333230,335933,338019,332345,319938,334612,340101,350807,359381,360180,387364,386767,369458,358184,368416,367960,347060,333498,330110,295315,290081,287580,287013,271731,265959,258839,260244,260292,253630,245372,227348,222452,218813,228936,237169],"y0":1990},{"n":"South Korea","s":[9082,13253,15951,21449,28554,59228,68405,67359,50596,55970,72831,73714,76570,90313,105250,122188,125476,128701,127114,127316,131805,138034,148136,159978,164073,167275,163424,159084,162561,171603,180477,186245,183748,191142,195786],"y0":1990},{"n":"Germany","s":[30724,32256,33919,34752,36715,38103,42322,44438,46523,50029,51736,49989,47598,47818,48448,48367,48012,47853,49240,47859,47047,46986,46620,47353,48154,47384,48480,47785,46617,46632,42260,39822,37199,38489,40085],"y0":1990},{"n":"India","s":[1147,1267,1248,1209,1588,1545,1661,1926,2247,2206,2206,2379,2693,3425,4014,4721,5686,6296,6425,7262,8853,8841,9553,10669,12040,12579,13199,14961,16289,19454,23141,26267,38551,49860,63217],"y0":1990},{"n":"France","s":[12378,12597,12539,12638,12519,12419,12916,13252,13251,13592,13870,13499,13519,13511,14230,14327,14529,14722,14658,14100,14748,14655,14540,14690,14500,14306,14206,14415,14303,14103,12771,13386,13322,13602,12751],"y0":1990}];
+
+const COLORS = {
+  "China":       "#EA5E33",
+  "South Korea": "#F29A44",
+  "India":       "#C49A45",
+  "Japan":       "#9A9890",
+  "Germany":     "#B0AEA6",
+  "France":      "#C2C0B5"
+};
+
+const W = 760, H = 460;
+const margin = { top: 30, right: 130, bottom: 36, left: 68 };
+const innerW = W - margin.left - margin.right;
+const innerH = H - margin.top - margin.bottom;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 28) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// Log scale to show all series meaningfully
+const yMin = 800, yMax = 1800000;
+const logY = v => margin.top + (Math.log(yMax) - Math.log(Math.max(v, yMin))) / (Math.log(yMax) - Math.log(yMin)) * innerH;
+const yearMin = 1990, yearMax = 2024;
+const xScale = yr => margin.left + (yr - yearMin) / (yearMax - yearMin) * innerW;
+
+const yTicks = [1000, 5000, 20000, 100000, 500000, 1500000];
+const yLabels = ["1k", "5k", "20k", "100k", "500k", "1.5M"];
+yTicks.forEach((v, i) => {
+  const y = logY(v);
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: y + 3.5, "text-anchor": "end", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  lbl.textContent = yLabels[i];
+  svg.appendChild(lbl);
+});
+
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(yr => {
+  const x = xScale(yr);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.4" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-family": "JetBrains Mono,monospace", "font-size": "9" });
+  lbl.textContent = yr;
+  svg.appendChild(lbl);
+});
+
+const allGroups = [];
+data.forEach(series => {
+  const color = COLORS[series.n] || "#999";
+  const pts = series.s.map((v, i) => ({ year: series.y0 + i, value: v }));
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year).toFixed(1)} ${logY(p.value).toFixed(1)}`).join(" ");
+
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / innerW));
+    const idx = Math.round(ratio * (pts.length - 1));
+    const p = pts[idx];
+    showTip(`${series.n}  ${p.year}: ${p.value.toLocaleString()}`, e);
+    allGroups.forEach(gg => gg.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    allGroups.forEach(gg => gg.style.opacity = "1");
+    line.setAttribute("stroke-width", "1.5");
+  });
+
+  allGroups.push(g);
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+const labelItems = data.map(s => {
+  const last = s.s[s.s.length - 1];
+  return { n: s.n, y: logY(last), val: last };
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const color = COLORS[item.n] || "#999";
+  const lbl = mkEl("text", { x: W - margin.right + 8, y: item.y + 3.5, fill: color, "font-size": "9", "font-weight": "500" });
+  lbl.textContent = item.n;
+  svg.appendChild(lbl);
+});
+</script>
+</body></html>
