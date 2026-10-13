@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Women's Share of People Living with HIV, 1990–2023</h1>
+<p class="subtitle">HIV in Sub-Saharan Africa is a woman's disease. Nearly 63% of people living with HIV in the region are women — a share still rising. Globally, women account for 53% and rising, while the epidemic in other regions skews male.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Women's Share of Population Ages 15+ Living with HIV (%) (SH.DYN.AIDS.FE.ZS)</p>
+<script>
+const data = [{"n":"Africa W. & Central","pts":[{"y":1990,"v":55.7},{"y":1991,"v":56.3},{"y":1992,"v":56.7},{"y":1993,"v":57.2},{"y":1994,"v":57.5},{"y":1995,"v":57.8},{"y":1996,"v":58.0},{"y":1997,"v":58.2},{"y":1998,"v":58.3},{"y":1999,"v":58.4},{"y":2000,"v":58.5},{"y":2001,"v":58.6},{"y":2002,"v":58.6},{"y":2003,"v":58.7},{"y":2004,"v":58.7},{"y":2005,"v":58.7},{"y":2006,"v":58.7},{"y":2007,"v":58.6},{"y":2008,"v":58.6},{"y":2009,"v":58.7},{"y":2010,"v":58.7},{"y":2011,"v":58.8},{"y":2012,"v":59.1},{"y":2013,"v":59.5},{"y":2014,"v":60.0},{"y":2015,"v":60.4},{"y":2016,"v":60.9},{"y":2017,"v":61.4},{"y":2018,"v":62.0},{"y":2019,"v":62.4},{"y":2020,"v":62.9},{"y":2021,"v":63.3},{"y":2022,"v":63.6},{"y":2023,"v":63.9}]},{"n":"Africa E. & Southern","pts":[{"y":1990,"v":55.6},{"y":1991,"v":56.2},{"y":1992,"v":56.7},{"y":1993,"v":57.1},{"y":1994,"v":57.6},{"y":1995,"v":58.0},{"y":1996,"v":58.2},{"y":1997,"v":58.5},{"y":1998,"v":58.7},{"y":1999,"v":59.0},{"y":2000,"v":59.1},{"y":2001,"v":59.2},{"y":2002,"v":59.4},{"y":2003,"v":59.4},{"y":2004,"v":59.5},{"y":2005,"v":59.6},{"y":2006,"v":59.6},{"y":2007,"v":59.7},{"y":2008,"v":59.6},{"y":2009,"v":59.6},{"y":2010,"v":59.6},{"y":2011,"v":59.7},{"y":2012,"v":59.8},{"y":2013,"v":60.2},{"y":2014,"v":60.4},{"y":2015,"v":60.6},{"y":2016,"v":60.8},{"y":2017,"v":61.0},{"y":2018,"v":61.3},{"y":2019,"v":61.5},{"y":2020,"v":61.7},{"y":2021,"v":61.9},{"y":2022,"v":62.1},{"y":2023,"v":62.3}]},{"n":"Angola","pts":[{"y":1990,"v":67.3},{"y":1995,"v":69.8},{"y":2000,"v":70.7},{"y":2005,"v":71.0},{"y":2010,"v":70.7},{"y":2015,"v":71.3},{"y":2020,"v":72.1},{"y":2023,"v":72.9}]},{"n":"Ghana","pts":[{"y":1990,"v":59.3},{"y":1995,"v":61.8},{"y":2000,"v":63.1},{"y":2005,"v":63.6},{"y":2010,"v":63.3},{"y":2015,"v":64.4},{"y":2020,"v":67.8},{"y":2023,"v":69.2}]},{"n":"World","pts":[{"y":1990,"v":46.9},{"y":1991,"v":47.4},{"y":1992,"v":48.0},{"y":1993,"v":48.7},{"y":1994,"v":49.2},{"y":1995,"v":49.7},{"y":1996,"v":50.1},{"y":1997,"v":50.4},{"y":1998,"v":50.8},{"y":1999,"v":51.0},{"y":2000,"v":51.3},{"y":2001,"v":51.4},{"y":2002,"v":51.5},{"y":2003,"v":51.6},{"y":2004,"v":51.7},{"y":2005,"v":51.7},{"y":2006,"v":51.7},{"y":2007,"v":51.7},{"y":2008,"v":51.8},{"y":2009,"v":51.8},{"y":2010,"v":51.9},{"y":2011,"v":52.0},{"y":2012,"v":52.1},{"y":2013,"v":52.3},{"y":2014,"v":52.4},{"y":2015,"v":52.6},{"y":2016,"v":52.8},{"y":2017,"v":52.9},{"y":2018,"v":53.1},{"y":2019,"v":53.1},{"y":2020,"v":53.2},{"y":2021,"v":53.2},{"y":2022,"v":53.2},{"y":2023,"v":53.2}]},{"n":"Kenya","pts":[{"y":1990,"v":60.9},{"y":1995,"v":63.4},{"y":2000,"v":64.3},{"y":2005,"v":64.5},{"y":2010,"v":63.3},{"y":2015,"v":64.1},{"y":2020,"v":65.3},{"y":2023,"v":66.0}]},{"n":"Haiti","pts":[{"y":1990,"v":50.2},{"y":1995,"v":53.6},{"y":2000,"v":55.8},{"y":2005,"v":57.2},{"y":2010,"v":57.8},{"y":2015,"v":59.3},{"y":2020,"v":61.2},{"y":2023,"v":61.9}]},{"n":"Brazil","pts":[{"y":1990,"v":27.2},{"y":1995,"v":28.9},{"y":2000,"v":29.6},{"y":2005,"v":30.8},{"y":2010,"v":32.6},{"y":2015,"v":33.1},{"y":2020,"v":33.0},{"y":2023,"v":32.9}]},{"n":"India","pts":[{"y":1990,"v":29.7},{"y":1995,"v":34.6},{"y":2000,"v":38.3},{"y":2005,"v":39.9},{"y":2010,"v":41.1},{"y":2015,"v":42.9},{"y":2020,"v":44.7},{"y":2023,"v":45.3}]}];
+
+const COLORS = {
+  "Africa W. & Central": "#EA5E33",
+  "Africa E. & Southern": "#F29A44",
+  "Angola": "#C49A45",
+  "Ghana": "#8BAD72",
+  "Kenya": "#5B9E78",
+  "Haiti": "#A6C4A2",
+  "World": "#2B2A27",
+  "Brazil": "#7A786F",
+  "India": "#9A9890"
+};
+const STROKE_WIDTHS = {
+  "Africa W. & Central": "2.5",
+  "Africa E. & Southern": "2.5",
+  "World": "2",
+};
+
+const W = 760, H = 420;
+const margin = { top: 30, right: 150, bottom: 36, left: 52 };
+const yearMin = 1990, yearMax = 2023;
+const valMin = 20, valMax = 78;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid
+[30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// 50% reference
+svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(50), x2: W - margin.right, y2: yScale(50), stroke: "#C2C0B5", "stroke-width": "0.8", "stroke-dasharray": "4,3" }));
+const ref = mkEl("text", { x: margin.left + 4, y: yScale(50) - 5, fill: "#9A9890", "font-size": "8.5", "font-family": "JetBrains Mono, monospace" });
+ref.textContent = "50% (parity)";
+svg.appendChild(ref);
+
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2023].forEach(y => {
+  const x = xScale(y);
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topC = margin.top + 6, botC = H - margin.bottom - 6;
+  sorted.forEach(item => { item.y = Math.max(topC, Math.min(botC, item.y)); });
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(series => {
+  const color = COLORS[series.n] || "#888";
+  const sw = STROKE_WIDTHS[series.n] || "1.5";
+  const pts = series.pts;
+  const g = mkEl("g", {});
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": sw, fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", style: "cursor:pointer;" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const svgRect = svg.getBoundingClientRect();
+    const mx = e.clientX - svgRect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yearGuess = yearMin + ratio * (yearMax - yearMin);
+    let best = pts[0], bestDist = Infinity;
+    pts.forEach(p => { const d = Math.abs(p.y - yearGuess); if (d < bestDist) { bestDist = d; best = p; } });
+    tip.textContent = `${series.n}: ${best.v}% women (${best.y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach(gg => { gg.line.setAttribute("stroke-width", gg === group ? (parseFloat(sw) + 0.8).toFixed(1) : "0.6"); gg.line.setAttribute("opacity", gg === group ? "1" : "0.1"); });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(gg => { gg.line.setAttribute("stroke-width", STROKE_WIDTHS[gg.n] || "1.5"); gg.line.setAttribute("opacity", "1"); });
+  });
+
+  const group = { g, line, n: series.n };
+  groups.push(group);
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+const labelItems = data.map(series => {
+  const last = series.pts[series.pts.length - 1];
+  return { n: series.n, y: yScale(last.v), v: last.v };
+});
+const resolved = resolveCollisions(labelItems.map(l => ({ ...l })), 13);
+
+resolved.forEach(item => {
+  const color = COLORS[item.n] || "#888";
+  const lastPt = data.find(s => s.n === item.n).pts.slice(-1)[0];
+  const anchorY = yScale(lastPt.v);
+
+  if (Math.abs(item.y - anchorY) > 4) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 4, y1: anchorY, x2: W - margin.right + 6, y2: item.y, stroke: color, "stroke-width": "0.7", opacity: "0.5" }));
+  }
+  const lbl = mkEl("text", { x: W - margin.right + 8, y: item.y + 3.5, fill: color, "font-size": "9.5", "font-weight": "500" });
+  lbl.textContent = `${lastPt.v}%  ${item.n}`;
+  svg.appendChild(lbl);
+});
+</script>
+</body></html>

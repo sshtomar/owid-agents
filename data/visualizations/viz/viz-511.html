@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>ATMs per 100,000 Adults, 2004–2024</h1>
+<p class="subtitle">High-income countries peaked around 2012–2015 as digital payments displaced cash machines. Korea leads with 244 ATMs per 100,000 adults; India and China are still catching up.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Automated Teller Machines (ATMs) per 100,000 Adults (FB.ATM.TOTL.P5)</p>
+<script>
+const data = [{"n":"Korea, Rep.","pts":[{"y":2004,"v":209.4},{"y":2005,"v":213.2},{"y":2006,"v":219.2},{"y":2007,"v":235.1},{"y":2008,"v":242.6},{"y":2009,"v":247.9},{"y":2010,"v":266.3},{"y":2011,"v":281.8},{"y":2012,"v":288.7},{"y":2013,"v":288.7},{"y":2014,"v":280.9},{"y":2015,"v":275.8},{"y":2016,"v":271.1},{"y":2017,"v":271.9},{"y":2018,"v":266.3},{"y":2019,"v":263.3},{"y":2020,"v":258.2},{"y":2021,"v":256.9},{"y":2022,"v":252.6},{"y":2023,"v":244.5}]},{"n":"Japan","pts":[{"y":2004,"v":124.2},{"y":2005,"v":123.8},{"y":2006,"v":124.1},{"y":2007,"v":125.1},{"y":2008,"v":125.5},{"y":2009,"v":132.8},{"y":2010,"v":131.0},{"y":2011,"v":128.6},{"y":2012,"v":127.8},{"y":2013,"v":128.2},{"y":2014,"v":127.4},{"y":2015,"v":127.4},{"y":2016,"v":127.4},{"y":2017,"v":127.2},{"y":2018,"v":126.8},{"y":2019,"v":123.5},{"y":2020,"v":121.0},{"y":2021,"v":116.6},{"y":2022,"v":113.1},{"y":2023,"v":109.8},{"y":2024,"v":107.0}]},{"n":"France","pts":[{"y":2004,"v":85.6},{"y":2005,"v":92.9},{"y":2006,"v":92.2},{"y":2007,"v":99.9},{"y":2008,"v":101.6},{"y":2009,"v":104.2},{"y":2010,"v":106.2},{"y":2011,"v":109.3},{"y":2012,"v":109.4},{"y":2013,"v":108.9},{"y":2014,"v":108.1},{"y":2015,"v":107.1},{"y":2016,"v":104.5},{"y":2017,"v":102.0},{"y":2018,"v":97.8},{"y":2019,"v":95.8},{"y":2020,"v":93.0},{"y":2021,"v":89.0},{"y":2022,"v":84.3},{"y":2023,"v":77.6}]},{"n":"Germany","pts":[{"y":2007,"v":107.1},{"y":2008,"v":109.9},{"y":2009,"v":112.4},{"y":2010,"v":116.9},{"y":2011,"v":121.2},{"y":2012,"v":118.6},{"y":2013,"v":118.3},{"y":2014,"v":123.4},{"y":2015,"v":122.3},{"y":2016,"v":82.5},{"y":2017,"v":81.2},{"y":2019,"v":81.4},{"y":2020,"v":79.4},{"y":2021,"v":77.0},{"y":2022,"v":73.0},{"y":2023,"v":70.9}]},{"n":"Brazil","pts":[{"y":2004,"v":105.5},{"y":2005,"v":109.1},{"y":2006,"v":107.7},{"y":2007,"v":110.0},{"y":2008,"v":112.6},{"y":2009,"v":115.2},{"y":2010,"v":119.1},{"y":2011,"v":117.5},{"y":2012,"v":116.7},{"y":2013,"v":119.9},{"y":2014,"v":119.4},{"y":2015,"v":116.5},{"y":2016,"v":113.7},{"y":2017,"v":109.5},{"y":2018,"v":108.3},{"y":2019,"v":117.7},{"y":2020,"v":116.1},{"y":2021,"v":111.9},{"y":2022,"v":113.5},{"y":2023,"v":100.7},{"y":2024,"v":89.9}]},{"n":"China","pts":[{"y":2006,"v":9.6},{"y":2007,"v":12.0},{"y":2008,"v":15.6},{"y":2009,"v":19.8},{"y":2010,"v":24.9},{"y":2011,"v":30.4},{"y":2012,"v":37.6},{"y":2013,"v":46.7},{"y":2014,"v":54.9},{"y":2015,"v":76.9},{"y":2016,"v":81.5},{"y":2017,"v":84.3},{"y":2018,"v":97.0},{"y":2019,"v":95.3},{"y":2020,"v":87.6},{"y":2021,"v":81.4},{"y":2022,"v":76.6},{"y":2023,"v":71.9},{"y":2024,"v":67.8}]},{"n":"India","pts":[{"y":2005,"v":2.3},{"y":2006,"v":2.7},{"y":2007,"v":3.4},{"y":2008,"v":4.3},{"y":2009,"v":5.3},{"y":2010,"v":7.2},{"y":2011,"v":8.8},{"y":2012,"v":10.9},{"y":2013,"v":12.8},{"y":2014,"v":17.6},{"y":2015,"v":19.5},{"y":2016,"v":21.0},{"y":2017,"v":21.8},{"y":2018,"v":21.4},{"y":2019,"v":20.7},{"y":2020,"v":21.2},{"y":2021,"v":21.2},{"y":2022,"v":24.6},{"y":2023,"v":24.8},{"y":2024,"v":24.5}]}];
+
+const COLORS = {
+  "Korea, Rep.": "#EA5E33",
+  "Japan": "#F29A44",
+  "France": "#C49A45",
+  "Germany": "#8BAD72",
+  "Brazil": "#5B9E78",
+  "China": "#3D7A5A",
+  "India": "#A6C4A2"
+};
+
+const W = 760, H = 420;
+const margin = { top: 30, right: 130, bottom: 36, left: 48 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const allYears = [...new Set(data.flatMap(s => s.pts.map(p => p.y)))].sort();
+const yearMin = Math.min(...allYears), yearMax = Math.max(...allYears);
+const valMax = 310, valMin = 0;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[0, 50, 100, 150, 200, 250, 300].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" });
+  lbl.textContent = v;
+  svg.appendChild(lbl);
+});
+
+// Year axis
+[2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", fill: "#7A786F", "font-size": "9", "font-family": "JetBrains Mono, monospace" });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to chart area
+  const topClamp = margin.top + 6, botClamp = H - margin.bottom - 6;
+  sorted.forEach(item => { item.y = Math.max(topClamp, Math.min(botClamp, item.y)); });
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(series => {
+  const color = COLORS[series.n] || "#888";
+  const pts = series.pts;
+  if (pts.length < 2) return;
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const g = mkEl("g", {});
+
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", style: "cursor:pointer;" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const svgRect = svg.getBoundingClientRect();
+    const mx = e.clientX - svgRect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yearGuess = yearMin + ratio * (yearMax - yearMin);
+    let best = pts[0], bestDist = Infinity;
+    pts.forEach(p => { const d = Math.abs(p.y - yearGuess); if (d < bestDist) { bestDist = d; best = p; } });
+    tip.textContent = `${series.n}: ${best.v} ATMs/100k (${best.y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach(gg => { gg.line.setAttribute("stroke-width", gg === group ? "2.5" : "1"); gg.line.setAttribute("opacity", gg === group ? "1" : "0.12"); });
+  });
+  hit.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(gg => { gg.line.setAttribute("stroke-width", "1.8"); gg.line.setAttribute("opacity", "1"); });
+  });
+
+  const group = { g, line };
+  groups.push(group);
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+const labelItems = data.map(series => {
+  const last = series.pts[series.pts.length - 1];
+  return { n: series.n, y: yScale(last.v), v: last.v };
+});
+const resolved = resolveCollisions(labelItems.map(l => ({ ...l })), 13);
+
+resolved.forEach(item => {
+  const orig = labelItems.find(l => l.n === item.n);
+  const color = COLORS[item.n] || "#888";
+  const lastPt = data.find(s => s.n === item.n).pts.slice(-1)[0];
+  const anchorY = yScale(lastPt.v);
+  const labelY = item.y;
+
+  if (Math.abs(labelY - anchorY) > 4) {
+    const lx = W - margin.right + 4;
+    svg.appendChild(mkEl("line", { x1: lx, y1: anchorY, x2: lx + 2, y2: labelY, stroke: color, "stroke-width": "0.8", opacity: "0.5" }));
+  }
+
+  const lbl = mkEl("text", { x: W - margin.right + 8, y: labelY + 3.5, fill: color, "font-size": "9.5", "font-weight": "500" });
+  lbl.textContent = `${lastPt.v}  ${item.n}`;
+  svg.appendChild(lbl);
+});
+</script>
+</body></html>
