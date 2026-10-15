@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Who Has a Safety Net? Social Protection Coverage by Country</h1>
+<p class="subtitle">Share of the population covered by at least one social protection or labor program. Most recent year available. Wide gaps persist between countries at similar income levels.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank per_allsp.cov_pop_tot — Social Protection & Labor</p>
+<script>
+const data = [
+  {"n":"Bolivia","v":96.9,"y":2021},
+  {"n":"Iran","v":89.9,"y":2020},
+  {"n":"El Salvador","v":88.8,"y":2022},
+  {"n":"Chile","v":85.6,"y":2022},
+  {"n":"Iraq","v":83.6,"y":2012},
+  {"n":"Eswatini","v":81.2,"y":2016},
+  {"n":"India","v":77.2,"y":2011},
+  {"n":"Armenia","v":75.3,"y":2022},
+  {"n":"Jordan","v":73.2,"y":2010},
+  {"n":"Belarus","v":71.8,"y":2019},
+  {"n":"Croatia","v":71.1,"y":2014},
+  {"n":"Costa Rica","v":70.9,"y":2022},
+  {"n":"Georgia","v":66.0,"y":2021},
+  {"n":"Indonesia","v":65.1,"y":2022},
+  {"n":"Azerbaijan","v":64.6,"y":2015},
+  {"n":"Guatemala","v":63.3,"y":2014},
+  {"n":"China","v":63.1,"y":2013},
+  {"n":"Kazakhstan","v":57.3,"y":2021},
+  {"n":"Argentina","v":56.6,"y":2022},
+  {"n":"Bangladesh","v":55.6,"y":2022},
+  {"n":"Botswana","v":55.4,"y":2015},
+  {"n":"Brazil","v":52.3,"y":2022},
+  {"n":"Dominican Rep.","v":51.1,"y":2021},
+  {"n":"Gabon","v":49.4,"y":2017},
+  {"n":"Albania","v":48.5,"y":2018}
+];
+
+const W = 680, H = data.length * 22 + 50;
+const margin = { top: 30, right: 60, bottom: 20, left: 140 };
+const chartW = W - margin.left - margin.right;
+const barH = 14;
+const rowH = 22;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "default";
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// X axis grid lines
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = margin.left + (v / 100) * chartW;
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: margin.top - 10, x2: x, y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": v === 0 ? "0.8" : "0.5"
+  }));
+  const t = mkEl("text", { x, y: margin.top - 14, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "8.5", fill: "#9A9890" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+const colorForValue = v => {
+  if (v >= 80) return "#3D7A5A";
+  if (v >= 65) return "#5B9E78";
+  if (v >= 50) return "#8BAD72";
+  if (v >= 35) return "#C49A45";
+  return "#C4715A";
+};
+
+const bars = [];
+data.forEach((d, i) => {
+  const y = margin.top + i * rowH;
+  const barW = (d.v / 100) * chartW;
+  const col = colorForValue(d.v);
+
+  // Label
+  const nameT = mkEl("text", { x: margin.left - 8, y: y + barH - 1,
+    "text-anchor": "end", "font-size": "10", fill: "#2B2A27" });
+  nameT.textContent = d.n;
+  svg.appendChild(nameT);
+
+  // Bar
+  const bar = mkEl("rect", {
+    x: margin.left, y, width: barW, height: barH,
+    fill: col, rx: "2", opacity: "0.85"
+  });
+  bar.style.cursor = "pointer";
+  svg.appendChild(bar);
+
+  // Hit area (full width)
+  const hit = mkEl("rect", {
+    x: margin.left, y, width: chartW, height: rowH - 2,
+    fill: "transparent"
+  });
+  hit.style.cursor = "pointer";
+  svg.appendChild(hit);
+
+  // Value label
+  const vt = mkEl("text", { x: margin.left + barW + 4, y: y + barH - 1,
+    "text-anchor": "start", "font-size": "9", fill: "#2B2A27",
+    "font-family": "'JetBrains Mono', monospace" });
+  vt.textContent = d.v.toFixed(1) + "%";
+  svg.appendChild(vt);
+
+  bars.push({ bar, hit, d, col });
+
+  // Hover
+  hit.addEventListener("mouseenter", e => {
+    bars.forEach((b, j) => {
+      b.bar.setAttribute("opacity", j === i ? "1" : "0.25");
+    });
+    const tip = document.getElementById("tip");
+    tip.textContent = `${d.n}: ${d.v.toFixed(1)}% covered (${d.y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mousemove", e => {
+    const tip = document.getElementById("tip");
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    bars.forEach(b => b.bar.setAttribute("opacity", "0.85"));
+    document.getElementById("tip").style.opacity = "0";
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body></html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Tertiarization of Economies, 1990–2022</h1>
+<p class="subtitle">Services sector value added as a share of GDP. Most economies have shifted toward services over three decades, but the pace and starting point vary enormously. Lines rising to the right signal structural transformation.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank NV.SRV.TOTL.ZS</p>
+<script>
+const data = [
+  {"n":"Georgia","y":1990,"a":33.4,"b":59.0},
+  {"n":"Bulgaria","y":1990,"a":35.2,"b":59.9},
+  {"n":"Botswana","y":1990,"a":31.8,"b":56.4},
+  {"n":"China","y":1990,"a":32.5,"b":55.0},
+  {"n":"Guinea-Bissau","y":1990,"a":19.3,"b":43.6},
+  {"n":"Chad","y":1990,"a":50.5,"b":28.3},
+  {"n":"Burundi","y":1990,"a":23.0,"b":43.7},
+  {"n":"Belarus","y":1990,"a":28.6,"b":48.2},
+  {"n":"Gabon","y":1990,"a":49.7,"b":33.4},
+  {"n":"Cabo Verde","y":1990,"a":55.5,"b":69.0},
+  {"n":"Guyana","y":1990,"a":32.7,"b":19.3},
+  {"n":"Ecuador","y":1990,"a":45.1,"b":58.2},
+  {"n":"Cote d'Ivoire","y":1990,"a":41.2,"b":53.0},
+  {"n":"Eswatini","y":1990,"a":39.6,"b":50.8},
+  {"n":"Iraq","y":1990,"a":22.3,"b":33.2},
+  {"n":"Korea, Rep.","y":1990,"a":47.2,"b":58.1},
+  {"n":"Bhutan","y":1990,"a":40.5,"b":51.2},
+  {"n":"Dominican Rep.","y":1990,"a":47.7,"b":58.3},
+  {"n":"India","y":1990,"a":37.0,"b":47.2},
+  {"n":"France","y":1990,"a":62.2,"b":71.8},
+  {"n":"Honduras","y":1990,"a":47.6,"b":57.1},
+  {"n":"Congo, Rep.","y":1990,"a":46.5,"b":37.3},
+  {"n":"Costa Rica","y":1990,"a":58.5,"b":67.5},
+  {"n":"Gambia, The","y":1990,"a":64.6,"b":55.6}
+];
+
+const W = 700, H = 640;
+const pad = { left: 130, right: 150, top: 44, bottom: 24 };
+const minV = 15, maxV = 75;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Column headers
+function hdr(x, txt) {
+  const t = mkEl("text", { x, y: 24, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace", "font-size": "10", fill: "#7A786F", "letter-spacing": "0.5" });
+  t.textContent = txt;
+  svg.appendChild(t);
+}
+hdr(pad.left, "1990");
+hdr(W - pad.right, "2022");
+
+// Grid lines
+[20, 30, 40, 50, 60, 70].forEach(v => {
+  if (v >= minV && v <= maxV) {
+    svg.appendChild(mkEl("line", {
+      x1: pad.left, y1: scale(v), x2: W - pad.right, y2: scale(v),
+      stroke: "#E2E0D5", "stroke-width": "0.5", "stroke-dasharray": "3,3"
+    }));
+    const t = mkEl("text", { x: pad.left - 6, y: scale(v) + 3,
+      "text-anchor": "end", "font-family": "'JetBrains Mono', monospace",
+      "font-size": "8", fill: "#9A9890" });
+    t.textContent = v + "%";
+    svg.appendChild(t);
+  }
+});
+
+// 50% reference line
+svg.appendChild(mkEl("line", {
+  x1: pad.left, y1: scale(50), x2: W - pad.right, y2: scale(50),
+  stroke: "#C2C0B5", "stroke-width": "0.8", "stroke-dasharray": "6,3"
+}));
+const refT = mkEl("text", { x: pad.left + 4, y: scale(50) - 4,
+  "font-size": "8", fill: "#9A9890", "font-family": "'JetBrains Mono', monospace" });
+refT.textContent = "50% threshold";
+svg.appendChild(refT);
+
+const colorForChange = d => {
+  const delta = d.b - d.a;
+  if (delta > 20) return "#EA5E33";
+  if (delta > 12) return "#F29A44";
+  if (delta > 5) return "#C49A45";
+  if (delta >= -3) return "#A6C4A2";
+  if (delta >= -10) return "#5B9E78";
+  return "#3D7A5A";
+};
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(item => {
+    item.y = Math.max(pad.top + 6, Math.min(H - pad.bottom - 6, item.y));
+  });
+  return sorted;
+}
+
+const displayName = n => n === "Korea, Rep." ? "South Korea" : n === "Gambia, The" ? "Gambia" : n;
+
+const leftLabels = data.map(d => ({ n: d.n, y: scale(d.a), v: d.a, d }));
+const rightLabels = data.map(d => ({ n: d.n, y: scale(d.b), v: d.b, d }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const rows = [];
+data.forEach((d, i) => {
+  const x1 = pad.left + 4, x2 = W - pad.right - 4;
+  const y1 = scale(d.a), y2 = scale(d.b);
+  const col = colorForChange(d);
+  const g = mkEl("g", {});
+
+  const line = mkEl("line", { x1, y1, x2, y2, stroke: col, "stroke-width": "1.5", opacity: "0.8" });
+  g.appendChild(line);
+
+  [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+    g.appendChild(mkEl("circle", { cx: p.x, cy: p.y, r: "2.5", fill: col }));
+  });
+
+  const ll = leftLabels.find(l => l.n === d.n);
+  const lt = mkEl("text", { x: x1 - 8, y: ll.y + 3.5,
+    "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27" });
+  lt.textContent = `${displayName(d.n)}  ${d.a.toFixed(1)}%`;
+  g.appendChild(lt);
+
+  if (Math.abs(ll.y - y1) > 4) {
+    g.appendChild(mkEl("line", { x1: x1 - 5, y1, x2: x1 - 5, y2: ll.y,
+      stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const rl = rightLabels.find(l => l.n === d.n);
+  const rt = mkEl("text", { x: x2 + 8, y: rl.y + 3.5,
+    "text-anchor": "start", "font-size": "9.5", fill: "#2B2A27" });
+  rt.textContent = `${d.b.toFixed(1)}%  ${displayName(d.n)}`;
+  g.appendChild(rt);
+
+  if (Math.abs(rl.y - y2) > 4) {
+    g.appendChild(mkEl("line", { x1: x2 + 5, y1: y2, x2: x2 + 5, y2: rl.y,
+      stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+
+  const hit = mkEl("line", { x1, y1, x2, y2, stroke: "transparent", "stroke-width": "14" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, col, y1, y2 });
+});
+
+// Legend
+const legend = [
+  { col: "#EA5E33", label: "Services up >20pp" },
+  { col: "#F29A44", label: "Up 12–20pp" },
+  { col: "#C49A45", label: "Up 5–12pp" },
+  { col: "#A6C4A2", label: "Stable ±5pp" },
+  { col: "#5B9E78", label: "Services down" },
+];
+legend.forEach((l, i) => {
+  const lx = i * 140;
+  const ly = H - 6;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 6, width: 12, height: 3, fill: l.col, rx: 1 }));
+  const t = mkEl("text", { x: lx + 16, y: ly, "font-size": "8.5", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace" });
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+
+document.getElementById("chart").appendChild(svg);
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "1.5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "3");
+    } else {
+      row.g.style.opacity = "0.12";
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+
+  let best = -1, bestDist = 22;
+  rows.forEach((row, i) => {
+    const t = Math.max(0, Math.min(1, (sx - pad.left) / (W - pad.left - pad.right)));
+    const lineY = row.y1 + (row.y2 - row.y1) * t;
+    if (Math.abs(sy - lineY) < bestDist) { bestDist = Math.abs(sy - lineY); best = i; }
+  });
+
+  highlight(best);
+  if (best >= 0) {
+    const d = rows[best].d;
+    const delta = d.b - d.a;
+    const sign = delta >= 0 ? "+" : "";
+    tip.textContent = `${displayName(d.n)}: ${d.a.toFixed(1)}% → ${d.b.toFixed(1)}% (${sign}${delta.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 22) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body></html>
