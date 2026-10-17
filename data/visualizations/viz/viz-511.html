@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Who Has Access to Safely Managed Drinking Water?</h1>
+<p class="subtitle">Share of population using safely managed drinking-water services — accessible on premises, available when needed, and free from contamination. Data for 2022. The gap between the highest and lowest ranked countries exceeds 93 percentage points.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — WSH_WATER_SAFELY_MANAGED (2022)</p>
+<script>
+const data = [
+  {n:"Chad",v:6.2},{n:"DR Congo",v:6.0},{n:"Benin",v:17.4},{n:"Ivory Coast",v:20.3},
+  {n:"Kiribati",v:20.9},{n:"Laos",v:20.9},{n:"Indonesia",v:30.3},{n:"Nigeria",v:35.6},
+  {n:"Dominican Rep.",v:36.0},{n:"Ecuador",v:48.5},{n:"South Africa",v:51.6},
+  {n:"Rwanda",v:51.8},{n:"Peru",v:58.5},{n:"Bangladesh",v:59.2},{n:"Iraq",v:59.7},
+  {n:"Serbia",v:66.1},{n:"North Korea",v:66.5},{n:"Botswana",v:67.5},
+  {n:"Georgia",v:70.0},{n:"Brazil",v:71.5},{n:"Romania",v:82.1},
+  {n:"N. Macedonia",v:84.7},{n:"Poland",v:89.7},{n:"Oman",v:90.9},
+  {n:"Ireland",v:96.4},{n:"United States",v:97.6},{n:"Chile",v:97.6},
+  {n:"Norway",v:99.1},{n:"Israel",v:99.4},{n:"Hungary",v:99.7}
+].sort((a, b) => a.v - b.v);
+
+const W = 680, rowH = 18, barH = 11;
+const H = data.length * rowH + 70;
+const pad = { left: 130, right: 50, top: 40, bottom: 20 };
+const barW = W - pad.left - pad.right;
+
+function colorForValue(v) {
+  if (v >= 80) return "#3D7A5A";
+  if (v >= 60) return "#8BAD72";
+  if (v >= 40) return "#C49A45";
+  if (v >= 20) return "#F29A44";
+  return "#EA5E33";
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// X-axis grid lines
+[0, 25, 50, 75, 100].forEach(v => {
+  const x = pad.left + (v / 100) * barW;
+  svg.appendChild(mkEl("line", { x1: x, y1: pad.top - 10, x2: x, y2: H - pad.bottom, stroke: "#E2E0D5", "stroke-width": v === 0 ? "1" : "0.5" }));
+  const t = mkEl("text", { x, y: pad.top - 14, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+data.forEach((d, i) => {
+  const y = pad.top + i * rowH + rowH / 2;
+  const bw = (d.v / 100) * barW;
+  const color = colorForValue(d.v);
+  const g = mkEl("g", { cursor: "pointer" });
+
+  // Hit area
+  const hit = mkEl("rect", { x: 0, y: y - rowH / 2, width: W, height: rowH, fill: "transparent" });
+  hit.addEventListener("mouseover", e => { showTip(`${d.n}: ${d.v}%`, e); g.querySelectorAll("rect.bar").forEach(r => r.setAttribute("opacity", "1")); });
+  hit.addEventListener("mousemove", e => showTip(`${d.n}: ${d.v}%`, e));
+  hit.addEventListener("mouseout", () => hideTip());
+  g.appendChild(hit);
+
+  // Bar background
+  g.appendChild(mkEl("rect", { x: pad.left, y: y - barH / 2, width: barW, height: barH, fill: "#E2E0D5", rx: "2" }));
+
+  // Value bar
+  const bar = mkEl("rect", { x: pad.left, y: y - barH / 2, width: bw, height: barH, fill: color, rx: "2", class: "bar" });
+  g.appendChild(bar);
+
+  // Country label
+  const lbl = mkEl("text", { x: pad.left - 6, y: y + 3.5, "text-anchor": "end", "font-size": "10", fill: "#2B2A27", "font-family": "'Inter', sans-serif" });
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  // Value label
+  const vLbl = mkEl("text", { x: pad.left + bw + 5, y: y + 3.5, "text-anchor": "start", "font-size": "9", fill: color, "font-family": "'JetBrains Mono', monospace", "font-weight": "500" });
+  vLbl.textContent = d.v + "%";
+  g.appendChild(vLbl);
+
+  svg.appendChild(g);
+});
+
+// 50% reference line
+const x50 = pad.left + barW * 0.5;
+const refLine = mkEl("line", { x1: x50, y1: pad.top - 10, x2: x50, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-dasharray": "3,3", "stroke-width": "1" });
+svg.appendChild(refLine);
+</script>
+</body></html>

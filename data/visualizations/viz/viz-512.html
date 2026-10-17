@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Sanitation Progress Since 2000: Who Gained, Who Fell Behind</h1>
+<p class="subtitle">Population using safely managed sanitation services (%). India and Mexico made extraordinary gains of nearly 60 points. A handful of countries slid backward as populations outpaced infrastructure.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — WSH_SANITATION_SAFELY_MANAGED (~2001–2023)</p>
+<script>
+// {n: name, a: early value (~2001-2002), b: late value (~2020-2023)}
+const data = [
+  {n:"Gambia",a:57,b:23},{n:"Guyana",a:61,b:34},{n:"Nigeria",a:22,b:31},
+  {n:"Ghana",a:4,b:16},{n:"Vietnam",a:31,b:43},{n:"Bangladesh",a:19,b:30},
+  {n:"Kenya",a:20,b:36},{n:"China",a:14,b:34},{n:"Iraq",a:27,b:47},
+  {n:"Ireland",a:57,b:86},{n:"Lesotho",a:21,b:44},{n:"Brazil",a:34,b:54},
+  {n:"Morocco",a:37,b:41},{n:"Palestine",a:14,b:73},{n:"Tunisia",a:50,b:88},
+  {n:"Albania",a:20,b:60},{n:"Cambodia",a:2,b:42},{n:"Mexico",a:18,b:65},
+  {n:"India",a:5,b:64}
+];
+
+const W = 660, H = 580;
+const pad = { left: 130, right: 140, top: 50, bottom: 24 };
+const minV = 0, maxV = 96;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left, xR = W - pad.right;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = pad.top + 4, bot = H - pad.bottom - 4;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 40) return "#3D7A5A";
+  if (change > 20) return "#5B9E78";
+  if (change > 8)  return "#8BAD72";
+  if (change > -5) return "#C49A45";
+  if (change > -15) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1.5" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1.5" }));
+
+// Year column headers
+[{x: xL, label: "~2001"}, {x: xR, label: "~2022"}].forEach(({x, label}) => {
+  const t = mkEl("text", { x, y: pad.top - 16, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "10", fill: "#7A786F" });
+  t.textContent = label;
+  svg.appendChild(t);
+});
+
+// Grid lines
+[0, 20, 40, 60, 80].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: xL - 6, y: scale(v) + 3.5, "text-anchor": "end", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#9A9890" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const allGroups = [];
+
+data.forEach(d => {
+  const color = colorForChange(d);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g", { cursor: "pointer" });
+
+  // Connecting line
+  const line = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: color, "stroke-width": "1.5", "stroke-opacity": "0.85" });
+  g.appendChild(line);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: xL, cy: ya, r: "3.5", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yb, r: "3.5", fill: color }));
+
+  // Wide invisible hit area
+  const hit = mkEl("line", { x1: xL, y1: ya, x2: xR, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  hit.addEventListener("mouseover", e => {
+    allGroups.forEach(gg => gg.setAttribute("opacity", "0.12"));
+    g.setAttribute("opacity", "1");
+    showTip(`${d.n}: ${d.a}% → ${d.b}% (${d.b - d.a > 0 ? "+" : ""}${d.b - d.a}pp)`, e);
+  });
+  hit.addEventListener("mousemove", e => showTip(`${d.n}: ${d.a}% → ${d.b}% (${d.b - d.a > 0 ? "+" : ""}${d.b - d.a}pp)`, e));
+  hit.addEventListener("mouseout", () => { allGroups.forEach(gg => gg.setAttribute("opacity", "1")); hideTip(); });
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  allGroups.push(g);
+});
+
+// Left labels (collision-resolved)
+const leftItems = data.map(d => ({ d, y: scale(d.a) }));
+const leftResolved = resolveCollisions(leftItems, 11);
+leftResolved.forEach(({d, y}) => {
+  const actualY = scale(d.a);
+  const color = colorForChange(d);
+  const t = mkEl("text", { x: xL - 7, y: y + 3.5, "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27" });
+  t.textContent = d.n;
+  svg.appendChild(t);
+  if (Math.abs(y - actualY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xL - 4, y1: actualY, x2: xL - 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+
+// Right labels (collision-resolved)
+const rightItems = data.map(d => ({ d, y: scale(d.b) }));
+const rightResolved = resolveCollisions(rightItems, 11);
+rightResolved.forEach(({d, y}) => {
+  const actualY = scale(d.b);
+  const color = colorForChange(d);
+  const change = d.b - d.a;
+  const changeStr = (change > 0 ? "+" : "") + change + "pp";
+  const t = mkEl("text", { x: xR + 7, y: y + 3.5, "text-anchor": "start", "font-size": "9.5", fill: color });
+  t.textContent = d.n + "  " + changeStr;
+  svg.appendChild(t);
+  if (Math.abs(y - actualY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xR + 4, y1: actualY, x2: xR + 4, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+</script>
+</body></html>

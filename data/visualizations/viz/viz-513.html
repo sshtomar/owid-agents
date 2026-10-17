@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Malaria Mortality Has Fallen Sharply Across Africa</h1>
+<p class="subtitle">Estimated malaria deaths per 100,000 population, selected high-burden countries. Burkina Faso dropped from 375 to 70 per 100,000 between 2000 and 2023 — an 81% reduction. Yet Nigeria still records 81 deaths per 100,000, the highest of any large country.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — MALARIA_EST_MORTALITY (2000–2024)</p>
+<script>
+// {n: name, pts: [{y: year, v: value}]}
+const series = [
+  {n:"Burkina Faso",color:"#EA5E33",pts:[{y:2000,v:374.8},{y:2001,v:372.6},{y:2002,v:353.9},{y:2012,v:182.6},{y:2014,v:132.5},{y:2017,v:86.1},{y:2021,v:76.1},{y:2022,v:73.0},{y:2023,v:70.1}]},
+  {n:"Liberia",color:"#F29A44",pts:[{y:2001,v:189.5},{y:2005,v:120.2},{y:2006,v:95.6},{y:2007,v:86.0},{y:2008,v:93.1},{y:2009,v:80.5},{y:2011,v:71.8},{y:2013,v:66.0},{y:2015,v:73.5},{y:2017,v:90.4},{y:2018,v:90.6},{y:2020,v:89.9},{y:2024,v:63.5}]},
+  {n:"DR Congo",color:"#C49A45",pts:[{y:2000,v:184.5},{y:2004,v:190.8},{y:2005,v:191.5},{y:2007,v:182.6},{y:2010,v:124.2},{y:2017,v:78.8},{y:2018,v:86.1},{y:2023,v:63.8}]},
+  {n:"Nigeria",color:"#B34B3B",pts:[{y:2000,v:179.0},{y:2001,v:174.3},{y:2002,v:172.5},{y:2005,v:144.7},{y:2007,v:151.1},{y:2008,v:140.2},{y:2015,v:88.7},{y:2022,v:84.1},{y:2023,v:81.0}]},
+  {n:"Uganda",color:"#8BAD72",pts:[{y:2000,v:175.2},{y:2002,v:183.4},{y:2005,v:110.7},{y:2006,v:95.7},{y:2008,v:88.2},{y:2010,v:79.5},{y:2014,v:48.8},{y:2015,v:42.0},{y:2019,v:37.1},{y:2020,v:41.6},{y:2022,v:37.1}]},
+  {n:"Burundi",color:"#5B9E78",pts:[{y:2000,v:182.4},{y:2001,v:178.9},{y:2002,v:158.3},{y:2006,v:80.5},{y:2007,v:68.1},{y:2008,v:58.0},{y:2013,v:49.0},{y:2014,v:48.6},{y:2019,v:52.9},{y:2020,v:57.8}]},
+  {n:"Tanzania",color:"#3D7A5A",pts:[{y:2000,v:129.2},{y:2004,v:78.6},{y:2006,v:62.8},{y:2012,v:43.9},{y:2014,v:45.7},{y:2015,v:44.7},{y:2017,v:41.6},{y:2018,v:40.5},{y:2019,v:39.8},{y:2021,v:40.0},{y:2023,v:38.3}]},
+  {n:"Mali",color:"#7A786F",pts:[{y:2005,v:154.8},{y:2006,v:147.7},{y:2007,v:140.8},{y:2009,v:126.0},{y:2010,v:124.8},{y:2011,v:134.5},{y:2015,v:101.8},{y:2016,v:90.1},{y:2017,v:85.3},{y:2018,v:79.7},{y:2021,v:64.1},{y:2024,v:58.2}]}
+];
+
+const W = 720, H = 460;
+const margin = { top: 30, right: 130, bottom: 36, left: 54 };
+const yearMin = 2000, yearMax = 2024;
+const valMin = 0, valMax = 400;
+
+const xScale = year => margin.left + (year - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = val => margin.top + (valMax - val) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = margin.top + 2, bot = H - margin.bottom - 2;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+// Grid lines + y-axis labels
+[0, 100, 200, 300, 400].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v;
+  svg.appendChild(t);
+});
+
+// X-axis labels
+[2000, 2005, 2010, 2015, 2020].forEach(yr => {
+  const t = mkEl("text", { x: xScale(yr), y: H - margin.bottom + 14, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = yr;
+  svg.appendChild(t);
+});
+
+// Y-axis label
+const yLabel = mkEl("text", { x: 10, y: H / 2, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#7A786F", transform: `rotate(-90, 10, ${H/2})` });
+yLabel.textContent = "deaths per 100,000";
+svg.appendChild(yLabel);
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const allGroups = [];
+
+series.forEach(s => {
+  const g = mkEl("g", { cursor: "pointer" });
+  const pathPts = s.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+  const line = mkEl("path", { d: pathPts, stroke: s.color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  // Dots at data points
+  s.pts.forEach(p => {
+    g.appendChild(mkEl("circle", { cx: xScale(p.y), cy: yScale(p.v), r: "2.5", fill: s.color }));
+  });
+
+  // Wide hit area
+  const hitLine = mkEl("path", { d: pathPts, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hitLine.addEventListener("mouseover", e => {
+    allGroups.forEach(gg => { gg.querySelector("path").setAttribute("stroke-opacity", "0.1"); });
+    line.setAttribute("stroke-opacity", "1");
+    line.setAttribute("stroke-width", "3");
+    showTip(s.n, e);
+  });
+  hitLine.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const yearApprox = yearMin + (mx - margin.left) / (W - margin.left - margin.right) * (yearMax - yearMin);
+    const nearest = s.pts.reduce((a, b) => Math.abs(b.y - yearApprox) < Math.abs(a.y - yearApprox) ? b : a);
+    showTip(`${s.n} (${nearest.y}): ${nearest.v} per 100k`, e);
+  });
+  hitLine.addEventListener("mouseout", () => {
+    allGroups.forEach(gg => { gg.querySelector("path").setAttribute("stroke-opacity", "1"); gg.querySelector("path").setAttribute("stroke-width", "1.8"); });
+    hideTip();
+  });
+  g.appendChild(hitLine);
+  svg.appendChild(g);
+  allGroups.push(g);
+});
+
+// Endpoint labels (collision-resolved)
+const endItems = series.map(s => {
+  const last = s.pts[s.pts.length - 1];
+  return { s, y: yScale(last.v), x: xScale(last.y), v: last.v };
+});
+const resolved = resolveCollisions(endItems, 12);
+resolved.forEach(({ s, y, x, v }) => {
+  const actualY = yScale(s.pts[s.pts.length - 1].v);
+  const t = mkEl("text", { x: W - margin.right + 7, y: y + 3.5, "text-anchor": "start", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: s.color });
+  t.textContent = v + "  " + s.n;
+  svg.appendChild(t);
+  if (Math.abs(y - actualY) > 3) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 3, y1: actualY, x2: W - margin.right + 3, y2: y, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  }
+});
+</script>
+</body></html>
