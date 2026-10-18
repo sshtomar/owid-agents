@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Boys Are More Vulnerable: Under-5 Mortality by Sex, 2023</h1>
+<p class="subtitle">Male vs female under-5 mortality rates (per 1,000 live births) across 91 countries. Nearly every country sits above the equality line — boys face higher mortality risk than girls in almost every part of the world. India is the lone exception.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Mortality rate, under-5, female (SH.DYN.MORT.FE) and male (SH.DYN.MORT.MA), 2023</p>
+<script>
+// Data exported from notebook — do not modify
+const data = [{"c":"Chad","f":94.3,"m":106.6},{"c":"Guinea","f":87.7,"m":101.8},{"c":"Congo, Dem. Rep.","f":83.2,"m":99.1},{"c":"Burkina Faso","f":72.8,"m":81.8},{"c":"Benin","f":71.6,"m":82.3},{"c":"Equatorial Guinea","f":64.8,"m":75.8},{"c":"Guinea-Bissau","f":63.8,"m":75.2},{"c":"Cameroon","f":61.6,"m":72.1},{"c":"Cote d'Ivoire","f":59.2,"m":73.5},{"c":"Afghanistan","f":50.7,"m":58.8},{"c":"Kiribati","f":49.7,"m":59.1},{"c":"Haiti","f":49.3,"m":59.4},{"c":"Angola","f":45.8,"m":55},{"c":"Djibouti","f":45.6,"m":55.2},{"c":"Ethiopia","f":45.4,"m":57.3},{"c":"Burundi","f":44.5,"m":52.6},{"c":"Eswatini","f":41.2,"m":50.9},{"c":"Gambia, The","f":39,"m":48.4},{"c":"Congo, Rep.","f":36.7,"m":43.7},{"c":"Comoros","f":36.5,"m":43.5},{"c":"Kenya","f":35.4,"m":43.6},{"c":"Dominica","f":33,"m":37.7},{"c":"Ghana","f":33,"m":41.2},{"c":"Eritrea","f":31.2,"m":39.5},{"c":"Botswana","f":30.6,"m":38},{"c":"Gabon","f":29.9,"m":37.5},{"c":"Dominican Republic","f":28.6,"m":34.3},{"c":"Bangladesh","f":28.4,"m":32.7},{"c":"India","f":28.1,"m":27.9},{"c":"Fiji","f":26.4,"m":31.8},{"c":"Guyana","f":22.7,"m":29.2},{"c":"Egypt, Arab Rep.","f":21.3,"m":24.5},{"c":"Iraq","f":20.3,"m":24.6},{"c":"Algeria","f":20,"m":23.9},{"c":"Guatemala","f":18.9,"m":23.3},{"c":"Azerbaijan","f":17.6,"m":19.8},{"c":"Cambodia","f":16.9,"m":21.2},{"c":"Grenada","f":16.7,"m":19.8},{"c":"Indonesia","f":16.4,"m":20.2},{"c":"Korea, Dem. People's Rep.","f":16.1,"m":19.8},{"c":"Bhutan","f":16,"m":19.9},{"c":"Jamaica","f":15.9,"m":20.3},{"c":"Bolivia","f":14.8,"m":18},{"c":"Honduras","f":13.8,"m":17},{"c":"Brazil","f":12.8,"m":16},{"c":"British Virgin Islands","f":12.6,"m":12.9},{"c":"Jordan","f":12,"m":14.6},{"c":"Bahamas, The","f":11.7,"m":13.6},{"c":"Belize","f":11.5,"m":14},{"c":"Ecuador","f":11.3,"m":14.6},{"c":"Iran, Islamic Rep.","f":11.1,"m":12.3},{"c":"Colombia","f":10.6,"m":13.1},{"c":"Cabo Verde","f":10.5,"m":12.6},{"c":"El Salvador","f":9.4,"m":11.4},{"c":"Costa Rica","f":9.3,"m":11},{"c":"Barbados","f":9.3,"m":10.9},{"c":"Brunei Darussalam","f":9.3,"m":10.8},{"c":"Armenia","f":9,"m":11},{"c":"Argentina","f":8.7,"m":10.7},{"c":"Albania","f":8.6,"m":10.1},{"c":"Kazakhstan","f":8.5,"m":10.8},{"c":"Antigua and Barbuda","f":8.5,"m":10.1},{"c":"Bahrain","f":8.4,"m":8.8},{"c":"Georgia","f":8,"m":9.5},{"c":"Cuba","f":7.3,"m":9},{"c":"Chile","f":6.3,"m":7.4},{"c":"China","f":5.8,"m":6.4},{"c":"Bosnia and Herzegovina","f":5.5,"m":6.5},{"c":"Bulgaria","f":5.4,"m":6.4},{"c":"Canada","f":4.9,"m":5.8},{"c":"Croatia","f":4.7,"m":5.5},{"c":"Cyprus","f":4.2,"m":4.9},{"c":"France","f":4,"m":4.7},{"c":"Greece","f":3.6,"m":4.2},{"c":"Denmark","f":3.5,"m":4.2},{"c":"Ireland","f":3.5,"m":4.1},{"c":"Hungary","f":3.4,"m":4.2},{"c":"Germany","f":3.4,"m":4},{"c":"Australia","f":3.4,"m":4},{"c":"Belgium","f":3.3,"m":4.1},{"c":"Israel","f":3.1,"m":3.6},{"c":"Austria","f":3,"m":3.6},{"c":"Iceland","f":2.6,"m":3.1},{"c":"Korea, Rep.","f":2.6,"m":3.1},{"c":"Italy","f":2.5,"m":3},{"c":"Czechia","f":2.3,"m":2.9},{"c":"Japan","f":2.3,"m":2.5},{"c":"Finland","f":2.2,"m":2.5},{"c":"Andorra","f":2.2,"m":2.9},{"c":"Belarus","f":2.1,"m":2.7},{"c":"Estonia","f":1.9,"m":2.3}];
+
+const W = 680, H = 520;
+const margin = { top: 40, right: 30, bottom: 50, left: 58 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const maxVal = 115;
+const xScale = v => margin.left + v / maxVal * (W - margin.left - margin.right);
+const yScale = v => margin.top + (maxVal - v) / maxVal * (H - margin.top - margin.bottom);
+
+// Background
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+
+// Grid lines
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  if (v === 0) return;
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top, x2: xScale(v), y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+});
+
+// Equality line (male = female)
+const eqColor = "#C2C0B5";
+svg.appendChild(mkEl("line", {
+  x1: xScale(0), y1: yScale(0),
+  x2: xScale(maxVal), y2: yScale(maxVal),
+  stroke: eqColor, "stroke-width": "1", "stroke-dasharray": "4,3"
+}));
+svg.appendChild(mkEl("text", {
+  x: xScale(100) + 2, y: yScale(100) - 4,
+  "font-family": "JetBrains Mono, monospace", "font-size": "8",
+  fill: "#9A9890", "text-anchor": "start"
+}, "equal"));
+
+// Axis ticks and labels
+[0, 20, 40, 60, 80, 100].forEach(v => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(v), y: H - margin.bottom + 14,
+    "font-family": "JetBrains Mono, monospace", "font-size": "9",
+    fill: "#7A786F", "text-anchor": "middle"
+  }, v.toString()));
+  if (v > 0) {
+    svg.appendChild(mkEl("text", {
+      x: margin.left - 6, y: yScale(v) + 3.5,
+      "font-family": "JetBrains Mono, monospace", "font-size": "9",
+      fill: "#7A786F", "text-anchor": "end"
+    }, v.toString()));
+  }
+});
+
+// Axis labels
+svg.appendChild(mkEl("text", {
+  x: margin.left + (W - margin.left - margin.right) / 2,
+  y: H - 6,
+  "font-family": "Inter, sans-serif", "font-size": "10",
+  fill: "#7A786F", "text-anchor": "middle"
+}, "Female under-5 mortality (per 1,000 live births)"));
+
+const yLabel = mkEl("text", {
+  x: 0, y: 0,
+  "font-family": "Inter, sans-serif", "font-size": "10",
+  fill: "#7A786F", "text-anchor": "middle",
+  transform: `rotate(-90) translate(${-(margin.top + (H - margin.top - margin.bottom) / 2)}, 14)`
+}, "Male under-5 mortality");
+svg.appendChild(yLabel);
+
+// Color function by female mortality level
+function dotColor(f) {
+  if (f > 60) return "#EA5E33";
+  if (f > 30) return "#F29A44";
+  if (f > 15) return "#C49A45";
+  if (f > 8) return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Dots
+const circles = [];
+const tip = document.getElementById("tip");
+
+data.forEach(d => {
+  const cx = xScale(d.f);
+  const cy = yScale(d.m);
+  const r = 4.5;
+  const col = dotColor(d.f);
+
+  const circle = mkEl("circle", {
+    cx, cy, r,
+    fill: col, "fill-opacity": "0.85",
+    stroke: "#F6F5EE", "stroke-width": "0.8",
+    style: "cursor:pointer; transition: r 0.1s"
+  });
+
+  circle.addEventListener("mouseenter", e => {
+    circle.setAttribute("r", "7");
+    circle.setAttribute("fill-opacity", "1");
+    const gap = d.m - d.f;
+    const label = d.f < d.m
+      ? `${d.c}\nGirls: ${d.f}  Boys: ${d.m}\nBoys die ${gap.toFixed(1)} more per 1,000`
+      : `${d.c}\nGirls: ${d.f}  Boys: ${d.m}\nGirls die ${(-gap).toFixed(1)} more per 1,000`;
+    tip.style.opacity = "1";
+    tip.innerHTML = label.replace(/\n/g, "<br>");
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  circle.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  circle.addEventListener("mouseleave", () => {
+    circle.setAttribute("r", r.toString());
+    circle.setAttribute("fill-opacity", "0.85");
+    tip.style.opacity = "0";
+  });
+
+  svg.appendChild(circle);
+  circles.push({ el: circle, d });
+});
+
+// Label a few notable countries
+const labeled = ["Chad", "Guinea", "India", "Japan", "France", "Bangladesh"];
+data.forEach(d => {
+  if (!labeled.includes(d.c)) return;
+  const cx = xScale(d.f);
+  const cy = yScale(d.m);
+  const anchor = d.f > 60 ? "end" : "start";
+  const dx = d.f > 60 ? -7 : 7;
+  const dy = d.c === "India" ? 12 : (d.c === "Japan" ? -7 : -6);
+  svg.appendChild(mkEl("text", {
+    x: cx + dx, y: cy + dy,
+    "font-family": "Inter, sans-serif", "font-size": "9", "font-weight": "500",
+    fill: "#2B2A27", "text-anchor": anchor
+  }, d.c));
+});
+
+// Legend
+const legendY = margin.top + 10;
+const legendX = W - margin.right - 90;
+const bands = [
+  { col: "#EA5E33", label: "> 60" },
+  { col: "#F29A44", label: "30 – 60" },
+  { col: "#C49A45", label: "15 – 30" },
+  { col: "#8BAD72", label: "8 – 15" },
+  { col: "#5B9E78", label: "< 8" },
+];
+svg.appendChild(mkEl("text", {
+  x: legendX, y: legendY - 6,
+  "font-family": "JetBrains Mono, monospace", "font-size": "8",
+  fill: "#9A9890"
+}, "Female rate"));
+bands.forEach((b, i) => {
+  svg.appendChild(mkEl("circle", { cx: legendX + 5, cy: legendY + i * 14 + 5, r: "4", fill: b.col, "fill-opacity": "0.85" }));
+  svg.appendChild(mkEl("text", {
+    x: legendX + 14, y: legendY + i * 14 + 9,
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    fill: "#7A786F"
+  }, b.label));
+});
+
+// "Above line = boys die more" annotation
+svg.appendChild(mkEl("text", {
+  x: xScale(6), y: yScale(25),
+  "font-family": "Inter, sans-serif", "font-size": "9",
+  fill: "#7A786F", "text-anchor": "start", "font-style": "italic"
+}, "boys die more"));
+svg.appendChild(mkEl("text", {
+  x: xScale(26), y: yScale(20),
+  "font-family": "Inter, sans-serif", "font-size": "9",
+  fill: "#7A786F", "text-anchor": "start", "font-style": "italic"
+}, "(above line)"));
+</script>
+</body></html>

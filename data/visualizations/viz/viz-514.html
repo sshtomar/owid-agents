@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 12px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; position: relative; cursor: crosshair; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .cell canvas { display: block; width: 100%; }
+  .cell-vals { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #7A786F; margin-top: 3px; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Primary School Grade Repetition Rates, 1990–2019</h1>
+<p class="subtitle">Share of primary school students who repeat a grade. High repetition rates signal learning gaps and predict dropout risk. Most countries show strong declines — but West and Central Africa remain elevated, and some nations have made almost no progress.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Repeaters, primary, total (SE.PRM.REPT.ZS)</p>
+<script>
+// Data exported from notebook — do not modify
+const data = [{"n":"Comoros","pts":[{"y":1992,"v":39.1},{"y":1993,"v":40.9},{"y":1994,"v":35.8},{"y":1999,"v":26.0},{"y":2000,"v":26.0},{"y":2002,"v":28.0},{"y":2003,"v":28.0},{"y":2004,"v":27.1},{"y":2007,"v":25.9},{"y":2008,"v":24.4},{"y":2011,"v":24.4},{"y":2013,"v":20.7},{"y":2014,"v":17.5},{"y":2017,"v":16.6},{"y":2018,"v":16.0}],"e":39.1,"l":16.0,"max":40.9},{"n":"Congo, Rep.","pts":[{"y":1990,"v":38.5},{"y":1992,"v":32.8},{"y":1993,"v":34.0},{"y":1994,"v":35.7},{"y":1996,"v":33.2},{"y":1999,"v":39.1},{"y":2000,"v":27.2},{"y":2001,"v":24.9},{"y":2002,"v":24.8},{"y":2003,"v":27.8},{"y":2004,"v":24.5},{"y":2005,"v":23.9},{"y":2006,"v":21.2},{"y":2007,"v":21.2},{"y":2008,"v":22.4},{"y":2009,"v":19.7},{"y":2010,"v":19.1},{"y":2011,"v":18.7},{"y":2012,"v":22.8}],"e":38.5,"l":22.8,"max":39.1},{"n":"Gabon","pts":[{"y":1992,"v":33.4},{"y":1995,"v":38.9},{"y":1996,"v":34.9},{"y":1997,"v":34.5},{"y":2001,"v":36.5},{"y":2002,"v":34.4},{"y":2003,"v":34.4}],"e":33.4,"l":34.4,"max":38.9},{"n":"Burundi","pts":[{"y":1990,"v":22.2},{"y":1991,"v":21.8},{"y":1992,"v":23.0},{"y":1993,"v":23.7},{"y":2000,"v":25.2},{"y":2001,"v":24.5},{"y":2002,"v":26.3},{"y":2003,"v":26.5},{"y":2004,"v":29.1},{"y":2005,"v":30.4},{"y":2006,"v":28.8},{"y":2007,"v":32.0},{"y":2008,"v":33.8},{"y":2009,"v":32.3},{"y":2010,"v":33.7},{"y":2011,"v":36.2},{"y":2012,"v":33.1},{"y":2013,"v":29.0},{"y":2014,"v":24.3},{"y":2015,"v":22.6},{"y":2016,"v":22.0},{"y":2017,"v":23.9},{"y":2018,"v":25.7}],"e":22.2,"l":25.7,"max":36.2},{"n":"Chad","pts":[{"y":1990,"v":33.3},{"y":1991,"v":32.3},{"y":1994,"v":28.8},{"y":1995,"v":34.5},{"y":1996,"v":32.9},{"y":1997,"v":32.0},{"y":1998,"v":30.7},{"y":1999,"v":25.9},{"y":2000,"v":24.6},{"y":2001,"v":25.5},{"y":2002,"v":25.3},{"y":2003,"v":23.8},{"y":2004,"v":20.2},{"y":2005,"v":22.5},{"y":2006,"v":21.8},{"y":2007,"v":21.8},{"y":2008,"v":22.8},{"y":2009,"v":22.8},{"y":2010,"v":22.4},{"y":2011,"v":21.6},{"y":2012,"v":23.0},{"y":2013,"v":24.3},{"y":2015,"v":23.3},{"y":2016,"v":16.8}],"e":33.3,"l":16.8,"max":34.5},{"n":"Eritrea","pts":[{"y":1992,"v":32.2},{"y":1993,"v":25.1},{"y":1994,"v":20.1},{"y":1995,"v":18.9},{"y":1996,"v":18.6},{"y":1997,"v":20.5},{"y":1999,"v":19.4},{"y":2000,"v":19.4},{"y":2001,"v":13.9},{"y":2002,"v":17.5},{"y":2003,"v":20.7},{"y":2004,"v":21.3},{"y":2005,"v":12.9},{"y":2006,"v":13.7},{"y":2007,"v":14.6},{"y":2008,"v":15.4},{"y":2009,"v":13.7},{"y":2010,"v":14.7},{"y":2011,"v":11.3},{"y":2012,"v":12.6},{"y":2013,"v":11.2},{"y":2015,"v":6.0},{"y":2017,"v":7.9},{"y":2018,"v":8.1}],"e":32.2,"l":8.1,"max":32.2},{"n":"Cambodia","pts":[{"y":1994,"v":26.9},{"y":1995,"v":30.4},{"y":1997,"v":27.0},{"y":1998,"v":26.3},{"y":1999,"v":24.2},{"y":2001,"v":16.5},{"y":2002,"v":9.6},{"y":2003,"v":10.1},{"y":2004,"v":10.6},{"y":2005,"v":13.8},{"y":2006,"v":12.7},{"y":2007,"v":11.6},{"y":2008,"v":11.2},{"y":2009,"v":10.2},{"y":2010,"v":8.8},{"y":2011,"v":7.2},{"y":2012,"v":5.8},{"y":2013,"v":5.0},{"y":2014,"v":5.3},{"y":2015,"v":5.2},{"y":2016,"v":6.6},{"y":2017,"v":6.4},{"y":2018,"v":6.4}],"e":26.9,"l":6.4,"max":30.4},{"n":"Cameroon","pts":[{"y":1990,"v":28.6},{"y":1991,"v":29.2},{"y":1999,"v":26.7},{"y":2000,"v":26.7},{"y":2002,"v":25.2},{"y":2003,"v":25.8},{"y":2004,"v":25.1},{"y":2005,"v":26.0},{"y":2006,"v":25.1},{"y":2007,"v":20.1},{"y":2008,"v":16.8},{"y":2009,"v":14.7},{"y":2010,"v":13.1},{"y":2011,"v":12.5},{"y":2012,"v":12.3},{"y":2014,"v":12.7},{"y":2015,"v":12.2},{"y":2016,"v":11.8},{"y":2017,"v":12.2},{"y":2018,"v":12.2}],"e":28.6,"l":12.2,"max":29.2},{"n":"Guinea","pts":[{"y":1990,"v":18.4},{"y":1991,"v":19.8},{"y":1992,"v":19.7},{"y":1993,"v":20.6},{"y":1994,"v":21.9},{"y":1995,"v":22.0},{"y":1996,"v":23.9},{"y":1998,"v":27.9},{"y":1999,"v":26.2},{"y":2000,"v":23.3},{"y":2001,"v":20.3},{"y":2002,"v":20.8},{"y":2003,"v":20.3},{"y":2004,"v":10.5},{"y":2005,"v":8.7},{"y":2006,"v":8.6},{"y":2007,"v":9.1},{"y":2008,"v":15.4},{"y":2009,"v":15.3},{"y":2010,"v":16.5},{"y":2011,"v":12.7},{"y":2012,"v":14.2},{"y":2013,"v":14.1},{"y":2014,"v":13.6},{"y":2016,"v":11.6}],"e":18.4,"l":11.6,"max":27.9},{"n":"Cote d'Ivoire","pts":[{"y":1990,"v":26.3},{"y":1991,"v":24.1},{"y":1992,"v":27.0},{"y":1993,"v":26.6},{"y":1994,"v":25.4},{"y":1995,"v":26.7},{"y":1996,"v":23.5},{"y":1997,"v":24.6},{"y":1998,"v":25.4},{"y":1999,"v":23.7},{"y":2000,"v":24.2},{"y":2001,"v":23.0},{"y":2002,"v":23.3},{"y":2003,"v":17.6},{"y":2006,"v":23.5},{"y":2007,"v":21.6},{"y":2009,"v":18.8},{"y":2011,"v":16.6},{"y":2012,"v":19.6},{"y":2013,"v":20.2},{"y":2014,"v":15.0},{"y":2015,"v":15.2},{"y":2016,"v":12.7},{"y":2017,"v":11.0}],"e":26.3,"l":11.0,"max":27.0},{"n":"Equatorial Guinea","pts":[{"y":1994,"v":24.7},{"y":2000,"v":12.1},{"y":2005,"v":25.6},{"y":2008,"v":22.5},{"y":2009,"v":22.1},{"y":2010,"v":20.2},{"y":2011,"v":19.3},{"y":2012,"v":18.1},{"y":2015,"v":18.5}],"e":24.7,"l":18.5,"max":25.6},{"n":"Benin","pts":[{"y":1990,"v":24.6},{"y":1991,"v":21.5},{"y":1992,"v":23.1},{"y":1993,"v":23.9},{"y":1994,"v":24.7},{"y":1995,"v":24.5},{"y":1996,"v":25.1},{"y":1997,"v":25.2},{"y":1998,"v":23.7},{"y":2000,"v":19.9},{"y":2001,"v":19.9},{"y":2002,"v":21.6},{"y":2003,"v":19.9},{"y":2004,"v":23.1},{"y":2005,"v":16.8},{"y":2008,"v":14.3},{"y":2010,"v":13.4},{"y":2011,"v":10.8},{"y":2012,"v":11.6},{"y":2013,"v":11.2},{"y":2014,"v":10.8},{"y":2015,"v":10.7},{"y":2016,"v":9.9},{"y":2018,"v":15.1}],"e":24.6,"l":15.1,"max":25.2},{"n":"Brazil","pts":[{"y":1992,"v":18.1},{"y":1993,"v":18.4},{"y":1994,"v":19.1},{"y":1999,"v":24.0},{"y":2000,"v":25.0},{"y":2001,"v":21.5},{"y":2002,"v":20.6},{"y":2003,"v":20.0},{"y":2004,"v":20.1},{"y":2005,"v":18.7},{"y":2008,"v":11.8},{"y":2009,"v":10.8},{"y":2010,"v":9.4},{"y":2011,"v":8.7}],"e":18.1,"l":8.7,"max":25.0},{"n":"Guinea-Bissau","pts":[{"y":2000,"v":24.0},{"y":2001,"v":21.2},{"y":2005,"v":14.2},{"y":2006,"v":18.7},{"y":2010,"v":14.1}],"e":24.0,"l":14.1,"max":24.0},{"n":"Congo, Dem. Rep.","pts":[{"y":1991,"v":17.6},{"y":1992,"v":11.9},{"y":1993,"v":9.0},{"y":1994,"v":21.0},{"y":1999,"v":15.5},{"y":2002,"v":16.3},{"y":2007,"v":15.9},{"y":2008,"v":15.3},{"y":2009,"v":15.3},{"y":2010,"v":14.1},{"y":2011,"v":12.3},{"y":2012,"v":11.2},{"y":2013,"v":10.8},{"y":2015,"v":9.9}],"e":17.6,"l":9.9,"max":21.0},{"n":"Bhutan","pts":[{"y":1993,"v":18.6},{"y":1994,"v":19.0},{"y":1998,"v":13.0},{"y":1999,"v":12.1},{"y":2000,"v":13.2},{"y":2001,"v":12.9},{"y":2004,"v":10.1},{"y":2005,"v":7.5},{"y":2006,"v":6.9},{"y":2007,"v":6.6},{"y":2008,"v":6.4},{"y":2009,"v":6.6},{"y":2010,"v":6.3},{"y":2011,"v":5.7},{"y":2012,"v":5.3},{"y":2013,"v":5.9},{"y":2014,"v":6.3},{"y":2016,"v":6.0},{"y":2017,"v":4.7},{"y":2018,"v":7.3}],"e":18.6,"l":7.3,"max":19.0},{"n":"Cabo Verde","pts":[{"y":1990,"v":18.8},{"y":1994,"v":16.9},{"y":1998,"v":9.0},{"y":2000,"v":11.6},{"y":2001,"v":11.9},{"y":2002,"v":13.4},{"y":2003,"v":13.4},{"y":2004,"v":13.0},{"y":2005,"v":15.5},{"y":2006,"v":14.0},{"y":2007,"v":12.9},{"y":2008,"v":11.6},{"y":2009,"v":10.4},{"y":2010,"v":9.6},{"y":2011,"v":10.5},{"y":2012,"v":10.0},{"y":2013,"v":9.9},{"y":2014,"v":9.0},{"y":2015,"v":8.3},{"y":2016,"v":8.6},{"y":2017,"v":8.1},{"y":2018,"v":7.7}],"e":18.8,"l":7.7,"max":18.8},{"n":"Eswatini","pts":[{"y":1990,"v":14.9},{"y":1991,"v":15.3},{"y":1992,"v":15.4},{"y":1993,"v":15.8},{"y":1994,"v":14.8},{"y":1995,"v":15.6},{"y":1996,"v":15.5},{"y":1997,"v":15.7},{"y":1998,"v":15.3},{"y":1999,"v":17.1},{"y":2000,"v":16.1},{"y":2001,"v":16.7},{"y":2002,"v":15.5},{"y":2003,"v":16.3},{"y":2004,"v":16.2},{"y":2005,"v":17.3},{"y":2006,"v":16.5},{"y":2007,"v":18.0},{"y":2009,"v":16.9},{"y":2010,"v":15.1},{"y":2011,"v":15.5},{"y":2012,"v":15.5},{"y":2013,"v":16.9},{"y":2014,"v":15.7},{"y":2015,"v":15.6},{"y":2016,"v":13.9},{"y":2017,"v":13.4}],"e":14.9,"l":13.4,"max":18.0},{"n":"Burkina Faso","pts":[{"y":1990,"v":17.3},{"y":1991,"v":17.7},{"y":1992,"v":16.7},{"y":1993,"v":16.6},{"y":1994,"v":16.0},{"y":1995,"v":16.3},{"y":1996,"v":16.0},{"y":1999,"v":17.7},{"y":2000,"v":17.0},{"y":2001,"v":17.6},{"y":2002,"v":17.5},{"y":2003,"v":15.1},{"y":2004,"v":13.0},{"y":2005,"v":11.9},{"y":2006,"v":12.0},{"y":2007,"v":11.8},{"y":2008,"v":10.5},{"y":2009,"v":10.6},{"y":2010,"v":10.1},{"y":2012,"v":8.2},{"y":2013,"v":7.4},{"y":2014,"v":6.9},{"y":2015,"v":5.6},{"y":2016,"v":5.7},{"y":2017,"v":6.4},{"y":2018,"v":5.7}],"e":17.3,"l":5.7,"max":17.7},{"n":"Iraq","pts":[{"y":1993,"v":16.5},{"y":1999,"v":10.0},{"y":2000,"v":12.3},{"y":2004,"v":8.0},{"y":2007,"v":16.8}],"e":16.5,"l":16.8,"max":16.8},{"n":"Djibouti","pts":[{"y":1990,"v":10.7},{"y":1991,"v":13.4},{"y":1992,"v":13.7},{"y":1993,"v":14.0},{"y":1994,"v":13.5},{"y":1995,"v":12.4},{"y":1996,"v":14.7},{"y":1997,"v":16.1},{"y":1999,"v":16.6},{"y":2000,"v":14.1},{"y":2001,"v":14.4},{"y":2002,"v":11.3},{"y":2005,"v":9.2},{"y":2006,"v":7.5},{"y":2007,"v":9.1},{"y":2008,"v":10.6},{"y":2011,"v":9.6},{"y":2012,"v":9.1},{"y":2014,"v":9.1},{"y":2015,"v":8.6},{"y":2016,"v":8.3},{"y":2017,"v":10.1},{"y":2018,"v":8.7}],"e":10.7,"l":8.7,"max":16.6},{"n":"Guatemala","pts":[{"y":1993,"v":16.2},{"y":1996,"v":15.3},{"y":1999,"v":14.9},{"y":2000,"v":14.5},{"y":2001,"v":14.2},{"y":2002,"v":14.1},{"y":2004,"v":13.3},{"y":2005,"v":12.5},{"y":2006,"v":12.1},{"y":2007,"v":12.2},{"y":2008,"v":12.4},{"y":2009,"v":10.8},{"y":2010,"v":11.9},{"y":2011,"v":11.0},{"y":2012,"v":12.2},{"y":2013,"v":10.5},{"y":2014,"v":9.3},{"y":2015,"v":9.8},{"y":2016,"v":6.2},{"y":2017,"v":9.5},{"y":2018,"v":9.0}],"e":16.2,"l":9.0,"max":16.2},{"n":"Gambia, The","pts":[{"y":1992,"v":16.0},{"y":1993,"v":14.3},{"y":1994,"v":13.4},{"y":1995,"v":13.3},{"y":1996,"v":12.7},{"y":1997,"v":13.1},{"y":1999,"v":9.2},{"y":2000,"v":8.5},{"y":2001,"v":8.6},{"y":2002,"v":8.6},{"y":2003,"v":5.8},{"y":2004,"v":5.2},{"y":2005,"v":6.4},{"y":2006,"v":5.4},{"y":2007,"v":5.7},{"y":2008,"v":5.4},{"y":2010,"v":3.0},{"y":2011,"v":2.8},{"y":2012,"v":2.6},{"y":2013,"v":3.4},{"y":2014,"v":3.7},{"y":2015,"v":5.3},{"y":2016,"v":5.2}],"e":16.0,"l":5.2,"max":16.0},{"n":"Belgium","pts":[{"y":1991,"v":15.8},{"y":2006,"v":3.2},{"y":2007,"v":3.2},{"y":2008,"v":3.4},{"y":2009,"v":3.3},{"y":2010,"v":3.3},{"y":2011,"v":3.1},{"y":2012,"v":3.0},{"y":2013,"v":2.6},{"y":2014,"v":2.5},{"y":2015,"v":2.5},{"y":2016,"v":2.3},{"y":2017,"v":2.2}],"e":15.8,"l":2.2,"max":15.8}];
+
+const COLS = 6;
+const CELL_W = 120, CELL_H = 70;
+const Y_START = 1990, Y_END = 2019;
+
+const grid = document.getElementById("grid");
+const tip = document.getElementById("tip");
+
+function lineColor(maxVal) {
+  if (maxVal > 30) return "#EA5E33";
+  if (maxVal > 20) return "#F29A44";
+  if (maxVal > 15) return "#C49A45";
+  return "#8BAD72";
+}
+
+data.forEach((item, idx) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "cell-name";
+  nameEl.textContent = item.n;
+  cell.appendChild(nameEl);
+
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  const cw = CELL_W, ch = 36;
+  canvas.width = cw * dpr;
+  canvas.height = ch * dpr;
+  canvas.style.width = cw + "px";
+  canvas.style.height = ch + "px";
+  cell.appendChild(canvas);
+
+  const valsEl = document.createElement("div");
+  valsEl.className = "cell-vals";
+  valsEl.innerHTML = `<span>${item.e}%</span><span>${item.l}%</span>`;
+  cell.appendChild(valsEl);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const col = lineColor(item.max);
+
+  // Draw sparkline
+  const xScale = y => (y - Y_START) / (Y_END - Y_START) * (cw - 2) + 1;
+  const yMin = 0, yMax = Math.max(item.max * 1.1, 5);
+  const yScale = v => ch - 2 - (v - yMin) / (yMax - yMin) * (ch - 4);
+
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 1.4;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  item.pts.forEach((p, i) => {
+    const x = xScale(p.y), y = yScale(p.v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Dots at data points
+  ctx.fillStyle = col;
+  item.pts.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(xScale(p.y), yScale(p.v), 1.3, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Crosshair tracking
+  let crossX = null;
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const year = Math.round(Y_START + (mx / cw) * (Y_END - Y_START));
+    const nearest = item.pts.reduce((a, b) => Math.abs(b.y - year) < Math.abs(a.y - year) ? b : a);
+
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    item.pts.forEach((p, i) => {
+      const x = xScale(p.y), y = yScale(p.v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    item.pts.forEach(p => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(xScale(p.y), yScale(p.v), 1.3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Crosshair
+    const cx = xScale(nearest.y);
+    ctx.strokeStyle = "#9A9890";
+    ctx.lineWidth = 0.6;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, ch);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Highlight dot
+    ctx.strokeStyle = col;
+    ctx.fillStyle = "#F6F5EE";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(xScale(nearest.y), yScale(nearest.v), 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    tip.innerHTML = `${item.n} · ${nearest.y}<br>${nearest.v}% repetition rate`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 30) + "px";
+  });
+
+  canvas.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    item.pts.forEach((p, i) => {
+      const x = xScale(p.y), y = yScale(p.v);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    item.pts.forEach(p => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(xScale(p.y), yScale(p.v), 1.3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>

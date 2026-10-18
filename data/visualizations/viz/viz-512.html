@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 16px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Severe Wasting in Children Under 5: A Slow Decline</h1>
+<p class="subtitle">Severe wasting prevalence (weight-for-height below −3 SD) based on national surveys. Mali peaked at 12.9% in the 1990s; India, Yemen, and Chad remain high. Bangladesh has made the most sustained progress, from 7% down to under 2%.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — NUTRITION_WH_3, severe wasting survey estimates, 1986–2024</p>
+<script>
+// Data exported from notebook — do not modify
+const data = [{"n":"Mali","pts":[{"y":1987,"v":4.4},{"y":1996,"v":12.85},{"y":2001,"v":4.5},{"y":2006,"v":6.45},{"y":2010,"v":2.0},{"y":2015,"v":3.6},{"y":2018,"v":2.6},{"y":2020,"v":1.5},{"y":2021,"v":1.8},{"y":2024,"v":0.8}]},{"n":"Mauritania","pts":[{"y":2000,"v":8.15},{"y":2007,"v":4.3},{"y":2011,"v":4.5},{"y":2015,"v":3.8},{"y":2018,"v":1.6},{"y":2020,"v":1.15},{"y":2022,"v":3.7}]},{"n":"India","pts":[{"y":1992,"v":7.95},{"y":1999,"v":7.5},{"y":2006,"v":7.1},{"y":2014,"v":4.5},{"y":2015,"v":7.7},{"y":2017,"v":4.85},{"y":2020,"v":7.55}]},{"n":"Cambodia","pts":[{"y":1996,"v":4.7},{"y":2000,"v":7.55},{"y":2005,"v":1.75},{"y":2008,"v":1.9},{"y":2010,"v":2.65},{"y":2014,"v":2.55},{"y":2021,"v":2.6}]},{"n":"Bangladesh","pts":[{"y":1997,"v":7.05},{"y":2000,"v":2.6},{"y":2004,"v":3.65},{"y":2005,"v":3.0},{"y":2007,"v":3.0},{"y":2011,"v":4.25},{"y":2012,"v":2.0},{"y":2013,"v":1.8},{"y":2014,"v":3.25},{"y":2015,"v":2.0},{"y":2018,"v":1.4},{"y":2019,"v":2.37},{"y":2022,"v":1.8}]},{"n":"Benin","pts":[{"y":1996,"v":6.5},{"y":2001,"v":3.45},{"y":2008,"v":1.0},{"y":2014,"v":0.9},{"y":2018,"v":1.05},{"y":2021,"v":2.53}]},{"n":"Ghana","pts":[{"y":1993,"v":6.1},{"y":1997,"v":2.15},{"y":1998,"v":2.7},{"y":2003,"v":2.75},{"y":2006,"v":1.95},{"y":2008,"v":2.75},{"y":2011,"v":1.45},{"y":2014,"v":0.8},{"y":2017,"v":1.25},{"y":2022,"v":1.4}]},{"n":"Nepal","pts":[{"y":1996,"v":4.45},{"y":1998,"v":1.4},{"y":2001,"v":2.95},{"y":2006,"v":3.0},{"y":2011,"v":3.0},{"y":2014,"v":3.5},{"y":2016,"v":1.95},{"y":2019,"v":3.3},{"y":2022,"v":0.75}]},{"n":"Yemen","pts":[{"y":1991,"v":5.7},{"y":2005,"v":4.5},{"y":2011,"v":3.5},{"y":2013,"v":5.55},{"y":2022,"v":5.17}]},{"n":"Chad","pts":[{"y":1997,"v":6.45},{"y":2000,"v":4.3},{"y":2010,"v":6.7},{"y":2019,"v":4.03}]}];
+
+const W = 780, H = 440;
+const margin = { top: 30, right: 130, bottom: 40, left: 48 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.display = "block";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs, text) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+const allYears = data.flatMap(d => d.pts.map(p => p.y));
+const yearMin = Math.min(...allYears), yearMax = Math.max(...allYears);
+const valMax = 14;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / valMax * (H - margin.top - margin.bottom);
+
+// Grid lines
+svg.appendChild(mkEl("rect", { x: 0, y: 0, width: W, height: H, fill: "#F6F5EE" }));
+[2, 4, 6, 8, 10, 12].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 5, y: yScale(v) + 3.5,
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    fill: "#7A786F", "text-anchor": "end"
+  }, v + "%"));
+});
+
+// Year axis
+[1990, 1995, 2000, 2005, 2010, 2015, 2020].forEach(y => {
+  if (y < yearMin) return;
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: margin.top, x2: xScale(y), y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 13,
+    "font-family": "JetBrains Mono, monospace", "font-size": "8.5",
+    fill: "#7A786F", "text-anchor": "middle"
+  }, y.toString()));
+});
+
+// Colors by peak wasting level
+function lineColor(maxVal) {
+  if (maxVal > 10) return "#EA5E33";
+  if (maxVal > 7) return "#F29A44";
+  if (maxVal > 5) return "#C49A45";
+  if (maxVal > 3.5) return "#8BAD72";
+  return "#5B9E78";
+}
+
+const tip = document.getElementById("tip");
+const lineEls = [];
+
+data.forEach((series, i) => {
+  const maxV = Math.max(...series.pts.map(p => p.v));
+  const col = lineColor(maxV);
+
+  const pathPoints = series.pts.map(p => `${xScale(p.y)},${yScale(p.v)}`);
+  const pathD = "M " + pathPoints.join(" L ");
+
+  const g = mkEl("g", {});
+
+  const line = mkEl("path", {
+    d: pathD, stroke: col, "stroke-width": "1.8",
+    fill: "none", "stroke-linejoin": "round",
+    "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  // Dots at each survey point
+  series.pts.forEach(p => {
+    const dot = mkEl("circle", {
+      cx: xScale(p.y), cy: yScale(p.v), r: "2.5",
+      fill: col, stroke: "#F6F5EE", "stroke-width": "0.8"
+    });
+    g.appendChild(dot);
+  });
+
+  // Wide invisible hit area
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "14",
+    fill: "none", style: "cursor:pointer"
+  });
+
+  hit.addEventListener("mouseenter", () => {
+    lineEls.forEach(el => { el.line.setAttribute("opacity", "0.12"); });
+    line.setAttribute("opacity", "1");
+    line.setAttribute("stroke-width", "2.8");
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const year = Math.round(yearMin + (mx - margin.left) / (W - margin.left - margin.right) * (yearMax - yearMin));
+    const nearest = series.pts.reduce((a, b) => Math.abs(b.y - year) < Math.abs(a.y - year) ? b : a);
+    tip.innerHTML = `${series.n}<br>${nearest.y}: ${nearest.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 28) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    lineEls.forEach(el => { el.line.setAttribute("opacity", "1"); el.line.setAttribute("stroke-width", "1.8"); });
+    tip.style.opacity = "0";
+  });
+
+  g.appendChild(hit);
+  svg.appendChild(g);
+  lineEls.push({ line, col });
+});
+
+// Endpoint labels with collision resolution
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 25; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  // Clamp to chart area
+  sorted.forEach(item => {
+    item.y = Math.max(margin.top + 6, Math.min(H - margin.bottom - 4, item.y));
+  });
+  return sorted;
+}
+
+const labelItems = data.map(series => {
+  const last = series.pts[series.pts.length - 1];
+  const maxV = Math.max(...series.pts.map(p => p.v));
+  return { name: series.n, val: last.v, y: yScale(last.v), col: lineColor(maxV), lastPt: last };
+});
+
+const resolved = resolveCollisions(labelItems, 12);
+
+resolved.forEach(item => {
+  const lx = xScale(item.lastPt.y);
+  const ly = yScale(item.lastPt.v);
+  if (Math.abs(item.y - ly) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: lx + 3, y1: ly, x2: W - margin.right + 4, y2: item.y,
+      stroke: item.col, "stroke-width": "0.6", opacity: "0.5"
+    }));
+  }
+  svg.appendChild(mkEl("text", {
+    x: W - margin.right + 7, y: item.y + 3.5,
+    "font-family": "JetBrains Mono, monospace", "font-size": "9",
+    fill: item.col, "font-weight": "500"
+  }, `${item.val}%  ${item.name}`));
+});
+
+// Y-axis label
+const yLabel = mkEl("text", {
+  x: 0, y: 0,
+  "font-family": "Inter, sans-serif", "font-size": "9.5",
+  fill: "#7A786F", "text-anchor": "middle",
+  transform: `rotate(-90) translate(${-(margin.top + (H - margin.top - margin.bottom) / 2)}, 13)`
+}, "Severe wasting prevalence (%)");
+svg.appendChild(yLabel);
+</script>
+</body></html>
