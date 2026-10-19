@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Mental Health Workforce Gap: Psychiatrists per 100,000 People</h1>
+<p class="subtitle">Norway has 48 psychiatrists per 100,000 people. Chad has 0.007. This gap — more than 6,000-fold — reflects the extreme concentration of mental health capacity in high-income countries, with most of Africa operating with near-zero specialist coverage.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — Psychiatrists working in mental health sector (MH_6), ~2013–2017</p>
+<script>
+// n=ISO code matching WHO source countryName field, disp=display name, v=psychiatrists per 100,000
+// WHO dataset (who--MH_6) uses ISO codes as countryName; disp is used for chart labels only
+const data = [
+  {"n":"NOR","disp":"Norway","v":48.04},
+  {"n":"CHE","disp":"Switzerland","v":43.96},
+  {"n":"MCO","disp":"Monaco","v":31.33},
+  {"n":"NZL","disp":"New Zealand","v":28.54},
+  {"n":"POL","disp":"Poland","v":24.18},
+  {"n":"FIN","disp":"Finland","v":23.59},
+  {"n":"ARG","disp":"Argentina","v":21.71},
+  {"n":"FRA","disp":"France","v":20.91},
+  {"n":"NLD","disp":"Netherlands","v":20.87},
+  {"n":"SWE","disp":"Sweden","v":20.86},
+  {"n":"BEL","disp":"Belgium","v":20.06},
+  {"n":"LTU","disp":"Lithuania","v":18.45},
+  {"n":"LUX","disp":"Luxembourg","v":17.82},
+  {"n":"EST","disp":"Estonia","v":16.19},
+  {"n":"CAN","disp":"Canada","v":14.68},
+  {"n":"SRB","disp":"Serbia","v":8.64},
+  {"n":"RUS","disp":"Russia","v":8.48},
+  {"n":"MNE","disp":"Montenegro","v":8.28},
+  {"n":"BIH","disp":"Bosnia","v":8.03},
+  {"n":"BGR","disp":"Bulgaria","v":7.2},
+  {"n":"ZMB","disp":"Zambia","v":0.06},
+  {"n":"TZA","disp":"Tanzania","v":0.06},
+  {"n":"TGO","disp":"Togo","v":0.05},
+  {"n":"MOZ","disp":"Mozambique","v":0.05},
+  {"n":"LBR","disp":"Liberia","v":0.04},
+  {"n":"SLE","disp":"Sierra Leone","v":0.04},
+  {"n":"BFA","disp":"Burkina Faso","v":0.04},
+  {"n":"MLI","disp":"Mali","v":0.03},
+  {"n":"SSD","disp":"South Sudan","v":0.03},
+  {"n":"GIN","disp":"Guinea","v":0.02},
+  {"n":"CAF","disp":"Central African Rep.","v":0.02},
+  {"n":"NER","disp":"Niger","v":0.01},
+  {"n":"BDI","disp":"Burundi","v":0.01},
+  {"n":"TCD","disp":"Chad","v":0.01}
+];
+
+const W = 720, H = 760;
+const pad = { left: 148, right: 100, top: 30, bottom: 40 };
+const barH = 16, barGap = 6;
+const chartH = data.length * (barH + barGap);
+const totalH = pad.top + chartH + pad.bottom;
+
+const maxV = 52;
+const xScale = v => pad.left + v / maxV * (W - pad.left - pad.right);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${totalH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorFor(v) {
+  if (v >= 15) return "#3D7A5A";
+  if (v >= 5)  return "#5B9E78";
+  if (v >= 1)  return "#8BAD72";
+  if (v >= 0.1) return "#C49A45";
+  return "#B34B3B";
+}
+
+// Axis grid lines
+[0, 10, 20, 30, 40, 50].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: pad.top - 10, x2: x, y2: pad.top + chartH, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x, y: pad.top - 14, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#9A9890" });
+  t.textContent = v;
+  svg.appendChild(t);
+});
+
+// Gap indicator between top 20 and bottom group
+// Draw a separator line with label
+const sepY = pad.top + 20 * (barH + barGap) - 2;
+svg.appendChild(mkEl("line", { x1: pad.left - 10, y1: sepY, x2: W - pad.right, y2: sepY, stroke: "#C2C0B5", "stroke-dasharray": "3,3", "stroke-width": "0.8" }));
+const sepLabel = mkEl("text", { x: pad.left - 10, y: sepY + 10, "font-size": "8", fill: "#9A9890", "text-anchor": "end" });
+sepLabel.textContent = "↓ sub-Saharan Africa";
+svg.appendChild(sepLabel);
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const bars = [];
+data.forEach((d, i) => {
+  const y = pad.top + i * (barH + barGap);
+  const color = colorFor(d.v);
+  const barWidth = Math.max(1.5, xScale(d.v) - xScale(0));
+
+  const g = mkEl("g");
+  svg.appendChild(g);
+
+  const bar = mkEl("rect", { x: pad.left, y, width: barWidth, height: barH, fill: color, rx: "1", cursor: "pointer" });
+  g.appendChild(bar);
+
+  // Label: country name left of bar
+  const nameT = mkEl("text", { x: pad.left - 5, y: y + barH * 0.67, "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27" });
+  nameT.textContent = d.disp;
+  g.appendChild(nameT);
+
+  // Value label right of bar
+  const valX = xScale(d.v) + 5;
+  const valT = mkEl("text", { x: valX, y: y + barH * 0.67, "text-anchor": "start", "font-family": "'JetBrains Mono', monospace", "font-size": "8.5", fill: "#7A786F" });
+  valT.textContent = d.v >= 0.1 ? d.v.toFixed(1) : d.v.toFixed(3);
+  g.appendChild(valT);
+
+  bars.push({ g, d });
+
+  [bar].forEach(el => {
+    el.addEventListener("mouseenter", e => {
+      showTip(`${d.disp}: ${d.v} psychiatrists per 100,000`, e);
+      bars.forEach(b => b.g.style.opacity = b.d === d ? "1" : "0.25");
+    });
+    el.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; });
+    el.addEventListener("mouseleave", () => { hideTip(); bars.forEach(b => b.g.style.opacity = "1"); });
+  });
+});
+
+// X-axis label
+const xLbl = mkEl("text", { x: pad.left + (W - pad.left - pad.right) / 2, y: totalH - 8, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "9", fill: "#9A9890" });
+xLbl.textContent = "Psychiatrists per 100,000 population";
+svg.appendChild(xLbl);
+
+// Legend
+const legendItems = [
+  { color: "#3D7A5A", label: "≥ 15" },
+  { color: "#5B9E78", label: "5–15" },
+  { color: "#8BAD72", label: "1–5" },
+  { color: "#C49A45", label: "0.1–1" },
+  { color: "#B34B3B", label: "< 0.1" }
+];
+let lx = pad.left;
+const legendY = totalH - 25;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 7, width: 8, height: 8, fill: item.color }));
+  const t = mkEl("text", { x: lx + 11, y: legendY, "font-size": "8", fill: "#7A786F" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 55;
+});
+</script>
+</body></html>
