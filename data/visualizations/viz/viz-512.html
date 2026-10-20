@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Anemia in Pregnancy: High-Burden Countries, ~2000 vs 2023</h1>
+<p class="subtitle">Prevalence of anemia among pregnant women (%). West Africa carries the heaviest burden, with several countries above 50%. Most nations show modest decline, but Burundi and Cote d'Ivoire have worsened.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · Indicator SH.PRG.ANEM · WHO/UNICEF estimates</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [
+  {"n":"Benin","a":66.6,"b":60.2},
+  {"n":"Cote d'Ivoire","a":56.9,"b":57.3},
+  {"n":"Gabon","a":58.6,"b":54.8},
+  {"n":"Gambia, The","a":65.5,"b":54.1},
+  {"n":"Chad","a":60.4,"b":51.2},
+  {"n":"Guinea-Bissau","a":55.1,"b":51.1},
+  {"n":"Guinea","a":59.8,"b":50.2},
+  {"n":"Burkina Faso","a":56.3,"b":49.5},
+  {"n":"Congo, Rep.","a":56.5,"b":46.8},
+  {"n":"India","a":51.8,"b":46.6},
+  {"n":"Angola","a":50.7,"b":45.9},
+  {"n":"Haiti","a":53.8,"b":45.5},
+  {"n":"Ghana","a":53.3,"b":45.3},
+  {"n":"Congo, Dem. Rep.","a":49.9,"b":45.1},
+  {"n":"Burundi","a":40.8,"b":44.7},
+  {"n":"Cabo Verde","a":49.5,"b":43.9},
+  {"n":"Equatorial Guinea","a":49.5,"b":42.9},
+  {"n":"Eritrea","a":42.8,"b":41.5},
+  {"n":"Cambodia","a":54.3,"b":41.0},
+  {"n":"Cameroon","a":47.4,"b":41.0}
+];
+
+const W = 700, H = 600;
+const pad = { left: 140, right: 140, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 35, maxV = 72;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+["~2000", "2023"].forEach((lbl, i) => {
+  const x = i === 0 ? xLeft : xRight;
+  const t = mkEl("text", {
+    x, y: pad.top - 14, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "10", fill: "#7A786F"
+  });
+  t.textContent = lbl;
+  svg.appendChild(t);
+});
+
+// Axis lines
+[xLeft, xRight].forEach(x => {
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 5) return "#B34B3B";
+  if (change > 0) return "#C4715A";
+  if (change > -5) return "#C49A45";
+  if (change > -12) return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Resolve label collisions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+// Prepare label positions
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+
+const resolvedLeft = resolveCollisions(leftLabels, 13);
+const resolvedRight = resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const color = colorForChange(d);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "crosshair";
+
+  // Line
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.5",
+    "stroke-linecap": "round"
+  });
+
+  // Hit area
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "12"
+  });
+
+  // Dots
+  const dotA = mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color });
+  const dotB = mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color });
+
+  g.appendChild(line);
+  g.appendChild(dotA);
+  g.appendChild(dotB);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, dotA, dotB, d });
+
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach(r => r.g.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    const change = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${change > 0 ? '+' : ''}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(r => { r.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+// Draw resolved labels
+resolvedLeft.forEach(item => {
+  const rawY = scale(item.d.a);
+  const lblY = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  // Leader line if shifted
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft - 4, y1: rawY,
+      x2: xLeft - 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: xLeft - 8, y: lblY + 3.5,
+    "text-anchor": "end",
+    "font-size": "9", fill: "#2B2A27"
+  });
+  t.textContent = `${item.d.n}  ${item.d.a}`;
+  svg.appendChild(t);
+});
+
+resolvedRight.forEach(item => {
+  const rawY = scale(item.d.b);
+  const lblY = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xRight + 4, y1: rawY,
+      x2: xRight + 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: xRight + 8, y: lblY + 3.5,
+    "text-anchor": "start",
+    "font-size": "9", fill: "#2B2A27"
+  });
+  t.textContent = `${item.d.b}  ${item.d.n}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendItems = [
+  { label: "Worsened >5pp", color: "#B34B3B" },
+  { label: "Worsened 0–5pp", color: "#C4715A" },
+  { label: "Improved 0–5pp", color: "#C49A45" },
+  { label: "Improved 5–12pp", color: "#8BAD72" },
+  { label: "Improved >12pp", color: "#5B9E78" }
+];
+const legX = pad.left;
+const legY = pad.top - 30;
+legendItems.forEach((item, i) => {
+  const lx = legX + i * 120;
+  svg.appendChild(mkEl("rect", { x: lx, y: legY - 7, width: 10, height: 7, fill: item.color, rx: "1" }));
+  const lt = mkEl("text", {
+    x: lx + 13, y: legY - 1,
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "7.5", fill: "#7A786F"
+  });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>

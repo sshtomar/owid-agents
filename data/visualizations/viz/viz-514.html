@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Sanitation Leap: Safely Managed Sanitation, ~2000 vs 2024</h1>
+<p class="subtitle">Share of population using safely managed sanitation services (%). India's jump from 5% to 64% stands out as one of the largest improvements in a generation. Kuwait and Singapore held steady at 100%, while DR Congo and Yemen slid backward.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO/UNICEF Joint Monitoring Programme · Indicator WSH_SANITATION_SAFELY_MANAGED</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [
+  {"n":"Sierra Leone","a":5.0,"b":8.4},
+  {"n":"Niger","a":4.5,"b":9.2},
+  {"n":"DR Congo","a":21.1,"b":11.2},
+  {"n":"Madagascar","a":7.5,"b":11.9},
+  {"n":"Ghana","a":3.7,"b":16.5},
+  {"n":"Mozambique","a":4.1,"b":18.6},
+  {"n":"Uganda","a":12.7,"b":23.9},
+  {"n":"Thailand","a":18.1,"b":26.7},
+  {"n":"Yemen","a":35.1,"b":27.9},
+  {"n":"Zimbabwe","a":30.9,"b":30.0},
+  {"n":"Bangladesh","a":19.1,"b":30.5},
+  {"n":"Nigeria","a":21.9,"b":31.5},
+  {"n":"China","a":13.8,"b":34.0},
+  {"n":"Kenya","a":19.7,"b":35.8},
+  {"n":"Tanzania","a":4.9,"b":39.5},
+  {"n":"Morocco","a":37.1,"b":40.7},
+  {"n":"Vietnam","a":30.8,"b":43.3},
+  {"n":"Peru","a":17.1,"b":46.1},
+  {"n":"Iraq","a":26.9,"b":47.4},
+  {"n":"Ecuador","a":44.7,"b":49.3},
+  {"n":"Belarus","a":88.9,"b":50.9},
+  {"n":"Paraguay","a":51.2,"b":51.3},
+  {"n":"Brazil","a":34.3,"b":54.1},
+  {"n":"Algeria","a":58.9,"b":56.0},
+  {"n":"India","a":5.4,"b":64.2},
+  {"n":"Russia","a":55.3,"b":64.9},
+  {"n":"Mexico","a":17.9,"b":65.2},
+  {"n":"Turkey","a":49.8,"b":78.1},
+  {"n":"Italy","a":79.3,"b":78.6},
+  {"n":"Jordan","a":30.5,"b":82.2},
+  {"n":"Tunisia","a":50.0,"b":87.6},
+  {"n":"Spain","a":92.7,"b":88.3},
+  {"n":"Kyrgyzstan","a":86.0,"b":88.8},
+  {"n":"France","a":88.8,"b":90.0},
+  {"n":"Sweden","a":95.2,"b":95.8},
+  {"n":"Germany","a":96.2,"b":98.3},
+  {"n":"Chile","a":73.3,"b":98.7},
+  {"n":"Japan","a":96.5,"b":99.2},
+  {"n":"Kuwait","a":100.0,"b":100.0},
+  {"n":"Singapore","a":100.0,"b":100.0}
+];
+
+const W = 700, H = 860;
+const pad = { left: 120, right: 120, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 0, maxV = 100;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+["~2000", "~2024"].forEach((lbl, i) => {
+  const x = i === 0 ? xLeft : xRight;
+  const t = mkEl("text", {
+    x, y: pad.top - 14, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "10", fill: "#7A786F"
+  });
+  t.textContent = lbl;
+  svg.appendChild(t);
+});
+
+[xLeft, xRight].forEach(x => {
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+[0, 25, 50, 75, 100].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.4", "stroke-dasharray": "3,3"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 32, y: scale(v) + 3.5,
+    "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "8", fill: "#9A9890"
+  })).textContent = v + "%";
+});
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 40) return "#3D7A5A";
+  if (change > 20) return "#5B9E78";
+  if (change > 5) return "#8BAD72";
+  if (change >= -2) return "#C49A45";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+const resolvedLeft = resolveCollisions(leftLabels, 12);
+const resolvedRight = resolveCollisions(rightLabels, 12);
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const color = colorForChange(d);
+
+  const g = mkEl("g", {});
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  });
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "10"
+  });
+  const dotA = mkEl("circle", { cx: xLeft, cy: ya, r: "2.5", fill: color });
+  const dotB = mkEl("circle", { cx: xRight, cy: yb, r: "2.5", fill: color });
+
+  g.appendChild(line);
+  g.appendChild(dotA);
+  g.appendChild(dotB);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, d });
+
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach(r => r.g.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    const change = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (${change >= 0 ? '+' : ''}${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(r => { r.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+resolvedLeft.forEach(item => {
+  const rawY = scale(item.d.a);
+  const lblY = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft - 4, y1: rawY, x2: xLeft - 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: xLeft - 7, y: lblY + 3.5, "text-anchor": "end",
+    "font-size": "8.5", fill: "#2B2A27"
+  });
+  t.textContent = `${item.d.n}  ${item.d.a}`;
+  svg.appendChild(t);
+});
+
+resolvedRight.forEach(item => {
+  const rawY = scale(item.d.b);
+  const lblY = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xRight + 4, y1: rawY, x2: xRight + 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: xRight + 7, y: lblY + 3.5, "text-anchor": "start",
+    "font-size": "8.5", fill: "#2B2A27"
+  });
+  t.textContent = `${item.d.b}  ${item.d.n}`;
+  svg.appendChild(t);
+});
+
+const legendItems = [
+  { label: "Improved >40pp", color: "#3D7A5A" },
+  { label: "Improved 20–40pp", color: "#5B9E78" },
+  { label: "Improved 5–20pp", color: "#8BAD72" },
+  { label: "Stable (±5pp)", color: "#C49A45" },
+  { label: "Declined", color: "#B34B3B" }
+];
+legendItems.forEach((item, i) => {
+  const lx = pad.left + i * 118;
+  const ly = pad.top - 28;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 7, fill: item.color, rx: "1" }));
+  const lt = mkEl("text", {
+    x: lx + 13, y: ly - 1,
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "7.5", fill: "#7A786F"
+  });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Who Receives the Most Foreign Aid? Net ODA Per Capita, 2000–2023</h1>
+<p class="subtitle">Net official development assistance received per capita (current US$). Small island states and countries hosting large donor operations receive disproportionately high aid — Dominica spiked post-Hurricane Maria, Iraq flooded with post-invasion funds.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · Indicator DT.ODA.ODAT.PC.ZS · OECD DAC</p>
+<script>
+// Data exported from notebook -- do not modify
+const series = [
+  {"n":"Dominica","pts":[{"y":2000,"v":223},{"y":2001,"v":288},{"y":2002,"v":433},{"y":2003,"v":160},{"y":2004,"v":428},{"y":2005,"v":307},{"y":2006,"v":286},{"y":2007,"v":282},{"y":2008,"v":311},{"y":2009,"v":522},{"y":2010,"v":449},{"y":2011,"v":354},{"y":2012,"v":372},{"y":2013,"v":288},{"y":2014,"v":231},{"y":2015,"v":166},{"y":2016,"v":123},{"y":2017,"v":281},{"y":2018,"v":395},{"y":2019,"v":757},{"y":2020,"v":952},{"y":2021,"v":1177},{"y":2022,"v":891},{"y":2023,"v":791}]},
+  {"n":"Kiribati","pts":[{"y":2000,"v":191},{"y":2001,"v":123},{"y":2002,"v":218},{"y":2003,"v":172},{"y":2004,"v":151},{"y":2005,"v":272},{"y":2006,"v":255},{"y":2007,"v":269},{"y":2008,"v":259},{"y":2009,"v":236},{"y":2010,"v":204},{"y":2011,"v":583},{"y":2012,"v":585},{"y":2013,"v":571},{"y":2014,"v":699},{"y":2015,"v":556},{"y":2016,"v":514},{"y":2017,"v":641},{"y":2018,"v":656},{"y":2019,"v":457},{"y":2020,"v":460},{"y":2021,"v":567},{"y":2022,"v":698},{"y":2023,"v":742}]},
+  {"n":"Cabo Verde","pts":[{"y":2000,"v":209},{"y":2001,"v":170},{"y":2002,"v":198},{"y":2003,"v":307},{"y":2004,"v":300},{"y":2005,"v":336},{"y":2006,"v":283},{"y":2007,"v":335},{"y":2008,"v":443},{"y":2009,"v":389},{"y":2010,"v":598},{"y":2011,"v":491},{"y":2012,"v":480},{"y":2013,"v":479},{"y":2014,"v":452},{"y":2015,"v":299},{"y":2016,"v":225},{"y":2017,"v":240},{"y":2018,"v":164},{"y":2019,"v":297},{"y":2020,"v":309},{"y":2021,"v":283},{"y":2022,"v":161},{"y":2023,"v":195}]},
+  {"n":"Jordan","pts":[{"y":2000,"v":103},{"y":2001,"v":82},{"y":2002,"v":100},{"y":2003,"v":230},{"y":2004,"v":103},{"y":2005,"v":118},{"y":2006,"v":89},{"y":2007,"v":92},{"y":2008,"v":105},{"y":2009,"v":104},{"y":2010,"v":121},{"y":2011,"v":130},{"y":2012,"v":153},{"y":2013,"v":175},{"y":2014,"v":307},{"y":2015,"v":224},{"y":2016,"v":273},{"y":2017,"v":291},{"y":2018,"v":241},{"y":2019,"v":252},{"y":2020,"v":287},{"y":2021,"v":310},{"y":2022,"v":177},{"y":2023,"v":248}]},
+  {"n":"Bhutan","pts":[{"y":2000,"v":79},{"y":2001,"v":89},{"y":2002,"v":96},{"y":2003,"v":114},{"y":2004,"v":111},{"y":2005,"v":119},{"y":2006,"v":138},{"y":2007,"v":141},{"y":2008,"v":115},{"y":2009,"v":146},{"y":2010,"v":125},{"y":2011,"v":167},{"y":2012,"v":225},{"y":2013,"v":189},{"y":2014,"v":178},{"y":2015,"v":131},{"y":2016,"v":69},{"y":2017,"v":157},{"y":2018,"v":142},{"y":2019,"v":235},{"y":2020,"v":265},{"y":2021,"v":166},{"y":2022,"v":250},{"y":2023,"v":199}]},
+  {"n":"Djibouti","pts":[{"y":2000,"v":97},{"y":2001,"v":77},{"y":2002,"v":93},{"y":2003,"v":97},{"y":2004,"v":78},{"y":2005,"v":88},{"y":2006,"v":135},{"y":2007,"v":129},{"y":2008,"v":158},{"y":2009,"v":182},{"y":2010,"v":133},{"y":2011,"v":149},{"y":2012,"v":154},{"y":2013,"v":152},{"y":2014,"v":166},{"y":2015,"v":170},{"y":2016,"v":179},{"y":2017,"v":135},{"y":2018,"v":167},{"y":2019,"v":242},{"y":2020,"v":236},{"y":2021,"v":159},{"y":2022,"v":54},{"y":2023,"v":193}]},
+  {"n":"Georgia","pts":[{"y":2000,"v":42},{"y":2001,"v":73},{"y":2002,"v":80},{"y":2003,"v":58},{"y":2004,"v":80},{"y":2005,"v":75},{"y":2006,"v":92},{"y":2007,"v":99},{"y":2008,"v":213},{"y":2009,"v":208},{"y":2010,"v":139},{"y":2011,"v":145},{"y":2012,"v":177},{"y":2013,"v":174},{"y":2014,"v":152},{"y":2015,"v":121},{"y":2016,"v":124},{"y":2017,"v":120},{"y":2018,"v":158},{"y":2019,"v":133},{"y":2020,"v":280},{"y":2021,"v":208},{"y":2022,"v":101},{"y":2023,"v":98}]},
+  {"n":"Afghanistan","pts":[{"y":2000,"v":7},{"y":2001,"v":20},{"y":2002,"v":57},{"y":2003,"v":68},{"y":2004,"v":96},{"y":2005,"v":115},{"y":2006,"v":114},{"y":2007,"v":192},{"y":2008,"v":182},{"y":2009,"v":223},{"y":2010,"v":215},{"y":2011,"v":230},{"y":2012,"v":218},{"y":2013,"v":163},{"y":2014,"v":151},{"y":2015,"v":126},{"y":2016,"v":117},{"y":2017,"v":107},{"y":2018,"v":103},{"y":2019,"v":109},{"y":2020,"v":108},{"y":2021,"v":117},{"y":2022,"v":96},{"y":2023,"v":74}]},
+  {"n":"Iraq","pts":[{"y":2000,"v":4},{"y":2001,"v":5},{"y":2002,"v":4},{"y":2003,"v":85},{"y":2004,"v":169},{"y":2005,"v":776},{"y":2006,"v":311},{"y":2007,"v":324},{"y":2008,"v":341},{"y":2009,"v":93},{"y":2010,"v":68},{"y":2011,"v":60},{"y":2012,"v":39},{"y":2013,"v":44},{"y":2014,"v":37},{"y":2015,"v":39},{"y":2016,"v":59},{"y":2017,"v":74},{"y":2018,"v":57},{"y":2019,"v":51},{"y":2020,"v":56},{"y":2021,"v":42},{"y":2022,"v":36},{"y":2023,"v":45}]},
+  {"n":"Bosnia and Herzegovina","pts":[{"y":2000,"v":177},{"y":2001,"v":153},{"y":2002,"v":133},{"y":2003,"v":130},{"y":2004,"v":166},{"y":2005,"v":132},{"y":2006,"v":132},{"y":2007,"v":149},{"y":2008,"v":118},{"y":2009,"v":108},{"y":2010,"v":108},{"y":2011,"v":167},{"y":2012,"v":155},{"y":2013,"v":144},{"y":2014,"v":177},{"y":2015,"v":101},{"y":2016,"v":128},{"y":2017,"v":128},{"y":2018,"v":105},{"y":2019,"v":138},{"y":2020,"v":133},{"y":2021,"v":174},{"y":2022,"v":89},{"y":2023,"v":97}]}
+];
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 140, bottom: 30, left: 55 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 2000, yearMax = 2023;
+const allVals = series.flatMap(s => s.pts.map(p => p.v));
+const valMin = 0, valMax = 1250;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[0, 250, 500, 750, 1000, 1250].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3.5,
+    "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9", fill: "#7A786F"
+  })).textContent = "$" + v;
+});
+
+// X-axis years
+[2000, 2005, 2010, 2015, 2020, 2023].forEach(y => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 12,
+    "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9", fill: "#7A786F"
+  })).textContent = y;
+});
+
+const palette = [
+  "#EA5E33", "#F29A44", "#3D7A5A", "#5B9E78", "#8BAD72",
+  "#C49A45", "#C4715A", "#B34B3B", "#7A6B5A", "#A6C4A2"
+];
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+series.forEach((s, si) => {
+  const color = palette[si % palette.length];
+  const pts = s.pts;
+
+  const pathD = pts.map((p, i) =>
+    `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`
+  ).join(" ");
+
+  const g = mkEl("g", {});
+  g.style.cursor = "crosshair";
+
+  const line = mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+
+  const hitPath = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12",
+    fill: "none"
+  });
+
+  g.appendChild(line);
+  g.appendChild(hitPath);
+  svg.appendChild(g);
+  groups.push({ g, line, s, color });
+
+  hitPath.addEventListener("mouseenter", e => {
+    groups.forEach(r => r.g.style.opacity = "0.08");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yearIdx = Math.round(ratio * (pts.length - 1));
+    const pt = pts[Math.max(0, Math.min(pts.length - 1, yearIdx))];
+    tip.textContent = `${s.n}: $${pt.v}/capita (${pt.y})`;
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+    tip.style.opacity = "1";
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    groups.forEach(r => { r.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+// Endpoint labels with collision resolution
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const endLabels = series.map((s, si) => {
+  const last = s.pts[s.pts.length - 1];
+  return { s, y: yScale(last.v), rawY: yScale(last.v), color: palette[si % palette.length], v: last.v };
+});
+const resolved = resolveCollisions(endLabels, 12);
+
+resolved.forEach(item => {
+  const rawY = item.rawY;
+  const lblY = Math.max(margin.top + 5, Math.min(H - margin.bottom - 5, item.y));
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: W - margin.right + 4, y1: rawY,
+      x2: W - margin.right + 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: W - margin.right + 8, y: lblY + 3.5,
+    "text-anchor": "start",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9", fill: item.color
+  });
+  t.textContent = item.s.n;
+  svg.appendChild(t);
+});
+</script>
+</body></html>

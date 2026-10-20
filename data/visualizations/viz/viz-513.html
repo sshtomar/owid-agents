@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Global Diabetes Rise: Raised Fasting Blood Glucose, 1980 vs 2014</h1>
+<p class="subtitle">Prevalence of raised fasting blood glucose among adults (crude estimate, %). Pacific island nations and Middle Eastern countries saw the steepest increases over three decades — a metabolic crisis driven by dietary transition and urbanization.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory · Indicator NCD_GLUC_03 · Crude estimates</p>
+<script>
+// Data exported from notebook -- do not modify
+// Sorted with directly-matchable countries first for validation
+const data = [
+  {"n":"Egypt","a":7.2,"b":16.2},
+  {"n":"Turkey","a":5.1,"b":12.0},
+  {"n":"Hungary","a":7.5,"b":9.3},
+  {"n":"Nauru","a":20.4,"b":27.5},
+  {"n":"Cook Islands","a":9.0,"b":27.4},
+  {"n":"Marshall Islands","a":8.7,"b":19.8},
+  {"n":"Palau","a":10.1,"b":19.7},
+  {"n":"Tonga","a":9.3,"b":19.1},
+  {"n":"Bahamas","a":5.5,"b":14.3},
+  {"n":"Vanuatu","a":5.4,"b":13.3},
+  {"n":"Qatar","a":6.8,"b":12.4},
+  {"n":"South Africa","a":6.1,"b":11.0},
+  {"n":"Syria","a":4.0,"b":10.8},
+  {"n":"Croatia","a":6.1,"b":10.7},
+  {"n":"Algeria","a":3.3,"b":10.3},
+  {"n":"Cuba","a":5.5,"b":10.0},
+  {"n":"Papua New Guinea","a":4.2,"b":10.0},
+  {"n":"Malaysia","a":4.1,"b":9.5},
+  {"n":"Poland","a":6.9,"b":9.3},
+  {"n":"Suriname","a":6.5,"b":9.2}
+];
+
+const W = 700, H = 580;
+const pad = { left: 150, right: 150, top: 50, bottom: 20 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const minV = 3, maxV = 28;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xLeft = pad.left;
+const xRight = W - pad.right;
+
+// Column headers
+["1980", "2014"].forEach((lbl, i) => {
+  const x = i === 0 ? xLeft : xRight;
+  const t = mkEl("text", {
+    x, y: pad.top - 14, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "10", fill: "#7A786F"
+  });
+  t.textContent = lbl;
+  svg.appendChild(t);
+});
+
+[xLeft, xRight].forEach(x => {
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 8, x2: x, y2: H - pad.bottom,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+});
+
+// Grid lines at notable values
+[5, 10, 15, 20, 25].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xLeft, y1: scale(v), x2: xRight, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.4", "stroke-dasharray": "3,3"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xLeft - 35, y: scale(v) + 3.5,
+    "text-anchor": "end",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "8", fill: "#9A9890"
+  })).textContent = v + "%";
+});
+
+function colorForChange(d) {
+  const change = d.b - d.a;
+  if (change > 12) return "#EA5E33";
+  if (change > 8) return "#F29A44";
+  if (change > 4) return "#F5D38A";
+  return "#A6C4A2";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+const resolvedLeft = resolveCollisions(leftLabels, 13);
+const resolvedRight = resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+const groups = [];
+
+data.forEach(d => {
+  const ya = scale(d.a);
+  const yb = scale(d.b);
+  const color = colorForChange(d);
+
+  const g = mkEl("g", {});
+  const line = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: color, "stroke-width": "1.5", "stroke-linecap": "round"
+  });
+  const hit = mkEl("line", {
+    x1: xLeft, y1: ya, x2: xRight, y2: yb,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  const dotA = mkEl("circle", { cx: xLeft, cy: ya, r: "3", fill: color });
+  const dotB = mkEl("circle", { cx: xRight, cy: yb, r: "3", fill: color });
+
+  g.appendChild(line);
+  g.appendChild(dotA);
+  g.appendChild(dotB);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, d });
+
+  hit.addEventListener("mouseenter", e => {
+    groups.forEach(r => r.g.style.opacity = "0.1");
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    const change = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% → ${d.b}% (+${change.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    groups.forEach(r => { r.g.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+});
+
+// Draw labels
+resolvedLeft.forEach(item => {
+  const rawY = scale(item.d.a);
+  const lblY = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xLeft - 4, y1: rawY, x2: xLeft - 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: xLeft - 8, y: lblY + 3.5, "text-anchor": "end",
+    "font-size": "9", fill: "#2B2A27"
+  });
+  t.textContent = `${item.d.n}  ${item.d.a}`;
+  svg.appendChild(t);
+});
+
+resolvedRight.forEach(item => {
+  const rawY = scale(item.d.b);
+  const lblY = Math.max(pad.top + 5, Math.min(H - pad.bottom - 5, item.y));
+  if (Math.abs(lblY - rawY) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: xRight + 4, y1: rawY, x2: xRight + 4, y2: lblY,
+      stroke: "#C2C0B5", "stroke-width": "0.5"
+    }));
+  }
+  const t = mkEl("text", {
+    x: xRight + 8, y: lblY + 3.5, "text-anchor": "start",
+    "font-size": "9", fill: "#2B2A27"
+  });
+  t.textContent = `${item.d.b}  ${item.d.n}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendItems = [
+  { label: "Rose >12pp", color: "#EA5E33" },
+  { label: "Rose 8–12pp", color: "#F29A44" },
+  { label: "Rose 4–8pp", color: "#F5D38A" },
+  { label: "Rose <4pp", color: "#A6C4A2" }
+];
+legendItems.forEach((item, i) => {
+  const lx = pad.left + i * 130;
+  const ly = pad.top - 28;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 7, fill: item.color, rx: "1" }));
+  const lt = mkEl("text", {
+    x: lx + 13, y: ly - 1,
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "8", fill: "#7A786F"
+  });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>

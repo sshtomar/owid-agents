@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Health Expenditure as a Share of GDP</h1>
+<p class="subtitle">Current health expenditure (public + private) as a percentage of gross domestic product. The USA stands well above all peers, while most low-income countries spend under 5% of GDP on health.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Expenditure Database (GHED) · Most recent year 2016–2023</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [
+  {"n":"United States","v":17.4,"y":2021},
+  {"n":"Japan","v":12.3,"y":2022},
+  {"n":"Austria","v":12.2,"y":2021},
+  {"n":"France","v":11.5,"y":2023},
+  {"n":"Germany","v":11.2,"y":2018},
+  {"n":"Portugal","v":11.2,"y":2021},
+  {"n":"United Kingdom","v":11.1,"y":2022},
+  {"n":"Netherlands","v":11.1,"y":2021},
+  {"n":"Chile","v":9.7,"y":2020},
+  {"n":"Finland","v":9.9,"y":2021},
+  {"n":"Norway","v":9.8,"y":2021},
+  {"n":"Greece","v":9.0,"y":2021},
+  {"n":"South Africa","v":8.7,"y":2021},
+  {"n":"South Korea","v":8.3,"y":2021},
+  {"n":"Russia","v":7.0,"y":2023},
+  {"n":"Mexico","v":6.1,"y":2020},
+  {"n":"Morocco","v":5.8,"y":2022},
+  {"n":"China","v":5.3,"y":2019},
+  {"n":"Thailand","v":5.2,"y":2021},
+  {"n":"Vietnam","v":5.0,"y":2019},
+  {"n":"Egypt","v":4.7,"y":2018},
+  {"n":"Tanzania","v":4.3,"y":2018},
+  {"n":"Indonesia","v":3.7,"y":2021},
+  {"n":"Nigeria","v":3.1,"y":2018},
+  {"n":"Pakistan","v":3.0,"y":2020},
+  {"n":"Ethiopia","v":2.8,"y":2023}
+];
+
+const W = 700, H = 560;
+const ml = 150, mr = 80, mt = 20, mb = 30;
+const chartW = W - ml - mr;
+const rowH = (H - mt - mb) / data.length;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "default";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const maxV = 18;
+const xScale = v => ml + (v / maxV) * chartW;
+
+// Color by value band
+function colorFor(v) {
+  if (v >= 12) return "#EA5E33";
+  if (v >= 9) return "#F29A44";
+  if (v >= 6) return "#F5D38A";
+  return "#A6C4A2";
+}
+
+// Grid lines
+[0, 3, 6, 9, 12, 15, 18].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mt, x2: x, y2: H - mb,
+    stroke: "#E2E0D5", "stroke-width": v === 0 ? "0.5" : "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: x, y: H - mb + 12, "text-anchor": "middle",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9", fill: "#7A786F"
+  })).textContent = v + "%";
+});
+
+const tip = document.getElementById("tip");
+const rows = [];
+
+data.forEach((d, i) => {
+  const y = mt + i * rowH + rowH * 0.1;
+  const bh = rowH * 0.8;
+  const bw = xScale(d.v) - ml;
+  const color = colorFor(d.v);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "crosshair";
+
+  // Background hit area
+  const bg = mkEl("rect", {
+    x: 0, y: y - 1, width: W, height: bh + 2,
+    fill: "transparent"
+  });
+
+  // Bar
+  const bar = mkEl("rect", {
+    x: ml, y: y, width: bw, height: bh,
+    fill: color, rx: "1.5"
+  });
+
+  // Country label
+  const lbl = mkEl("text", {
+    x: ml - 6, y: y + bh * 0.5 + 4,
+    "text-anchor": "end",
+    "font-size": "10", fill: "#2B2A27", "font-weight": "500"
+  });
+  lbl.textContent = d.n;
+
+  // Value label at bar end
+  const vlbl = mkEl("text", {
+    x: xScale(d.v) + 5, y: y + bh * 0.5 + 4,
+    "text-anchor": "start",
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "9", fill: "#7A786F"
+  });
+  vlbl.textContent = d.v + "%";
+
+  g.appendChild(bg);
+  g.appendChild(bar);
+  g.appendChild(lbl);
+  g.appendChild(vlbl);
+  svg.appendChild(g);
+  rows.push({ g, bar, lbl, vlbl, d });
+
+  bg.addEventListener("mouseenter", e => {
+    rows.forEach(r => { r.bar.style.opacity = "0.2"; r.lbl.style.opacity = "0.3"; r.vlbl.style.opacity = "0.3"; });
+    bar.style.opacity = "1"; lbl.style.opacity = "1"; vlbl.style.opacity = "1";
+    tip.textContent = `${d.n}: ${d.v}% of GDP (${d.y})`;
+    tip.style.opacity = "1";
+  });
+  bg.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  bg.addEventListener("mouseleave", () => {
+    rows.forEach(r => { r.bar.style.opacity = "1"; r.lbl.style.opacity = "1"; r.vlbl.style.opacity = "1"; });
+    tip.style.opacity = "0";
+  });
+});
+
+// Legend
+const legendItems = [
+  { label: "≥12%", color: "#EA5E33" },
+  { label: "9–12%", color: "#F29A44" },
+  { label: "6–9%", color: "#F5D38A" },
+  { label: "<6%", color: "#A6C4A2" }
+];
+legendItems.forEach((item, i) => {
+  const lx = ml + i * 90;
+  const ly = H - 6;
+  svg.appendChild(mkEl("rect", { x: lx, y: ly - 8, width: 10, height: 8, fill: item.color, rx: "1" }));
+  const lt = mkEl("text", {
+    x: lx + 13, y: ly - 1,
+    "font-family": "'JetBrains Mono', monospace",
+    "font-size": "8", fill: "#7A786F"
+  });
+  lt.textContent = item.label;
+  svg.appendChild(lt);
+});
+</script>
+</body></html>
