@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; max-width: 860px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0; transition: opacity 0.1s;
+      background: #1e293b; color: #f8fafc; font-size: 12px; padding: 6px 10px;
+      border-radius: 6px; white-space: nowrap; z-index: 10;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Suicide Mortality Rates, 2000–2021</h1>
+  <p class="subtitle">Age-standardized deaths per 100,000 population. Eastern European countries saw dramatic declines; South Korea rose sharply before pulling back.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank / WHO Global Health Observatory &nbsp;·&nbsp; Indicator: SH.STA.SUIC.P5</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Korea, Rep.","pts":[{"y":2000,"v":15.06},{"y":2001,"v":16.14},{"y":2002,"v":19.56},{"y":2003,"v":24.9},{"y":2004,"v":26.21},{"y":2005,"v":27.58},{"y":2006,"v":24.45},{"y":2007,"v":27.55},{"y":2008,"v":29.29},{"y":2009,"v":35.12},{"y":2010,"v":34.92},{"y":2011,"v":35.49},{"y":2012,"v":31.01},{"y":2013,"v":31.21},{"y":2014,"v":29.35},{"y":2015,"v":28.23},{"y":2016,"v":27.06},{"y":2017,"v":25.61},{"y":2018,"v":28.28},{"y":2019,"v":28.44},{"y":2020,"v":27.16},{"y":2021,"v":27.53}]},{"n":"Japan","pts":[{"y":2000,"v":24.12},{"y":2001,"v":23.4},{"y":2002,"v":24.05},{"y":2003,"v":25.81},{"y":2004,"v":24.31},{"y":2005,"v":24.56},{"y":2006,"v":24.09},{"y":2007,"v":25.19},{"y":2008,"v":24.62},{"y":2009,"v":25.12},{"y":2010,"v":24.31},{"y":2011,"v":23.52},{"y":2012,"v":21.8},{"y":2013,"v":21.54},{"y":2014,"v":20.23},{"y":2015,"v":19.3},{"y":2016,"v":17.67},{"y":2017,"v":17.19},{"y":2018,"v":16.87},{"y":2019,"v":16.47},{"y":2020,"v":17.16},{"y":2021,"v":17.43}]},{"n":"Belgium","pts":[{"y":2000,"v":22.07},{"y":2001,"v":22.25},{"y":2002,"v":20.96},{"y":2003,"v":21.44},{"y":2004,"v":20.32},{"y":2005,"v":20.66},{"y":2006,"v":20.29},{"y":2007,"v":18.74},{"y":2008,"v":20.24},{"y":2009,"v":20.56},{"y":2010,"v":20.53},{"y":2011,"v":21.21},{"y":2012,"v":20.9},{"y":2013,"v":19.62},{"y":2014,"v":19.42},{"y":2015,"v":18.61},{"y":2016,"v":19.22},{"y":2017,"v":18.4},{"y":2018,"v":18.58},{"y":2019,"v":18.11},{"y":2020,"v":16.89},{"y":2021,"v":18.36}]},{"n":"France","pts":[{"y":2000,"v":20.32},{"y":2001,"v":19.57},{"y":2002,"v":19.9},{"y":2003,"v":20.18},{"y":2004,"v":19.53},{"y":2005,"v":19.17},{"y":2006,"v":18.46},{"y":2007,"v":18.03},{"y":2008,"v":18.26},{"y":2009,"v":18.43},{"y":2010,"v":18.23},{"y":2011,"v":18.04},{"y":2012,"v":17.13},{"y":2013,"v":16.98},{"y":2014,"v":15.66},{"y":2015,"v":15.57},{"y":2016,"v":14.63},{"y":2017,"v":14.78},{"y":2018,"v":15.17},{"y":2019,"v":15.05},{"y":2020,"v":16.25},{"y":2021,"v":16.58}]},{"n":"Germany","pts":[{"y":2000,"v":14.42},{"y":2001,"v":14.47},{"y":2002,"v":14.56},{"y":2003,"v":14.37},{"y":2004,"v":13.99},{"y":2005,"v":13.28},{"y":2006,"v":12.78},{"y":2007,"v":12.38},{"y":2008,"v":12.52},{"y":2009,"v":12.74},{"y":2010,"v":13.23},{"y":2011,"v":13.24},{"y":2012,"v":12.92},{"y":2013,"v":13.48},{"y":2014,"v":13.44},{"y":2015,"v":13.3},{"y":2016,"v":12.99},{"y":2017,"v":12.53},{"y":2018,"v":12.82},{"y":2019,"v":12.49},{"y":2020,"v":12.87},{"y":2021,"v":12.9}]},{"n":"Belarus","pts":[{"y":2000,"v":39.5},{"y":2001,"v":39.31},{"y":2002,"v":40.32},{"y":2003,"v":40.29},{"y":2004,"v":40.37},{"y":2005,"v":40.52},{"y":2006,"v":37.48},{"y":2007,"v":34.05},{"y":2008,"v":36.29},{"y":2009,"v":36.37},{"y":2010,"v":34.16},{"y":2011,"v":34.48},{"y":2012,"v":28.49},{"y":2013,"v":25.51},{"y":2014,"v":23.61},{"y":2015,"v":21.92},{"y":2016,"v":20.88},{"y":2017,"v":18.95},{"y":2018,"v":18.67},{"y":2019,"v":17.52},{"y":2020,"v":16.27},{"y":2021,"v":15.61}]},{"n":"Hungary","pts":[{"y":2000,"v":33.26},{"y":2001,"v":29.7},{"y":2002,"v":28.52},{"y":2003,"v":27.99},{"y":2004,"v":27.46},{"y":2005,"v":26.35},{"y":2006,"v":24.93},{"y":2007,"v":24.95},{"y":2008,"v":25.34},{"y":2009,"v":25.3},{"y":2010,"v":25.56},{"y":2011,"v":25.23},{"y":2012,"v":25.04},{"y":2013,"v":22.3},{"y":2014,"v":20.6},{"y":2015,"v":20.01},{"y":2016,"v":18.82},{"y":2017,"v":17.42},{"y":2018,"v":17.75},{"y":2019,"v":16.65},{"y":2020,"v":18.22},{"y":2021,"v":16.45}]},{"n":"India","pts":[{"y":2000,"v":15.93},{"y":2001,"v":15.1},{"y":2002,"v":15.14},{"y":2003,"v":15.03},{"y":2004,"v":15.4},{"y":2005,"v":15.68},{"y":2006,"v":15.86},{"y":2007,"v":15.86},{"y":2008,"v":15.8},{"y":2009,"v":15.68},{"y":2010,"v":15.9},{"y":2011,"v":15.85},{"y":2012,"v":15.88},{"y":2013,"v":15.68},{"y":2014,"v":15.12},{"y":2015,"v":14.63},{"y":2016,"v":14.62},{"y":2017,"v":14.87},{"y":2018,"v":14.31},{"y":2019,"v":13.98},{"y":2020,"v":13.01},{"y":2021,"v":12.56}]},{"n":"Brazil","pts":[{"y":2000,"v":4.23},{"y":2001,"v":4.7},{"y":2002,"v":4.65},{"y":2003,"v":4.65},{"y":2004,"v":4.74},{"y":2005,"v":4.99},{"y":2006,"v":4.97},{"y":2007,"v":5.18},{"y":2008,"v":5.41},{"y":2009,"v":5.42},{"y":2010,"v":5.25},{"y":2011,"v":5.48},{"y":2012,"v":5.64},{"y":2013,"v":5.79},{"y":2014,"v":5.85},{"y":2015,"v":6.11},{"y":2016,"v":6.25},{"y":2017,"v":6.89},{"y":2018,"v":6.68},{"y":2019,"v":6.71},{"y":2020,"v":6.93},{"y":2021,"v":7.59}]},{"n":"Indonesia","pts":[{"y":2000,"v":2.15},{"y":2001,"v":2.16},{"y":2002,"v":2.14},{"y":2003,"v":2.09},{"y":2004,"v":2.03},{"y":2005,"v":2},{"y":2006,"v":1.96},{"y":2007,"v":1.94},{"y":2008,"v":1.9},{"y":2009,"v":1.86},{"y":2010,"v":1.82},{"y":2011,"v":1.76},{"y":2012,"v":1.74},{"y":2013,"v":1.67},{"y":2014,"v":1.62},{"y":2015,"v":1.6},{"y":2016,"v":1.59},{"y":2017,"v":1.59},{"y":2018,"v":1.58},{"y":2019,"v":1.6},{"y":2020,"v":1.38},{"y":2021,"v":1.2}]},{"n":"Finland","pts":[{"y":2000,"v":24.13},{"y":2001,"v":24.31},{"y":2002,"v":22.16},{"y":2003,"v":21.85},{"y":2004,"v":21.31},{"y":2005,"v":19.96},{"y":2006,"v":21.1},{"y":2007,"v":19.68},{"y":2008,"v":20.56},{"y":2009,"v":20.33},{"y":2010,"v":18.63},{"y":2011,"v":17.74},{"y":2012,"v":16.85},{"y":2013,"v":17.2},{"y":2014,"v":15.52},{"y":2015,"v":14.09},{"y":2016,"v":15.29},{"y":2017,"v":15.71},{"y":2018,"v":15.67},{"y":2019,"v":14.38},{"y":2020,"v":14.14},{"y":2021,"v":14.57}]},{"n":"Guyana","pts":[{"y":2000,"v":26.74},{"y":2001,"v":29.74},{"y":2002,"v":29.04},{"y":2003,"v":28.78},{"y":2004,"v":27.43},{"y":2005,"v":26.72},{"y":2006,"v":26.93},{"y":2007,"v":26.87},{"y":2008,"v":26.3},{"y":2009,"v":28.46},{"y":2010,"v":28.77},{"y":2011,"v":29.11},{"y":2012,"v":30.78},{"y":2013,"v":33.32},{"y":2014,"v":33.64},{"y":2015,"v":33.24},{"y":2016,"v":34.25},{"y":2017,"v":32.01},{"y":2018,"v":29.05},{"y":2019,"v":27.64},{"y":2020,"v":29.53},{"y":2021,"v":24.78}]}];
+
+    const W = 860, H = 480;
+    const margin = { top: 36, right: 110, bottom: 36, left: 50 };
+    const yearMin = 2000, yearMax = 2021;
+    const allVals = data.flatMap(d => d.pts.map(p => p.v));
+    const valMin = 0, valMax = Math.ceil(Math.max(...allVals) / 5) * 5;
+
+    const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+    const COLORS = [
+      "#EA5E33","#3D7A5A","#5B9E78","#C49A45","#6B63C4","#C4715A",
+      "#2C8FC4","#8BAD72","#B34B3B","#A67CAA","#5B8FC4","#C4A045"
+    ];
+
+    const ns = s => "http://www.w3.org/2000/svg";
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS(ns(), tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:860px" });
+    document.getElementById("chart").appendChild(svg);
+
+    // Grid lines
+    for (let v = 0; v <= valMax; v += 10) {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+      const lbl = mkEl("text", { x: margin.left - 6, y: y + 4, "text-anchor": "end", "font-size": "10", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace" });
+      lbl.textContent = v;
+      svg.appendChild(lbl);
+    }
+
+    // X-axis ticks
+    for (let yr = 2000; yr <= 2021; yr += 3) {
+      const x = xScale(yr);
+      svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+      const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "10", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace" });
+      lbl.textContent = yr;
+      svg.appendChild(lbl);
+    }
+
+    const groups = [];
+    data.forEach((series, i) => {
+      const color = COLORS[i % COLORS.length];
+      const g = mkEl("g", {});
+
+      const pathD = series.pts.map((p, j) =>
+        `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`
+      ).join(" ");
+
+      g.appendChild(mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" }));
+
+      // Invisible hit path
+      const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+      g.appendChild(hit);
+
+      // Endpoint label
+      const last = series.pts[series.pts.length - 1];
+      groups.push({ g, color, series, labelY: yScale(last.v) });
+      svg.appendChild(g);
+    });
+
+    // Collision-resolve endpoint labels
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.labelY - b.labelY);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].labelY - sorted[i - 1].labelY;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].labelY -= shift;
+            sorted[i].labelY += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const resolved = resolveCollisions(groups.map(g => ({ ...g })), 12);
+    const labelXBase = W - margin.right + 6;
+    resolved.forEach(item => {
+      const last = item.series.pts[item.series.pts.length - 1];
+      const origY = yScale(last.v);
+      const lbl = mkEl("text", {
+        x: labelXBase, y: item.labelY + 3,
+        "font-size": "9", fill: item.color, "font-family": "JetBrains Mono, monospace", "font-weight": "500"
+      });
+      lbl.textContent = `${last.v.toFixed(1)}  ${item.series.n}`;
+      item.g.appendChild(lbl);
+
+      // Leader line if displaced
+      if (Math.abs(item.labelY - origY) > 3) {
+        item.g.appendChild(mkEl("line", {
+          x1: W - margin.right, y1: origY,
+          x2: labelXBase - 2, y2: item.labelY,
+          stroke: item.color, "stroke-width": "0.5", opacity: "0.5"
+        }));
+      }
+    });
+
+    // Interactivity
+    const tip = document.getElementById("tip");
+    groups.forEach(({ g, series, color }) => {
+      const hitPath = g.querySelector("[stroke='transparent']");
+      const lines = g.querySelectorAll("[stroke]:not([stroke='transparent'])");
+
+      hitPath.addEventListener("mousemove", e => {
+        // Dim others
+        groups.forEach(other => {
+          if (other.g !== g) {
+            other.g.querySelectorAll("path[stroke-width='1.8']").forEach(p => p.setAttribute("opacity", "0.1"));
+            other.g.querySelectorAll("text").forEach(t => t.setAttribute("opacity", "0.1"));
+          }
+        });
+        lines.forEach(l => l.setAttribute("stroke-width", "3"));
+
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const idx = Math.round(ratio * (series.pts.length - 1));
+        const pt = series.pts[idx];
+        tip.textContent = `${series.n}  ${pt.y}: ${pt.v.toFixed(1)} per 100k`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+
+      hitPath.addEventListener("mouseleave", () => {
+        groups.forEach(other => {
+          other.g.querySelectorAll("path[stroke-width]").forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "1.8"); });
+          other.g.querySelectorAll("text").forEach(t => t.setAttribute("opacity", "1"));
+        });
+        tip.style.opacity = "0";
+      });
+    });
+  </script>
+</body>
+</html>

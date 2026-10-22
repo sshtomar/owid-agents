@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 24px; background: #fff; color: #0f172a; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+    .subtitle { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+    #chart { width: 100%; max-width: 860px; }
+    .source { font-size: 11px; color: #94a3b8; margin-top: 12px; }
+    #tip {
+      position: fixed; pointer-events: none; opacity: 0; transition: opacity 0.1s;
+      background: #1e293b; color: #f8fafc; font-size: 12px; padding: 6px 10px;
+      border-radius: 6px; white-space: nowrap; z-index: 10;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Stock Market Capitalization, 1990–2024</h1>
+  <p class="subtitle">Listed domestic companies, market cap as % of GDP. India surpassed Japan to become a major market; Canada and Australia have outsized financial sectors.</p>
+  <div id="chart"></div>
+  <p class="source">Source: World Bank &nbsp;·&nbsp; Indicator: CM.MKT.LCAP.GD.ZS</p>
+  <div id="tip"></div>
+  <script>
+    const data = [{"n":"Japan","pts":[{"y":1990,"v":90.0},{"y":1991,"v":80.7},{"y":1992,"v":55.5},{"y":1993,"v":62.7},{"y":1994,"v":70.4},{"y":1995,"v":62.9},{"y":1996,"v":60.1},{"y":1997,"v":45.5},{"y":1998,"v":58.8},{"y":1999,"v":95.0},{"y":2000,"v":62.6},{"y":2001,"v":51.0},{"y":2002,"v":48.7},{"y":2003,"v":64.6},{"y":2004,"v":72.0},{"y":2005,"v":93.8},{"y":2006,"v":99.3},{"y":2007,"v":93.6},{"y":2008,"v":60.4},{"y":2009,"v":61.9},{"y":2010,"v":65.9},{"y":2011,"v":53.0},{"y":2012,"v":54.9},{"y":2013,"v":86.2},{"y":2014,"v":87.8},{"y":2015,"v":107.9},{"y":2016,"v":97.0},{"y":2017,"v":123.5},{"y":2018,"v":102.8},{"y":2019,"v":118.0},{"y":2020,"v":129.5},{"y":2021,"v":125.2},{"y":2022,"v":121.0},{"y":2023,"v":140.2},{"y":2024,"v":150.6}]},{"n":"China","pts":[{"y":2003,"v":30.5},{"y":2004,"v":22.6},{"y":2005,"v":17.3},{"y":2006,"v":41.0},{"y":2007,"v":124.3},{"y":2008,"v":38.1},{"y":2009,"v":68.9},{"y":2010,"v":65.0},{"y":2011,"v":44.5},{"y":2012,"v":42.6},{"y":2013,"v":40.5},{"y":2014,"v":56.3},{"y":2015,"v":72.6},{"y":2016,"v":63.9},{"y":2017,"v":69.5},{"y":2018,"v":44.7},{"y":2019,"v":58.9},{"y":2020,"v":81.9},{"y":2021,"v":79.3},{"y":2022,"v":62.6},{"y":2023,"v":59.9},{"y":2024,"v":62.8}]},{"n":"India","pts":[{"y":2000,"v":48.2},{"y":2001,"v":30.6},{"y":2002,"v":33.4},{"y":2003,"v":50.8},{"y":2004,"v":58.6},{"y":2005,"v":76.2},{"y":2006,"v":95.2},{"y":2007,"v":161.2},{"y":2008,"v":66.0},{"y":2009,"v":101.9},{"y":2010,"v":105.2},{"y":2011,"v":68.3},{"y":2012,"v":76.1},{"y":2013,"v":68.1},{"y":2014,"v":82.7},{"y":2015,"v":83.0},{"y":2016,"v":76.1},{"y":2017,"v":96.4},{"y":2018,"v":153.2},{"y":2019,"v":76.3},{"y":2020,"v":95.4},{"y":2021,"v":112.0},{"y":2022,"v":104.2},{"y":2023,"v":124.0},{"y":2024,"v":136.4}]},{"n":"France","pts":[{"y":1990,"v":24.8},{"y":1991,"v":28.5},{"y":1992,"v":23.6},{"y":1993,"v":34.7},{"y":1994,"v":32.7},{"y":1995,"v":31.3},{"y":1996,"v":36.6},{"y":1997,"v":46.5},{"y":1998,"v":10.1},{"y":1999,"v":101.1},{"y":2000,"v":106.3},{"y":2001,"v":85.7},{"y":2002,"v":64.8},{"y":2003,"v":73.9},{"y":2004,"v":73.9},{"y":2005,"v":80.2},{"y":2006,"v":104.8},{"y":2007,"v":103.2},{"y":2008,"v":50.3},{"y":2009,"v":72.1},{"y":2010,"v":72.2},{"y":2011,"v":54.1},{"y":2012,"v":67.4},{"y":2013,"v":81.7},{"y":2014,"v":72.9},{"y":2015,"v":85.5},{"y":2016,"v":87.4},{"y":2017,"v":106.2},{"y":2018,"v":85.1}]},{"n":"Germany","pts":[{"y":1990,"v":20.0},{"y":1991,"v":19.8},{"y":1992,"v":15.3},{"y":1993,"v":21.2},{"y":1994,"v":22.5},{"y":1995,"v":22.3},{"y":1996,"v":26.5},{"y":1997,"v":37.2},{"y":1998,"v":48.7},{"y":1999,"v":64.7},{"y":2000,"v":64.6},{"y":2001,"v":54.5},{"y":2002,"v":32.6},{"y":2003,"v":42.6},{"y":2004,"v":41.9},{"y":2005,"v":41.5},{"y":2006,"v":53.8},{"y":2007,"v":60.4},{"y":2008,"v":29.2},{"y":2009,"v":37.2},{"y":2010,"v":41.2},{"y":2011,"v":31.0},{"y":2012,"v":41.3},{"y":2013,"v":50.9},{"y":2014,"v":43.8},{"y":2015,"v":50.1},{"y":2016,"v":48.5},{"y":2017,"v":60.1},{"y":2018,"v":43.3},{"y":2019,"v":53.0},{"y":2020,"v":58.0},{"y":2021,"v":57.5},{"y":2022,"v":45.0},{"y":2023,"v":47.7},{"y":2024,"v":43.6}]},{"n":"Korea, Rep.","pts":[{"y":1990,"v":37.8},{"y":1991,"v":28.3},{"y":1992,"v":29.3},{"y":1993,"v":34.4},{"y":1994,"v":40.0},{"y":1995,"v":31.0},{"y":1996,"v":22.0},{"y":1997,"v":7.1},{"y":1998,"v":28.8},{"y":1999,"v":59.4},{"y":2000,"v":28.7},{"y":2001,"v":41.2},{"y":2002,"v":38.6},{"y":2003,"v":45.2},{"y":2004,"v":52.0},{"y":2005,"v":73.9},{"y":2006,"v":76.2},{"y":2007,"v":91.9},{"y":2008,"v":43.1},{"y":2009,"v":84.9},{"y":2010,"v":91.5},{"y":2011,"v":76.2},{"y":2012,"v":88.3},{"y":2013,"v":86.1},{"y":2014,"v":77.9},{"y":2015,"v":80.0},{"y":2016,"v":79.4},{"y":2017,"v":103.6},{"y":2018,"v":77.5},{"y":2019,"v":84.8},{"y":2020,"v":124.8},{"y":2021,"v":114.2},{"y":2022,"v":91.4},{"y":2023,"v":106.7},{"y":2024,"v":83.0}]},{"n":"Brazil","pts":[{"y":2000,"v":34.5},{"y":2001,"v":33.3},{"y":2002,"v":24.9},{"y":2003,"v":42.0},{"y":2004,"v":49.4},{"y":2005,"v":53.2},{"y":2006,"v":64.1},{"y":2007,"v":98.0},{"y":2008,"v":34.9},{"y":2009,"v":80.2},{"y":2010,"v":70.0},{"y":2011,"v":47.0},{"y":2012,"v":49.8},{"y":2013,"v":41.3},{"y":2014,"v":34.4},{"y":2015,"v":27.2},{"y":2016,"v":42.2},{"y":2017,"v":46.3},{"y":2018,"v":47.8},{"y":2019,"v":63.4},{"y":2020,"v":67.0},{"y":2021,"v":48.8},{"y":2022,"v":40.7},{"y":2023,"v":45.2},{"y":2024,"v":30.1}]},{"n":"Australia","pts":[{"y":1990,"v":34.6},{"y":1991,"v":44.4},{"y":1992,"v":41.5},{"y":1993,"v":65.4},{"y":1994,"v":67.7},{"y":1995,"v":66.5},{"y":1996,"v":77.7},{"y":1997,"v":67.8},{"y":1998,"v":82.2},{"y":1999,"v":109.6},{"y":2000,"v":89.4},{"y":2001,"v":98.6},{"y":2002,"v":95.9},{"y":2003,"v":125.0},{"y":2004,"v":126.1},{"y":2005,"v":115.4},{"y":2006,"v":146.2},{"y":2007,"v":151.6},{"y":2008,"v":64.6},{"y":2009,"v":135.4},{"y":2010,"v":126.2},{"y":2011,"v":85.4},{"y":2012,"v":89.3},{"y":2013,"v":86.2},{"y":2014,"v":87.4},{"y":2015,"v":87.5},{"y":2016,"v":104.7},{"y":2017,"v":113.3},{"y":2018,"v":88.1},{"y":2019,"v":106.4},{"y":2020,"v":129.0},{"y":2021,"v":120.9},{"y":2022,"v":99.0},{"y":2023,"v":103.1},{"y":2024,"v":98.9}]},{"n":"Canada","pts":[{"y":1990,"v":76.9},{"y":1991,"v":83.0},{"y":1992,"v":77.0},{"y":1993,"v":102.8},{"y":1994,"v":99.3},{"y":1995,"v":110.9},{"y":1996,"v":139.5},{"y":1997,"v":154.3},{"y":1998,"v":170.7},{"y":1999,"v":213.5},{"y":2000,"v":103.5},{"y":2001,"v":83.3},{"y":2002,"v":116.8},{"y":2003,"v":101.6},{"y":2004,"v":114.7},{"y":2005,"v":126.3},{"y":2006,"v":128.9},{"y":2007,"v":148.9},{"y":2008,"v":66.6},{"y":2009,"v":122.0},{"y":2010,"v":134.2},{"y":2011,"v":106.7},{"y":2012,"v":112.7},{"y":2013,"v":114.5},{"y":2014,"v":116.0},{"y":2015,"v":102.4},{"y":2016,"v":130.5},{"y":2017,"v":143.5},{"y":2018,"v":112.3},{"y":2019,"v":138.2},{"y":2020,"v":159.5},{"y":2021,"v":163.3},{"y":2022,"v":125.5},{"y":2023,"v":141.1},{"y":2024,"v":148.7}]}];
+
+    const W = 860, H = 480;
+    const margin = { top: 30, right: 110, bottom: 36, left: 55 };
+    const yearMin = 1990, yearMax = 2024;
+    const allVals = data.flatMap(d => d.pts.map(p => p.v));
+    const valMax = 220, valMin = 0;
+
+    const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+    const COLORS = ["#EA5E33","#3D7A5A","#C49A45","#6B63C4","#C4715A","#2C8FC4","#B34B3B","#8BAD72","#A67CAA"];
+
+    const ns = "http://www.w3.org/2000/svg";
+    function mkEl(tag, attrs) {
+      const el = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+      return el;
+    }
+
+    const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:860px" });
+    document.getElementById("chart").appendChild(svg);
+
+    // Grid lines
+    for (let v = 0; v <= valMax; v += 50) {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", { x1: margin.left, y1: y, x2: W - margin.right, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+      const lbl = mkEl("text", { x: margin.left - 6, y: y + 4, "text-anchor": "end", "font-size": "10", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace" });
+      lbl.textContent = v + "%";
+      svg.appendChild(lbl);
+    }
+
+    // X-axis
+    for (let yr = 1990; yr <= 2024; yr += 5) {
+      const x = xScale(yr);
+      svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: H - margin.bottom, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+      const lbl = mkEl("text", { x, y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "10", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace" });
+      lbl.textContent = yr;
+      svg.appendChild(lbl);
+    }
+
+    // 100% reference line
+    svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(100), x2: W - margin.right, y2: yScale(100), stroke: "#C2C0B5", "stroke-dasharray": "4,3", "stroke-width": "0.8" }));
+    const ref100 = mkEl("text", { x: margin.left + 4, y: yScale(100) - 4, "font-size": "9", fill: "#94A3B8", "font-family": "JetBrains Mono, monospace" });
+    ref100.textContent = "= GDP";
+    svg.appendChild(ref100);
+
+    // 2008 crisis marker
+    const x2008 = xScale(2008);
+    svg.appendChild(mkEl("line", { x1: x2008, y1: margin.top, x2: x2008, y2: H - margin.bottom, stroke: "#EA5E33", "stroke-dasharray": "3,3", "stroke-width": "0.7", opacity: "0.4" }));
+
+    const groups = [];
+    data.forEach((series, i) => {
+      const color = COLORS[i % COLORS.length];
+      const g = mkEl("g", {});
+      const validPts = series.pts.filter(p => p.v != null);
+      const pathD = validPts.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+
+      g.appendChild(mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round" }));
+      const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+      g.appendChild(hit);
+
+      const last = validPts[validPts.length - 1];
+      groups.push({ g, color, series: { ...series, pts: validPts }, labelY: yScale(last.v) });
+      svg.appendChild(g);
+    });
+
+    // Collision-resolve labels
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.labelY - b.labelY);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].labelY - sorted[i - 1].labelY;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].labelY -= shift;
+            sorted[i].labelY += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      return sorted;
+    }
+
+    const resolved = resolveCollisions(groups.map(g => ({ ...g })), 12);
+    resolved.forEach(item => {
+      const last = item.series.pts[item.series.pts.length - 1];
+      const origY = yScale(last.v);
+      const lbl = mkEl("text", {
+        x: W - margin.right + 6, y: item.labelY + 3,
+        "font-size": "9", fill: item.color, "font-family": "JetBrains Mono, monospace", "font-weight": "500"
+      });
+      lbl.textContent = `${last.v.toFixed(0)}%  ${item.series.n}`;
+      item.g.appendChild(lbl);
+      if (Math.abs(item.labelY - origY) > 4) {
+        item.g.appendChild(mkEl("line", {
+          x1: W - margin.right, y1: origY, x2: W - margin.right + 4, y2: item.labelY,
+          stroke: item.color, "stroke-width": "0.5", opacity: "0.5"
+        }));
+      }
+    });
+
+    const tip = document.getElementById("tip");
+    groups.forEach(({ g, series, color }) => {
+      const hit = g.querySelector("[stroke='transparent']");
+      hit.addEventListener("mousemove", e => {
+        groups.forEach(o => {
+          if (o.g !== g) {
+            o.g.querySelectorAll("path[stroke-width='1.8']").forEach(p => p.setAttribute("opacity", "0.1"));
+            o.g.querySelectorAll("text").forEach(t => t.setAttribute("opacity", "0.1"));
+          }
+        });
+        g.querySelectorAll("path[stroke-width='1.8']").forEach(p => p.setAttribute("stroke-width", "3"));
+        const rect = svg.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+        const yearEst = Math.round(yearMin + ratio * (yearMax - yearMin));
+        const closest = series.pts.reduce((a, b) => Math.abs(b.y - yearEst) < Math.abs(a.y - yearEst) ? b : a);
+        tip.textContent = `${series.n}  ${closest.y}: ${closest.v.toFixed(1)}% of GDP`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 12) + "px";
+        tip.style.top = (e.clientY - 20) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        groups.forEach(o => {
+          o.g.querySelectorAll("path[stroke-width]").forEach(p => { p.setAttribute("opacity", "1"); p.setAttribute("stroke-width", "1.8"); });
+          o.g.querySelectorAll("text").forEach(t => t.setAttribute("opacity", "1"));
+        });
+        tip.style.opacity = "0";
+      });
+    });
+  </script>
+</body>
+</html>
