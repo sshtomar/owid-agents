@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotavirus Vaccine Coverage Rollout</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F6F5EE;
+    color: #1a1a1a;
+    padding: 28px 32px 36px;
+    min-height: 100vh;
+  }
+  .header {
+    margin-bottom: 24px;
+    max-width: 860px;
+  }
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 12.5px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .legend {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #666;
+  }
+  .legend-swatch {
+    width: 20px;
+    height: 3px;
+    border-radius: 1px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    max-width: 860px;
+  }
+  .cell {
+    background: #fff;
+    border-radius: 6px;
+    padding: 10px 10px 8px;
+    border: 1px solid #e8e6de;
+  }
+  .cell-name {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+  }
+  .cell canvas {
+    display: block;
+    width: 100%;
+  }
+  .cell-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .cell-intro {
+    font-size: 9.5px;
+    color: #999;
+  }
+  .cell-latest {
+    font-size: 11px;
+    font-weight: 600;
+    color: #EA5E33;
+  }
+  .source {
+    margin-top: 18px;
+    font-size: 10.5px;
+    color: #999;
+    max-width: 860px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">When Countries Adopted Rotavirus Vaccination (2006-2025)</div>
+  <div class="subtitle">
+    Coverage of the third dose of rotavirus vaccine among infants (%), 30 countries sorted by 2025 coverage.
+    Grey bars indicate years before vaccine introduction; orange lines show coverage after rollout.
+  </div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:#ddd;"></div>
+      <span>Pre-introduction</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:#EA5E33;"></div>
+      <span>Coverage after rollout</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:#F29A44;"></div>
+      <span>Partial coverage (&lt;60%)</span>
+    </div>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="source">Source: WHO Global Health Observatory (ROTAC indicator) &bull; Years 2006-2025</div>
+
+<script>
+const DATA = [{"n":"Uzbekistan","s":[0,0,0,0,0,0,0,0,0,0,74,74,74,74,74,74,74,74,74,99]},{"n":"Saudi Arabia","s":[0,0,0,0,0,0,0,0,0,95,95,95,95,95,96,97,97,97,97,98]},{"n":"Rwanda","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,98,91,91,91,91,91,98]},{"n":"Turkmenistan","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,95,95,95,95,98]},{"n":"Eritrea","s":[0,0,0,0,0,0,0,0,25,96,96,96,96,96,96,96,96,96,96,97]},{"n":"Albania","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,97,97,98,96]},{"n":"Armenia","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93,94,96]},{"n":"Nicaragua","s":[0,66,89,94,98,98,99,99,99,99,99,99,99,99,99,99,99,99,94,96]},{"n":"Norway","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,95,95,95,95,95,95]},{"n":"Qatar","s":[0,0,0,0,0,93,93,93,93,93,99,93,95,95,95,95,95,95,95,95]},{"n":"Japan","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94]},{"n":"S. Korea","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94]},{"n":"Ghana","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,96,96,96,82,93]},{"n":"Morocco","s":[0,0,0,0,0,0,0,0,0,90,99,99,99,99,99,99,92,92,92,92]},{"n":"India","s":[0,0,0,0,0,0,0,0,0,0,4,13,13,53,53,53,53,90,90,91]},{"n":"Togo","s":[0,0,0,0,0,0,0,0,28,28,28,28,28,28,86,86,86,91,91,91]},{"n":"Niger","s":[0,0,0,0,0,0,0,0,0,0,80,85,85,85,85,85,85,85,90,91]},{"n":"Colombia","s":[0,0,0,0,0,0,0,0,0,0,90,90,90,90,90,86,86,86,86,91]},{"n":"Senegal","s":[0,0,0,0,0,0,0,0,0,83,83,83,83,83,83,83,83,83,91,90]},{"n":"Pakistan","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,89]},{"n":"UK","s":[0,0,0,0,0,0,0,0,0,0,0,0,91,91,91,91,90,90,90,89]},{"n":"Sweden","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,83,83,82,84,84,89]},{"n":"Burundi","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,89,89]},{"n":"Latvia","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,85,85,84,84,84,86,88]},{"n":"Sierra Leone","s":[0,0,0,0,0,0,0,0,0,0,95,95,95,92,92,92,92,92,92,88]},{"n":"Honduras","s":[0,0,0,0,0,0,98,98,98,98,98,98,92,92,92,92,92,92,92,87]},{"n":"Belgium","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,86]},{"n":"Zimbabwe","s":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,85,85]},{"n":"Mexico","s":[0,0,0,93,93,93,93,93,93,93,93,93,93,93,93,93,84,84,84,85]},{"n":"Dominican Rep","s":[0,0,0,0,0,0,9,9,86,86,75,75,81,81,81,81,81,81,83,83]}];
+
+const YEARS = Array.from({length: 20}, (_, i) => 2006 + i);
+const CW = 108, CH = 42;
+const PR = window.devicePixelRatio || 1;
+
+function introYear(series) {
+  for (let i = 0; i < series.length; i++) {
+    if (series[i] > 0) return YEARS[i];
+  }
+  return null;
+}
+
+function lineColor(val) {
+  if (val >= 75) return '#EA5E33';
+  if (val >= 40) return '#F29A44';
+  return '#C49A45';
+}
+
+function drawSparkline(canvas, series) {
+  canvas.width = CW * PR;
+  canvas.height = CH * PR;
+  canvas.style.width = CW + 'px';
+  canvas.style.height = CH + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(PR, PR);
+
+  const padL = 2, padR = 2, padT = 4, padB = 4;
+  const w = CW - padL - padR;
+  const h = CH - padT - padB;
+  const n = series.length;
+
+  const xOf = i => padL + (i / (n - 1)) * w;
+  const yOf = v => padT + h - (v / 100) * h;
+
+  // Gray floor baseline
+  ctx.strokeStyle = '#e0ddd6';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + h);
+  ctx.lineTo(padL + w, padT + h);
+  ctx.stroke();
+
+  // Find first non-zero
+  const startIdx = series.findIndex(v => v > 0);
+
+  if (startIdx < 0) {
+    // No data at all — just gray bar
+    ctx.fillStyle = '#f0ede6';
+    ctx.fillRect(padL, padT, w, h);
+    return;
+  }
+
+  // Draw pre-intro shaded region
+  if (startIdx > 0) {
+    ctx.fillStyle = '#f0ede6';
+    const x0 = xOf(0);
+    const x1 = xOf(startIdx - 1) + (xOf(startIdx) - xOf(startIdx - 1)) * 0.5;
+    ctx.fillRect(x0, padT, x1 - x0, h);
+  }
+
+  // Draw the coverage line from startIdx onward
+  // Break into segments by color (coverage level)
+  const activeSeries = series.slice(startIdx);
+  const activeStart = startIdx;
+
+  for (let i = 0; i < activeSeries.length - 1; i++) {
+    const ai = i + activeStart;
+    const val = (activeSeries[i] + activeSeries[i + 1]) / 2;
+    ctx.strokeStyle = lineColor(val);
+    ctx.lineWidth = 1.8;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(xOf(ai), yOf(activeSeries[i]));
+    ctx.lineTo(xOf(ai + 1), yOf(activeSeries[i + 1]));
+    ctx.stroke();
+  }
+
+  // Endpoint dot
+  const lastVal = series[n - 1];
+  const lx = xOf(n - 1);
+  const ly = yOf(lastVal);
+  ctx.fillStyle = lineColor(lastVal);
+  ctx.beginPath();
+  ctx.arc(lx, ly, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+const grid = document.getElementById('grid');
+
+DATA.forEach(d => {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+
+  const name = document.createElement('div');
+  name.className = 'cell-name';
+  name.textContent = d.n;
+
+  const canvas = document.createElement('canvas');
+  canvas.style.height = CH + 'px';
+
+  const stats = document.createElement('div');
+  stats.className = 'cell-stats';
+
+  const yr = introYear(d.s);
+  const latestVal = d.s[d.s.length - 1];
+
+  const introEl = document.createElement('div');
+  introEl.className = 'cell-intro';
+  introEl.textContent = yr ? 'since ’' + String(yr).slice(2) : '—';
+
+  const latestEl = document.createElement('div');
+  latestEl.className = 'cell-latest';
+  latestEl.textContent = latestVal + '%';
+
+  stats.appendChild(introEl);
+  stats.appendChild(latestEl);
+
+  cell.appendChild(name);
+  cell.appendChild(canvas);
+  cell.appendChild(stats);
+  grid.appendChild(cell);
+
+  drawSparkline(canvas, d.s);
+});
+</script>
+</body>
+</html>

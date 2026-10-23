@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EU Crime Perception: Feeling Unsafe at Night</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F6F5EE;
+    color: #1a1a1a;
+    padding: 28px 32px 36px;
+  }
+  .header {
+    max-width: 740px;
+    margin-bottom: 20px;
+  }
+  .title {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .subtitle {
+    font-size: 12.5px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #555;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 3px;
+    border-radius: 1.5px;
+  }
+  svg { overflow: visible; }
+  .source {
+    margin-top: 14px;
+    font-size: 10.5px;
+    color: #999;
+    max-width: 700px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">Crime Perception in Europe Fell Sharply from 2010 to 2020</div>
+  <div class="subtitle">
+    Share of people who feel unsafe walking alone in their neighbourhood after dark (%).
+    Nearly all European countries saw declines; France, Sweden, and Spain are notable exceptions.
+  </div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#2d8a5d"></div>
+      <span>Large decrease (&gt;5 pp)</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#68ab84"></div>
+      <span>Moderate decrease</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#aaa"></div>
+      <span>Roughly flat</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#EA5E33"></div>
+      <span>Increased</span>
+    </div>
+  </div>
+</div>
+
+<svg id="chart" width="700" height="580"></svg>
+
+<div class="source">Source: Eurostat SDG indicator sdg_16_20 (SDG 16 — Peace, Justice and Strong Institutions)</div>
+
+<script>
+const DATA = [{"n":"Belgium","yr":2010,"a":17.5,"b":10.8},{"n":"Denmark","yr":2010,"a":14.2,"b":7.3},{"n":"Ireland","yr":2010,"a":10.2,"b":10.8},{"n":"Greece","yr":2010,"a":19.1,"b":18.1},{"n":"Luxembourg","yr":2010,"a":10.2,"b":11.0},{"n":"Norway","yr":2010,"a":5.5,"b":4.1},{"n":"Estonia","yr":2010,"a":18.0,"b":5.5},{"n":"Spain","yr":2010,"a":13.0,"b":14.1},{"n":"France","yr":2010,"a":15.6,"b":17.7},{"n":"Italy","yr":2010,"a":12.7,"b":8.4},{"n":"Austria","yr":2010,"a":13.4,"b":5.7},{"n":"Portugal","yr":2010,"a":11.3,"b":6.6},{"n":"Finland","yr":2010,"a":8.7,"b":7.0},{"n":"Sweden","yr":2010,"a":10.4,"b":13.8},{"n":"Iceland","yr":2010,"a":3.7,"b":2.6},{"n":"Bulgaria","yr":2010,"a":27.7,"b":19.1},{"n":"Czechia","yr":2010,"a":15.4,"b":6.1},{"n":"Germany","yr":2010,"a":12.0,"b":8.2},{"n":"Cyprus","yr":2010,"a":12.7,"b":10.5},{"n":"Latvia","yr":2010,"a":23.8,"b":5.3},{"n":"Lithuania","yr":2010,"a":5.3,"b":3.3},{"n":"Hungary","yr":2010,"a":11.7,"b":5.3},{"n":"Malta","yr":2010,"a":10.4,"b":11.4},{"n":"Netherlands","yr":2010,"a":16.8,"b":15.7},{"n":"Slovenia","yr":2010,"a":9.3,"b":7.3},{"n":"Slovakia","yr":2010,"a":10.2,"b":4.3},{"n":"Romania","yr":2010,"a":15.4,"b":8.8},{"n":"Switzerland","yr":2010,"a":13.6,"b":7.2},{"n":"Croatia","yr":2010,"a":4.6,"b":2.4},{"n":"North Macedonia","yr":2010,"a":7.0,"b":5.5}];
+
+const W = 700, H = 580;
+const padL = 120, padR = 132, padT = 44, padB = 24;
+const plotH = H - padT - padB;
+const xLeft = padL, xRight = W - padR;
+const MIN_VAL = 0, MAX_VAL = 30;
+
+const svg = document.getElementById('chart');
+svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+function yOf(v) {
+  return padT + (1 - (v - MIN_VAL) / (MAX_VAL - MIN_VAL)) * plotH;
+}
+
+function lineColor(d) {
+  const delta = d.b - d.a;
+  if (delta > 1) return '#EA5E33';
+  if (delta > -2) return '#aaa';
+  if (delta > -5) return '#68ab84';
+  return '#2d8a5d';
+}
+
+function resolveCollisions(labels, minGap) {
+  const sorted = [...labels].sort((a, b) => a.y - b.y);
+  let changed = true;
+  let iters = 0;
+  while (changed && iters < 80) {
+    changed = false;
+    iters++;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const mid = (sorted[i - 1].y + sorted[i].y) / 2;
+        sorted[i - 1].y = mid - minGap / 2;
+        sorted[i].y = mid + minGap / 2;
+        changed = true;
+      }
+    }
+  }
+  return sorted;
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+// Background
+svg.appendChild(el('rect', {width: W, height: H, fill: '#F6F5EE'}));
+
+// Year axis labels
+svg.appendChild(el('text', {x: xLeft, y: padT - 20, 'font-family': 'Inter, sans-serif', 'font-size': '13', 'font-weight': '600', fill: '#333', 'text-anchor': 'middle'}, '2010'));
+svg.appendChild(el('text', {x: xRight, y: padT - 20, 'font-family': 'Inter, sans-serif', 'font-size': '13', 'font-weight': '600', fill: '#333', 'text-anchor': 'middle'}, '2020'));
+
+// Axis lines
+svg.appendChild(el('line', {x1: xLeft, y1: padT - 10, x2: xLeft, y2: padT + plotH, stroke: '#ccc', 'stroke-width': '1'}));
+svg.appendChild(el('line', {x1: xRight, y1: padT - 10, x2: xRight, y2: padT + plotH, stroke: '#ccc', 'stroke-width': '1'}));
+
+// Gridlines at 5, 10, 15, 20, 25
+[5, 10, 15, 20, 25].forEach(v => {
+  const y = yOf(v);
+  svg.appendChild(el('line', {x1: xLeft, y1: y, x2: xRight, y2: y, stroke: '#e0ddd6', 'stroke-width': '0.8', 'stroke-dasharray': '3,3'}));
+  svg.appendChild(el('text', {x: xLeft - 6, y: y + 4, 'font-family': 'Inter, sans-serif', 'font-size': '9', fill: '#bbb', 'text-anchor': 'end'}, v + '%'));
+});
+
+// Draw connector lines
+DATA.forEach(d => {
+  const y1 = yOf(d.a), y2 = yOf(d.b);
+  const color = lineColor(d);
+  const delta = d.b - d.a;
+  const isNotable = Math.abs(delta) > 5 || delta > 1;
+  svg.appendChild(el('line', {
+    x1: xLeft, y1, x2: xRight, y2,
+    stroke: color,
+    'stroke-width': isNotable ? '1.8' : '1.1',
+    'stroke-opacity': isNotable ? '0.9' : '0.55'
+  }));
+});
+
+// Left labels (2010 side)
+const leftLabels = DATA.map(d => ({
+  id: d.n, rawY: yOf(d.a), y: yOf(d.a),
+  val: d.a, color: lineColor(d), delta: d.b - d.a
+}));
+resolveCollisions(leftLabels, 13);
+
+leftLabels.forEach(lb => {
+  const naturalY = lb.rawY;
+  const isNotable = Math.abs(lb.delta) > 3 || lb.delta > 1;
+  const fill = isNotable ? lb.color : '#999';
+
+  // Leader line if offset more than 4px
+  if (Math.abs(lb.y - naturalY) > 4) {
+    svg.appendChild(el('line', {
+      x1: xLeft - 4, y1: naturalY,
+      x2: xLeft - 4, y2: lb.y,
+      stroke: '#ddd', 'stroke-width': '0.8'
+    }));
+  }
+
+  // Value dot
+  svg.appendChild(el('circle', {cx: xLeft, cy: naturalY, r: '2.5', fill: lb.color}));
+
+  const g = el('g', {});
+  g.appendChild(el('text', {
+    x: xLeft - 8, y: lb.y + 4,
+    'font-family': 'Inter, sans-serif',
+    'font-size': '10',
+    fill: fill,
+    'text-anchor': 'end',
+    'font-weight': isNotable ? '500' : '400'
+  }, lb.id));
+  svg.appendChild(g);
+});
+
+// Right labels (2020 side)
+const rightLabels = DATA.map(d => ({
+  id: d.n, rawY: yOf(d.b), y: yOf(d.b),
+  val: d.b, color: lineColor(d), delta: d.b - d.a
+}));
+resolveCollisions(rightLabels, 13);
+
+rightLabels.forEach(lb => {
+  const naturalY = lb.rawY;
+  const isNotable = Math.abs(lb.delta) > 3 || lb.delta > 1;
+  const fill = isNotable ? lb.color : '#999';
+  const deltaStr = lb.delta > 0 ? '+' + lb.delta.toFixed(1) : lb.delta.toFixed(1);
+
+  if (Math.abs(lb.y - naturalY) > 4) {
+    svg.appendChild(el('line', {
+      x1: xRight + 4, y1: naturalY,
+      x2: xRight + 4, y2: lb.y,
+      stroke: '#ddd', 'stroke-width': '0.8'
+    }));
+  }
+
+  svg.appendChild(el('circle', {cx: xRight, cy: naturalY, r: '2.5', fill: lb.color}));
+
+  const g = el('g', {});
+  g.appendChild(el('text', {
+    x: xRight + 8, y: lb.y + 4,
+    'font-family': 'Inter, sans-serif',
+    'font-size': '10',
+    fill: fill,
+    'text-anchor': 'start',
+    'font-weight': isNotable ? '500' : '400'
+  }, `${lb.id} ${deltaStr}`));
+  svg.appendChild(g);
+});
+</script>
+</body>
+</html>
