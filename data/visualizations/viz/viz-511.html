@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Uneven Coal Retreat, 2000–2024</h1>
+<p class="subtitle">Electricity generation from coal (TWh). The US and Australia are in steep decline; Vietnam and Indonesia are still climbing fast. China operates on its own scale.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: Ember — Yearly Electricity Data (ember--GEN-COAL)</p>
+<script>
+const data = [
+  {"n":"China","s":[1060.3,1129.1,1282.6,1520.0,1722.4,1980.2,2302.4,2656.7,2708.9,2911.5,3233.6,3690.9,3748.2,4077.4,4203.1,4046.2,4156.4,4430.0,4763.9,4855.1,4921.9,5333.8,5414.7,5752.7,5827.6],"y0":2000},
+  {"n":"India","s":[390.2,408.3,426.7,441.5,463.0,478.5,505.5,533.3,573.1,611.1,643.0,701.2,787.1,848.0,949.9,1006.5,1073.6,1115.2,1198.9,1198.8,1143.8,1255.6,1344.4,1445.4,1517.9],"y0":2000},
+  {"n":"USA","s":[1966.3,1904.0,1933.1,1973.7,1978.3,2012.9,1990.5,2016.5,1985.8,1755.9,1847.3,1733.4,1514.0,1581.1,1581.7,1352.4,1239.2,1205.8,1149.5,965.0,773.4,898,831.5,675.1,652.2],"y0":2000},
+  {"n":"Japan","s":[238.2,253.9,264.4,292.1,295.4,319.2,311.3,317.3,333.7,312.1,316.9,285.1,334.3,362.6,355.6,349.6,338.6,363.5,360.7,350.8,340.2,348.3,351.0,326.9,327.1],"y0":2000},
+  {"n":"Indonesia","s":[34,37.7,42.9,46.5,48.2,51.8,58.7,63.9,61.5,65.9,68.5,81.1,102.2,111.2,119.5,124.7,135.4,148.0,160.0,174.5,180.9,190.0,205.3,216.8,228.4],"y0":2000},
+  {"n":"Russia","s":[175.6,168.8,170.4,172.2,160.8,165.7,177.8,170.7,196.6,164.4,166.1,165.0,169.2,161.9,158.7,158.6,171.4,174.0,176.6,187.6,175.0,187.1,192.0,204.1,215.2],"y0":2000},
+  {"n":"S. Africa","s":[196.1,197.2,206.0,220.3,229.9,231.8,240.4,247.6,243.3,234.7,243.4,244.4,239.7,233.5,229.8,227.3,229.6,228.7,231.0,225.3,214.1,210.9,201.8,192.3,206.8],"y0":2000},
+  {"n":"S. Korea","s":[114.9,127.4,137.5,139.1,143.4,150.4,154.0,170.9,190.9,209.3,218.4,225.1,223.4,223.8,226.1,232.7,232.9,260.8,257.7,245.0,208.0,213.3,209.2,201.3,190.8],"y0":2000},
+  {"n":"Vietnam","s":[3.1,3.2,4.9,7.2,7.2,11.0,12.2,12.4,12.3,12.4,15.9,19.9,21.2,24.0,34.9,56.5,68.3,67.7,91.7,120.2,122.5,118.0,104.0,129.8,152.8],"y0":2000},
+  {"n":"Australia","s":[180.3,179.9,171.9,173.6,179.0,183.0,185.8,185.5,184.2,182.0,176.0,172.0,165.4,155.4,155.2,162.2,162.4,159.2,156.6,149.8,142.9,137.4,129.2,125.6,127.3],"y0":2000},
+  {"n":"Turkey","s":[38.2,38.4,32.1,32.2,34.5,43.2,46.6,53.4,57.7,55.7,55.0,66.2,68.0,63.8,76.3,76.2,92.3,97.5,111.8,112.9,106.3,104.1,113.6,118.0,121.3],"y0":2000}
+];
+
+const W = 820, H = 500;
+const margin = { top: 36, right: 130, bottom: 36, left: 60 };
+const yearMin = 2000, yearMax = 2024;
+const valMin = 0, valMax = 6000;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = margin.top + 4, bot = H - margin.bottom - 4;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+function pctChange(s) {
+  const first = s[0], last = s[s.length - 1];
+  return (last - first) / first * 100;
+}
+
+function colorForSeries(d) {
+  if (d.n === "China") return "#9A9890";
+  const pct = pctChange(d.s);
+  if (pct > 200) return "#B34B3B";
+  if (pct > 80) return "#C4715A";
+  if (pct > 20) return "#C49A45";
+  if (pct > -10) return "#F5D38A";
+  if (pct > -40) return "#8BAD72";
+  return "#3D7A5A";
+}
+
+// Grid lines
+[1000, 2000, 3000, 4000, 5000, 6000].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-size": "8", "font-family": "'JetBrains Mono', monospace", fill: "#9A9890" });
+  t.textContent = v === 1000 ? "1,000" : v === 6000 ? "6,000 TWh" : (v/1000).toFixed(0) + "k";
+  svg.appendChild(t);
+});
+
+// X-axis ticks
+[2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(y), y1: H - margin.bottom, x2: xScale(y), y2: H - margin.bottom + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.8"
+  }));
+  const t = mkEl("text", { x: xScale(y), y: H - margin.bottom + 12, "text-anchor": "middle", "font-size": "8", "font-family": "'JetBrains Mono', monospace", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const rows = [];
+
+data.forEach(d => {
+  const color = colorForSeries(d);
+  const pts = d.s.map((v, i) => ({ year: d.y0 + i, value: v }));
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.year)} ${yScale(p.value)}`).join(" ");
+  const g = mkEl("g");
+  svg.appendChild(g);
+
+  const isChina = d.n === "China";
+  const line = mkEl("path", {
+    d: pathD, stroke: color,
+    "stroke-width": isChina ? "2.5" : "1.5",
+    fill: "none", "stroke-linejoin": "round",
+    opacity: isChina ? "0.5" : "1"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "pointer" });
+  g.appendChild(hit);
+  rows.push({ g, d, color });
+
+  const lastPt = pts[pts.length - 1];
+  const pct = pctChange(d.s);
+  const sign = pct >= 0 ? "+" : "";
+  hit.addEventListener("mouseenter", e => {
+    showTip(`${d.n}: ${lastPt.value.toFixed(0)} TWh in 2024  (${sign}${pct.toFixed(0)}% since 2000)`, e);
+    rows.forEach(r => r.g.style.opacity = r.d === d ? "1" : "0.1");
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; });
+  hit.addEventListener("mouseleave", () => { hideTip(); rows.forEach(r => r.g.style.opacity = "1"); });
+});
+
+// Endpoint labels
+const endLabels = data.map(d => {
+  const lastVal = d.s[d.s.length - 1];
+  return { name: d.n, val: lastVal, y: yScale(lastVal), color: colorForSeries(d) };
+});
+
+resolveCollisions(endLabels, 11).forEach(item => {
+  const origY = yScale(item.val);
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: W - margin.right + 4, y1: origY, x2: W - margin.right + 4, y2: item.y,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+  const t = mkEl("text", { x: W - margin.right + 8, y: item.y + 3.5, "text-anchor": "start", "font-size": "9", fill: "#2B2A27" });
+  t.textContent = `${item.val.toFixed(0)}  ${item.name}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendItems = [
+  { color: "#B34B3B", label: ">200% rise" },
+  { color: "#C4715A", label: "80-200% rise" },
+  { color: "#C49A45", label: "20-80% rise" },
+  { color: "#3D7A5A", label: "Declining" },
+  { color: "#9A9890", label: "China (context)" }
+];
+let lx = margin.left;
+const legendY = margin.top - 10;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 6, width: 8, height: 8, fill: item.color }));
+  const t = mkEl("text", { x: lx + 11, y: legendY, "font-size": "8", fill: "#7A786F" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 90;
+});
+</script>
+</body></html>
