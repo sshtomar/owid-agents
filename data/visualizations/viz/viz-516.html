@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Mean HDL Cholesterol by Country, 2018</h1>
+<p class="subtitle">Age-standardized mean HDL ("good") cholesterol in mmol/L. Higher HDL is protective against cardiovascular disease. Nordic and European countries tend to have higher values; parts of the Middle East and Pacific score lower.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory (who--NCD_CHOL_MEANHDL_A)</p>
+<script>
+// 33 countries with 2018 data, sorted by value descending
+// Values from WHO GHO NCD_CHOL_MEANHDL_A, year=2018
+const data = [
+  {"n":"Denmark","v":1.6},{"n":"Andorra","v":1.6},{"n":"Czechia","v":1.5},
+  {"n":"Australia","v":1.5},{"n":"Switzerland","v":1.5},{"n":"North Korea","v":1.4},
+  {"n":"Norway","v":1.4},{"n":"Belarus","v":1.3},{"n":"Brunei","v":1.3},
+  {"n":"Uzbekistan","v":1.3},{"n":"Malta","v":1.3},{"n":"China","v":1.2},
+  {"n":"Uruguay","v":1.2},{"n":"Netherlands","v":1.2},{"n":"Malaysia","v":1.2},
+  {"n":"Dom. Republic","v":1.2},{"n":"Congo","v":1.2},{"n":"Bahrain","v":1.1},
+  {"n":"Nigeria","v":1.1},{"n":"Guinea","v":1.1},{"n":"Kenya","v":1.1},
+  {"n":"Iran","v":1.1},{"n":"Haiti","v":1.1},{"n":"Egypt","v":1.1},
+  {"n":"Marshall Islands","v":1.0},{"n":"Barbados","v":1.0},
+  {"n":"Guatemala","v":1.0},{"n":"Sudan","v":1.0},
+  {"n":"Malawi","v":1.0},{"n":"Djibouti","v":1.0}
+];
+
+const W = 680, H = 560;
+const margin = { top: 36, right: 60, bottom: 24, left: 140 };
+const barH = 13, gap = 3;
+const minVal = 0.9, maxVal = 1.7;
+
+const totalH = data.length * (barH + gap) + margin.top + margin.bottom;
+const actualH = Math.max(H, totalH);
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${actualH}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xScale = v => margin.left + (v - minVal) / (maxVal - minVal) * (W - margin.left - margin.right);
+
+function barColor(v) {
+  if (v >= 1.5) return "#3D7A5A";
+  if (v >= 1.4) return "#5B9E78";
+  if (v >= 1.3) return "#8BAD72";
+  if (v >= 1.2) return "#C49A45";
+  if (v >= 1.1) return "#C4715A";
+  return "#B34B3B";
+}
+
+// Threshold line at 1.0 (low HDL risk threshold)
+const threshX = xScale(1.0);
+svg.appendChild(mkEl("line", {
+  x1: threshX, y1: margin.top - 10, x2: threshX, y2: actualH - margin.bottom,
+  stroke: "#C2C0B5", "stroke-width": "1", "stroke-dasharray": "4,3"
+}));
+const threshLbl = mkEl("text", { x: threshX + 3, y: margin.top - 2, "font-size": "8", "font-family": "'JetBrains Mono', monospace", fill: "#9A9890" });
+threshLbl.textContent = "1.0 — low HDL threshold";
+svg.appendChild(threshLbl);
+
+// X axis labels
+[1.0, 1.2, 1.4, 1.6].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: margin.top - 8, x2: x, y2: actualH - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x, y: actualH - margin.bottom + 12, "text-anchor": "middle", "font-size": "8", "font-family": "'JetBrains Mono', monospace", fill: "#9A9890" });
+  t.textContent = v.toFixed(1);
+  svg.appendChild(t);
+});
+
+const xAxisLbl = mkEl("text", { x: W - margin.right + 4, y: actualH - margin.bottom + 12, "font-size": "8", "font-family": "'JetBrains Mono', monospace", fill: "#7A786F" });
+xAxisLbl.textContent = "mmol/L";
+svg.appendChild(xAxisLbl);
+
+const tip = document.getElementById("tip");
+
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + gap);
+  const color = barColor(d.v);
+  const barW = xScale(d.v) - xScale(minVal);
+
+  const g = mkEl("g");
+  svg.appendChild(g);
+
+  const bar = mkEl("rect", { x: xScale(minVal), y, width: Math.max(barW, 0), height: barH, fill: color, "rx": "1.5", cursor: "pointer" });
+  g.appendChild(bar);
+
+  const lbl = mkEl("text", { x: margin.left - 6, y: y + barH - 3.5, "text-anchor": "end", "font-size": "9", fill: "#2B2A27" });
+  lbl.textContent = d.n;
+  g.appendChild(lbl);
+
+  const valLbl = mkEl("text", { x: xScale(d.v) + 5, y: y + barH - 3.5, "text-anchor": "start", "font-size": "8.5", "font-family": "'JetBrains Mono', monospace", fill: "#7A786F" });
+  valLbl.textContent = d.v.toFixed(1);
+  g.appendChild(valLbl);
+
+  g.addEventListener("mouseenter", e => {
+    tip.textContent = `${d.n}: ${d.v.toFixed(1)} mmol/L HDL cholesterol (2018)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    bar.setAttribute("opacity", "0.75");
+  });
+  g.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; });
+  g.addEventListener("mouseleave", () => { tip.style.opacity = "0"; bar.setAttribute("opacity", "1"); });
+});
+
+// Legend
+const legendY = margin.top - 18;
+const legendItems = [
+  { color: "#3D7A5A", label: "≥ 1.5 (optimal)" },
+  { color: "#8BAD72", label: "1.3–1.4" },
+  { color: "#C49A45", label: "1.2" },
+  { color: "#C4715A", label: "1.1" },
+  { color: "#B34B3B", label: "1.0 (low)" }
+];
+let lx = margin.left;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 7, width: 8, height: 8, fill: item.color }));
+  const t = mkEl("text", { x: lx + 11, y: legendY, "font-size": "8", fill: "#7A786F" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 80;
+});
+</script>
+</body></html>
