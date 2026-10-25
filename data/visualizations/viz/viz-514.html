@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Foreign Direct Investment Inflows, 1990–2024 (% of GDP)</h1>
+<p class="subtitle">Net FDI inflows as share of GDP, 3-year smoothed. China's dramatic rise and retreat mirrors its growth trajectory; China attracted peak FDI in the 1990s as wages were low, then declined as manufacturing costs rose. Colombia and Ethiopia show how targeted reforms can draw investment to frontier economies.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — BX.KLT.DINV.WD.GD.ZS</p>
+<script>
+const raw = [{"n":"China","pts":[{"y":1990,"v":1.02},{"y":1991,"v":1.57},{"y":1992,"v":3.3},{"y":1993,"v":4.91},{"y":1994,"v":5.66},{"y":1995,"v":5.15},{"y":1996,"v":4.73},{"y":1997,"v":4.57},{"y":1998,"v":4.27},{"y":1999,"v":3.85},{"y":2000,"v":3.54},{"y":2001,"v":3.49},{"y":2002,"v":3.49},{"y":2003,"v":3.48},{"y":2004,"v":3.79},{"y":2005,"v":4.12},{"y":2006,"v":4.42},{"y":2007,"v":4.15},{"y":2008,"v":3.51},{"y":2009,"v":3.38},{"y":2010,"v":3.37},{"y":2011,"v":3.46},{"y":2012,"v":3.14},{"y":2013,"v":2.76},{"y":2014,"v":2.55},{"y":2015,"v":2.06},{"y":2016,"v":1.67},{"y":2017,"v":1.5},{"y":2018,"v":1.42},{"y":2019,"v":1.55},{"y":2020,"v":1.62},{"y":2021,"v":1.54},{"y":2022,"v":1.07},{"y":2023,"v":0.52},{"y":2024,"v":0.25}]},{"n":"India","pts":[{"y":1990,"v":0.06},{"y":1991,"v":0.07},{"y":1992,"v":0.11},{"y":1993,"v":0.2},{"y":1994,"v":0.36},{"y":1995,"v":0.5},{"y":1996,"v":0.69},{"y":1997,"v":0.7},{"y":1998,"v":0.65},{"y":1999,"v":0.62},{"y":2000,"v":0.76},{"y":2001,"v":0.94},{"y":2002,"v":0.89},{"y":2003,"v":0.79},{"y":2004,"v":0.75},{"y":2005,"v":1.26},{"y":2006,"v":1.7},{"y":2007,"v":2.61},{"y":2008,"v":2.78},{"y":2009,"v":2.64},{"y":2010,"v":2.1},{"y":2011,"v":1.65},{"y":2012,"v":1.61},{"y":2013,"v":1.51},{"y":2014,"v":1.77},{"y":2015,"v":1.91},{"y":2016,"v":1.85},{"y":2017,"v":1.67},{"y":2018,"v":1.62},{"y":2019,"v":1.92},{"y":2020,"v":1.87},{"y":2021,"v":1.79},{"y":2022,"v":1.25},{"y":2023,"v":1.02},{"y":2024,"v":0.76}]},{"n":"Brazil","pts":[{"y":1990,"v":0.28},{"y":1991,"v":0.4},{"y":1992,"v":0.43},{"y":1993,"v":0.52},{"y":1994,"v":0.52},{"y":1995,"v":0.9},{"y":1996,"v":1.42},{"y":1997,"v":2.32},{"y":1998,"v":3.41},{"y":1999,"v":4.37},{"y":2000,"v":4.64},{"y":2001,"v":4.15},{"y":2002,"v":3.07},{"y":2003,"v":2.59},{"y":2004,"v":2.09},{"y":2005,"v":2.07},{"y":2006,"v":2.23},{"y":2007,"v":2.64},{"y":2008,"v":2.69},{"y":2009,"v":2.87},{"y":2010,"v":3.18},{"y":2011,"v":3.8},{"y":2012,"v":3.57},{"y":2013,"v":3.46},{"y":2014,"v":3.4},{"y":2015,"v":3.77},{"y":2016,"v":3.69},{"y":2017,"v":3.85},{"y":2018,"v":3.7},{"y":2019,"v":3.45},{"y":2020,"v":3.02},{"y":2021,"v":3.08},{"y":2022,"v":3.17},{"y":2023,"v":3.37},{"y":2024,"v":3.13}]},{"n":"Colombia","pts":[{"y":1990,"v":1.14},{"y":1991,"v":1.07},{"y":1992,"v":1.21},{"y":1993,"v":1.49},{"y":1994,"v":1.42},{"y":1995,"v":2.01},{"y":1996,"v":3.15},{"y":1997,"v":3.76},{"y":1998,"v":3.28},{"y":1999,"v":2.35},{"y":2000,"v":2.26},{"y":2001,"v":2.4},{"y":2002,"v":2.19},{"y":2003,"v":2.22},{"y":2004,"v":3.84},{"y":2005,"v":4.62},{"y":2006,"v":5.17},{"y":2007,"v":4.28},{"y":2008,"v":4.04},{"y":2009,"v":3.35},{"y":2010,"v":3.36},{"y":2011,"v":3.56},{"y":2012,"v":4.22},{"y":2013,"v":4.18},{"y":2014,"v":4.15},{"y":2015,"v":4.37},{"y":2016,"v":4.42},{"y":2017,"v":4.23},{"y":2018,"v":4.03},{"y":2019,"v":3.49},{"y":2020,"v":3.36},{"y":2021,"v":3.58},{"y":2022,"v":4.18},{"y":2023,"v":4.27},{"y":2024,"v":3.92}]},{"n":"Ethiopia","pts":[{"y":1990,"v":0.05},{"y":1991,"v":0.05},{"y":1992,"v":0.03},{"y":1993,"v":0.09},{"y":1994,"v":0.15},{"y":1995,"v":0.22},{"y":1996,"v":1.24},{"y":1997,"v":2.26},{"y":1998,"v":2.47},{"y":1999,"v":1.92},{"y":2000,"v":2.25},{"y":2001,"v":3.04},{"y":2002,"v":4.29},{"y":2003,"v":4.67},{"y":2004,"v":4.3},{"y":2005,"v":3.7},{"y":2006,"v":2.28},{"y":2007,"v":1.7},{"y":2008,"v":0.74},{"y":2009,"v":0.68},{"y":2010,"v":1.2},{"y":2011,"v":1.19},{"y":2012,"v":1.81},{"y":2013,"v":2.27},{"y":2014,"v":3.46},{"y":2015,"v":4.54},{"y":2016,"v":5.18},{"y":2017,"v":5.11},{"y":2018,"v":4.02},{"y":2019,"v":3.08},{"y":2020,"v":3.04},{"y":2021,"v":3.1},{"y":2022,"v":3.1},{"y":2023,"v":2.69},{"y":2024,"v":2.54}]},{"n":"France","pts":[{"y":1990,"v":1.09},{"y":1992,"v":1.45},{"y":1995,"v":1.33},{"y":1998,"v":2.22},{"y":2000,"v":3.26},{"y":2002,"v":3.14},{"y":2005,"v":2.99},{"y":2008,"v":2.05},{"y":2010,"v":1.23},{"y":2013,"v":0.86},{"y":2016,"v":1.63},{"y":2019,"v":1.83},{"y":2022,"v":2.73},{"y":2024,"v":1.28}]},{"n":"Germany","pts":[{"y":1990,"v":0.26},{"y":1992,"v":0.06},{"y":1995,"v":0.48},{"y":1998,"v":2.01},{"y":2000,"v":6.46},{"y":2002,"v":2.64},{"y":2005,"v":1.41},{"y":2008,"v":1.3},{"y":2010,"v":2.22},{"y":2013,"v":1.34},{"y":2016,"v":2.12},{"y":2019,"v":3.46},{"y":2022,"v":2.25},{"y":2024,"v":1.66}]},{"n":"Argentina","pts":[{"y":1990,"v":1.31},{"y":1993,"v":1.51},{"y":1996,"v":2.62},{"y":1998,"v":4.68},{"y":2000,"v":4.31},{"y":2002,"v":1.43},{"y":2005,"v":2.51},{"y":2008,"v":2.05},{"y":2011,"v":2.51},{"y":2014,"v":1.57},{"y":2017,"v":1.54},{"y":2019,"v":1.66},{"y":2022,"v":2.6},{"y":2024,"v":2.99}]},{"n":"Korea","pts":[{"y":1990,"v":0.44},{"y":1993,"v":0.24},{"y":1996,"v":0.48},{"y":1998,"v":1.38},{"y":2000,"v":1.72},{"y":2002,"v":0.98},{"y":2005,"v":1.29},{"y":2008,"v":0.89},{"y":2010,"v":0.82},{"y":2013,"v":0.73},{"y":2016,"v":0.69},{"y":2019,"v":0.57},{"y":2022,"v":1.19},{"y":2024,"v":0.86}]},{"n":"Indonesia","pts":[{"y":1990,"v":1.01},{"y":1993,"v":1.28},{"y":1996,"v":2.35},{"y":1998,"v":0.19},{"y":2000,"v":-1.98},{"y":2003,"v":0.19},{"y":2006,"v":1.96},{"y":2009,"v":1.59},{"y":2012,"v":2.39},{"y":2015,"v":1.87},{"y":2018,"v":2.02},{"y":2021,"v":1.82},{"y":2024,"v":1.65}]}];
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 130, bottom: 40, left: 55 };
+
+const COLORS = {
+  "China": "#EA5E33",
+  "India": "#3D7A5A",
+  "Brazil": "#F29A44",
+  "Colombia": "#C49A45",
+  "Ethiopia": "#5B9E78",
+  "France": "#7A786F",
+  "Germany": "#9A9890",
+  "Argentina": "#C4715A",
+  "Korea": "#8BAD72",
+  "Indonesia": "#B34B3B"
+};
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const valMin = 0, valMax = 7;
+const yearMin = 1990, yearMax = 2024;
+
+const xS = y => margin.left + (y-yearMin)/(yearMax-yearMin)*(W-margin.left-margin.right);
+const yS = v => margin.top + (valMax-v)/(valMax-valMin)*(H-margin.top-margin.bottom);
+
+// Grid
+[1,2,3,4,5,6].forEach(v => {
+  const y = yS(v);
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:y,x2:W-margin.right,y2:y,stroke:"#E2E0D5","stroke-width":"0.5","stroke-dasharray":"3,3"}));
+  const t = mkEl("text",{x:margin.left-6,y:y+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"8",fill:"#9A9890"});
+  t.textContent = v+"%";
+  svg.appendChild(t);
+});
+[1995,2000,2005,2010,2015,2020].forEach(y => {
+  const x = xS(y);
+  svg.appendChild(mkEl("line",{x1:x,y1:H-margin.bottom,x2:x,y2:H-margin.bottom+4,stroke:"#C2C0B5","stroke-width":"1"}));
+  const t = mkEl("text",{x,y:H-margin.bottom+13,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"8",fill:"#7A786F"});
+  t.textContent = y;
+  svg.appendChild(t);
+});
+svg.appendChild(mkEl("line",{x1:margin.left,y1:H-margin.bottom,x2:W-margin.right,y2:H-margin.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+svg.appendChild(mkEl("line",{x1:margin.left,y1:margin.top,x2:margin.left,y2:H-margin.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass=0; pass<30; pass++) {
+    let moved = false;
+    for (let i=1; i<sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap-gap)/2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+
+raw.forEach(series => {
+  const col = COLORS[series.n] || "#7A786F";
+  const validPts = series.pts.filter(p => p.v > -10);
+  const g = mkEl("g",{});
+
+  const pathD = validPts.map((p,i) => `${i===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const line = mkEl("path",{d:pathD,stroke:col,"stroke-width":"1.5",fill:"none","stroke-linejoin":"round"});
+  g.appendChild(line);
+
+  const hit = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none"});
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseenter", () => {
+    document.querySelectorAll(".fdi-series").forEach(el => el.style.opacity="0.1");
+    g.style.opacity = "1";
+    g.querySelector("path").setAttribute("stroke-width","3");
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left*(rect.width/W)) / ((W-margin.left-margin.right)*(rect.width/W));
+    const approxYear = Math.round(yearMin + ratio*(yearMax-yearMin));
+    const closest = validPts.reduce((a,b) => Math.abs(b.y-approxYear)<Math.abs(a.y-approxYear)?b:a);
+    tip.textContent = `${series.n} (${closest.y}): ${closest.v.toFixed(2)}% of GDP`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+12)+"px";
+    tip.style.top = (e.clientY-20)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    document.querySelectorAll(".fdi-series").forEach(el => el.style.opacity="1");
+    g.querySelector("path").setAttribute("stroke-width","1.5");
+    tip.style.opacity = "0";
+  });
+
+  g.classList.add("fdi-series");
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+const endItems = raw.map(s => {
+  const validPts = s.pts.filter(p => p.v > -10);
+  const last = validPts[validPts.length-1];
+  return { s, y: yS(last.v), v: last.v };
+});
+const resolved = resolveCollisions(endItems, 12);
+resolved.forEach(({s, y, v}) => {
+  const col = COLORS[s.n] || "#7A786F";
+  const validPts = s.pts.filter(p => p.v > -10);
+  const origY = yS(validPts[validPts.length-1].v);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:W-margin.right+2,y1:origY,x2:W-margin.right+14,y2:y,stroke:col,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  const t = mkEl("text",{x:W-margin.right+8,y:y+3.5,"font-size":"9",fill:col,"font-weight":"500"});
+  t.textContent = `${v.toFixed(1)}%  ${s.n}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
