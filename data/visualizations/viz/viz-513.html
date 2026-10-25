@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Freshwater Withdrawal as % of Internal Resources</h1>
+<p class="subtitle">Annual freshwater withdrawn for agriculture, industry and domestic use, as a share of total renewable internal freshwater resources. Values above 100% mean a country draws on fossil aquifers, cross-border rivers, or desalination—unsustainable long-term. The 100% threshold marks the boundary of renewable supply.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — ER.H2O.FWTL.ZS (AQUASTAT/FAO)</p>
+<script>
+const raw = [{"n":"Israel","pts":[{"y":1970,"v":205.8},{"y":1975,"v":213.1},{"y":1980,"v":219.7},{"y":1985,"v":236.8},{"y":1990,"v":209.7},{"y":1995,"v":204.3},{"y":2000,"v":215.1},{"y":2005,"v":187.4},{"y":2010,"v":178.7},{"y":2015,"v":152.8},{"y":2021,"v":204.0}]},{"n":"Azerbaijan","pts":[{"y":1992,"v":199.7},{"y":1995,"v":172.2},{"y":2000,"v":135.4},{"y":2005,"v":145.4},{"y":2010,"v":135.2},{"y":2015,"v":144.0},{"y":2022,"v":160.5}]},{"n":"Iraq","pts":[{"y":1975,"v":115.2},{"y":1980,"v":115.9},{"y":1985,"v":116.5},{"y":1990,"v":121.6},{"y":1995,"v":154.5},{"y":2000,"v":187.5},{"y":2005,"v":161.1},{"y":2010,"v":134.7},{"y":2015,"v":99.2},{"y":2019,"v":160.8},{"y":2022,"v":120.5}]},{"n":"Jordan","pts":[{"y":1975,"v":66.1},{"y":1980,"v":78.4},{"y":1985,"v":90.8},{"y":1990,"v":122.4},{"y":1995,"v":127.4},{"y":2000,"v":109.3},{"y":2005,"v":127.0},{"y":2010,"v":130.9},{"y":2015,"v":127.3},{"y":2022,"v":139.3}]},{"n":"Hungary","pts":[{"y":1970,"v":49.7},{"y":1975,"v":66.1},{"y":1980,"v":80.1},{"y":1985,"v":105.8},{"y":1990,"v":115.2},{"y":1995,"v":104.9},{"y":2000,"v":97.4},{"y":2005,"v":93.3},{"y":2010,"v":89.5},{"y":2015,"v":67.2},{"y":2022,"v":78.2}]},{"n":"Barbados","pts":[{"y":1970,"v":52.5},{"y":1980,"v":71.2},{"y":1990,"v":90.0},{"y":1996,"v":101.2},{"y":2005,"v":87.5},{"y":2022,"v":87.5}]},{"n":"Algeria","pts":[{"y":1970,"v":17.8},{"y":1975,"v":22.2},{"y":1980,"v":26.7},{"y":1985,"v":31.1},{"y":1990,"v":39.4},{"y":1995,"v":44.8},{"y":2000,"v":50.1},{"y":2005,"v":58.4},{"y":2010,"v":66.3},{"y":2015,"v":79.6},{"y":2022,"v":91.5}]},{"n":"Iran","pts":[{"y":1975,"v":35.0},{"y":1980,"v":40.4},{"y":1985,"v":45.8},{"y":1990,"v":51.3},{"y":1995,"v":64.6},{"y":2000,"v":68.9},{"y":2004,"v":72.3},{"y":2022,"v":72.3}]},{"n":"India","pts":[{"y":1975,"v":26.3},{"y":1980,"v":30.3},{"y":1985,"v":34.3},{"y":1990,"v":34.6},{"y":1995,"v":38.4},{"y":2000,"v":42.2},{"y":2005,"v":43.5},{"y":2010,"v":44.8},{"y":2022,"v":44.8}]},{"n":"Afghanistan","pts":[{"y":1975,"v":22.7},{"y":1980,"v":36.3},{"y":1985,"v":49.9},{"y":1987,"v":55.4},{"y":1995,"v":46.4},{"y":2000,"v":43.0},{"y":2022,"v":43.0}]}];
+
+const W = 800, H = 480;
+const margin = { top: 30, right: 140, bottom: 40, left: 55 };
+
+function lineColor(latest) {
+  if (latest > 150) return "#B34B3B";
+  if (latest > 100) return "#C4715A";
+  if (latest > 70)  return "#C49A45";
+  if (latest > 40)  return "#8BAD72";
+  return "#5B9E78";
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const valMin = 0, valMax = 260;
+const yearMin = 1970, yearMax = 2022;
+
+const xS = y => margin.left + (y - yearMin)/(yearMax - yearMin)*(W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v)/(valMax - valMin)*(H - margin.top - margin.bottom);
+
+// Grid lines
+[50,100,150,200,250].forEach(v => {
+  const y = yS(v);
+  const isDanger = v >= 100;
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:y,x2:W-margin.right,y2:y,stroke: isDanger ? "#C4715A" : "#E2E0D5","stroke-width": isDanger ? "1" : "0.5","stroke-dasharray": isDanger ? "4,3" : "3,3"}));
+  const t = mkEl("text",{x:margin.left-6,y:y+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"8",fill: isDanger ? "#C4715A" : "#9A9890"});
+  t.textContent = v+"%";
+  svg.appendChild(t);
+});
+// 100% label
+const danger100 = mkEl("text",{x:W-margin.right+6,y:yS(100)+3,"font-family":"JetBrains Mono, monospace","font-size":"7.5",fill:"#C4715A"});
+danger100.textContent = "100% limit";
+svg.appendChild(danger100);
+
+// Danger zone annotation
+svg.appendChild(mkEl("rect",{x:margin.left,y:margin.top,width:W-margin.left-margin.right,height:yS(100)-margin.top,fill:"#C4715A",opacity:"0.04"}));
+
+// X axis ticks
+[1975,1985,1995,2005,2015].forEach(y => {
+  const x = xS(y);
+  svg.appendChild(mkEl("line",{x1:x,y1:H-margin.bottom,x2:x,y2:H-margin.bottom+4,stroke:"#C2C0B5","stroke-width":"1"}));
+  const t = mkEl("text",{x,y:H-margin.bottom+13,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"8",fill:"#7A786F"});
+  t.textContent = y;
+  svg.appendChild(t);
+});
+svg.appendChild(mkEl("line",{x1:margin.left,y1:H-margin.bottom,x2:W-margin.right,y2:H-margin.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+svg.appendChild(mkEl("line",{x1:margin.left,y1:margin.top,x2:margin.left,y2:H-margin.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass=0; pass<30; pass++) {
+    let moved = false;
+    for (let i=1; i<sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap)/2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+
+raw.forEach(series => {
+  const lastV = series.pts[series.pts.length-1].v;
+  const col = lineColor(lastV);
+  const g = mkEl("g",{});
+
+  const pathD = series.pts.map((p,i) => `${i===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const line = mkEl("path",{d:pathD,stroke:col,"stroke-width":"1.5",fill:"none","stroke-linejoin":"round"});
+  g.appendChild(line);
+
+  const hit = mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none"});
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseenter", () => {
+    document.querySelectorAll(".fw-series").forEach(el => el.style.opacity="0.1");
+    g.style.opacity = "1";
+    g.querySelector("path").setAttribute("stroke-width","3");
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - margin.left*(rect.width/W)) / ((W-margin.left-margin.right)*(rect.width/W));
+    const approxYear = Math.round(yearMin + ratio*(yearMax-yearMin));
+    const closest = series.pts.reduce((a,b) => Math.abs(b.y-approxYear)<Math.abs(a.y-approxYear)?b:a);
+    tip.textContent = `${series.n} (${closest.y}): ${closest.v.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX+12)+"px";
+    tip.style.top = (e.clientY-20)+"px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    document.querySelectorAll(".fw-series").forEach(el => el.style.opacity="1");
+    g.querySelector("path").setAttribute("stroke-width","1.5");
+    tip.style.opacity = "0";
+  });
+
+  g.classList.add("fw-series");
+  svg.appendChild(g);
+});
+
+// Endpoint labels
+const endItems = raw.map(s => ({ s, y: yS(s.pts[s.pts.length-1].v) }));
+const resolved = resolveCollisions(endItems, 12);
+resolved.forEach(({s, y}) => {
+  const lastV = s.pts[s.pts.length-1].v;
+  const col = lineColor(lastV);
+  const origY = yS(lastV);
+  if (Math.abs(y - origY) > 2) {
+    svg.appendChild(mkEl("line",{x1:W-margin.right+2,y1:origY,x2:W-margin.right+14,y2:y,stroke:col,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  const t = mkEl("text",{x:W-margin.right+8,y:y+3.5,"font-size":"9",fill:col,"font-weight":"500"});
+  t.textContent = `${lastV.toFixed(0)}%  ${s.n}`;
+  svg.appendChild(t);
+});
+</script>
+</body></html>

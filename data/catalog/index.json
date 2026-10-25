@@ -11815,13 +11815,14 @@
         "indicatorId": "BX.KLT.DINV.WD.GD.ZS",
         "indicatorName": "Foreign direct investment, net inflows (% of GDP)",
         "sourceUrl": "https://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS",
-        "lastFetched": "2026-03-20T13:23:07.348Z"
+        "lastFetched": "2026-10-25T03:17:26.201Z"
       },
       "topics": [
-        "economics",
         "investment",
+        "economics",
+        "globalization",
         "trade",
-        "globalization"
+        "development"
       ],
       "countries": [
         "ZH",
@@ -11834,7 +11835,7 @@
         "7E",
         "T7",
         "EU",
-        "F1",
+        "F2",
         "XE",
         "XD",
         "XF",
@@ -11952,6 +11953,7 @@
         "HU",
         "DJ",
         "AW",
+        "CU",
         "AM",
         "BY",
         "HR",
@@ -11972,7 +11974,7 @@
         "start": "1970",
         "end": "2024"
       },
-      "dataPointCount": 7121,
+      "dataPointCount": 7153,
       "dataFilePath": "datasets/wb--BX-KLT-DINV-WD-GD-ZS.json"
     },
     {
@@ -12142,20 +12144,21 @@
     },
     {
       "id": "wb--EG-CFT-ACCS-ZS",
-      "title": "Access to Clean Fuels and Technologies for Cooking (% of population)",
+      "title": "Access to Clean Fuels and Technologies for Cooking",
       "description": "Access to clean fuels and technologies for cooking (% of population) from world-bank",
       "source": {
         "provider": "world-bank",
         "indicatorId": "EG.CFT.ACCS.ZS",
         "indicatorName": "Access to clean fuels and technologies for cooking (% of population)",
         "sourceUrl": "https://data.worldbank.org/indicator/EG.CFT.ACCS.ZS",
-        "lastFetched": "2026-03-20T13:23:09.570Z"
+        "lastFetched": "2026-10-25T03:17:17.157Z"
       },
       "topics": [
         "energy",
         "health",
-        "environment",
-        "development"
+        "development",
+        "air pollution",
+        "environment"
       ],
       "countries": [
         "ZH",
@@ -12172,7 +12175,7 @@
         "7E",
         "T7",
         "EU",
-        "F1",
+        "F2",
         "XE",
         "XD",
         "XF",
@@ -12231,6 +12234,7 @@
         "BW",
         "BR",
         "BN",
+        "BG",
         "BF",
         "BI",
         "CV",
@@ -12299,9 +12303,9 @@
       ],
       "dateRange": {
         "start": "2000",
-        "end": "2023"
+        "end": "2024"
       },
-      "dataPointCount": 3312,
+      "dataPointCount": 3475,
       "dataFilePath": "datasets/wb--EG-CFT-ACCS-ZS.json"
     },
     {
@@ -20565,10 +20569,11 @@
         "indicatorId": "AG.YLD.CREL.KG",
         "indicatorName": "Cereal yield (kg per hectare)",
         "sourceUrl": "https://data.worldbank.org/indicator/AG.YLD.CREL.KG",
-        "lastFetched": "2026-03-20T18:17:12.637Z"
+        "lastFetched": "2026-10-25T03:17:20.190Z"
       },
       "topics": [
         "agriculture",
+        "food security",
         "food production",
         "crops",
         "productivity"
@@ -20588,7 +20593,7 @@
         "7E",
         "T7",
         "EU",
-        "F1",
+        "F2",
         "XE",
         "XD",
         "XF",
@@ -20713,9 +20718,9 @@
       ],
       "dateRange": {
         "start": "1961",
-        "end": "2023"
+        "end": "2024"
       },
-      "dataPointCount": 8074,
+      "dataPointCount": 8230,
       "dataFilePath": "datasets/wb--AG-YLD-CREL-KG.json"
     },
     {
@@ -25401,20 +25406,21 @@
     },
     {
       "id": "wb--ER-H2O-FWTL-ZS",
-      "title": "Annual Freshwater Withdrawals, Total (% of internal resources)",
+      "title": "Annual Freshwater Withdrawals (% of internal resources)",
       "description": "Annual freshwater withdrawals, total (% of internal resources) from world-bank",
       "source": {
         "provider": "world-bank",
         "indicatorId": "ER.H2O.FWTL.ZS",
         "indicatorName": "Annual freshwater withdrawals, total (% of internal resources)",
         "sourceUrl": "https://data.worldbank.org/indicator/ER.H2O.FWTL.ZS",
-        "lastFetched": "2026-03-20T18:19:59.282Z"
+        "lastFetched": "2026-10-25T03:17:23.278Z"
       },
       "topics": [
         "water",
         "environment",
-        "resources",
-        "sustainability"
+        "freshwater",
+        "sustainability",
+        "resources"
       ],
       "countries": [
         "BB",
@@ -25486,6 +25492,7 @@
         "JM",
         "KZ",
         "ZH",
+        "F2",
         "BY",
         "CD",
         "CU",
@@ -25519,7 +25526,6 @@
         "7E",
         "T7",
         "EU",
-        "F1",
         "XE",
         "XD",
         "XF",
@@ -25557,7 +25563,7 @@
         "start": "1962",
         "end": "2022"
       },
-      "dataPointCount": 3527,
+      "dataPointCount": 3593,
       "dataFilePath": "datasets/wb--ER-H2O-FWTL-ZS.json"
     },
     {
@@ -53292,5 +53298,5 @@
       "dataFilePath": "datasets/wb--SH-XPD-PVTD-CH-ZS.json"
     }
   ],
-  "lastUpdated": "2026-10-11T00:38:17.754Z"
+  "lastUpdated": "2026-10-25T03:17:26.211Z"
 }
