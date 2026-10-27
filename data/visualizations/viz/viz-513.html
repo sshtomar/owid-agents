@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Poverty Gap at $3/Day, 1990–2024</h1>
+<p class="subtitle">The average income shortfall below $3/day (2021 PPP), as a percentage of the poverty line. East Asia — driven by China — collapsed from 30% to near zero. Sub-Saharan Africa remains above 17%. Two divergent trajectories in one chart.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Poverty Gap at $3.00 a Day (2021 PPP) · SI.POV.GAPS</p>
+<script>
+const data = [{"n":"Sub-Saharan Africa","s":[29.7,30.9,31.9,32.1,32.4,32.1,31.5,31.2,31.0,30.5,30.1,29.0,28.3,27.4,25.6,24.5,23.7,22.6,21.6,21.4,20.0,19.4,18.5,17.9,17.6,17.6,17.6,17.4,17.1,17.1,18.1,18.0,17.6,17.3,17.1],"y0":1990},{"n":"East Asia & Pacific","s":[30.1,29.3,28.3,27.3,24.2,21.9,19.8,19.8,20.5,18.7,17.5,16.3,14.3,12.3,10.6,8.7,8.4,7.5,7.0,6.2,5.3,4.1,3.4,1.9,1.6,1.2,1.0,0.8,0.7,0.6,0.6,0.6,0.5,0.5,0.4],"y0":1990},{"n":"South Asia","s":[13.1,12.9,12.5,12.1,11.8,11.6,11.5,11.1,10.9,10.7,10.1,9.2,8.4,8.0,7.4,6.2,5.4,4.8,4.2,3.6,1.5,1.2,0.9,0.6,0.3],"y0":1990},{"n":"Latin America & Caribbean","s":[8.7,8.3,8.4,8.4,8.1,7.6,8.4,8.3,8.2,8.3,7.7,7.5,6.8,6.6,6.0,5.7,4.7,4.0,3.6,3.5,3.1,2.8,2.7,2.4,2.2,2.0,2.2,2.2,2.2,2.2,2.1,2.3,1.8,1.6,1.5],"y0":1990},{"n":"World","s":[17.7,17.4,17.0,16.6,15.5,14.6,13.9,13.8,14.1,13.6,13.0,12.5,11.7,10.8,9.9,9.0,8.5,7.8,7.4,7.0,6.3,5.7,5.2,4.4,4.1,3.9,3.8,3.6,3.5,3.7,3.7,3.6,3.6,3.5],"y0":1990},{"n":"Europe & Central Asia","s":[1.4,1.5,1.9,2.1,2.6,2.6,2.7,2.6,2.7,3.2,3.1,2.8,2.6,2.6,2.2,2.2,2.0,1.9,1.8,1.7,1.7,1.7,1.6,0.4,0.4,0.4,0.4,0.4,0.3,0.3,0.3,0.3,0.3,0.3,0.3],"y0":1990}];
+const labelMap = {"Latin America & Caribbean":"Lat. Am. & Carib.","Europe & Central Asia":"Europe & C. Asia"};
+
+const W = 820, H = 480;
+const margin = { top: 30, right: 130, bottom: 36, left: 52 };
+const yearMin = 1990, yearMax = 2024;
+const valMin = 0, valMax = 35;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+[0, 10, 20, 30].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(v), x2: W - margin.right, y2: yS(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: margin.left - 6, y: yS(v) + 3, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  svg.appendChild(mkEl("line", { x1: xS(y), y1: H - margin.bottom, x2: xS(y), y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.7" }));
+  const t = mkEl("text", { x: xS(y), y: H - margin.bottom + 13, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+const palette = ["#EA5E33","#3D7A5A","#5B9E78","#C49A45","#7A786F","#A6C4A2"];
+
+const groups = [];
+data.forEach((series, i) => {
+  const color = palette[i % palette.length];
+  const pts = series.s.map((v, j) => ({ year: series.y0 + j, value: v }));
+  const pathD = pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xS(p.year)} ${yS(p.value)}`).join(" ");
+  const g = mkEl("g", {});
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.6", fill: "none", "stroke-linejoin": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", cursor: "crosshair" });
+  g.appendChild(line);
+  g.appendChild(hit);
+  svg.appendChild(g);
+  groups.push({ g, line, series, color });
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const labelItems = groups.map(({ series, color }) => ({
+  n: series.n, color,
+  rawY: yS(series.s[series.s.length - 1]),
+  y: yS(series.s[series.s.length - 1])
+}));
+const resolved = resolveCollisions(labelItems, 11);
+const chartTop = margin.top, chartBottom = H - margin.bottom;
+resolved.forEach(item => { item.y = Math.max(chartTop + 5, Math.min(chartBottom - 5, item.y)); });
+
+resolved.forEach(({ n, color, rawY, y }) => {
+  if (Math.abs(y - rawY) > 3) {
+    svg.appendChild(mkEl("line", { x1: xS(yearMax) + 4, y1: rawY, x2: xS(yearMax) + 8, y2: y, stroke: color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const t = mkEl("text", { x: xS(yearMax) + 10, y: y + 3.5, "font-size": "9", fill: color, "font-weight": "500" });
+  t.textContent = labelMap[n] || n;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+groups.forEach(({ g, line, series, color }, idx) => {
+  const hitPath = g.querySelectorAll("path")[1];
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const yi = Math.round(Math.max(0, Math.min(series.s.length - 1, ratio * (series.s.length - 1))));
+    const year = series.y0 + yi;
+    const val = series.s[yi];
+    tip.textContent = `${labelMap[series.n] || series.n}  ${year}  ${val.toFixed(1)}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+    groups.forEach(({ line: l }, j) => l.setAttribute("opacity", j === idx ? "1" : "0.08"));
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(({ line: l }) => { l.setAttribute("opacity", "1"); l.setAttribute("stroke-width", "1.6"); });
+  });
+});
+</script>
+</body></html>
