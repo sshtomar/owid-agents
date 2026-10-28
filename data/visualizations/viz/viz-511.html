@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Factory or Finance? Industry's Share of GDP, 2000 vs. 2022</h1>
+<p class="subtitle">Industry (including construction) as a percentage of GDP. Developed economies have shed manufacturing while Bangladesh and Cambodia industrialize through garments; Guyana's oil boom is the most dramatic swing.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Industry, value added (% of GDP), NV.IND.TOTL.ZS</p>
+<script>
+// All values from dataset wb--NV-IND-TOTL-ZS: {n: country, a: 2000%, b: 2022%}
+const data = [
+  {"n":"Indonesia","a":42.0,"b":41.4},
+  {"n":"Cote d'Ivoire","a":13.9,"b":23.0},
+  {"n":"China","a":45.1,"b":37.9},
+  {"n":"Guyana","a":20.0,"b":67.8},
+  {"n":"Chad","a":10.9,"b":33.1},
+  {"n":"Congo, Dem. Rep.","a":22.4,"b":42.0},
+  {"n":"Cambodia","a":21.6,"b":40.9},
+  {"n":"Ireland","a":31.5,"b":40.8},
+  {"n":"Bangladesh","a":22.3,"b":33.9},
+  {"n":"Ethiopia","a":11.4,"b":22.7},
+  {"n":"Korea, Rep.","a":34.4,"b":32.5},
+  {"n":"India","a":27.3,"b":25.6},
+  {"n":"Germany","a":27.3,"b":25.6},
+  {"n":"Italy","a":24.1,"b":23.3},
+  {"n":"Brazil","a":23.0,"b":22.8},
+  {"n":"Japan","a":32.5,"b":27.1},
+  {"n":"Finland","a":31.6,"b":25.2},
+  {"n":"France","a":21.1,"b":15.8}
+];
+
+const W = 680, H = 600;
+const pad = { left: 148, right: 152, top: 50, bottom: 40 };
+const minV = 5, maxV = 72;
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+const xL = pad.left, xR = W - pad.right;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs = {}) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const top = pad.top + 4, bot = H - pad.bottom - 4;
+  for (const item of sorted) item.y = Math.max(top, Math.min(bot, item.y));
+  return sorted;
+}
+
+function colorFor(d) {
+  const change = d.b - d.a;
+  if (change > 15)  return "#EA5E33";
+  if (change > 5)   return "#F29A44";
+  if (change > 0)   return "#F5D38A";
+  if (change > -5)  return "#A6C4A2";
+  return "#5B9E78";
+}
+
+// Axis lines
+svg.appendChild(mkEl("line", { x1: xL, y1: pad.top, x2: xL, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: xR, y1: pad.top, x2: xR, y2: H - pad.bottom, stroke: "#C2C0B5", "stroke-width": "1" }));
+
+[{x: xL, label: "2000"}, {x: xR, label: "2022"}].forEach(({x, label}) => {
+  const t = mkEl("text", { x, y: pad.top - 14, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "10", fill: "#7A786F" });
+  t.textContent = label;
+  svg.appendChild(t);
+});
+
+[10, 20, 30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: xL, y1: scale(v), x2: xR, y2: scale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: xL - 28, y: scale(v) + 3.5, "text-anchor": "end", "font-family": "'JetBrains Mono', monospace", "font-size": "8", fill: "#9A9890" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const rows = [];
+
+data.forEach(d => {
+  const color = colorFor(d);
+  const yA = scale(d.a), yB = scale(d.b);
+  const g = mkEl("g");
+  svg.appendChild(g);
+
+  g.appendChild(mkEl("line", { x1: xL, y1: yA, x2: xR, y2: yB, stroke: color, "stroke-width": "1.5", opacity: "0.9" }));
+  g.appendChild(mkEl("circle", { cx: xL, cy: yA, r: "3", fill: color }));
+  g.appendChild(mkEl("circle", { cx: xR, cy: yB, r: "3", fill: color }));
+
+  const hit = mkEl("line", { x1: xL - 10, y1: yA, x2: xR + 10, y2: yB, stroke: "transparent", "stroke-width": "14", cursor: "pointer" });
+  g.appendChild(hit);
+  rows.push({ g, d });
+
+  const change = d.b - d.a;
+  const sign = change >= 0 ? "+" : "";
+  hit.addEventListener("mouseenter", e => {
+    showTip(`${d.n}: ${d.a}% → ${d.b}%  (${sign}${change.toFixed(1)} pp)`, e);
+    rows.forEach(r => r.g.style.opacity = r.d === d ? "1" : "0.1");
+  });
+  hit.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 24) + "px"; });
+  hit.addEventListener("mouseleave", () => { hideTip(); rows.forEach(r => r.g.style.opacity = "1"); });
+});
+
+// Left labels
+resolveCollisions(data.map(d => ({ name: d.n, val: d.a, y: scale(d.a), color: colorFor(d) })), 13).forEach(item => {
+  const origY = scale(item.val);
+  if (Math.abs(item.y - origY) > 1.5) {
+    svg.appendChild(mkEl("line", { x1: xL - 4, y1: origY, x2: xL - 4, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.6" }));
+  }
+  const t = mkEl("text", { x: xL - 8, y: item.y + 3.5, "text-anchor": "end", "font-size": "9", fill: "#2B2A27" });
+  t.textContent = `${item.name}  ${item.val}`;
+  svg.appendChild(t);
+});
+
+// Right labels
+resolveCollisions(data.map(d => ({ name: d.n, val: d.b, y: scale(d.b), color: colorFor(d) })), 13).forEach(item => {
+  const origY = scale(item.val);
+  if (Math.abs(item.y - origY) > 1.5) {
+    svg.appendChild(mkEl("line", { x1: xR + 4, y1: origY, x2: xR + 4, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.6" }));
+  }
+  const t = mkEl("text", { x: xR + 8, y: item.y + 3.5, "text-anchor": "start", "font-size": "9", fill: "#2B2A27" });
+  t.textContent = `${item.val}  ${item.name}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendY = H - 10;
+const legendItems = [
+  { color: "#EA5E33", label: ">15pp rise" },
+  { color: "#F29A44", label: "5–15pp rise" },
+  { color: "#F5D38A", label: "0–5pp rise" },
+  { color: "#A6C4A2", label: "0–5pp drop" },
+  { color: "#5B9E78", label: ">5pp drop" }
+];
+let lx = pad.left;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legendY - 7, width: 8, height: 8, fill: item.color }));
+  const t = mkEl("text", { x: lx + 11, y: legendY, "font-size": "8", fill: "#7A786F" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 78;
+});
+</script>
+</body></html>
