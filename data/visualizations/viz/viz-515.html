@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Income Inequality: The Top 20%'s Share, 1990–2024</h1>
+<p class="subtitle">Share of national income held by the wealthiest 20% of the population. Latin American countries cluster around 50–65%; European welfare states sit at 35–41%. Most Latin American economies have gradually reduced this gap, but remain far more unequal than Europe.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Income Share Held by Highest 20% (SI.DST.05TH.20)</p>
+<script>
+const data = [{"n":"Colombia","pts":[{"y":1991,"v":55.8},{"y":1992,"v":56.6},{"y":1996,"v":60.7},{"y":1999,"v":62.3},{"y":2000,"v":62.1},{"y":2001,"v":61.4},{"y":2002,"v":60.6},{"y":2003,"v":58.6},{"y":2004,"v":60},{"y":2005,"v":59},{"y":2008,"v":59.3},{"y":2009,"v":58.6},{"y":2010,"v":59},{"y":2011,"v":58},{"y":2012,"v":57.8},{"y":2013,"v":57.8},{"y":2014,"v":57.8},{"y":2015,"v":56.3},{"y":2016,"v":56.1},{"y":2017,"v":55.5},{"y":2018,"v":56.1},{"y":2019,"v":56.7},{"y":2020,"v":58.3},{"y":2021,"v":59.8},{"y":2022,"v":59.6},{"y":2023,"v":59.2},{"y":2024,"v":58.9}],"last":58.9,"ly":2024},{"n":"Brazil","pts":[{"y":1990,"v":64.6},{"y":1992,"v":57.1},{"y":1993,"v":64.2},{"y":1995,"v":63.8},{"y":1996,"v":63.9},{"y":1997,"v":63.8},{"y":1998,"v":63.8},{"y":1999,"v":63.3},{"y":2001,"v":62.5},{"y":2002,"v":62.4},{"y":2003,"v":61.8},{"y":2004,"v":60.8},{"y":2005,"v":60.7},{"y":2006,"v":60.1},{"y":2007,"v":59.3},{"y":2008,"v":58.6},{"y":2009,"v":58.2},{"y":2011,"v":57.5},{"y":2012,"v":58.1},{"y":2013,"v":57.5},{"y":2014,"v":56.9},{"y":2015,"v":56.7},{"y":2016,"v":58},{"y":2017,"v":57.8},{"y":2018,"v":58.3},{"y":2019,"v":57.8},{"y":2020,"v":54.6},{"y":2021,"v":57.4},{"y":2022,"v":56.8},{"y":2023,"v":56.5},{"y":2024,"v":55.4}],"last":55.4,"ly":2024},{"n":"Costa Rica","pts":[{"y":1990,"v":49.6},{"y":1991,"v":50.8},{"y":1992,"v":50.3},{"y":1993,"v":50.5},{"y":1994,"v":51.5},{"y":1995,"v":50.3},{"y":1996,"v":51.1},{"y":1997,"v":50.6},{"y":1998,"v":50.8},{"y":1999,"v":52.6},{"y":2000,"v":52.1},{"y":2001,"v":56.2},{"y":2002,"v":56.7},{"y":2003,"v":54},{"y":2004,"v":53.4},{"y":2005,"v":52.8},{"y":2006,"v":54.7},{"y":2007,"v":55},{"y":2008,"v":54.1},{"y":2009,"v":55.9},{"y":2010,"v":53.6},{"y":2011,"v":53.9},{"y":2012,"v":53.6},{"y":2013,"v":54.2},{"y":2014,"v":53.9},{"y":2015,"v":53.9},{"y":2016,"v":54},{"y":2017,"v":54},{"y":2018,"v":53.3},{"y":2019,"v":53.7},{"y":2020,"v":54.4},{"y":2021,"v":54.1},{"y":2022,"v":52.7},{"y":2023,"v":52.1},{"y":2024,"v":51.1}],"last":51.1,"ly":2024},{"n":"Ecuador","pts":[{"y":1994,"v":57.9},{"y":1995,"v":56},{"y":1998,"v":54.8},{"y":1999,"v":62.5},{"y":2000,"v":60.7},{"y":2003,"v":58.1},{"y":2004,"v":58.3},{"y":2005,"v":57.5},{"y":2006,"v":57},{"y":2007,"v":58},{"y":2008,"v":54.6},{"y":2009,"v":53.5},{"y":2010,"v":53.9},{"y":2011,"v":51},{"y":2012,"v":51.1},{"y":2013,"v":52.2},{"y":2014,"v":50.6},{"y":2015,"v":51.3},{"y":2016,"v":50.5},{"y":2017,"v":50.1},{"y":2018,"v":51},{"y":2019,"v":51},{"y":2020,"v":52.3},{"y":2021,"v":51.3},{"y":2022,"v":50.9},{"y":2023,"v":49.8},{"y":2024,"v":50}],"last":50,"ly":2024},{"n":"Honduras","pts":[{"y":1990,"v":59.9},{"y":1991,"v":56.7},{"y":1992,"v":56.9},{"y":1993,"v":58},{"y":1994,"v":59.3},{"y":1995,"v":59.8},{"y":1996,"v":59.6},{"y":1997,"v":57.2},{"y":1998,"v":60.7},{"y":1999,"v":58.9},{"y":2001,"v":58.9},{"y":2002,"v":59.4},{"y":2003,"v":61.7},{"y":2004,"v":61.7},{"y":2005,"v":62.9},{"y":2006,"v":60.8},{"y":2007,"v":60},{"y":2008,"v":59.2},{"y":2009,"v":55.4},{"y":2010,"v":57.1},{"y":2011,"v":56.7},{"y":2012,"v":57.4},{"y":2013,"v":54.3},{"y":2014,"v":54.5},{"y":2015,"v":53.8},{"y":2016,"v":53.9},{"y":2017,"v":53.7},{"y":2018,"v":53},{"y":2019,"v":52.2},{"y":2023,"v":50.8},{"y":2024,"v":50}],"last":50,"ly":2024},{"n":"Chile","pts":[{"y":1990,"v":62.5},{"y":1992,"v":60.1},{"y":1994,"v":61.5},{"y":1996,"v":60.1},{"y":1998,"v":60.7},{"y":2000,"v":58},{"y":2003,"v":56.8},{"y":2006,"v":53.8},{"y":2009,"v":53.8},{"y":2011,"v":53.4},{"y":2013,"v":53.6},{"y":2015,"v":52.1},{"y":2017,"v":52},{"y":2020,"v":53.3},{"y":2022,"v":50},{"y":2024,"v":49.9}],"last":49.9,"ly":2024},{"n":"Argentina","pts":[{"y":1991,"v":52.5},{"y":1992,"v":50.8},{"y":1993,"v":49.9},{"y":1994,"v":50.9},{"y":1995,"v":53.8},{"y":1996,"v":54},{"y":1997,"v":53.6},{"y":1998,"v":55.1},{"y":1999,"v":54.1},{"y":2000,"v":55.1},{"y":2001,"v":57},{"y":2002,"v":57.8},{"y":2003,"v":55},{"y":2004,"v":52.6},{"y":2005,"v":52.1},{"y":2006,"v":50.7},{"y":2007,"v":50.7},{"y":2008,"v":49.5},{"y":2009,"v":48.4},{"y":2010,"v":48.6},{"y":2011,"v":47.9},{"y":2012,"v":46.6},{"y":2013,"v":46.2},{"y":2014,"v":47},{"y":2016,"v":47.5},{"y":2017,"v":46.7},{"y":2018,"v":46.9},{"y":2019,"v":48.3},{"y":2020,"v":47.7},{"y":2021,"v":47.8},{"y":2022,"v":46.6},{"y":2023,"v":47.8},{"y":2024,"v":47.9}],"last":47.9,"ly":2024},{"n":"Germany","pts":[{"y":1991,"v":38.1},{"y":1992,"v":38},{"y":1993,"v":37.5},{"y":1994,"v":37.6},{"y":1995,"v":37.5},{"y":1996,"v":37.3},{"y":1997,"v":37.1},{"y":1998,"v":37.1},{"y":1999,"v":37.9},{"y":2000,"v":37.6},{"y":2001,"v":38.8},{"y":2002,"v":38.6},{"y":2003,"v":38.7},{"y":2004,"v":38.9},{"y":2005,"v":40.1},{"y":2006,"v":39.7},{"y":2007,"v":39.9},{"y":2008,"v":39.3},{"y":2009,"v":39},{"y":2010,"v":38.8},{"y":2011,"v":39.1},{"y":2012,"v":39.3},{"y":2013,"v":39.8},{"y":2014,"v":39},{"y":2015,"v":39.5},{"y":2016,"v":39.4},{"y":2017,"v":39.4},{"y":2018,"v":40},{"y":2019,"v":40.2},{"y":2020,"v":40.4},{"y":2021,"v":41.1},{"y":2022,"v":40.9}],"last":40.9,"ly":2022},{"n":"France","pts":[{"y":1990,"v":40.2},{"y":1996,"v":39.8},{"y":1997,"v":39.7},{"y":1998,"v":39.6},{"y":1999,"v":40.4},{"y":2000,"v":40.5},{"y":2001,"v":40.5},{"y":2002,"v":40},{"y":2003,"v":39.8},{"y":2004,"v":39.2},{"y":2005,"v":38.5},{"y":2006,"v":38.3},{"y":2007,"v":40.9},{"y":2008,"v":41.2},{"y":2009,"v":40.8},{"y":2010,"v":41.8},{"y":2011,"v":41.4},{"y":2012,"v":41.3},{"y":2013,"v":40.9},{"y":2014,"v":40.6},{"y":2015,"v":40.9},{"y":2016,"v":40.2},{"y":2017,"v":40},{"y":2018,"v":40.8},{"y":2019,"v":39.2},{"y":2020,"v":38.8},{"y":2021,"v":39.4},{"y":2022,"v":39.2},{"y":2023,"v":39.7}],"last":39.7,"ly":2023},{"n":"Finland","pts":[{"y":1991,"v":33.6},{"y":1995,"v":34.5},{"y":2000,"v":36.9},{"y":2003,"v":37.2},{"y":2004,"v":37.4},{"y":2005,"v":37.2},{"y":2006,"v":37.3},{"y":2007,"v":37.6},{"y":2008,"v":37.2},{"y":2009,"v":36.9},{"y":2010,"v":37},{"y":2011,"v":37.1},{"y":2012,"v":36.7},{"y":2013,"v":36.6},{"y":2014,"v":36.4},{"y":2015,"v":36.7},{"y":2016,"v":36.6},{"y":2017,"v":36.9},{"y":2018,"v":36.8},{"y":2019,"v":37.1},{"y":2020,"v":36.7},{"y":2021,"v":37.1},{"y":2022,"v":37.3},{"y":2023,"v":36.7}],"last":36.7,"ly":2023},{"n":"Belgium","pts":[{"y":1992,"v":34.5},{"y":1995,"v":37.3},{"y":1997,"v":36.1},{"y":2000,"v":41.7},{"y":2003,"v":37},{"y":2004,"v":39.2},{"y":2005,"v":38.2},{"y":2006,"v":36.9},{"y":2007,"v":38},{"y":2008,"v":37.2},{"y":2009,"v":37.2},{"y":2010,"v":37.2},{"y":2011,"v":36.8},{"y":2012,"v":36.4},{"y":2013,"v":36.4},{"y":2014,"v":36.9},{"y":2015,"v":36.5},{"y":2016,"v":36.4},{"y":2017,"v":36.3},{"y":2018,"v":36.4},{"y":2019,"v":36.5},{"y":2020,"v":35.5},{"y":2021,"v":36},{"y":2022,"v":36.1},{"y":2023,"v":36.3}],"last":36.3,"ly":2023},{"n":"Czechia","pts":[{"y":1992,"v":32.6},{"y":1993,"v":37.3},{"y":1996,"v":36},{"y":2002,"v":36.5},{"y":2004,"v":37},{"y":2005,"v":36.7},{"y":2006,"v":36.5},{"y":2007,"v":36.2},{"y":2008,"v":36.5},{"y":2009,"v":36.2},{"y":2010,"v":36.4},{"y":2011,"v":36.2},{"y":2012,"v":36.1},{"y":2013,"v":36.4},{"y":2014,"v":36},{"y":2015,"v":35.9},{"y":2016,"v":35.8},{"y":2017,"v":35.4},{"y":2018,"v":35.5},{"y":2019,"v":35.7},{"y":2020,"v":36.5},{"y":2021,"v":36.3},{"y":2022,"v":36},{"y":2023,"v":35.5}],"last":35.5,"ly":2023}];
+
+// Colors: warm for LatAm (high inequality), cool/green for Europe
+const COLORS = {
+  "Brazil":     "#B34B3B",
+  "Colombia":   "#C4715A",
+  "Honduras":   "#EA5E33",
+  "Ecuador":    "#F29A44",
+  "Chile":      "#C49A45",
+  "Costa Rica": "#F5D38A",
+  "Argentina":  "#D4A96A",
+  "Germany":    "#5B9E78",
+  "France":     "#3D7A5A",
+  "Finland":    "#A6C4A2",
+  "Belgium":    "#7BAD8A",
+  "Czechia":    "#8BAD72"
+};
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 120, bottom: 30, left: 50 };
+const yearMin = 1990, yearMax = 2024;
+const valMin = 30, valMax = 68;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid and axis
+[30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const lbl = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#9A9890" });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// X axis ticks
+[1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.8" }));
+  const lbl = mkEl("text", { x, y: H - margin.bottom + 13, "text-anchor": "middle", "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#9A9890" });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+// Annotation band: Latin America vs Europe gap
+svg.appendChild(mkEl("rect", { x: margin.left, y: yScale(47), width: W - margin.left - margin.right, height: yScale(36) - yScale(47), fill: "#A6C4A2", opacity: "0.08" }));
+svg.appendChild(mkEl("rect", { x: margin.left, y: yScale(65), width: W - margin.left - margin.right, height: yScale(47) - yScale(65), fill: "#EA5E33", opacity: "0.04" }));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  for (const item of sorted) {
+    item.y = Math.max(margin.top + 4, Math.min(H - margin.bottom - 4, item.y));
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const endLabels = [];
+
+data.forEach(series => {
+  const color = COLORS[series.n] || "#888";
+  const g = mkEl("g", {});
+
+  const pathPts = series.pts.map(p => ({ x: xScale(p.y), y: yScale(p.v), v: p.v, yr: p.y }));
+  const pathD = pathPts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+  const rect = () => svg.getBoundingClientRect();
+  hit.addEventListener("mousemove", e => {
+    const r = rect();
+    const mx = e.clientX - r.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const yr = yearMin + ratio * (yearMax - yearMin);
+    const closest = pathPts.reduce((best, p) => Math.abs(p.yr - yr) < Math.abs(best.yr - yr) ? p : best, pathPts[0]);
+    tip.textContent = `${series.n}: ${closest.v.toFixed(1)}% (${closest.yr})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+    svg.querySelectorAll("g").forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mouseout", () => {
+    tip.style.opacity = "0";
+    svg.querySelectorAll("g").forEach(gg => { gg.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+
+  // Collect end labels
+  const last = pathPts[pathPts.length - 1];
+  endLabels.push({ d: series, y: last.y, color });
+});
+
+// Resolve end label collisions and draw
+resolveCollisions(endLabels, 12);
+endLabels.forEach(({ d, y, color }) => {
+  const t = mkEl("text", { x: W - margin.right + 6, y: y + 3.5, "text-anchor": "start", "font-size": "9.5", fill: color });
+  t.textContent = `${d.last}  ${d.n}`;
+  svg.appendChild(t);
+});
+
+// Y axis label
+const yLbl = mkEl("text", { x: 10, y: H / 2, "text-anchor": "middle", "font-size": "8.5", "font-family": "JetBrains Mono, monospace", fill: "#7A786F", transform: `rotate(-90, 10, ${H / 2})` });
+yLbl.textContent = "% of national income";
+svg.appendChild(yLbl);
+</script>
+</body></html>

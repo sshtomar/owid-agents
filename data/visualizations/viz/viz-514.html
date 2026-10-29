@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 720px; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; }
+  .cell { padding: 12px 10px 10px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; box-sizing: border-box; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-vals { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; margin-top: 4px; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Primary School Enrollment Surge, 2000–2022</h1>
+<p class="subtitle">Countries that started the millennium with the lowest enrollment rates have seen the largest gains. Most went from under 65% to near or above 100% (gross rate) within two decades. Sorted by enrollment in 2000.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — School Enrollment, Primary (% Gross) (SE.PRM.ENRR)</p>
+<script>
+const data = [{"n":"Afghanistan","pts":[{"y":2000,"v":21.5},{"y":2001,"v":23.7},{"y":2002,"v":45.5},{"y":2003,"v":61.2},{"y":2004,"v":71.6},{"y":2005,"v":84.0},{"y":2006,"v":92.0},{"y":2007,"v":96.8},{"y":2008,"v":99.3},{"y":2009,"v":104.5},{"y":2010,"v":104.3},{"y":2011,"v":107.8},{"y":2012,"v":104.1},{"y":2013,"v":100.1},{"y":2014,"v":105.0},{"y":2015,"v":101.5},{"y":2016,"v":104.0},{"y":2017,"v":107.6},{"y":2018,"v":110.2},{"y":2019,"v":109.1}],"first":21.5,"fy":2000,"last":109.1,"ly":2019},{"n":"Burkina Faso","pts":[{"y":2000,"v":42.8},{"y":2001,"v":44.7},{"y":2002,"v":47.1},{"y":2003,"v":48.7},{"y":2004,"v":51.4},{"y":2005,"v":54.3},{"y":2006,"v":57.6},{"y":2007,"v":61.0},{"y":2008,"v":65.0},{"y":2009,"v":69.4},{"y":2010,"v":73.1},{"y":2011,"v":77.4},{"y":2012,"v":79.8},{"y":2013,"v":81.4},{"y":2014,"v":83.1},{"y":2015,"v":85.1},{"y":2016,"v":86.9},{"y":2017,"v":87.0},{"y":2018,"v":87.3},{"y":2019,"v":87.3},{"y":2020,"v":85.8},{"y":2021,"v":85.4},{"y":2022,"v":82.3}],"first":42.8,"fy":2000,"last":82.3,"ly":2022},{"n":"Ethiopia","pts":[{"y":2000,"v":52.2},{"y":2001,"v":59.9},{"y":2002,"v":66.5},{"y":2003,"v":69.4},{"y":2004,"v":72.5},{"y":2005,"v":79.4},{"y":2006,"v":87.2},{"y":2007,"v":91.9},{"y":2008,"v":92.2},{"y":2009,"v":90.3},{"y":2010,"v":93.7},{"y":2011,"v":94.7},{"y":2012,"v":97.2},{"y":2013,"v":98.3},{"y":2014,"v":99.2},{"y":2015,"v":102.9},{"y":2016,"v":105.5},{"y":2017,"v":104.7},{"y":2018,"v":106.8},{"y":2020,"v":88.9},{"y":2021,"v":84.1},{"y":2022,"v":84.6}],"first":52.2,"fy":2000,"last":84.6,"ly":2022},{"n":"Guinea","pts":[{"y":2000,"v":58.4},{"y":2001,"v":63.2},{"y":2002,"v":68.9},{"y":2003,"v":72.3},{"y":2004,"v":76.3},{"y":2005,"v":80.2},{"y":2006,"v":83.9},{"y":2007,"v":87.5},{"y":2008,"v":88.2},{"y":2009,"v":88.4},{"y":2010,"v":88.5},{"y":2011,"v":91.9},{"y":2012,"v":88.1},{"y":2013,"v":86.9},{"y":2014,"v":85.0},{"y":2015,"v":83.9},{"y":2016,"v":89.5},{"y":2017,"v":97.2},{"y":2018,"v":98.7},{"y":2019,"v":100.0},{"y":2020,"v":100.5}],"first":58.4,"fy":2000,"last":100.5,"ly":2020},{"n":"Chad","pts":[{"y":2000,"v":61.5},{"y":2001,"v":63.6},{"y":2002,"v":69.0},{"y":2003,"v":72.7},{"y":2004,"v":77.2},{"y":2005,"v":79.6},{"y":2006,"v":82.9},{"y":2007,"v":81.5},{"y":2008,"v":79.8},{"y":2009,"v":79.0},{"y":2010,"v":81.5},{"y":2011,"v":83.8},{"y":2012,"v":83.0},{"y":2013,"v":85.4},{"y":2014,"v":83.7},{"y":2015,"v":82.6},{"y":2016,"v":83.0},{"y":2017,"v":83.6},{"y":2018,"v":84.5},{"y":2019,"v":84.5},{"y":2020,"v":85.2},{"y":2021,"v":85.6},{"y":2022,"v":87.0}],"first":61.5,"fy":2000,"last":87.0,"ly":2022},{"n":"Burundi","pts":[{"y":2000,"v":59.2},{"y":2001,"v":62.5},{"y":2002,"v":63.7},{"y":2003,"v":68.5},{"y":2004,"v":76.7},{"y":2005,"v":87.0},{"y":2006,"v":96.3},{"y":2007,"v":102.3},{"y":2008,"v":107.2},{"y":2009,"v":114.6},{"y":2010,"v":119.3},{"y":2011,"v":121.7},{"y":2012,"v":122.4},{"y":2013,"v":115.9},{"y":2014,"v":112.4},{"y":2015,"v":107.6},{"y":2016,"v":106.7},{"y":2017,"v":106.5},{"y":2018,"v":103.2},{"y":2019,"v":102.0},{"y":2020,"v":101.7}],"first":59.2,"fy":2000,"last":101.7,"ly":2020},{"n":"DR Congo","pts":[{"y":2002,"v":61.0},{"y":2003,"v":65.0},{"y":2004,"v":71.8},{"y":2005,"v":74.4},{"y":2006,"v":77.8},{"y":2007,"v":82.7},{"y":2008,"v":90.3},{"y":2009,"v":94.2},{"y":2010,"v":102.1},{"y":2011,"v":110.3},{"y":2012,"v":111.6},{"y":2014,"v":112.8},{"y":2021,"v":120.1}],"first":61.0,"fy":2002,"last":120.1,"ly":2021},{"n":"Benin","pts":[{"y":2000,"v":77.3},{"y":2001,"v":81.2},{"y":2002,"v":84.0},{"y":2003,"v":88.9},{"y":2004,"v":91.5},{"y":2005,"v":94.9},{"y":2006,"v":94.9},{"y":2007,"v":96.2},{"y":2008,"v":96.8},{"y":2009,"v":97.4},{"y":2010,"v":100.8},{"y":2011,"v":103.4},{"y":2012,"v":106.5},{"y":2013,"v":110.3},{"y":2014,"v":108.8},{"y":2015,"v":108.5},{"y":2016,"v":108.2},{"y":2017,"v":108.8},{"y":2018,"v":109.5},{"y":2019,"v":107.5},{"y":2020,"v":106.5},{"y":2021,"v":107.3},{"y":2022,"v":108.0}],"first":77.3,"fy":2000,"last":108.0,"ly":2022},{"n":"Ghana","pts":[{"y":2000,"v":79.9},{"y":2001,"v":82.0},{"y":2002,"v":83.0},{"y":2003,"v":84.5},{"y":2004,"v":85.5},{"y":2005,"v":87.5},{"y":2006,"v":89.4},{"y":2007,"v":87.5},{"y":2008,"v":88.1},{"y":2009,"v":91.0},{"y":2010,"v":96.3},{"y":2011,"v":100.5},{"y":2012,"v":103.4},{"y":2013,"v":103.1},{"y":2014,"v":103.2},{"y":2015,"v":101.2},{"y":2016,"v":100.8},{"y":2017,"v":99.6},{"y":2018,"v":99.5},{"y":2019,"v":98.0},{"y":2020,"v":98.3},{"y":2021,"v":98.3},{"y":2022,"v":98.2}],"first":79.9,"fy":2000,"last":98.2,"ly":2022},{"n":"Cameroon","pts":[{"y":2000,"v":88.5},{"y":2001,"v":90.3},{"y":2002,"v":94.1},{"y":2003,"v":97.3},{"y":2004,"v":100.5},{"y":2005,"v":103.9},{"y":2006,"v":106.3},{"y":2007,"v":107.6},{"y":2008,"v":108.7},{"y":2009,"v":108.4},{"y":2010,"v":109.4},{"y":2011,"v":112.0},{"y":2012,"v":112.5},{"y":2013,"v":113.6},{"y":2014,"v":113.2},{"y":2015,"v":113.0},{"y":2016,"v":113.5},{"y":2017,"v":114.2},{"y":2018,"v":113.2},{"y":2019,"v":112.3},{"y":2020,"v":112.3},{"y":2021,"v":112.5},{"y":2022,"v":112.5}],"first":88.5,"fy":2000,"last":112.5,"ly":2022},{"n":"Kenya","pts":[{"y":2000,"v":94.3},{"y":2001,"v":96.2},{"y":2002,"v":99.9},{"y":2003,"v":106.8},{"y":2004,"v":109.9},{"y":2005,"v":113.3},{"y":2006,"v":112.5},{"y":2007,"v":112.3},{"y":2008,"v":111.1},{"y":2009,"v":110.3},{"y":2010,"v":109.7},{"y":2011,"v":107.3},{"y":2012,"v":104.1},{"y":2013,"v":102.3},{"y":2014,"v":100.6},{"y":2015,"v":99.8},{"y":2016,"v":99.5},{"y":2017,"v":99.7},{"y":2018,"v":98.8},{"y":2019,"v":98.4},{"y":2020,"v":98.6},{"y":2021,"v":98.3},{"y":2022,"v":98.6}],"first":94.3,"fy":2000,"last":98.6,"ly":2022},{"n":"India","pts":[{"y":2000,"v":98.8},{"y":2001,"v":99.6},{"y":2002,"v":102.0},{"y":2003,"v":105.9},{"y":2004,"v":108.0},{"y":2005,"v":110.0},{"y":2006,"v":113.0},{"y":2007,"v":115.6},{"y":2008,"v":113.6},{"y":2009,"v":111.7},{"y":2010,"v":110.9},{"y":2011,"v":110.3},{"y":2012,"v":110.0},{"y":2013,"v":109.4},{"y":2014,"v":108.6},{"y":2015,"v":108.2},{"y":2016,"v":108.8},{"y":2017,"v":110.3},{"y":2018,"v":111.4},{"y":2019,"v":111.2},{"y":2020,"v":111.8},{"y":2021,"v":110.9},{"y":2022,"v":111.1}],"first":98.8,"fy":2000,"last":111.1,"ly":2022}];
+
+const CELL_W = 160, CELL_H = 70;
+const SPARK_H = 36, SPARK_PAD = 4;
+const grid = document.getElementById("grid");
+const tip = document.getElementById("tip");
+
+data.forEach(series => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameDiv = document.createElement("div");
+  nameDiv.className = "cell-name";
+  nameDiv.textContent = series.n;
+  cell.appendChild(nameDiv);
+
+  const canvas = document.createElement("canvas");
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = CELL_W * dpr;
+  canvas.height = SPARK_H * dpr;
+  canvas.style.width = "100%";
+  canvas.style.height = SPARK_H + "px";
+  canvas.style.display = "block";
+  cell.appendChild(canvas);
+
+  const valsDiv = document.createElement("div");
+  valsDiv.className = "cell-vals";
+  valsDiv.innerHTML = `<span>${series.first.toFixed(0)}%</span><span>${series.fy}</span><span>${series.ly}</span><span>${series.last.toFixed(0)}%</span>`;
+  cell.appendChild(valsDiv);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  const pts = series.pts;
+  const vals = pts.map(p => p.v);
+  const minV = Math.min(...vals);
+  const maxV = Math.max(...vals);
+  const range = maxV - minV || 1;
+  const cw = CELL_W;
+  const ch = SPARK_H;
+
+  const norm = v => ch - SPARK_PAD - ((v - minV) / range) * (ch - SPARK_PAD * 2);
+  const xPos = i => (i / (pts.length - 1)) * cw;
+
+  // Fill under curve
+  ctx.beginPath();
+  ctx.moveTo(xPos(0), norm(pts[0].v));
+  pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), norm(p.v)); });
+  ctx.lineTo(xPos(pts.length - 1), ch);
+  ctx.lineTo(0, ch);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(234,94,51,0.07)";
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.strokeStyle = "#EA5E33";
+  ctx.lineWidth = 1.3;
+  ctx.lineJoin = "round";
+  pts.forEach((p, i) => {
+    const x = xPos(i), y = norm(p.v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Hover crosshair
+  let crossX = null;
+  function drawCross(mx) {
+    const ratio = mx / canvas.getBoundingClientRect().width;
+    const idx = Math.max(0, Math.min(pts.length - 1, Math.round(ratio * (pts.length - 1))));
+    const px = xPos(idx);
+    ctx.clearRect(0, 0, cw * dpr, ch * dpr);
+
+    // Redraw fill
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), norm(pts[0].v));
+    pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), norm(p.v)); });
+    ctx.lineTo(xPos(pts.length - 1), ch); ctx.lineTo(0, ch); ctx.closePath();
+    ctx.fillStyle = "rgba(234,94,51,0.07)"; ctx.fill();
+
+    // Redraw line
+    ctx.beginPath(); ctx.strokeStyle = "#EA5E33"; ctx.lineWidth = 1.3; ctx.lineJoin = "round";
+    pts.forEach((p, i) => { const x = xPos(i), y = norm(p.v); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+    ctx.stroke();
+
+    // Crosshair
+    ctx.beginPath(); ctx.strokeStyle = "#C2C0B5"; ctx.lineWidth = 0.8;
+    ctx.moveTo(px, 0); ctx.lineTo(px, ch); ctx.stroke();
+    // Dot
+    ctx.beginPath(); ctx.arc(px, norm(pts[idx].v), 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#EA5E33"; ctx.fill();
+    return idx;
+  }
+
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const idx = drawCross(mx);
+    tip.textContent = `${series.n}: ${pts[idx].v.toFixed(1)}% (${pts[idx].y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  canvas.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    ctx.clearRect(0, 0, cw * dpr, ch * dpr);
+    // Redraw clean
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), norm(pts[0].v));
+    pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), norm(p.v)); });
+    ctx.lineTo(xPos(pts.length - 1), ch); ctx.lineTo(0, ch); ctx.closePath();
+    ctx.fillStyle = "rgba(234,94,51,0.07)"; ctx.fill();
+    ctx.beginPath(); ctx.strokeStyle = "#EA5E33"; ctx.lineWidth = 1.3; ctx.lineJoin = "round";
+    pts.forEach((p, i) => { const x = xPos(i), y = norm(p.v); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+    ctx.stroke();
+  });
+
+  grid.appendChild(cell);
+});
+</script>
+</body></html>
