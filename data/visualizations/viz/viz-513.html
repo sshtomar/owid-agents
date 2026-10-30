@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Carbon Burden: CO₂ Damage as a Share of National Income, 2021</h1>
+<p class="subtitle">Adjusted savings: the economic cost of CO₂ emissions as a percentage of Gross National Income. This measure captures how much of a nation's wealth is effectively consumed by carbon damage — fossil-fuel exporters and coal-heavy economies pay the heaviest toll.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Adjusted savings: CO₂ damage (% of GNI) — NY.ADJ.DCO2.GN.ZS</p>
+<script>
+// Data from wb--NY-ADJ-DCO2-GN-ZS, top 25 countries by CO2 damage share, 2021
+// y field enables validator year-specific matching
+const data = [
+  {"n":"Iran, Islamic Rep.","l":"Iran","y":2021,"v":8.623},
+  {"n":"Kazakhstan","l":"Kazakhstan","y":2021,"v":5.039},
+  {"n":"Algeria","l":"Algeria","y":2021,"v":4.91},
+  {"n":"Bosnia and Herzegovina","l":"Bosnia & Herz.","y":2021,"v":4.113},
+  {"n":"Bahrain","l":"Bahrain","y":2021,"v":4.099},
+  {"n":"Belarus","l":"Belarus","y":2021,"v":3.929},
+  {"n":"India","l":"India","y":2021,"v":3.441},
+  {"n":"Iraq","l":"Iraq","y":2021,"v":3.435},
+  {"n":"Cambodia","l":"Cambodia","y":2021,"v":3.305},
+  {"n":"Azerbaijan","l":"Azerbaijan","y":2021,"v":3.136},
+  {"n":"Guyana","l":"Guyana","y":2021,"v":3.005},
+  {"n":"Georgia","l":"Georgia","y":2021,"v":2.813},
+  {"n":"China","l":"China","y":2021,"v":2.746},
+  {"n":"Congo, Rep.","l":"Congo","y":2021,"v":2.544},
+  {"n":"Jamaica","l":"Jamaica","y":2021,"v":2.526},
+  {"n":"Bolivia","l":"Bolivia","y":2021,"v":2.475},
+  {"n":"Jordan","l":"Jordan","y":2021,"v":2.443},
+  {"n":"Indonesia","l":"Indonesia","y":2021,"v":2.376},
+  {"n":"Equatorial Guinea","l":"Eq. Guinea","y":2021,"v":2.324},
+  {"n":"Botswana","l":"Botswana","y":2021,"v":2.239},
+  {"n":"Brunei Darussalam","l":"Brunei","y":2021,"v":2.239},
+  {"n":"Benin","l":"Benin","y":2021,"v":2.143},
+  {"n":"Bulgaria","l":"Bulgaria","y":2021,"v":2.079},
+  {"n":"Bhutan","l":"Bhutan","y":2021,"v":2.031},
+  {"n":"Armenia","l":"Armenia","y":2021,"v":1.951}
+];
+
+const W = 680, H = 660;
+const margin = { top: 16, right: 70, bottom: 40, left: 130 };
+const barH = 17, barGap = 7;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const maxVal = 9;
+const xScale = v => margin.left + v / maxVal * (W - margin.left - margin.right);
+
+function colorForVal(v) {
+  if (v >= 5)   return "#B34B3B";
+  if (v >= 4)   return "#C4715A";
+  if (v >= 3)   return "#C49A45";
+  if (v >= 2.5) return "#F5D38A";
+  return "#D6C789";
+}
+
+// Grid lines
+[2, 4, 6, 8].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: xScale(v), y1: margin.top,
+    x2: xScale(v), y2: H - margin.bottom,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: xScale(v), y: H - margin.bottom + 14,
+    "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  })).textContent = v + "%";
+});
+
+const xlabel = mkEl("text", {
+  x: xScale(4.5), y: H - margin.bottom + 28,
+  "text-anchor": "middle", "font-size": "9", fill: "#7A786F",
+  "font-family": "'JetBrains Mono', monospace", "letter-spacing": "0.3"
+});
+xlabel.textContent = "CO₂ DAMAGE AS % OF GNI (2021)";
+svg.appendChild(xlabel);
+
+// Bars
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + barGap);
+  const bw = xScale(d.v) - margin.left;
+  const color = colorForVal(d.v);
+
+  const g = mkEl("g", {});
+
+  const bar = mkEl("rect", { x: margin.left, y, width: bw, height: barH, fill: color, rx: "2", style: "cursor:pointer" });
+  bar.addEventListener("mousemove", e => showTip(`${d.l}: ${d.v}% of GNI lost to CO₂ damage (2021)`, e));
+  bar.addEventListener("mouseleave", hideTip);
+
+  const label = mkEl("text", { x: margin.left - 6, y: y + barH / 2 + 4, "text-anchor": "end", "font-size": "10", fill: "#2B2A27" });
+  label.textContent = d.l;
+
+  const valLabel = mkEl("text", {
+    x: xScale(d.v) + 5, y: y + barH / 2 + 4,
+    "text-anchor": "start", "font-size": "9", fill: "#7A786F",
+    "font-family": "'JetBrains Mono', monospace"
+  });
+  valLabel.textContent = d.v + "%";
+
+  g.appendChild(bar);
+  g.appendChild(label);
+  g.appendChild(valLabel);
+  svg.appendChild(g);
+});
+
+// Legend
+const legY = H - 8;
+const legendItems = [
+  { color: "#B34B3B", label: "≥5%" },
+  { color: "#C4715A", label: "4–5%" },
+  { color: "#C49A45", label: "3–4%" },
+  { color: "#F5D38A", label: "2.5–3%" },
+  { color: "#D6C789", label: "<2.5%" }
+];
+let lx = margin.left;
+legendItems.forEach(item => {
+  svg.appendChild(mkEl("rect", { x: lx, y: legY - 7, width: 8, height: 8, fill: item.color }));
+  const t = mkEl("text", { x: lx + 11, y: legY, "font-size": "8", fill: "#7A786F" });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 64;
+});
+</script>
+</body></html>
