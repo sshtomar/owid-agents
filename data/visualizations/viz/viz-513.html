@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disaster-Induced Internal Displacement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      background: #FAFAF8;
+      color: #2B2A27;
+      padding: 28px 24px 32px;
+    }
+    h1 { font-size: 17px; font-weight: 700; color: #1A1916; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #6B6960; margin-bottom: 20px; line-height: 1.5; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      max-width: 860px;
+      border-top: 1px solid #E2E0D5;
+      border-left: 1px solid #E2E0D5;
+    }
+    .cell {
+      padding: 12px 10px 10px;
+      border-bottom: 1px solid #E2E0D5;
+      border-right: 1px solid #E2E0D5;
+      cursor: crosshair;
+      position: relative;
+      min-height: 80px;
+    }
+    .cell:hover { background: #F4F2EC; }
+    .country-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: #2B2A27;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .canvas-wrap { position: relative; width: 100%; height: 44px; }
+    .cell canvas { display: block; width: 100%; height: 44px; }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .meta-val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 8px;
+      color: #9A9890;
+    }
+    .source { font-size: 11px; color: #9A9890; margin-top: 14px; max-width: 860px; }
+    #tip {
+      position: fixed;
+      background: #1A1916;
+      color: #FAFAF8;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>New Disaster-Induced Internal Displacement by Country</h1>
+  <p class="subtitle">Annual new displacement events from floods, storms, earthquakes and other natural disasters, 2008–2023. Each sparkline is normalized to that country's peak. Sorted by cumulative total.</p>
+
+  <div class="grid" id="grid"></div>
+  <p class="source">Source: World Bank — VC.IDP.NWDS (Internal Displacement Monitoring Centre data). Excludes conflict-driven displacement.</p>
+  <div id="tip"></div>
+
+  <script>
+    // Data exported from notebook -- do not modify
+    const data = [{"n":"China","s":[18660000,4031000,15920000,4490000,5731000,5924000,3612000,3602000,7434000,4463000,4033000,4034000,5074000,6037000,3632000,4702000],"y0":2008,"total":101.8,"peak":18.66},{"n":"India","s":[6662000,5304000,1411000,1503000,9110000,2145000,3428000,3655000,2400000,1346000,2675000,5018000,3856000,4903000,2507000,528000],"y0":2008,"total":56.5,"peak":9.11},{"n":"Bangladesh","s":[61000,1342000,569000,400000,651000,1160000,543000,531000,614000,946000,78000,4084000,4443000,99000,1524000,1791000],"y0":2008,"total":18.8,"peak":4.44},{"n":"Indonesia","s":[221000,854000,409000,7400,104000,427000,943000,204000,1204000,375000,853000,463000,705000,749000,308000,238000],"y0":2008,"total":8.1,"peak":1.2},{"n":"Haiti","s":[139000,9900,1573000,500,86000,1100,6500,1500,356000,15000,8800,1200,13000,220000,15000,9800],"y0":2008,"total":2.5,"peak":1.57},{"n":"Colombia","s":[63000,9100,3000000,149000,71000,11000,20000,4600,31000,25000,67000,36000,64000,32000,281000,351000],"y0":2008,"total":4.2,"peak":3.0},{"n":"Japan","s":[800,0,85000,892000,308000,639000,707000,486000,863000,21000,146000,265000,186000,14000,51000,8600],"y0":2008,"total":4.7,"peak":0.89},{"n":"Brazil","s":[309000,523000,230000,170000,35000,82000,150000,59000,14000,71000,86000,293000,358000,449000,708000,745000],"y0":2008,"total":4.3,"peak":0.75},{"n":"Ethiopia","s":[73000,0,10000,0,20000,61000,49000,104000,347000,434000,296000,504000,664000,240000,873000,618000],"y0":2008,"total":4.3,"peak":0.87},{"n":"Kenya","s":[10000,92000,54000,19000,98000,180000,1400,105000,49000,35000,336000,74000,335000,36000,318000,641000],"y0":2008,"total":2.4,"peak":0.64},{"n":"DR Congo","s":[5100,120,98000,12000,23000,3800,24000,106000,130000,27000,81000,237000,279000,888000,423000,133000],"y0":2008,"total":2.5,"peak":0.89},{"n":"Honduras","s":[70000,2200,8000,12000,0,0,2500,2000,890,0,17000,390,937000,260,46000,5800],"y0":2008,"total":1.1,"peak":0.94},{"n":"Afghanistan","s":[3400,28000,71000,3000,30000,15000,13000,71000,7400,27000,435000,117000,49000,25000,220000,418000],"y0":2008,"total":1.5,"peak":0.44},{"n":"Chile","s":[43000,700,2000000,4000,7300,3600,985000,1047000,16000,9100,2600,3900,3400,2500,1500,44000],"y0":2008,"total":4.2,"peak":2.0},{"n":"Cambodia","s":[0,66000,32000,214000,0,144000,151000,8900,8300,15000,37000,70000,66000,15000,28000,46000],"y0":2008,"total":0.9,"peak":0.21},{"n":"Iran","s":[0,0,3500,0,50000,4700,12000,5400,78,225000,74000,520000,52000,42000,42000,124000],"y0":2008,"total":1.2,"peak":0.52}];
+
+    const tip = document.getElementById("tip");
+    const grid = document.getElementById("grid");
+
+    function fmtM(v) {
+      if (v >= 1e6) return (v / 1e6).toFixed(1) + "M";
+      if (v >= 1000) return Math.round(v / 1000) + "K";
+      return v.toString();
+    }
+
+    data.forEach(country => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      const name = document.createElement("div");
+      name.className = "country-name";
+      name.textContent = country.n;
+      cell.appendChild(name);
+
+      const wrap = document.createElement("div");
+      wrap.className = "canvas-wrap";
+      const canvas = document.createElement("canvas");
+      canvas.width = 160;
+      canvas.height = 44;
+      wrap.appendChild(canvas);
+      cell.appendChild(wrap);
+
+      const meta = document.createElement("div");
+      meta.className = "meta-row";
+      const m1 = document.createElement("span");
+      m1.className = "meta-val";
+      m1.textContent = "2008";
+      const m2 = document.createElement("span");
+      m2.className = "meta-val";
+      m2.textContent = "peak " + country.peak + "M";
+      const m3 = document.createElement("span");
+      m3.className = "meta-val";
+      m3.textContent = "2023";
+      meta.appendChild(m1);
+      meta.appendChild(m2);
+      meta.appendChild(m3);
+      cell.appendChild(meta);
+
+      // Draw sparkline
+      const ctx = canvas.getContext("2d");
+      const cw = 160, ch = 44;
+      const series = country.s;
+      const maxVal = Math.max(...series);
+      const minVal = 0;
+
+      const norm = v => (maxVal === minVal) ? ch / 2 : ch - 4 - ((v - minVal) / (maxVal - minVal)) * (ch - 8);
+
+      // Fill area
+      const gradient = ctx.createLinearGradient(0, 0, 0, ch);
+      gradient.addColorStop(0, "rgba(234,94,51,0.25)");
+      gradient.addColorStop(1, "rgba(234,94,51,0.03)");
+      ctx.beginPath();
+      series.forEach((v, i) => {
+        const x = (i / (series.length - 1)) * cw;
+        const y = norm(v);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.lineTo(cw, ch);
+      ctx.lineTo(0, ch);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Line
+      ctx.strokeStyle = "#EA5E33";
+      ctx.lineWidth = 1.4;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      series.forEach((v, i) => {
+        const x = (i / (series.length - 1)) * cw;
+        const y = norm(v);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Crosshair on mousemove
+      let crossX = null;
+      cell.addEventListener("mousemove", e => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = (e.clientX - rect.left) * (cw / rect.width);
+        const idx = Math.min(series.length - 1, Math.max(0, Math.round(mx / cw * (series.length - 1))));
+        const year = country.y0 + idx;
+        const val = series[idx];
+
+        // Redraw with crosshair
+        ctx.clearRect(0, 0, cw, ch);
+
+        ctx.beginPath();
+        series.forEach((v, i) => {
+          const x = (i / (series.length - 1)) * cw;
+          const y = norm(v);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.lineTo(cw, ch);
+        ctx.lineTo(0, ch);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        ctx.strokeStyle = "#EA5E33";
+        ctx.lineWidth = 1.4;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        series.forEach((v, i) => {
+          const x = (i / (series.length - 1)) * cw;
+          const y = norm(v);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        const cx = (idx / (series.length - 1)) * cw;
+        ctx.strokeStyle = "#9A9890";
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(cx, 0);
+        ctx.lineTo(cx, ch);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        tip.textContent = `${country.n} ${year}: ${fmtM(val)} displaced`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 22) + "px";
+      });
+
+      cell.addEventListener("mouseleave", () => {
+        // Redraw clean
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.beginPath();
+        series.forEach((v, i) => {
+          const x = (i / (series.length - 1)) * cw;
+          const y = norm(v);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.lineTo(cw, ch);
+        ctx.lineTo(0, ch);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        ctx.strokeStyle = "#EA5E33";
+        ctx.lineWidth = 1.4;
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        series.forEach((v, i) => {
+          const x = (i / (series.length - 1)) * cw;
+          const y = norm(v);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        tip.style.opacity = "0";
+      });
+
+      grid.appendChild(cell);
+    });
+  </script>
+</body>
+</html>
