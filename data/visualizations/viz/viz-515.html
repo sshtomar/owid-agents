@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Urban Safe Drinking Water Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      background: #FAFAF8;
+      color: #2B2A27;
+      padding: 28px 24px 32px;
+      min-height: 100vh;
+    }
+    h1 { font-size: 17px; font-weight: 700; color: #1A1916; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #6B6960; margin-bottom: 20px; line-height: 1.5; }
+    #chart-wrap { width: 100%; max-width: 740px; }
+    svg { width: 100%; height: auto; display: block; }
+    .source { font-size: 11px; color: #9A9890; margin-top: 14px; }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #6B6960; }
+    .legend-swatch { width: 20px; height: 3px; border-radius: 2px; }
+    #tip {
+      position: fixed;
+      background: #1A1916;
+      color: #FAFAF8;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Urban Population with Safe Drinking Water: 2000 vs. 2020s</h1>
+  <p class="subtitle">Share of urban residents using safely managed drinking water services (piped water with adequate quality, quantity, and availability). Hover any line to highlight.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A"></div> Large gain (&gt;15 pp)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#6BAE8C"></div> Moderate gain (5–15 pp)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#C4A84A"></div> Little change (±5 pp)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#C4573A"></div> Decline</div>
+  </div>
+
+  <div id="chart-wrap">
+    <svg id="chart" viewBox="0 0 700 600"></svg>
+  </div>
+  <p class="source">Source: World Bank — SH.H2O.SMDW.UR.ZS. "Safely managed" means piped water free from contamination and available when needed.</p>
+  <div id="tip"></div>
+
+  <script>
+    // Data exported from notebook -- do not modify
+    const data = [{"n":"Chad","a":14.9,"b":17.6},{"n":"Afghanistan","a":21.9,"b":36.4},{"n":"Ghana","a":32.2,"b":60.2},{"n":"DR Congo","a":33.6,"b":24.2},{"n":"Ethiopia","a":35.8,"b":38.4},{"n":"Bangladesh","a":42.1,"b":54.3},{"n":"Gambia","a":44.8,"b":68.4},{"n":"Honduras","a":46.1,"b":78.4},{"n":"Cambodia","a":46.5,"b":57.2},{"n":"Iraq","a":60.6,"b":64.6},{"n":"Guatemala","a":61.6,"b":51.7},{"n":"India","a":67.4,"b":83.0},{"n":"Georgia","a":78.1,"b":89.3},{"n":"Algeria","a":81.9,"b":72.1},{"n":"Brazil","a":82.3,"b":90.7},{"n":"Botswana","a":84.1,"b":68.9},{"n":"El Salvador","a":90.3,"b":75.7},{"n":"China","a":91.7,"b":96.4},{"n":"France","a":97.0,"b":100},{"n":"Germany","a":99.8,"b":100.0}];
+
+    const W = 700, H = 600;
+    const pad = { left: 128, right: 145, top: 50, bottom: 24 };
+    const innerH = H - pad.top - pad.bottom;
+    const minV = 8, maxV = 104;
+
+    const svg = document.getElementById("chart");
+    const tip = document.getElementById("tip");
+
+    function mkEl(tag, attrs, text) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      if (attrs) Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    function sc(v) {
+      return pad.top + (maxV - v) / (maxV - minV) * innerH;
+    }
+
+    function colorFor(d) {
+      const diff = d.b - d.a;
+      if (diff > 15) return "#3D7A5A";
+      if (diff > 5) return "#6BAE8C";
+      if (diff >= -5) return "#C4A84A";
+      return "#C4573A";
+    }
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      const yMin = pad.top + 6;
+      const yMax = H - pad.bottom - 6;
+      sorted.forEach(item => {
+        item.y = Math.max(yMin, Math.min(yMax, item.y));
+      });
+      return sorted;
+    }
+
+    // Column headers
+    svg.appendChild(mkEl("text", {
+      x: pad.left - 8, y: pad.top - 16,
+      "text-anchor": "end",
+      "font-family": "JetBrains Mono, monospace",
+      "font-size": "10",
+      fill: "#9A9890"
+    }, "Year 2000"));
+
+    svg.appendChild(mkEl("text", {
+      x: W - pad.right + 8, y: pad.top - 16,
+      "text-anchor": "start",
+      "font-family": "JetBrains Mono, monospace",
+      "font-size": "10",
+      fill: "#9A9890"
+    }, "2018–2024"));
+
+    // Axis lines
+    svg.appendChild(mkEl("line", {
+      x1: pad.left, y1: pad.top - 4,
+      x2: pad.left, y2: H - pad.bottom,
+      stroke: "#D8D6CF", "stroke-width": "1"
+    }));
+    svg.appendChild(mkEl("line", {
+      x1: W - pad.right, y1: pad.top - 4,
+      x2: W - pad.right, y2: H - pad.bottom,
+      stroke: "#D8D6CF", "stroke-width": "1"
+    }));
+
+    // Gridlines
+    [0, 25, 50, 75, 100].forEach(v => {
+      const y = sc(v);
+      svg.appendChild(mkEl("line", {
+        x1: pad.left, y1: y,
+        x2: W - pad.right, y2: y,
+        stroke: "#E8E6DF", "stroke-width": "0.5",
+        "stroke-dasharray": "3,3"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: pad.left - 5, y: y + 4,
+        "text-anchor": "end",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "8",
+        fill: "#B0AEA6"
+      }, v + "%"));
+    });
+
+    // Labels
+    const leftLabels = data.map(d => ({ y: sc(d.a), d }));
+    const rightLabels = data.map(d => ({ y: sc(d.b), d }));
+
+    const leftResolved = resolveCollisions(leftLabels, 13);
+    const rightResolved = resolveCollisions(rightLabels, 13);
+
+    const leftPos = {};
+    leftResolved.forEach(item => { leftPos[item.d.n] = item.y; });
+    const rightPos = {};
+    rightResolved.forEach(item => { rightPos[item.d.n] = item.y; });
+
+    const groups = [];
+
+    data.forEach(d => {
+      const x1 = pad.left;
+      const x2 = W - pad.right;
+      const y1 = sc(d.a);
+      const y2 = sc(d.b);
+      const col = colorFor(d);
+      const ly1 = leftPos[d.n];
+      const ly2 = rightPos[d.n];
+
+      const g = mkEl("g", { opacity: "1" });
+
+      g.appendChild(mkEl("line", {
+        x1, y1, x2, y2,
+        stroke: col, "stroke-width": "1.4",
+        "stroke-linecap": "round"
+      }));
+
+      if (Math.abs(y1 - ly1) > 1) {
+        g.appendChild(mkEl("line", {
+          x1: x1 - 4, y1,
+          x2: x1 - 8, y2: ly1,
+          stroke: col, "stroke-width": "0.6", opacity: "0.5"
+        }));
+      }
+      if (Math.abs(y2 - ly2) > 1) {
+        g.appendChild(mkEl("line", {
+          x1: x2 + 4, y1: y2,
+          x2: x2 + 8, y2: ly2,
+          stroke: col, "stroke-width": "0.6", opacity: "0.5"
+        }));
+      }
+
+      g.appendChild(mkEl("circle", { cx: x1, cy: y1, r: "2.5", fill: col }));
+      g.appendChild(mkEl("circle", { cx: x2, cy: y2, r: "2.5", fill: col }));
+
+      g.appendChild(mkEl("text", {
+        x: x1 - 10, y: ly1 + 3.5,
+        "text-anchor": "end",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "8.5",
+        fill: "#4A4840"
+      }, d.n + "  " + d.a + "%"));
+
+      g.appendChild(mkEl("text", {
+        x: x2 + 10, y: ly2 + 3.5,
+        "text-anchor": "start",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "8.5",
+        fill: "#4A4840"
+      }, d.b + "%  " + d.n));
+
+      const hit = mkEl("line", {
+        x1, y1, x2, y2,
+        stroke: "transparent", "stroke-width": "14",
+        cursor: "pointer"
+      });
+      g.appendChild(hit);
+
+      hit.addEventListener("mouseenter", (e) => {
+        groups.forEach(grp => grp.setAttribute("opacity", grp === g ? "1" : "0.1"));
+        const diff = (d.b - d.a).toFixed(1);
+        const sign = diff > 0 ? "+" : "";
+        tip.textContent = `${d.n}: ${d.a}% (2000) → ${d.b}% (${sign}${diff} pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 22) + "px";
+      });
+      hit.addEventListener("mousemove", (e) => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 22) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        groups.forEach(grp => grp.setAttribute("opacity", "1"));
+        tip.style.opacity = "0";
+      });
+
+      groups.push(g);
+    });
+
+    groups.forEach(g => svg.appendChild(g));
+  </script>
+</body>
+</html>

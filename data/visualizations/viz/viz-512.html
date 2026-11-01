@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PM2.5 Air Pollution Exposure Above WHO Guidelines</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", -apple-system, sans-serif;
+      background: #FAFAF8;
+      color: #2B2A27;
+      padding: 28px 24px 32px;
+      min-height: 100vh;
+    }
+    h1 { font-size: 17px; font-weight: 700; color: #1A1916; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #6B6960; margin-bottom: 20px; line-height: 1.5; }
+    #chart-wrap { width: 100%; max-width: 820px; }
+    svg { width: 100%; height: auto; display: block; }
+    .source { font-size: 11px; color: #9A9890; margin-top: 14px; }
+    #tip {
+      position: fixed;
+      background: #1A1916;
+      color: #FAFAF8;
+      font-size: 12px;
+      font-family: "Inter", sans-serif;
+      padding: 6px 10px;
+      border-radius: 5px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      white-space: nowrap;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <h1>Share of Population Exposed to PM2.5 Above WHO Air Quality Guidelines</h1>
+  <p class="subtitle">Percentage of each country's population living in areas where annual mean PM2.5 exceeds the WHO guideline of 10 µg/m³. Hover a line to isolate it.</p>
+
+  <div id="chart-wrap">
+    <svg id="chart" viewBox="0 0 820 460"></svg>
+  </div>
+  <p class="source">Source: World Bank — EN.ATM.PM25.MC.ZS (2017 data, latest available). WHO PM2.5 annual mean guideline: 10 µg/m³.</p>
+  <div id="tip"></div>
+
+  <script>
+    // Data exported from notebook -- do not modify
+    const data = [{"n":"Finland","pts":[{"y":1990,"v":1.63},{"y":1995,"v":0.67},{"y":2000,"v":0},{"y":2005,"v":0.72},{"y":2010,"v":0.74},{"y":2011,"v":0.74},{"y":2012,"v":0},{"y":2013,"v":0},{"y":2014,"v":0},{"y":2015,"v":0},{"y":2016,"v":0},{"y":2017,"v":0}]},{"n":"Canada","pts":[{"y":1990,"v":16.21},{"y":1995,"v":12.91},{"y":2000,"v":11.02},{"y":2005,"v":19.6},{"y":2010,"v":13.67},{"y":2011,"v":18.72},{"y":2012,"v":8.34},{"y":2013,"v":6.63},{"y":2014,"v":2.02},{"y":2015,"v":0.73},{"y":2016,"v":0},{"y":2017,"v":0}]},{"n":"Ireland","pts":[{"y":1990,"v":60.3},{"y":1995,"v":54.96},{"y":2000,"v":50.34},{"y":2005,"v":46.54},{"y":2010,"v":49.34},{"y":2011,"v":56.88},{"y":2012,"v":29.96},{"y":2013,"v":27.36},{"y":2014,"v":3.61},{"y":2015,"v":2.72},{"y":2016,"v":0.27},{"y":2017,"v":0.27}]},{"n":"Australia","pts":[{"y":1990,"v":31.88},{"y":1995,"v":31.61},{"y":2000,"v":33.83},{"y":2005,"v":33.49},{"y":2010,"v":32.97},{"y":2011,"v":36.32},{"y":2012,"v":30.65},{"y":2013,"v":28.27},{"y":2014,"v":27.11},{"y":2015,"v":26.05},{"y":2016,"v":24.9},{"y":2017,"v":24.89}]},{"n":"Denmark","pts":[{"y":1990,"v":99.96},{"y":1995,"v":99.55},{"y":2000,"v":97.97},{"y":2005,"v":97.14},{"y":2010,"v":96.1},{"y":2011,"v":98.96},{"y":2012,"v":85.47},{"y":2013,"v":78.75},{"y":2014,"v":82.83},{"y":2015,"v":75.19},{"y":2016,"v":57.09},{"y":2017,"v":56.91}]},{"n":"Andorra","pts":[{"y":1990,"v":100},{"y":1995,"v":99.98},{"y":2000,"v":99.96},{"y":2005,"v":100},{"y":2010,"v":99.96},{"y":2011,"v":100},{"y":2012,"v":99.96},{"y":2013,"v":97.69},{"y":2014,"v":16.6},{"y":2015,"v":90.85},{"y":2016,"v":17.42},{"y":2017,"v":17.82}]},{"n":"France","pts":[{"y":1990,"v":99.77},{"y":1995,"v":99.63},{"y":2000,"v":99.37},{"y":2005,"v":99.6},{"y":2010,"v":99.48},{"y":2011,"v":99.7},{"y":2012,"v":98.61},{"y":2013,"v":97.41},{"y":2014,"v":87.85},{"y":2015,"v":90.41},{"y":2016,"v":78.28},{"y":2017,"v":78.21}]},{"n":"Japan","pts":[{"y":1990,"v":92.53},{"y":1995,"v":92.51},{"y":2000,"v":91.75},{"y":2005,"v":92.09},{"y":2010,"v":92.59},{"y":2011,"v":92.56},{"y":2012,"v":89.13},{"y":2013,"v":89.8},{"y":2014,"v":87.82},{"y":2015,"v":88.67},{"y":2016,"v":75.41},{"y":2017,"v":76.76}]},{"n":"Germany","pts":[{"y":1990,"v":99.76},{"y":1995,"v":99.65},{"y":2000,"v":99.41},{"y":2005,"v":99.18},{"y":2010,"v":99.6},{"y":2011,"v":99.45},{"y":2012,"v":98.3},{"y":2013,"v":97.85},{"y":2014,"v":95.73},{"y":2015,"v":95.95},{"y":2016,"v":89.15},{"y":2017,"v":89.17}]},{"n":"Austria","pts":[{"y":1990,"v":99.66},{"y":1995,"v":99.23},{"y":2000,"v":98.68},{"y":2005,"v":99.15},{"y":2010,"v":98.45},{"y":2011,"v":99.26},{"y":2012,"v":97.41},{"y":2013,"v":95.77},{"y":2014,"v":93.79},{"y":2015,"v":91.47},{"y":2016,"v":85.02},{"y":2017,"v":85.05}]},{"n":"Brazil","pts":[{"y":1990,"v":89},{"y":1995,"v":89.49},{"y":2000,"v":90.79},{"y":2005,"v":89.78},{"y":2010,"v":90.94},{"y":2011,"v":91.93},{"y":2012,"v":86.83},{"y":2013,"v":85.33},{"y":2014,"v":77.12},{"y":2015,"v":74.93},{"y":2016,"v":67.95},{"y":2017,"v":68.14}]}];
+
+    const W = 820, H = 460;
+    const margin = { top: 32, right: 130, bottom: 36, left: 52 };
+
+    const svg = document.getElementById("chart");
+    const tip = document.getElementById("tip");
+
+    function mkEl(tag, attrs, text) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      if (attrs) Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    const yearMin = 1990, yearMax = 2017;
+    const valMin = 0, valMax = 102;
+
+    const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+    const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+    // Color by 2017 value
+    function colorFor(series) {
+      const last = series[series.length - 1].v;
+      if (last < 5) return "#3D7A5A";
+      if (last < 35) return "#6BAE8C";
+      if (last < 70) return "#C4A84A";
+      if (last < 90) return "#E87540";
+      return "#C4573A";
+    }
+
+    // Y-axis gridlines
+    [0, 25, 50, 75, 100].forEach(v => {
+      const y = yScale(v);
+      svg.appendChild(mkEl("line", {
+        x1: margin.left, y1: y,
+        x2: W - margin.right, y2: y,
+        stroke: v === 0 ? "#C2C0B5" : "#E8E6DF",
+        "stroke-width": "0.5",
+        "stroke-dasharray": v === 0 ? "none" : "3,3"
+      }));
+      svg.appendChild(mkEl("text", {
+        x: margin.left - 5, y: y + 4,
+        "text-anchor": "end",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9",
+        fill: "#9A9890"
+      }, v + "%"));
+    });
+
+    // X-axis labels
+    [1990, 1995, 2000, 2005, 2010, 2015, 2017].forEach(yr => {
+      svg.appendChild(mkEl("text", {
+        x: xScale(yr), y: H - margin.bottom + 14,
+        "text-anchor": "middle",
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "9",
+        fill: "#9A9890"
+      }, yr));
+    });
+
+    // Prepare endpoint labels
+    const endLabels = data.map(d => ({
+      y: yScale(d.pts[d.pts.length - 1].v),
+      d
+    }));
+
+    function resolveCollisions(items, minGap) {
+      const sorted = items.slice().sort((a, b) => a.y - b.y);
+      for (let pass = 0; pass < 30; pass++) {
+        let moved = false;
+        for (let i = 1; i < sorted.length; i++) {
+          const gap = sorted[i].y - sorted[i - 1].y;
+          if (gap < minGap) {
+            const shift = (minGap - gap) / 2;
+            sorted[i - 1].y -= shift;
+            sorted[i].y += shift;
+            moved = true;
+          }
+        }
+        if (!moved) break;
+      }
+      const yMin = margin.top + 4;
+      const yMax = H - margin.bottom - 4;
+      sorted.forEach(item => {
+        item.y = Math.max(yMin, Math.min(yMax, item.y));
+      });
+      return sorted;
+    }
+
+    const resolvedLabels = resolveCollisions(endLabels, 13);
+    const labelPos = {};
+    resolvedLabels.forEach(item => { labelPos[item.d.n] = item.y; });
+
+    const groups = [];
+
+    data.forEach(d => {
+      const col = colorFor(d.pts);
+      const g = mkEl("g", { opacity: "1" });
+
+      // Build path
+      const pathD = d.pts.map((p, i) => {
+        const x = xScale(p.y);
+        const y = yScale(p.v);
+        return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+      }).join(" ");
+
+      g.appendChild(mkEl("path", {
+        d: pathD,
+        stroke: col, "stroke-width": "1.6",
+        fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+      }));
+
+      // Endpoint dot
+      const lastPt = d.pts[d.pts.length - 1];
+      g.appendChild(mkEl("circle", {
+        cx: xScale(lastPt.y), cy: yScale(lastPt.v),
+        r: "2.5", fill: col
+      }));
+
+      // Leader line to label if needed
+      const dataY = yScale(lastPt.v);
+      const labY = labelPos[d.n];
+      if (Math.abs(dataY - labY) > 2) {
+        g.appendChild(mkEl("line", {
+          x1: xScale(lastPt.y) + 4, y1: dataY,
+          x2: xScale(lastPt.y) + 8, y2: labY,
+          stroke: col, "stroke-width": "0.6", opacity: "0.5"
+        }));
+      }
+
+      // Endpoint label
+      g.appendChild(mkEl("text", {
+        x: xScale(lastPt.y) + 10, y: labY + 3.5,
+        "font-family": "JetBrains Mono, monospace",
+        "font-size": "8.5",
+        fill: "#4A4840"
+      }, lastPt.v.toFixed(1) + "%  " + d.n));
+
+      // Invisible hit path
+      const hit = mkEl("path", {
+        d: pathD,
+        stroke: "transparent", "stroke-width": "14",
+        fill: "none", cursor: "pointer"
+      });
+      g.appendChild(hit);
+
+      hit.addEventListener("mouseenter", (e) => {
+        groups.forEach(grp => grp.setAttribute("opacity", grp === g ? "1" : "0.1"));
+        const last = d.pts[d.pts.length - 1];
+        const first = d.pts[0];
+        const diff = (last.v - first.v).toFixed(1);
+        const sign = diff > 0 ? "+" : "";
+        tip.textContent = `${d.n}: ${first.v}% (1990) → ${last.v}% (2017) (${sign}${diff} pp)`;
+        tip.style.opacity = "1";
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 22) + "px";
+      });
+      hit.addEventListener("mousemove", (e) => {
+        tip.style.left = (e.clientX + 14) + "px";
+        tip.style.top = (e.clientY - 22) + "px";
+      });
+      hit.addEventListener("mouseleave", () => {
+        groups.forEach(grp => grp.setAttribute("opacity", "1"));
+        tip.style.opacity = "0";
+      });
+
+      groups.push(g);
+    });
+
+    groups.forEach(g => svg.appendChild(g));
+
+    // Y-axis label
+    const yAxisLabel = mkEl("text", {
+      transform: `translate(12, ${margin.top + (H - margin.top - margin.bottom) / 2}) rotate(-90)`,
+      "text-anchor": "middle",
+      "font-family": "Inter, sans-serif",
+      "font-size": "10",
+      fill: "#9A9890"
+    }, "Population exposed (%)");
+    svg.appendChild(yAxisLabel);
+  </script>
+</body>
+</html>
