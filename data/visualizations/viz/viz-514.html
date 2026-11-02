@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Services Economy: Services Value Added as Share of GDP, 1960–2024</h1>
+<p class="subtitle">France rose from 47% to 71% services. China climbed from 33% — despite its manufacturing reputation. India remains at 48% even as its IT sector grew. Most economies converge toward services-led growth.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Services, Value Added (% of GDP), NV.SRV.TOTL.ZS</p>
+<script>
+const data = [{"n":"France","pts":[{"y":1960,"v":47.0},{"y":1961,"v":48.1},{"y":1962,"v":48.0},{"y":1963,"v":49.2},{"y":1964,"v":49.3},{"y":1965,"v":49.7},{"y":1966,"v":50.2},{"y":1967,"v":50.9},{"y":1968,"v":52.5},{"y":1969,"v":52.4},{"y":1970,"v":52.8},{"y":1971,"v":53.0},{"y":1972,"v":52.7},{"y":1973,"v":53.1},{"y":1974,"v":55.0},{"y":1975,"v":55.9},{"y":1976,"v":56.3},{"y":1977,"v":57.4},{"y":1978,"v":57.3},{"y":1979,"v":57.2},{"y":1980,"v":58.0},{"y":1981,"v":59.0},{"y":1982,"v":58.9},{"y":1983,"v":59.6},{"y":1984,"v":60.2},{"y":1985,"v":60.2},{"y":1986,"v":60.8},{"y":1987,"v":61.3},{"y":1988,"v":61.5},{"y":1989,"v":62.1},{"y":1990,"v":62.2},{"y":1991,"v":63.0},{"y":1992,"v":63.7},{"y":1993,"v":65.0},{"y":1994,"v":65.2},{"y":1995,"v":65.0},{"y":1996,"v":65.3},{"y":1997,"v":65.6},{"y":1998,"v":65.7},{"y":1999,"v":66.0},{"y":2000,"v":66.4},{"y":2001,"v":67.0},{"y":2002,"v":67.5},{"y":2003,"v":68.2},{"y":2004,"v":68.3},{"y":2005,"v":68.7},{"y":2006,"v":68.9},{"y":2007,"v":69.2},{"y":2008,"v":69.8},{"y":2009,"v":70.8},{"y":2010,"v":70.7},{"y":2011,"v":70.3},{"y":2012,"v":70.4},{"y":2013,"v":70.4},{"y":2014,"v":70.4},{"y":2015,"v":70.3},{"y":2016,"v":70.6},{"y":2017,"v":70.4},{"y":2018,"v":70.1},{"y":2019,"v":70.1},{"y":2020,"v":71.0},{"y":2021,"v":70.7},{"y":2022,"v":71.8},{"y":2023,"v":70.2},{"y":2024,"v":70.9}]},{"n":"Korea, Rep.","pts":[{"y":1970,"v":40.4},{"y":1975,"v":40.5},{"y":1980,"v":43.7},{"y":1985,"v":45.0},{"y":1990,"v":47.2},{"y":1995,"v":49.7},{"y":2000,"v":52.5},{"y":2005,"v":54.4},{"y":2010,"v":54.9},{"y":2015,"v":55.1},{"y":2020,"v":56.9},{"y":2021,"v":56.9},{"y":2022,"v":58.1},{"y":2023,"v":58.9},{"y":2024,"v":57.5}]},{"n":"China","pts":[{"y":1960,"v":32.6},{"y":1965,"v":27.5},{"y":1970,"v":25.1},{"y":1975,"v":22.8},{"y":1980,"v":22.4},{"y":1985,"v":29.5},{"y":1990,"v":32.5},{"y":1995,"v":34.0},{"y":2000,"v":40.4},{"y":2005,"v":42.1},{"y":2010,"v":45.1},{"y":2015,"v":51.7},{"y":2020,"v":55.5},{"y":2021,"v":54.8},{"y":2022,"v":55.0},{"y":2023,"v":56.3},{"y":2024,"v":56.8}]},{"n":"India","pts":[{"y":1960,"v":38.8},{"y":1965,"v":37.5},{"y":1970,"v":35.0},{"y":1975,"v":35.1},{"y":1980,"v":33.8},{"y":1985,"v":36.1},{"y":1990,"v":37.0},{"y":1995,"v":37.8},{"y":2000,"v":42.7},{"y":2005,"v":44.4},{"y":2010,"v":45.0},{"y":2015,"v":47.8},{"y":2020,"v":47.9},{"y":2021,"v":47.8},{"y":2022,"v":47.2},{"y":2023,"v":47.6},{"y":2024,"v":48.0}]},{"n":"Bangladesh","pts":[{"y":1980,"v":44.6},{"y":1985,"v":44.4},{"y":1990,"v":46.7},{"y":1995,"v":45.1},{"y":2000,"v":50.6},{"y":2005,"v":52.9},{"y":2010,"v":53.5},{"y":2015,"v":53.7},{"y":2020,"v":51.5},{"y":2021,"v":51.3},{"y":2022,"v":51.0},{"y":2023,"v":51.1},{"y":2024,"v":51.4}]},{"n":"Botswana","pts":[{"y":1960,"v":43.1},{"y":1965,"v":47.0},{"y":1970,"v":39.4},{"y":1975,"v":33.6},{"y":1980,"v":29.9},{"y":1985,"v":30.1},{"y":1990,"v":31.8},{"y":1995,"v":46.3},{"y":2000,"v":42.7},{"y":2005,"v":45.3},{"y":2010,"v":54.7},{"y":2015,"v":56.9},{"y":2020,"v":65.9},{"y":2021,"v":60.2},{"y":2022,"v":56.4},{"y":2023,"v":59.2},{"y":2024,"v":63.5}]},{"n":"Costa Rica","pts":[{"y":1960,"v":53.5},{"y":1965,"v":53.4},{"y":1970,"v":53.3},{"y":1975,"v":52.3},{"y":1980,"v":55.2},{"y":1985,"v":52.3},{"y":1990,"v":58.5},{"y":1995,"v":52.6},{"y":2000,"v":56.1},{"y":2005,"v":58.0},{"y":2010,"v":62.1},{"y":2015,"v":67.5},{"y":2020,"v":68.4},{"y":2021,"v":67.2},{"y":2022,"v":67.5},{"y":2023,"v":68.1},{"y":2024,"v":69.0}]},{"n":"Ecuador","pts":[{"y":1960,"v":41.0},{"y":1965,"v":41.1},{"y":1970,"v":41.7},{"y":1975,"v":48.6},{"y":1980,"v":53.3},{"y":1985,"v":47.8},{"y":1990,"v":45.1},{"y":1995,"v":47.8},{"y":2000,"v":46.9},{"y":2005,"v":54.4},{"y":2010,"v":53.6},{"y":2015,"v":57.6},{"y":2020,"v":61.3},{"y":2021,"v":58.5},{"y":2022,"v":58.2},{"y":2023,"v":58.4},{"y":2024,"v":57.1}]}];
+
+const COLORS = ["#EA5E33","#F29A44","#C49A45","#8BAD72","#5B9E78","#3D7A5A","#A6C4A2","#C4715A"];
+
+const W = 720, H = 460;
+const margin = { top: 36, right: 100, bottom: 36, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 1960, yearMax = 2024;
+const valMin = 10, valMax = 75;
+
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+[20, 30, 40, 50, 60, 70].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(v), x2: W - margin.right, y2: yS(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: margin.left - 6, y: yS(v) + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" })).textContent = v + "%";
+});
+
+[1960, 1970, 1980, 1990, 2000, 2010, 2024].forEach(y => {
+  svg.appendChild(mkEl("line", { x1: xS(y), y1: H - margin.bottom, x2: xS(y), y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: xS(y), y: H - margin.bottom + 13, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" })).textContent = y;
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  sorted.forEach(item => { item.y = Math.max(margin.top, Math.min(H - margin.bottom, item.y)); });
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 22) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+data.forEach((series, idx) => {
+  const color = COLORS[idx % COLORS.length];
+  const pts = series.pts;
+  const g = mkEl("g", {});
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+
+  g.appendChild(line);
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / (rect.width / W);
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const idx2 = Math.round(ratio * (pts.length - 1));
+    const p = pts[idx2];
+    showTip(`${series.n}: ${p.v}% (${p.y})`, e);
+    groups.forEach(({g: og}) => { og.style.opacity = og === g ? "1" : "0.1"; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    groups.forEach(({g: og, line: ol}) => { og.style.opacity = "1"; ol.setAttribute("stroke-width", "1.8"); });
+  });
+
+  svg.appendChild(g);
+  groups.push({ g, line, series, color });
+});
+
+const labelItems = groups.map(({ series, color }) => {
+  const last = series.pts[series.pts.length - 1];
+  return { name: series.n, v: last.v, color, y: yS(last.v) };
+});
+
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const origY = yS(item.v);
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 4, y1: origY, x2: W - margin.right + 8, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const t = mkEl("text", { x: W - margin.right + 10, y: item.y + 3.5, "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: item.color });
+  t.textContent = item.name;
+  svg.appendChild(t);
+});
+</script>
+</body></html>
