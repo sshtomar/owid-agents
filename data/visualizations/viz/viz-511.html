@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Net Primary School Enrollment by World Region, 1970–2018</h1>
+<p class="subtitle">Share of children of official primary school age enrolled in primary school. Low-income countries made dramatic gains, though Sub-Saharan Africa still lags high-income levels by 20 percentage points.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — School Enrollment, Primary (% Net), SE.PRM.NENR</p>
+<script>
+const data = [{"n":"Sub-Saharan Africa","pts":[{"y":1975,"v":44.1},{"y":1976,"v":45.0},{"y":1977,"v":47.1},{"y":1978,"v":49.3},{"y":1979,"v":52.2},{"y":1980,"v":54.4},{"y":1981,"v":56.4},{"y":1982,"v":57.7},{"y":1983,"v":58.2},{"y":1984,"v":57.6},{"y":1985,"v":56.5},{"y":1986,"v":54.9},{"y":1987,"v":53.9},{"y":1988,"v":53.1},{"y":1989,"v":53.7},{"y":1990,"v":53.0},{"y":1991,"v":53.9},{"y":1992,"v":53.7},{"y":1993,"v":54.1},{"y":1994,"v":54.4},{"y":1995,"v":55.1},{"y":1996,"v":53.9},{"y":1997,"v":56.6},{"y":1998,"v":57.3},{"y":1999,"v":58.0},{"y":2000,"v":60.2},{"y":2001,"v":61.8},{"y":2002,"v":63.3},{"y":2003,"v":65.8},{"y":2004,"v":67.5},{"y":2005,"v":69.7},{"y":2006,"v":71.4},{"y":2007,"v":74.0},{"y":2008,"v":75.0},{"y":2009,"v":75.3}]},{"n":"South Asia","pts":[{"y":1970,"v":57.4},{"y":1971,"v":57.1},{"y":1972,"v":58.8},{"y":1973,"v":62.2},{"y":1974,"v":62.0},{"y":1975,"v":63.2},{"y":1976,"v":63.6},{"y":1977,"v":65.3},{"y":1978,"v":63.0},{"y":1979,"v":63.1},{"y":1980,"v":64.0},{"y":1981,"v":65.3},{"y":1982,"v":65.3},{"y":1983,"v":66.9},{"y":1984,"v":68.0},{"y":1985,"v":68.1},{"y":1986,"v":69.6},{"y":1987,"v":68.4},{"y":1988,"v":70.7},{"y":1989,"v":72.9},{"y":1990,"v":73.1},{"y":1991,"v":73.0},{"y":1992,"v":73.2},{"y":1993,"v":74.3},{"y":1994,"v":75.2},{"y":1995,"v":75.1},{"y":1996,"v":75.0},{"y":1997,"v":74.7},{"y":1998,"v":73.7},{"y":1999,"v":74.0},{"y":2000,"v":75.4},{"y":2001,"v":75.4},{"y":2002,"v":76.0},{"y":2003,"v":80.0},{"y":2004,"v":82.3},{"y":2005,"v":84.0},{"y":2006,"v":85.2},{"y":2007,"v":87.0},{"y":2008,"v":86.7},{"y":2009,"v":86.6},{"y":2010,"v":86.8},{"y":2011,"v":85.9},{"y":2012,"v":86.7},{"y":2013,"v":87.1},{"y":2014,"v":87.7},{"y":2015,"v":87.5},{"y":2016,"v":87.9},{"y":2017,"v":87.6},{"y":2018,"v":87.8}]},{"n":"Arab World","pts":[{"y":1970,"v":56.4},{"y":1971,"v":56.5},{"y":1972,"v":57.7},{"y":1973,"v":58.8},{"y":1974,"v":59.5},{"y":1975,"v":60.7},{"y":1976,"v":62.2},{"y":1977,"v":63.1},{"y":1978,"v":63.7},{"y":1979,"v":65.3},{"y":1980,"v":66.4},{"y":1981,"v":66.8},{"y":1982,"v":67.2},{"y":1983,"v":67.9},{"y":1984,"v":69.1},{"y":1985,"v":69.7},{"y":1986,"v":70.6},{"y":1987,"v":71.7},{"y":1988,"v":72.5},{"y":1989,"v":72.6},{"y":1990,"v":72.9},{"y":1991,"v":73.5},{"y":1992,"v":70.9},{"y":1993,"v":71.4},{"y":1994,"v":73.6},{"y":1995,"v":72.7},{"y":1996,"v":74.8},{"y":1997,"v":75.3},{"y":1999,"v":76.0},{"y":2000,"v":76.7},{"y":2001,"v":77.9},{"y":2002,"v":79.0},{"y":2003,"v":79.4},{"y":2004,"v":79.9},{"y":2005,"v":80.3},{"y":2006,"v":80.6},{"y":2007,"v":81.8},{"y":2008,"v":82.7},{"y":2009,"v":82.9},{"y":2010,"v":84.1},{"y":2011,"v":83.9},{"y":2012,"v":84.5},{"y":2013,"v":83.4},{"y":2014,"v":83.2},{"y":2015,"v":83.2},{"y":2016,"v":83.5},{"y":2017,"v":83.8},{"y":2018,"v":84.1}]},{"n":"Latin America & Caribbean","pts":[{"y":1970,"v":83.2},{"y":1971,"v":83.5},{"y":1972,"v":84.1},{"y":1973,"v":84.9},{"y":1974,"v":85.5},{"y":1975,"v":85.6},{"y":1976,"v":86.4},{"y":1977,"v":87.3},{"y":1978,"v":87.9},{"y":1979,"v":89.5},{"y":1980,"v":89.9},{"y":1981,"v":90.9},{"y":1982,"v":91.0},{"y":1983,"v":91.0},{"y":1984,"v":90.8},{"y":1985,"v":91.3},{"y":1986,"v":91.0},{"y":1987,"v":91.0},{"y":1988,"v":90.7},{"y":1989,"v":89.9},{"y":1990,"v":90.3},{"y":1991,"v":90.6},{"y":1992,"v":91.4},{"y":1993,"v":91.7},{"y":1994,"v":91.2},{"y":1995,"v":91.1},{"y":1996,"v":91.6},{"y":1997,"v":90.6},{"y":1999,"v":93.6},{"y":2000,"v":94.2},{"y":2001,"v":94.5},{"y":2002,"v":94.3},{"y":2003,"v":93.7},{"y":2004,"v":94.0},{"y":2005,"v":94.2},{"y":2006,"v":93.9},{"y":2007,"v":93.7},{"y":2008,"v":95.1},{"y":2009,"v":94.9},{"y":2010,"v":94.9},{"y":2011,"v":94.8},{"y":2012,"v":94.8},{"y":2013,"v":93.7},{"y":2014,"v":93.5},{"y":2015,"v":93.4},{"y":2016,"v":93.6},{"y":2017,"v":93.7},{"y":2018,"v":93.7}]},{"n":"Europe & Central Asia","pts":[{"y":1972,"v":93.5},{"y":1973,"v":93.2},{"y":1974,"v":93.2},{"y":1975,"v":93.3},{"y":1976,"v":93.5},{"y":1977,"v":93.6},{"y":1978,"v":93.7},{"y":1979,"v":93.8},{"y":1980,"v":93.8},{"y":1981,"v":93.2},{"y":1982,"v":93.2},{"y":1983,"v":93.0},{"y":1984,"v":93.6},{"y":1985,"v":93.6},{"y":1986,"v":94.2},{"y":1987,"v":94.6},{"y":1988,"v":95.1},{"y":1989,"v":94.9},{"y":1990,"v":95.0},{"y":1991,"v":95.3},{"y":1992,"v":95.1},{"y":1993,"v":94.8},{"y":1994,"v":94.7},{"y":1995,"v":94.3},{"y":1996,"v":94.6},{"y":1997,"v":94.5},{"y":1998,"v":95.1},{"y":1999,"v":95.0},{"y":2000,"v":94.6},{"y":2001,"v":95.0},{"y":2002,"v":95.3},{"y":2003,"v":96.0},{"y":2004,"v":95.5},{"y":2005,"v":95.1},{"y":2006,"v":95.1},{"y":2007,"v":95.1},{"y":2008,"v":95.4},{"y":2009,"v":95.1},{"y":2010,"v":95.4},{"y":2011,"v":95.6},{"y":2012,"v":95.6},{"y":2013,"v":95.9},{"y":2014,"v":95.7},{"y":2015,"v":95.9},{"y":2016,"v":95.9},{"y":2017,"v":95.0},{"y":2018,"v":94.9}]},{"n":"High income","pts":[{"y":1972,"v":88.6},{"y":1973,"v":89.2},{"y":1974,"v":89.0},{"y":1975,"v":89.2},{"y":1976,"v":89.8},{"y":1977,"v":90.3},{"y":1978,"v":90.5},{"y":1979,"v":90.6},{"y":1980,"v":92.9},{"y":1981,"v":92.9},{"y":1982,"v":93.3},{"y":1983,"v":92.8},{"y":1984,"v":92.3},{"y":1985,"v":92.3},{"y":1986,"v":93.1},{"y":1987,"v":94.0},{"y":1988,"v":94.5},{"y":1989,"v":94.9},{"y":1990,"v":94.8},{"y":1991,"v":94.8},{"y":1992,"v":94.4},{"y":1993,"v":94.3},{"y":1994,"v":94.1},{"y":1995,"v":94.5},{"y":1996,"v":94.5},{"y":1997,"v":94.0},{"y":1998,"v":95.1},{"y":1999,"v":94.9},{"y":2000,"v":95.0},{"y":2001,"v":95.0},{"y":2002,"v":94.6},{"y":2003,"v":94.9},{"y":2004,"v":94.7},{"y":2005,"v":95.0},{"y":2006,"v":95.4},{"y":2007,"v":95.8},{"y":2008,"v":96.1},{"y":2009,"v":95.7},{"y":2010,"v":95.5},{"y":2011,"v":95.3},{"y":2012,"v":95.6},{"y":2013,"v":95.5},{"y":2014,"v":95.7},{"y":2015,"v":96.0},{"y":2016,"v":96.4},{"y":2017,"v":96.2},{"y":2018,"v":96.2}]},{"n":"Low income","pts":[{"y":1972,"v":36.8},{"y":1973,"v":38.0},{"y":1974,"v":39.1},{"y":1975,"v":41.1},{"y":1976,"v":43.2},{"y":1977,"v":45.1},{"y":1978,"v":46.7},{"y":1979,"v":47.7},{"y":1980,"v":49.4},{"y":1981,"v":50.5},{"y":1982,"v":49.5},{"y":1983,"v":50.2},{"y":1984,"v":50.0},{"y":1985,"v":49.6},{"y":1986,"v":49.6},{"y":1987,"v":48.8},{"y":1988,"v":48.9},{"y":1989,"v":48.2},{"y":1990,"v":47.2},{"y":1991,"v":48.4},{"y":1992,"v":47.5},{"y":1993,"v":47.2},{"y":1994,"v":48.3},{"y":1995,"v":50.5},{"y":1996,"v":50.6},{"y":1997,"v":53.4},{"y":1998,"v":53.6},{"y":1999,"v":53.4},{"y":2000,"v":55.6},{"y":2001,"v":57.9},{"y":2002,"v":61.9},{"y":2009,"v":78.2},{"y":2015,"v":80.7},{"y":2016,"v":80.9},{"y":2017,"v":80.8}]},{"n":"World","pts":[{"y":1970,"v":71.7},{"y":1971,"v":71.6},{"y":1972,"v":72.4},{"y":1973,"v":74.6},{"y":1974,"v":75.3},{"y":1975,"v":76.4},{"y":1976,"v":77.1},{"y":1977,"v":77.1},{"y":1978,"v":76.1},{"y":1979,"v":76.4},{"y":1980,"v":77.5},{"y":1981,"v":78.3},{"y":1982,"v":78.8},{"y":1983,"v":79.0},{"y":1984,"v":79.3},{"y":1985,"v":79.9},{"y":1986,"v":80.7},{"y":1987,"v":81.0},{"y":1988,"v":81.6},{"y":1989,"v":82.3},{"y":1990,"v":82.0},{"y":1991,"v":82.3},{"y":1992,"v":82.0},{"y":1993,"v":82.1},{"y":1994,"v":82.1},{"y":1995,"v":81.7},{"y":1996,"v":81.4},{"y":1997,"v":81.5},{"y":1998,"v":82.0},{"y":1999,"v":82.7},{"y":2000,"v":83.4},{"y":2001,"v":83.6},{"y":2002,"v":83.8},{"y":2003,"v":85.1},{"y":2004,"v":86.2},{"y":2005,"v":86.8},{"y":2006,"v":87.2},{"y":2007,"v":88.4},{"y":2008,"v":88.7},{"y":2009,"v":88.6},{"y":2010,"v":88.6},{"y":2011,"v":88.7},{"y":2012,"v":89.0},{"y":2013,"v":89.0},{"y":2014,"v":89.2},{"y":2015,"v":89.2},{"y":2016,"v":89.4},{"y":2017,"v":89.3},{"y":2018,"v":89.4}]}];
+
+const COLORS = {
+  "Low income": "#B34B3B",
+  "Sub-Saharan Africa": "#C4715A",
+  "Arab World": "#C49A45",
+  "South Asia": "#F29A44",
+  "World": "#9A9890",
+  "Latin America & Caribbean": "#8BAD72",
+  "High income": "#3D7A5A",
+  "Europe & Central Asia": "#5B9E78",
+};
+
+const W = 720, H = 460;
+const margin = { top: 36, right: 180, bottom: 36, left: 52 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const yearMin = 1970, yearMax = 2018;
+const valMin = 30, valMax = 100;
+
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Grid lines
+[40, 50, 60, 70, 80, 90, 100].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(v), x2: W - margin.right, y2: yS(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: margin.left - 6, y: yS(v) + 3.5, "text-anchor": "end", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" })).textContent = v + "%";
+});
+
+// X axis ticks
+[1970, 1980, 1990, 2000, 2010, 2018].forEach(y => {
+  svg.appendChild(mkEl("line", { x1: xS(y), y1: H - margin.bottom, x2: xS(y), y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.5" }));
+  svg.appendChild(mkEl("text", { x: xS(y), y: H - margin.bottom + 13, "text-anchor": "middle", "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F" })).textContent = y;
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 14) + "px"; tip.style.top = (e.clientY - 22) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+
+data.forEach(series => {
+  const color = COLORS[series.n] || "#9A9890";
+  const pts = series.pts;
+  const g = mkEl("g", {});
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: color, "stroke-width": "1.8", fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / (rect.width / W);
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const idx = Math.round(ratio * (pts.length - 1));
+    const p = pts[idx];
+    showTip(`${series.n}: ${p.v}% (${p.y})`, e);
+    groups.forEach(({g: og}) => { og.style.opacity = og === g ? "1" : "0.1"; });
+    line.setAttribute("stroke-width", "3");
+  });
+  hit.addEventListener("mouseleave", () => {
+    hideTip();
+    groups.forEach(({g: og, line: ol}) => { og.style.opacity = "1"; ol.setAttribute("stroke-width", "1.8"); });
+  });
+
+  svg.appendChild(g);
+  groups.push({ g, line, series, color });
+});
+
+// Endpoint labels (right side) with collision resolution
+const labelItems = groups.map(({ series, color }) => {
+  const last = series.pts[series.pts.length - 1];
+  return { name: series.n, v: last.v, color, y: yS(last.v) };
+});
+
+const resolved = resolveCollisions(labelItems, 13);
+resolved.forEach(item => {
+  const last = item;
+  const origY = yS(item.v);
+  // Leader line if label moved
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", { x1: W - margin.right + 4, y1: origY, x2: W - margin.right + 8, y2: item.y, stroke: item.color, "stroke-width": "0.5", opacity: "0.5" }));
+  }
+  const t = mkEl("text", { x: W - margin.right + 10, y: item.y + 3.5, "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: item.color });
+  t.textContent = item.name;
+  svg.appendChild(t);
+});
+
+</script>
+</body></html>
