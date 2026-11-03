@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .subtitle { font-size: 12px; color: #7A786F; margin: 0 0 20px; line-height: 1.5; }
+  #chart { width: 100%; max-width: 820px; }
+  #tip { position: fixed; background: #2B2A27; color: #F6F5EE; font-family: 'Inter', sans-serif;
+         font-size: 11px; padding: 6px 10px; border-radius: 4px; pointer-events: none;
+         opacity: 0; transition: opacity 0.1s; z-index: 10; white-space: nowrap; }
+  .source { font-size: 10px; color: #A6A49C; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>The Feminization of HIV in Sub-Saharan Africa</h1>
+<p class="subtitle">Women's share of population ages 15+ living with HIV (%), 1990–2024.<br>In every country shown, women now account for the majority of HIV-positive adults.</p>
+<div id="chart"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank, SH.DYN.AIDS.FE.ZS</p>
+<script>
+const data = [{"n":"Angola","pts":[{"y":1990,"v":67.3},{"y":1991,"v":67.9},{"y":1992,"v":68.5},{"y":1993,"v":69.1},{"y":1994,"v":69.5},{"y":1995,"v":69.8},{"y":1996,"v":70.0},{"y":1997,"v":70.2},{"y":1998,"v":70.4},{"y":1999,"v":70.6},{"y":2000,"v":70.7},{"y":2001,"v":70.8},{"y":2002,"v":70.9},{"y":2003,"v":71.0},{"y":2004,"v":71.0},{"y":2005,"v":71.0},{"y":2006,"v":71.0},{"y":2007,"v":70.9},{"y":2008,"v":70.8},{"y":2009,"v":70.7},{"y":2010,"v":70.7},{"y":2011,"v":70.6},{"y":2012,"v":70.6},{"y":2013,"v":70.7},{"y":2014,"v":71.0},{"y":2015,"v":71.3},{"y":2016,"v":71.4},{"y":2017,"v":71.5},{"y":2018,"v":71.6},{"y":2019,"v":71.8},{"y":2020,"v":72.1},{"y":2021,"v":72.4},{"y":2022,"v":72.7},{"y":2023,"v":72.9},{"y":2024,"v":73.1}]},{"n":"Gabon","pts":[{"y":1990,"v":67.0},{"y":1991,"v":67.7},{"y":1992,"v":68.2},{"y":1993,"v":68.7},{"y":1994,"v":69.1},{"y":1995,"v":69.4},{"y":1996,"v":69.6},{"y":1997,"v":69.8},{"y":1998,"v":69.9},{"y":1999,"v":70.1},{"y":2000,"v":70.2},{"y":2001,"v":70.3},{"y":2002,"v":70.4},{"y":2003,"v":70.4},{"y":2004,"v":70.3},{"y":2005,"v":70.0},{"y":2006,"v":69.7},{"y":2007,"v":69.3},{"y":2008,"v":68.9},{"y":2009,"v":68.6},{"y":2010,"v":68.3},{"y":2011,"v":68.0},{"y":2012,"v":68.0},{"y":2013,"v":68.0},{"y":2014,"v":68.2},{"y":2015,"v":68.4},{"y":2016,"v":68.6},{"y":2017,"v":69.0},{"y":2018,"v":69.3},{"y":2019,"v":69.7},{"y":2020,"v":70.0},{"y":2021,"v":70.4},{"y":2022,"v":70.7},{"y":2023,"v":71.0},{"y":2024,"v":71.2}]},{"n":"Congo, Rep.","pts":[{"y":1990,"v":63.2},{"y":1991,"v":63.7},{"y":1992,"v":64.2},{"y":1993,"v":64.6},{"y":1994,"v":65.0},{"y":1995,"v":65.4},{"y":1996,"v":65.7},{"y":1997,"v":66.2},{"y":1998,"v":66.6},{"y":1999,"v":66.8},{"y":2000,"v":67.0},{"y":2001,"v":67.2},{"y":2002,"v":67.3},{"y":2003,"v":67.3},{"y":2004,"v":67.4},{"y":2005,"v":67.3},{"y":2006,"v":67.2},{"y":2007,"v":67.1},{"y":2008,"v":66.9},{"y":2009,"v":66.7},{"y":2010,"v":66.5},{"y":2011,"v":66.5},{"y":2012,"v":66.7},{"y":2013,"v":66.9},{"y":2014,"v":67.2},{"y":2015,"v":67.5},{"y":2016,"v":67.9},{"y":2017,"v":68.4},{"y":2018,"v":68.8},{"y":2019,"v":69.3},{"y":2020,"v":69.8},{"y":2021,"v":70.1},{"y":2022,"v":70.4},{"y":2023,"v":70.7},{"y":2024,"v":70.9}]},{"n":"Ghana","pts":[{"y":1990,"v":59.3},{"y":1991,"v":60.0},{"y":1992,"v":60.5},{"y":1993,"v":61.0},{"y":1994,"v":61.4},{"y":1995,"v":61.8},{"y":1996,"v":62.2},{"y":1997,"v":62.4},{"y":1998,"v":62.7},{"y":1999,"v":62.9},{"y":2000,"v":63.1},{"y":2001,"v":63.2},{"y":2002,"v":63.4},{"y":2003,"v":63.5},{"y":2004,"v":63.6},{"y":2005,"v":63.6},{"y":2006,"v":63.6},{"y":2007,"v":63.6},{"y":2008,"v":63.5},{"y":2009,"v":63.4},{"y":2010,"v":63.3},{"y":2011,"v":63.3},{"y":2012,"v":63.5},{"y":2013,"v":63.7},{"y":2014,"v":64.0},{"y":2015,"v":64.4},{"y":2016,"v":65.1},{"y":2017,"v":65.9},{"y":2018,"v":66.6},{"y":2019,"v":67.2},{"y":2020,"v":67.8},{"y":2021,"v":68.3},{"y":2022,"v":68.8},{"y":2023,"v":69.2},{"y":2024,"v":69.6}]},{"n":"Cote d'Ivoire","pts":[{"y":1990,"v":55.0},{"y":1991,"v":55.8},{"y":1992,"v":56.5},{"y":1993,"v":57.1},{"y":1994,"v":57.6},{"y":1995,"v":58.1},{"y":1996,"v":58.6},{"y":1997,"v":59.0},{"y":1998,"v":59.4},{"y":1999,"v":59.7},{"y":2000,"v":60.0},{"y":2001,"v":60.3},{"y":2002,"v":60.6},{"y":2003,"v":60.9},{"y":2004,"v":61.2},{"y":2005,"v":61.4},{"y":2006,"v":61.7},{"y":2007,"v":62.0},{"y":2008,"v":61.9},{"y":2009,"v":61.9},{"y":2010,"v":61.9},{"y":2011,"v":61.9},{"y":2012,"v":62.0},{"y":2013,"v":62.1},{"y":2014,"v":62.7},{"y":2015,"v":63.3},{"y":2016,"v":64.0},{"y":2017,"v":64.7},{"y":2018,"v":65.3},{"y":2019,"v":65.9},{"y":2020,"v":66.4},{"y":2021,"v":66.8},{"y":2022,"v":67.3},{"y":2023,"v":67.7},{"y":2024,"v":68.1}]},{"n":"Guinea-Bissau","pts":[{"y":1990,"v":57.5},{"y":1995,"v":60.1},{"y":2000,"v":60.5},{"y":2005,"v":60.5},{"y":2010,"v":60.3},{"y":2015,"v":62.1},{"y":2020,"v":65.6},{"y":2024,"v":67.5}]},{"n":"Kenya","pts":[{"y":1990,"v":60.9},{"y":1991,"v":61.7},{"y":1992,"v":62.3},{"y":1993,"v":62.8},{"y":1994,"v":63.2},{"y":1995,"v":63.4},{"y":1996,"v":63.7},{"y":1997,"v":63.8},{"y":1998,"v":64.0},{"y":1999,"v":64.1},{"y":2000,"v":64.3},{"y":2001,"v":64.4},{"y":2002,"v":64.5},{"y":2003,"v":64.5},{"y":2004,"v":64.5},{"y":2005,"v":64.5},{"y":2006,"v":64.3},{"y":2007,"v":64.0},{"y":2008,"v":63.8},{"y":2009,"v":63.5},{"y":2010,"v":63.3},{"y":2011,"v":63.2},{"y":2012,"v":63.4},{"y":2013,"v":63.6},{"y":2014,"v":63.9},{"y":2015,"v":64.1},{"y":2016,"v":64.4},{"y":2017,"v":64.6},{"y":2018,"v":64.8},{"y":2019,"v":65.1},{"y":2020,"v":65.3},{"y":2021,"v":65.5},{"y":2022,"v":65.8},{"y":2023,"v":66.0},{"y":2024,"v":66.2}]},{"n":"Guinea","pts":[{"y":1990,"v":53.7},{"y":1995,"v":56.4},{"y":2000,"v":58.2},{"y":2005,"v":59.7},{"y":2010,"v":60.0},{"y":2015,"v":61.8},{"y":2020,"v":64.2},{"y":2024,"v":65.8}]},{"n":"Central African Republic","pts":[{"y":1990,"v":66.7},{"y":1995,"v":66.6},{"y":2000,"v":65.7},{"y":2005,"v":64.5},{"y":2010,"v":62.8},{"y":2015,"v":62.1},{"y":2020,"v":63.9},{"y":2024,"v":65.1}]},{"n":"Ethiopia","pts":[{"y":1990,"v":58.9},{"y":1991,"v":59.4},{"y":1992,"v":59.8},{"y":1993,"v":60.2},{"y":1994,"v":60.6},{"y":1995,"v":61.0},{"y":1996,"v":61.4},{"y":1997,"v":61.8},{"y":1998,"v":62.1},{"y":1999,"v":62.5},{"y":2000,"v":62.8},{"y":2001,"v":63.1},{"y":2002,"v":63.4},{"y":2003,"v":63.6},{"y":2004,"v":63.7},{"y":2005,"v":63.8},{"y":2006,"v":63.9},{"y":2007,"v":63.8},{"y":2008,"v":63.7},{"y":2009,"v":63.7},{"y":2010,"v":63.6},{"y":2011,"v":63.6},{"y":2012,"v":63.6},{"y":2013,"v":63.6},{"y":2014,"v":63.6},{"y":2015,"v":63.6},{"y":2016,"v":63.7},{"y":2017,"v":63.9},{"y":2018,"v":64.0},{"y":2019,"v":64.2},{"y":2020,"v":64.3},{"y":2021,"v":64.5},{"y":2022,"v":64.7},{"y":2023,"v":64.9},{"y":2024,"v":65.1}]},{"n":"Cameroon","pts":[{"y":1990,"v":55.4},{"y":1995,"v":57.1},{"y":2000,"v":57.4},{"y":2005,"v":57.6},{"y":2010,"v":57.8},{"y":2015,"v":60.3},{"y":2020,"v":63.5},{"y":2024,"v":64.8}]},{"n":"Benin","pts":[{"y":1990,"v":58.0},{"y":1995,"v":60.0},{"y":2000,"v":60.5},{"y":2005,"v":60.8},{"y":2010,"v":61.3},{"y":2015,"v":62.6},{"y":2020,"v":63.5},{"y":2024,"v":64.4}]}];
+
+const W = 820, H = 480;
+const margin = {top: 36, right: 160, bottom: 36, left: 52};
+const yearMin = 1990, yearMax = 2024;
+const valMin = 50, valMax = 78;
+
+const palette = [
+  "#B34B3B","#C4715A","#C49A45","#8BAD72","#5B9E78","#3D7A5A",
+  "#7A5A9A","#3D6FA8","#9A4A7A","#A87A3D","#5A8A8A","#8A6A3D"
+];
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+const svg = mkEl("svg", {viewBox: `0 0 ${W} ${H}`, width: "100%", style: "max-width:820px;display:block;"});
+
+// Background
+svg.appendChild(mkEl("rect", {x:0, y:0, width:W, height:H, fill:"#F6F5EE"}));
+
+// 50% reference line
+const refY = yScale(50);
+svg.appendChild(mkEl("line", {
+  x1: margin.left, y1: refY, x2: W - margin.right, y2: refY,
+  stroke: "#C2C0B5", "stroke-dasharray": "4,3", "stroke-width": "1"
+}));
+const refLabel = mkEl("text", {
+  x: margin.left + 4, y: refY - 5,
+  "font-family": "JetBrains Mono, monospace", "font-size": "9",
+  fill: "#A6A49C"
+});
+refLabel.textContent = "50% (gender parity)";
+svg.appendChild(refLabel);
+
+// Y axis ticks
+for (let v = 52; v <= 76; v += 4) {
+  const ty = yScale(v);
+  svg.appendChild(mkEl("line", {x1: margin.left - 4, y1: ty, x2: margin.left, y2: ty, stroke: "#C2C0B5", "stroke-width": "0.7"}));
+  const t = mkEl("text", {x: margin.left - 8, y: ty + 4, "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F"});
+  t.textContent = v + "%";
+  svg.appendChild(t);
+}
+
+// X axis ticks
+for (let yr = 1990; yr <= 2024; yr += 5) {
+  const tx = xScale(yr);
+  svg.appendChild(mkEl("line", {x1: tx, y1: H - margin.bottom, x2: tx, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "0.7"}));
+  const t = mkEl("text", {x: tx, y: H - margin.bottom + 14, "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace", "font-size": "9", fill: "#7A786F"});
+  t.textContent = yr;
+  svg.appendChild(t);
+}
+
+// Build endpoint labels for collision resolution
+const endLabels = [];
+
+const groups = [];
+data.forEach((series, i) => {
+  const color = palette[i % palette.length];
+  const pts = series.pts;
+
+  const pathD = pts.map((p, j) => `${j === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const g = mkEl("g", {});
+
+  const line = mkEl("path", {d: pathD, stroke: color, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round"});
+  const hit = mkEl("path", {d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none", style: "cursor:pointer"});
+
+  g.appendChild(line);
+  g.appendChild(hit);
+
+  const lastPt = pts[pts.length - 1];
+  endLabels.push({i, y: yScale(lastPt.v), val: lastPt.v, name: series.n, color});
+
+  groups.push({g, line, hit, series, color, pts});
+  svg.appendChild(g);
+});
+
+// Resolve endpoint label collisions
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolved = resolveCollisions(endLabels, 12);
+const labelX = W - margin.right + 8;
+
+resolved.forEach(item => {
+  const series = data[item.i];
+  const lastPt = series.pts[series.pts.length - 1];
+  const origY = yScale(lastPt.v);
+
+  // Leader line if label moved significantly
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: xScale(lastPt.y) + 2, y1: origY,
+      x2: labelX - 2, y2: item.y,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+
+  const dot = mkEl("circle", {cx: xScale(lastPt.y), cy: origY, r: "3", fill: item.color});
+  svg.appendChild(dot);
+
+  const t = mkEl("text", {
+    x: labelX, y: item.y + 4,
+    "font-family": "JetBrains Mono, monospace", "font-size": "9",
+    fill: item.color
+  });
+  t.textContent = `${item.val}  ${item.name}`;
+  svg.appendChild(t);
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+
+groups.forEach(({g, line, hit, series, color, pts}) => {
+  hit.addEventListener("mouseover", () => {
+    groups.forEach(other => {
+      other.line.style.opacity = "0.12";
+      other.line.style.strokeWidth = "1.5";
+    });
+    line.style.opacity = "1";
+    line.style.strokeWidth = "3";
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const targetYear = yearMin + ratio * (yearMax - yearMin);
+    let closest = pts[0];
+    for (const p of pts) {
+      if (Math.abs(p.y - targetYear) < Math.abs(closest.y - targetYear)) closest = p;
+    }
+    tip.textContent = `${series.n}: ${closest.v}% women (${closest.y})`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(other => {
+      other.line.style.opacity = "1";
+      other.line.style.strokeWidth = "1.5";
+    });
+    tip.style.opacity = "0";
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>

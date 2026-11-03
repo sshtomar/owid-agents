@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .subtitle { font-size: 12px; color: #7A786F; margin: 0 0 20px; line-height: 1.5; }
+  #chart { width: 100%; max-width: 760px; }
+  #tip { position: fixed; background: #2B2A27; color: #F6F5EE; font-family: 'Inter', sans-serif;
+         font-size: 11px; padding: 6px 10px; border-radius: 4px; pointer-events: none;
+         opacity: 0; transition: opacity 0.1s; z-index: 10; white-space: nowrap; }
+  .source { font-size: 10px; color: #A6A49C; margin-top: 8px; }
+</style>
+</head>
+<body>
+<h1>Urban Electrification Progress in Africa and Asia</h1>
+<p class="subtitle">Access to electricity among urban populations (% of urban residents), earliest available year vs. 2024.<br>Countries where urban access was below 85% at some point — showing major gains in recent decades.</p>
+<div id="chart"></div>
+<div id="tip"></div>
+<p class="source">Source: World Bank, EG.ELC.ACCS.UR.ZS</p>
+<script>
+const data = [{"n":"Botswana","a":17.5,"b":96.7,"ay":1991,"by":2024},{"n":"Burkina Faso","a":29.4,"b":87.8,"ay":1993,"by":2024},{"n":"Kenya","a":42.5,"b":98.1,"ay":1993,"by":2024},{"n":"Comoros","a":51.8,"b":98.5,"ay":1996,"by":2024},{"n":"Gambia, The","a":38.9,"b":85.6,"ay":1993,"by":2024},{"n":"Cambodia","a":56.0,"b":100,"ay":1998,"by":2024},{"n":"Guinea-Bissau","a":23.8,"b":65.6,"ay":2000,"by":2024},{"n":"Chad","a":9.4,"b":51.0,"ay":1997,"by":2024},{"n":"Bangladesh","a":58.1,"b":99.5,"ay":1991,"by":2024},{"n":"Guinea","a":53.8,"b":93.6,"ay":1999,"by":2024},{"n":"Eswatini","a":54.8,"b":92.1,"ay":2000,"by":2024},{"n":"Benin","a":34.4,"b":71.6,"ay":1996,"by":2024},{"n":"Congo, Dem. Rep.","a":20.0,"b":55.0,"ay":2000,"by":2024},{"n":"Angola","a":44.9,"b":78.0,"ay":2000,"by":2024},{"n":"Cameroon","a":63.0,"b":95.6,"ay":1991,"by":2024},{"n":"Cent. Afr. Republic","a":8.0,"b":38.8,"ay":1995,"by":2024},{"n":"Congo, Rep.","a":46.2,"b":72.0,"ay":2000,"by":2024},{"n":"Cote d'Ivoire","a":69.7,"b":94.3,"ay":1994,"by":2024}];
+
+const W = 760, H = 620;
+const pad = {left: 140, right: 140, top: 50, bottom: 24};
+const minV = 0, maxV = 105;
+
+function scale(v) {
+  return pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function colorForChange(pct) {
+  if (pct >= 70) return "#3D7A5A";
+  if (pct >= 50) return "#5B9E78";
+  if (pct >= 40) return "#8BAD72";
+  if (pct >= 30) return "#C49A45";
+  if (pct >= 20) return "#C4715A";
+  return "#B34B3B";
+}
+
+const svg = mkEl("svg", {viewBox:`0 0 ${W} ${H}`, width:"100%", style:"max-width:760px;display:block;"});
+svg.appendChild(mkEl("rect", {x:0, y:0, width:W, height:H, fill:"#F6F5EE"}));
+
+const xL = pad.left;
+const xR = W - pad.right;
+
+// Axes
+svg.appendChild(mkEl("line", {x1:xL, y1:pad.top-10, x2:xL, y2:H-pad.bottom, stroke:"#C2C0B5","stroke-width":"1"}));
+svg.appendChild(mkEl("line", {x1:xR, y1:pad.top-10, x2:xR, y2:H-pad.bottom, stroke:"#C2C0B5","stroke-width":"1"}));
+
+// Y grid lines
+for (let v = 0; v <= 100; v += 20) {
+  const ty = scale(v);
+  svg.appendChild(mkEl("line", {x1:xL, y1:ty, x2:xR, y2:ty, stroke:"#E2E0D5","stroke-width":"0.6"}));
+  const tl = mkEl("text", {x:(xL+xR)/2, y:ty-3,"text-anchor":"middle",
+    "font-family":"JetBrains Mono, monospace","font-size":"8",fill:"#C2C0B5"});
+  tl.textContent = v + "%";
+  svg.appendChild(tl);
+}
+
+// 100% line bolder
+svg.appendChild(mkEl("line", {x1:xL, y1:scale(100), x2:xR, y2:scale(100), stroke:"#A6A49C","stroke-width":"0.8","stroke-dasharray":"4,3"}));
+
+// Column headers
+const headerY = pad.top - 18;
+const hL = mkEl("text", {x:xL, y:headerY, "text-anchor":"middle",
+  "font-family":"JetBrains Mono, monospace","font-size":"10",fill:"#7A786F","font-weight":"500"});
+hL.textContent = "Before";
+svg.appendChild(hL);
+const hR = mkEl("text", {x:xR, y:headerY, "text-anchor":"middle",
+  "font-family":"JetBrains Mono, monospace","font-size":"10",fill:"#7A786F","font-weight":"500"});
+hR.textContent = "2024";
+svg.appendChild(hR);
+
+// Build label positions
+const leftLabels = data.map((d, i) => ({i, y: scale(d.a), val: d.a}));
+const rightLabels = data.map((d, i) => ({i, y: scale(d.b), val: d.b}));
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 60; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const resolvedL = resolveCollisions(leftLabels, 11);
+const resolvedR = resolveCollisions(rightLabels, 11);
+
+// Draw lines
+const rows = [];
+data.forEach((d, i) => {
+  const color = colorForChange(d.b - d.a);
+  const yA = scale(d.a), yB = scale(d.b);
+
+  const line = mkEl("line", {x1:xL, y1:yA, x2:xR, y2:yB,
+    stroke:color,"stroke-width":"1.4","stroke-opacity":"0.85"});
+  const hit = mkEl("line", {x1:xL, y1:yA, x2:xR, y2:yB,
+    stroke:"transparent","stroke-width":"12",style:"cursor:pointer"});
+
+  svg.appendChild(mkEl("circle", {cx:xL, cy:yA, r:"3", fill:color}));
+  svg.appendChild(mkEl("circle", {cx:xR, cy:yB, r:"3", fill:color}));
+  svg.appendChild(line);
+  svg.appendChild(hit);
+  rows.push({d, color, yA, yB, line, hit});
+});
+
+// Left labels
+resolvedL.forEach(item => {
+  const d = data[item.i];
+  const origY = scale(d.a);
+  const color = colorForChange(d.b - d.a);
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", {x1:xL-2,y1:origY,x2:xL-22,y2:item.y,
+      stroke:color,"stroke-width":"0.5",opacity:"0.4"}));
+  }
+  const t = mkEl("text", {x:xL-6, y:item.y+4, "text-anchor":"end",
+    "font-family":"JetBrains Mono, monospace","font-size":"9",fill:color});
+  t.textContent = `${d.n}  ${d.a}%`;
+  svg.appendChild(t);
+});
+
+// Right labels
+resolvedR.forEach(item => {
+  const d = data[item.i];
+  const origY = scale(d.b);
+  const color = colorForChange(d.b - d.a);
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", {x1:xR+2,y1:origY,x2:xR+22,y2:item.y,
+      stroke:color,"stroke-width":"0.5",opacity:"0.4"}));
+  }
+  const t = mkEl("text", {x:xR+6, y:item.y+4, "text-anchor":"start",
+    "font-family":"JetBrains Mono, monospace","font-size":"9",fill:color});
+  t.textContent = `${d.b}%  ${d.n}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendX = (xL + xR) / 2 - 160;
+const legendY = H - 10;
+const bands = [
+  {color:"#3D7A5A",label:"70pp+ gain"},
+  {color:"#5B9E78",label:"50–70pp"},
+  {color:"#8BAD72",label:"40–50pp"},
+  {color:"#C49A45",label:"30–40pp"},
+  {color:"#C4715A",label:"20–30pp"},
+  {color:"#B34B3B",label:"<20pp"}
+];
+bands.forEach((b, idx) => {
+  const bx = legendX + idx * 55;
+  svg.appendChild(mkEl("rect", {x:bx, y:legendY-8, width:8, height:8, fill:b.color}));
+  const bt = mkEl("text", {x:bx+10, y:legendY, "font-family":"Inter, sans-serif","font-size":"8",fill:"#7A786F"});
+  bt.textContent = b.label;
+  svg.appendChild(bt);
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+rows.forEach(({d, color, yA, yB, line, hit}) => {
+  hit.addEventListener("mouseover", () => {
+    rows.forEach(r => { r.line.style.opacity = "0.08"; });
+    line.style.opacity = "1";
+    line.style.strokeWidth = "3";
+  });
+  hit.addEventListener("mousemove", e => {
+    const chg = d.b - d.a;
+    tip.textContent = `${d.n}: ${d.a}% (${d.ay}) → ${d.b}% (2024)  [+${chg.toFixed(1)}pp]`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 14) + "px";
+    tip.style.top = (e.clientY - 24) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    rows.forEach(r => { r.line.style.opacity = "1"; r.line.style.strokeWidth = "1.4"; });
+    tip.style.opacity = "0";
+  });
+});
+
+document.getElementById("chart").appendChild(svg);
+</script>
+</body>
+</html>
