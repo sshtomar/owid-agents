@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Women and Tobacco: Diverging Paths</h1>
+<p class="subtitle">Female tobacco use prevalence (% of female adults), 2000–2024, for selected countries. Rates are rising in the Balkans while South Asia and Latin America have seen dramatic declines.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SH.PRV.SMOK.FE</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [{"n":"Bulgaria","pts":[{"y":2000,"v":31.9},{"y":2005,"v":32.7},{"y":2007,"v":33.4},{"y":2010,"v":33.8},{"y":2015,"v":34.8},{"y":2020,"v":36},{"y":2022,"v":36.4},{"y":2023,"v":36.5},{"y":2024,"v":36.7}]},{"n":"Croatia","pts":[{"y":2000,"v":28},{"y":2005,"v":29},{"y":2007,"v":29.4},{"y":2010,"v":30.1},{"y":2015,"v":31.3},{"y":2020,"v":32.7},{"y":2022,"v":33},{"y":2023,"v":33.2},{"y":2024,"v":33.6}]},{"n":"France","pts":[{"y":2000,"v":30.2},{"y":2005,"v":30.3},{"y":2007,"v":30.4},{"y":2010,"v":30.5},{"y":2015,"v":30.7},{"y":2020,"v":30.9},{"y":2022,"v":31.1},{"y":2023,"v":31},{"y":2024,"v":31.2}]},{"n":"Greece","pts":[{"y":2000,"v":42.2},{"y":2005,"v":38.1},{"y":2007,"v":36.5},{"y":2010,"v":34.4},{"y":2015,"v":31.1},{"y":2020,"v":28.3},{"y":2022,"v":27.3},{"y":2023,"v":26.8},{"y":2024,"v":26.2}]},{"n":"Germany","pts":[{"y":2000,"v":30.3},{"y":2005,"v":27.6},{"y":2007,"v":26.8},{"y":2010,"v":25.3},{"y":2015,"v":23.1},{"y":2020,"v":21.1},{"y":2022,"v":20.4},{"y":2023,"v":19.9},{"y":2024,"v":19.6}]},{"n":"Chile","pts":[{"y":2000,"v":43.3},{"y":2005,"v":38.2},{"y":2007,"v":36.2},{"y":2010,"v":33.9},{"y":2015,"v":30},{"y":2020,"v":26.6},{"y":2022,"v":25.4},{"y":2023,"v":24.8},{"y":2024,"v":24.3}]},{"n":"Brazil","pts":[{"y":2000,"v":17.9},{"y":2005,"v":15.2},{"y":2007,"v":14.3},{"y":2010,"v":13},{"y":2015,"v":11.1},{"y":2020,"v":9.5},{"y":2022,"v":8.9},{"y":2023,"v":8.7},{"y":2024,"v":8.4}]},{"n":"Japan","pts":[{"y":2000,"v":14.6},{"y":2005,"v":13.2},{"y":2007,"v":12.6},{"y":2010,"v":11.9},{"y":2015,"v":10.7},{"y":2020,"v":9.6},{"y":2022,"v":9.2},{"y":2023,"v":9},{"y":2024,"v":8.9}]},{"n":"China","pts":[{"y":2000,"v":3.3},{"y":2005,"v":2.7},{"y":2007,"v":2.6},{"y":2010,"v":2.3},{"y":2015,"v":2},{"y":2020,"v":1.7},{"y":2022,"v":1.6},{"y":2023,"v":1.5},{"y":2024,"v":1.5}]},{"n":"India","pts":[{"y":2000,"v":40.7},{"y":2005,"v":30.7},{"y":2007,"v":27.3},{"y":2010,"v":22.7},{"y":2015,"v":16.7},{"y":2020,"v":12.2},{"y":2022,"v":10.9},{"y":2023,"v":10.2},{"y":2024,"v":9.7}]},{"n":"Indonesia","pts":[{"y":2000,"v":8.6},{"y":2005,"v":6.8},{"y":2007,"v":6.2},{"y":2010,"v":5.3},{"y":2015,"v":4.2},{"y":2020,"v":3.3},{"y":2022,"v":3},{"y":2023,"v":2.9},{"y":2024,"v":2.7}]}];
+
+const W = 800, H = 460;
+const margin = { top: 30, right: 130, bottom: 30, left: 50 };
+
+// Year range
+const yearMin = 2000, yearMax = 2024;
+const valMin = 0, valMax = 46;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Color assignment: warm for rising/high, cool for falling fast
+const palette = {
+  "Bulgaria": "#EA5E33",
+  "Croatia": "#F29A44",
+  "France": "#C49A45",
+  "Greece": "#8BAD72",
+  "Germany": "#5B9E78",
+  "Chile": "#3D7A5A",
+  "Brazil": "#6B9BC4",
+  "Japan": "#7B8FC4",
+  "China": "#9A9890",
+  "India": "#B34B3B",
+  "Indonesia": "#A6C4A2",
+};
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topBound = margin.top + 2;
+  const botBound = H - margin.bottom - 2;
+  for (const item of sorted) {
+    item.y = Math.max(topBound, Math.min(botBound, item.y));
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+// Grid lines
+[10, 20, 30, 40].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v), x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: margin.left - 6, y: yScale(v) + 3.5, "text-anchor": "end", "font-size": "9", fill: "#7A786F", "font-family": "'JetBrains Mono', monospace" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X axis labels
+[2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const t = mkEl("text", { x: xScale(y), y: H - margin.bottom + 14, "text-anchor": "middle", "font-size": "9", fill: "#7A786F", "font-family": "'JetBrains Mono', monospace" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+// Build endpoint labels for collision resolution
+const endLabels = data.map(d => {
+  const last = d.pts[d.pts.length - 1];
+  return { n: d.n, y: yScale(last.v), v: last.v };
+});
+resolveCollisions(endLabels, 12);
+
+const series = [];
+
+data.forEach((d, idx) => {
+  const col = palette[d.n] || "#9A9890";
+  const g = mkEl("g", {});
+
+  // Build path
+  const pathD = d.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: col, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  // Invisible hit path
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  // Endpoint label
+  const el = endLabels.find(e => e.n === d.n);
+  const lastPt = d.pts[d.pts.length - 1];
+  const lastX = xScale(lastPt.y);
+  const lastY = yScale(lastPt.v);
+
+  // Leader line if label was moved
+  if (Math.abs(el.y - lastY) > 2) {
+    g.appendChild(mkEl("line", { x1: lastX + 2, y1: el.y, x2: lastX + 2, y2: lastY, stroke: col, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+
+  const lt = mkEl("text", { x: lastX + 8, y: el.y + 3.5, "text-anchor": "start", "font-size": "9.5", fill: col, "font-weight": "500" });
+  lt.textContent = `${lastPt.v}  ${d.n}`;
+  g.appendChild(lt);
+
+  svg.appendChild(g);
+  series.push({ g, line, hit, d, col });
+});
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  series.forEach((s, i) => {
+    if (idx === -1) {
+      s.g.style.opacity = "1";
+      s.line.setAttribute("stroke-width", "1.5");
+    } else if (i === idx) {
+      s.g.style.opacity = "1";
+      s.line.setAttribute("stroke-width", "3");
+    } else {
+      s.g.style.opacity = "0.1";
+      s.line.setAttribute("stroke-width", "1");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) / rect.width * W;
+  const my = (e.clientY - rect.top) / rect.height * H;
+  const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+  const hovYear = yearMin + ratio * (yearMax - yearMin);
+
+  let best = -1, bestDist = 20;
+  series.forEach((s, i) => {
+    // Find nearest point in this series
+    let nearPt = null, nearDist = Infinity;
+    for (const p of s.d.pts) {
+      const d = Math.abs(p.y - hovYear);
+      if (d < nearDist) { nearDist = d; nearPt = p; }
+    }
+    if (!nearPt) return;
+    const lineY = yScale(nearPt.v);
+    const dist = Math.abs(my - lineY);
+    if (dist < bestDist) { bestDist = dist; best = i; }
+  });
+
+  highlight(best);
+  if (best >= 0) {
+    const s = series[best];
+    let nearPt = null, nearDist = Infinity;
+    for (const p of s.d.pts) {
+      const d = Math.abs(p.y - hovYear);
+      if (d < nearDist) { nearDist = d; nearPt = p; }
+    }
+    tip.textContent = `${s.d.n} (${nearPt.y}): ${nearPt.v}%`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body></html>
