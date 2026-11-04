@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>A Generation of Progress in Maternal Survival</h1>
+<p class="subtitle">Lifetime risk of dying from maternal causes (% of women), 1990 vs 2023, in 20 high-burden countries. Each line shows how much safer pregnancy became over three decades — but in Chad and Central African Republic, more than 1 in 25 women still face this risk.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank SH.MMR.RISK.ZS</p>
+<script>
+// Data exported from notebook -- do not modify
+const data = [{"n":"Central African Republic","a":5.276,"b":4.236},{"n":"Chad","a":7.967,"b":4.225},{"n":"Congo, Dem. Rep.","a":4.42,"b":2.463},{"n":"Afghanistan","a":10.744,"b":2.469},{"n":"Benin","a":4.332,"b":2.27},{"n":"Guinea","a":6.825,"b":2.119},{"n":"Guinea-Bissau","a":10.157,"b":1.887},{"n":"Burundi","a":9.424,"b":1.763},{"n":"Cote d'Ivoire","a":4.094,"b":1.49},{"n":"Gambia, The","a":7.545,"b":1.389},{"n":"Cameroon","a":3.459,"b":1.129},{"n":"Eritrea","a":7.362,"b":1.063},{"n":"Burkina Faso","a":4.843,"b":0.984},{"n":"Congo, Rep.","a":2.58,"b":0.964},{"n":"Angola","a":5.553,"b":0.945},{"n":"Haiti","a":4.244,"b":0.847},{"n":"Gabon","a":1.939,"b":0.833},{"n":"Ethiopia","a":8.536,"b":0.794},{"n":"Ghana","a":4.11,"b":0.75},{"n":"Equatorial Guinea","a":3.978,"b":0.714}];
+
+const W = 700, H = 580;
+const pad = { left: 170, right: 170, top: 44, bottom: 24 };
+const minV = 0, maxV = 11.5;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function pctDecline(d) {
+  return (d.a - d.b) / d.a * 100;
+}
+
+function colorFor(d) {
+  const p = pctDecline(d);
+  if (p > 65) return "#3D7A5A";
+  if (p > 50) return "#5B9E78";
+  if (p > 40) return "#8BAD72";
+  if (p > 30) return "#C49A45";
+  if (p > 20) return "#C4715A";
+  return "#B34B3B";
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const topBound = pad.top + 4;
+  const botBound = H - pad.bottom - 4;
+  for (const item of sorted) {
+    item.y = Math.max(topBound, Math.min(botBound, item.y));
+  }
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const hdr = (x, txt) => {
+  const t = mkEl("text", { x, y: 26, "text-anchor": "middle", "font-family": "'JetBrains Mono', monospace", "font-size": "10", fill: "#7A786F", "letter-spacing": "0.5" });
+  t.textContent = txt;
+  svg.appendChild(t);
+};
+hdr(pad.left, "1990");
+hdr(W - pad.right, "2023");
+
+// Grid lines
+[2, 4, 6, 8, 10].forEach(v => {
+  svg.appendChild(mkEl("line", {
+    x1: pad.left, y1: scale(v), x2: W - pad.right, y2: scale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const t = mkEl("text", { x: W / 2, y: scale(v) - 3, "text-anchor": "middle", "font-size": "7.5", fill: "#C2C0B5", "font-family": "'JetBrains Mono', monospace" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+const leftLabels = data.map(d => ({ d, y: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b) }));
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const rows = [];
+
+data.forEach((d, i) => {
+  const x1 = pad.left + 4, x2 = W - pad.right - 4;
+  const y1 = scale(d.a), y2 = scale(d.b);
+  const col = colorFor(d);
+
+  const g = mkEl("g", { "data-idx": String(i) });
+
+  const line = mkEl("line", { x1, y1, x2, y2, stroke: col, "stroke-width": "1.5", opacity: "0.78" });
+  g.appendChild(line);
+
+  [{ x: x1, y: y1 }, { x: x2, y: y2 }].forEach(p => {
+    g.appendChild(mkEl("circle", { cx: p.x, cy: p.y, r: "2.5", fill: col }));
+  });
+
+  const ll = leftLabels.find(l => l.d === d);
+  const lt = mkEl("text", { x: x1 - 8, y: ll.y + 3.5, "text-anchor": "end", "font-size": "9.5", fill: "#2B2A27" });
+  lt.textContent = `${d.n}  ${d.a.toFixed(2)}%`;
+  g.appendChild(lt);
+  if (Math.abs(ll.y - y1) > 2) {
+    g.appendChild(mkEl("line", { x1: x1 - 7, y1: ll.y, x2: x1, y2: y1, stroke: col, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+
+  const rl = rightLabels.find(l => l.d === d);
+  const rt = mkEl("text", { x: x2 + 8, y: rl.y + 3.5, "text-anchor": "start", "font-size": "9.5", fill: "#2B2A27" });
+  rt.textContent = `${d.b.toFixed(2)}%  ${d.n}`;
+  g.appendChild(rt);
+  if (Math.abs(rl.y - y2) > 2) {
+    g.appendChild(mkEl("line", { x1: x2 + 7, y1: rl.y, x2: x2, y2: y2, stroke: col, "stroke-width": "0.5", opacity: "0.4" }));
+  }
+
+  const hit = mkEl("line", { x1, y1, x2, y2, stroke: "transparent", "stroke-width": "14" });
+  hit.style.cursor = "pointer";
+  g.appendChild(hit);
+
+  svg.appendChild(g);
+  rows.push({ g, line, d, col, y1, y2 });
+});
+
+// Legend
+const legendItems = [
+  { col: "#3D7A5A", label: ">65% reduction" },
+  { col: "#8BAD72", label: "40-65% reduction" },
+  { col: "#C49A45", label: "30-40% reduction" },
+  { col: "#B34B3B", label: "<30% reduction" },
+];
+legendItems.forEach((l, i) => {
+  const y = H - 6;
+  const x = i * 148;
+  svg.appendChild(mkEl("rect", { x, y: y - 5, width: 10, height: 3, fill: l.col, rx: "1" }));
+  const t = mkEl("text", { x: x + 14, y, "font-size": "8.5", fill: "#7A786F", "font-family": "'JetBrains Mono', monospace" });
+  t.textContent = l.label;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+let activeIdx = -1;
+
+function highlight(idx) {
+  if (idx === activeIdx) return;
+  activeIdx = idx;
+  rows.forEach((row, i) => {
+    if (idx === -1) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "1.5");
+    } else if (i === idx) {
+      row.g.style.opacity = "1";
+      row.line.setAttribute("stroke-width", "3");
+    } else {
+      row.g.style.opacity = "0.12";
+      row.line.setAttribute("stroke-width", "1");
+    }
+  });
+}
+
+svg.addEventListener("mousemove", e => {
+  const rect = svg.getBoundingClientRect();
+  const sx = (e.clientX - rect.left) / rect.width * W;
+  const sy = (e.clientY - rect.top) / rect.height * H;
+  let best = -1, bestDist = 18;
+  rows.forEach((row, i) => {
+    const t = Math.max(0, Math.min(1, (sx - pad.left) / (W - pad.left - pad.right)));
+    const lineY = row.y1 + (row.y2 - row.y1) * t;
+    if (Math.abs(sy - lineY) < bestDist) { bestDist = Math.abs(sy - lineY); best = i; }
+  });
+  highlight(best);
+  if (best >= 0) {
+    const d = rows[best].d;
+    const pct = pctDecline(d).toFixed(0);
+    tip.textContent = `${d.n}: ${d.a.toFixed(2)}% → ${d.b.toFixed(2)}% (−${pct}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  } else {
+    tip.style.opacity = "0";
+  }
+});
+
+svg.addEventListener("mouseleave", () => { highlight(-1); tip.style.opacity = "0"; });
+</script>
+</body></html>
