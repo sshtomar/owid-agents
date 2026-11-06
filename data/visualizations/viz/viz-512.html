@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Current Account Balance (% of GDP), 2000–2024</h1>
+<p class="subtitle">A positive current account means a country exports more than it imports. Germany and Denmark run large persistent surpluses; Brazil and India run persistent deficits. Canada flipped from surplus to deficit after the 2008 crisis.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · BN.CAB.XOKA.GD.ZS</p>
+<script>
+// Data from notebook -- current account balance series 2000-2024
+const data = [
+  {"n":"Germany","s":[-1.8,-0.4,1.7,1.3,4.3,4.4,5.5,6.5,5.4,5.7,5.6,6.1,7.0,6.6,7.2,8.1,8.9,8.1,8.4,7.9,6.3,6.9,4.1,5.5,5.9],"y0":2000},
+  {"n":"Denmark","s":[1.4,2.9,1.9,3.2,2.4,4.2,3.3,1.5,2.9,3.7,6.4,6.3,6.0,7.4,8.3,8.0,7.2,7.4,6.3,7.5,7.3,8.6,11.2,9.7,11.5],"y0":2000},
+  {"n":"Japan","s":[2.6,1.9,2.6,3.0,3.7,3.5,3.8,4.6,2.8,2.7,3.8,2.1,0.9,0.9,0.7,3.0,3.9,4.0,3.4,3.4,2.9,3.8,2.0,3.6,4.6],"y0":2000},
+  {"n":"South Korea","s":[1.7,0.4,0.6,1.6,3.6,1.3,0.2,0.9,0.2,3.4,2.3,1.3,3.7,5.4,5.3,6.8,6.2,4.4,4.2,3.4,4.4,4.3,1.3,1.8,5.3],"y0":2000},
+  {"n":"China","s":[1.7,1.3,2.4,2.6,3.5,5.7,8.3,9.8,9.0,4.7,3.8,1.8,2.5,1.5,2.2,2.6,1.7,1.5,0.2,0.6,1.5,1.6,2.2,1.4,2.5],"y0":2000},
+  {"n":"Canada","s":[2.5,2.1,1.6,1.2,2.3,1.9,1.4,0.8,0.2,-3.0,-3.6,-2.8,-3.5,-3.1,-2.3,-3.5,-3.1,-2.8,-2.4,-2.0,-2.0,-0.0,-0.4,-0.7,-0.5],"y0":2000},
+  {"n":"Brazil","s":[-4.0,-4.4,-1.8,0.4,1.3,1.3,1.0,-0.2,-2.1,-1.8,-3.9,-3.2,-3.8,-3.6,-4.5,-3.5,-1.7,-1.2,-2.8,-3.4,-1.6,-2.4,-2.1,-1.2,-3.0],"y0":2000},
+  {"n":"India","s":[-1.0,0.3,1.4,1.4,0.1,-1.3,-1.0,-0.7,-2.6,-2.0,-3.3,-3.4,-5.0,-2.6,-1.3,-1.1,-0.5,-1.4,-2.4,-1.0,1.2,-1.1,-2.4,-0.9,-0.9],"y0":2000}
+];
+
+const COLORS = {
+  "Germany": "#EA5E33",
+  "Denmark": "#C4715A",
+  "Japan": "#8BAD72",
+  "South Korea": "#5B9E78",
+  "China": "#F29A44",
+  "Canada": "#7A9CB8",
+  "Brazil": "#9B70A8",
+  "India": "#6B8F9B"
+};
+
+const W = 780, H = 460;
+const ml = 50, mr = 110, mt = 30, mb = 35;
+const cW = W - ml - mr;
+const cH = H - mt - mb;
+
+const years = Array.from({length: 25}, (_, i) => 2000 + i);
+const allVals = data.flatMap(d => d.s.filter(v => v !== null));
+const minV = Math.min(...allVals) - 0.5;
+const maxV = Math.max(...allVals) + 0.5;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const xScale = y => ml + (y - 2000) / 24 * cW;
+const yScale = v => mt + (maxV - v) / (maxV - minV) * cH;
+
+// Grid lines
+[-4, -2, 0, 2, 4, 6, 8, 10, 12].forEach(v => {
+  if (v < minV || v > maxV) return;
+  svg.appendChild(mkEl("line", {
+    x1: ml, y1: yScale(v), x2: W - mr, y2: yScale(v),
+    stroke: v === 0 ? "#2B2A27" : "#E2E0D5",
+    "stroke-width": v === 0 ? "1" : "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: ml - 5, y: yScale(v) + 3,
+    "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#7A786F"
+  });
+  lbl.textContent = (v > 0 ? "+" : "") + v + "%";
+  svg.appendChild(lbl);
+});
+
+// Surplus / Deficit labels
+const zeroY = yScale(0);
+const surplusLbl = mkEl("text", {
+  x: ml + 5, y: zeroY - 6,
+  "font-family": "Inter, sans-serif",
+  "font-size": "8", fill: "#5B9E78", "font-weight": "500"
+});
+surplusLbl.textContent = "▲ SURPLUS";
+svg.appendChild(surplusLbl);
+const deficitLbl = mkEl("text", {
+  x: ml + 5, y: zeroY + 12,
+  "font-family": "Inter, sans-serif",
+  "font-size": "8", fill: "#C4715A", "font-weight": "500"
+});
+deficitLbl.textContent = "▼ DEFICIT";
+svg.appendChild(deficitLbl);
+
+// X-axis year labels
+[2000, 2005, 2010, 2015, 2020, 2024].forEach(y => {
+  const x = xScale(y);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mt + cH, x2: x, y2: mt + cH + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x, y: mt + cH + 13,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#7A786F"
+  });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+
+// Collect endpoint labels
+const endLabels = [];
+
+// Draw lines
+const groups = data.map(series => {
+  const color = COLORS[series.name] || COLORS[series.n] || "#9A9890";
+  const c = COLORS[series.n];
+  const pts = series.s.map((v, i) => v !== null ? { x: xScale(2000 + i), y: yScale(v), v, year: 2000 + i } : null).filter(Boolean);
+
+  const g = mkEl("g", {});
+  g.style.opacity = "1";
+
+  // Build path segments (handle nulls)
+  let pathD = "";
+  pts.forEach((p, i) => {
+    pathD += (i === 0 ? "M" : "L") + ` ${p.x} ${p.y}`;
+  });
+
+  const line = mkEl("path", {
+    d: pathD, stroke: c, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  // Invisible hit area
+  const hit = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "10",
+    fill: "none"
+  });
+  hit.style.cursor = "pointer";
+  hit.addEventListener("mouseover", () => {
+    data.forEach((_, j) => groups[j] && (groups[j].style.opacity = "0.1"));
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - ml) / cW;
+    const yearIdx = Math.round(ratio * 24);
+    const yr = 2000 + Math.max(0, Math.min(24, yearIdx));
+    const val = series.s[yr - 2000];
+    if (val !== null && val !== undefined) {
+      tip.textContent = `${series.n} ${yr}: ${val > 0 ? "+" : ""}${val}%`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - 20) + "px";
+    }
+  });
+  hit.addEventListener("mouseout", () => {
+    data.forEach((_, j) => groups[j] && (groups[j].style.opacity = "1"));
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+  g.appendChild(hit);
+
+  // Endpoint label data
+  const lastPt = pts[pts.length - 1];
+  if (lastPt) {
+    endLabels.push({ n: series.n, y: lastPt.y, v: lastPt.v, color: c });
+  }
+
+  return g;
+});
+
+groups.forEach(g => svg.appendChild(g));
+
+// Resolve label collisions and render
+const resolved = resolveCollisions(endLabels.map(l => ({ ...l })), 11);
+resolved.forEach(item => {
+  const lbl = mkEl("text", {
+    x: W - mr + 5, y: item.y + 3,
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8.5", fill: item.color
+  });
+  lbl.textContent = `${item.v > 0 ? "+" : ""}${item.v}  ${item.n}`;
+  svg.appendChild(lbl);
+
+  // Leader line if label moved
+  const original = endLabels.find(l => l.n === item.n);
+  if (original && Math.abs(item.y - original.y) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: W - mr + 2, y1: original.y,
+      x2: W - mr + 4, y2: item.y,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+});
+</script>
+</body></html>
