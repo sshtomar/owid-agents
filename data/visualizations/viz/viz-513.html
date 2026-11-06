@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Progress in Primary School Enrollment, ~2000 to ~2017</h1>
+<p class="subtitle">Adjusted net enrollment rate (% of primary school-age children). The Millennium Development Goals era saw dramatic gains in getting children into school — Ivory Coast nearly doubled its enrollment in 17 years.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · SE.PRM.TENR · Adjusted net enrollment rate</p>
+<script>
+// Data from notebook -- slope chart: ~2000 to ~2017 for countries starting below 90%
+const data = [
+  {"n":"Ivory Coast","p0":56.1,"p1":93.7},
+  {"n":"Burkina Faso","p0":49.6,"p1":79.3},
+  {"n":"Djibouti","p0":39.9,"p1":67.0},
+  {"n":"Ethiopia","p0":65.8,"p1":85.2},
+  {"n":"Burundi","p0":74.5,"p1":93.4},
+  {"n":"Chad","p0":57.6,"p1":73.5},
+  {"n":"Bhutan","p0":74.3,"p1":90.1},
+  {"n":"Comoros","p0":67.5,"p1":81.7},
+  {"n":"Ghana","p0":72.7,"p1":86.7},
+  {"n":"Gambia","p0":68.6,"p1":81.8},
+  {"n":"Guinea","p0":65.6,"p1":78.1},
+  {"n":"Dominican Rep.","p0":84.2,"p1":93.9},
+  {"n":"Azerbaijan","p0":83.8,"p1":92.6}
+];
+
+const W = 680, H = 540;
+const pad = { left: 130, right: 140, top: 50, bottom: 30 };
+const leftX = pad.left;
+const rightX = W - pad.right;
+const cH = H - pad.top - pad.bottom;
+
+const allVals = data.flatMap(d => [d.p0, d.p1]);
+const minV = Math.floor(Math.min(...allVals)) - 2;
+const maxV = Math.ceil(Math.max(...allVals)) + 2;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * cH;
+
+function colorForChange(diff) {
+  if (diff > 35) return "#EA5E33";
+  if (diff > 25) return "#F29A44";
+  if (diff > 15) return "#C49A45";
+  if (diff > 8) return "#8BAD72";
+  return "#A6C4A2";
+}
+
+// Grid lines
+[40, 50, 60, 70, 80, 90, 100].forEach(v => {
+  if (v < minV || v > maxV) return;
+  const y = scale(v);
+  svg.appendChild(mkEl("line", {
+    x1: leftX, y1: y, x2: rightX, y2: y,
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: leftX - 60, y: y + 3,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#9A9890"
+  });
+  lbl.textContent = v + "%";
+  svg.appendChild(lbl);
+});
+
+// Axes
+["2000", "2017"].forEach((yr, i) => {
+  const x = i === 0 ? leftX : rightX;
+  const lbl = mkEl("text", {
+    x, y: pad.top - 20,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "10", fill: "#7A786F"
+  });
+  lbl.textContent = yr;
+  svg.appendChild(lbl);
+
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: pad.top - 12, x2: x, y2: pad.top + cH,
+    stroke: "#C2C0B5", "stroke-width": "1"
+  }));
+});
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+const leftLabels = [];
+const rightLabels = [];
+
+data.forEach(d => {
+  const ya = scale(d.p0);
+  const yb = scale(d.p1);
+  const diff = d.p1 - d.p0;
+  const color = colorForChange(diff);
+
+  const g = mkEl("g", {});
+  g.style.opacity = "1";
+
+  const line = mkEl("line", {
+    x1: leftX, y1: ya, x2: rightX, y2: yb,
+    stroke: color, "stroke-width": "1.5"
+  });
+  g.appendChild(line);
+
+  // Dots
+  [{ x: leftX, y: ya }, { x: rightX, y: yb }].forEach(pt => {
+    g.appendChild(mkEl("circle", {
+      cx: pt.x, cy: pt.y, r: "3",
+      fill: color
+    }));
+  });
+
+  // Invisible hit area
+  const hit = mkEl("line", {
+    x1: leftX, y1: ya, x2: rightX, y2: yb,
+    stroke: "transparent", "stroke-width": "12"
+  });
+  hit.style.cursor = "pointer";
+  hit.addEventListener("mouseover", () => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+    tip.textContent = `${d.n}: ${d.p0}% → ${d.p1}% (+${diff.toFixed(1)}pp)`;
+    tip.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+  g.appendChild(hit);
+  groups.push(g);
+  svg.appendChild(g);
+
+  leftLabels.push({ n: d.n, y: ya, v: d.p0, color });
+  rightLabels.push({ n: d.n, y: yb, v: d.p1, diff, color });
+});
+
+// Resolve collisions
+const minGap = 13;
+const leftResolved = resolveCollisions(leftLabels.map(l => ({ ...l })), minGap);
+const rightResolved = resolveCollisions(rightLabels.map(l => ({ ...l })), minGap);
+
+leftResolved.forEach(item => {
+  const lbl = mkEl("text", {
+    x: leftX - 6, y: item.y + 3,
+    "text-anchor": "end",
+    "font-family": "Inter, sans-serif",
+    "font-size": "9", fill: item.color
+  });
+  lbl.textContent = `${item.n}  ${item.v}%`;
+  svg.appendChild(lbl);
+
+  const orig = leftLabels.find(l => l.n === item.n);
+  if (orig && Math.abs(item.y - orig.y) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: leftX - 3, y1: orig.y, x2: leftX - 4, y2: item.y,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.35"
+    }));
+  }
+});
+
+rightResolved.forEach(item => {
+  const lbl = mkEl("text", {
+    x: rightX + 6, y: item.y + 3,
+    "text-anchor": "start",
+    "font-family": "Inter, sans-serif",
+    "font-size": "9", fill: item.color
+  });
+  lbl.textContent = `${item.v}%  ${item.n}`;
+  svg.appendChild(lbl);
+
+  const orig = rightLabels.find(l => l.n === item.n);
+  if (orig && Math.abs(item.y - orig.y) > 3) {
+    svg.appendChild(mkEl("line", {
+      x1: rightX + 3, y1: orig.y, x2: rightX + 4, y2: item.y,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.35"
+    }));
+  }
+});
+
+// Legend
+const legendItems = [
+  { color: "#EA5E33", label: ">35pp gain" },
+  { color: "#F29A44", label: "25–35pp" },
+  { color: "#C49A45", label: "15–25pp" },
+  { color: "#8BAD72", label: "8–15pp" }
+];
+let lx = pad.left;
+const ly = H - 10;
+legendItems.forEach(item => {
+  const r = mkEl("rect", { x: lx, y: ly - 7, width: 7, height: 7, fill: item.color, rx: "1" });
+  svg.appendChild(r);
+  const t = mkEl("text", {
+    x: lx + 10, y: ly,
+    "font-family": "Inter, sans-serif",
+    "font-size": "8", fill: "#7A786F"
+  });
+  t.textContent = item.label;
+  svg.appendChild(t);
+  lx += 10 + item.label.length * 4.8 + 10;
+});
+</script>
+</body></html>

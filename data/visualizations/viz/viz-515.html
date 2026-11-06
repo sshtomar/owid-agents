@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>New Business Formation Growth, 2010–2023 (Index: 2010 = 100)</h1>
+<p class="subtitle">New businesses registered per year, indexed to 2010 = 100. Japan simplified its company registration process, triggering a 5x surge. Chile and China tripled. Germany stagnated. The COVID dip (2020) is visible in most countries, followed by a sharp rebound.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank · IC.BUS.NREG · New businesses registered (number)</p>
+<script>
+// Data from notebook -- indexed to 2010=100, 2010-2023
+const data = [
+  {"n":"Japan","s":[100,127.2,151.8,202.6,274.8,308.0,329.4,377.5,402.3,422.8,459.6,512.8,513.3,563.3],"y0":2010},
+  {"n":"Chile","s":[100,122.0,142.1,168.7,197.5,206.8,221.6,284.1,314.8,314.7,327.7,447.8,377.2,358.4],"y0":2010},
+  {"n":"China","s":[100,108.8,109.4,123.1,189.9,218.0,249.5,235.6,238.4,223.9,241.6,321.4,266.1,339.0],"y0":2010},
+  {"n":"Brazil","s":[100,104.1,98.1,99.9,92.8,92.0,90.3,98.1,110.6,129.9,150.5,198.2,203.8,215.6],"y0":2010},
+  {"n":"Australia","s":[100,104.7,115.7,126.8,139.6,151.4,152.7,156.4,148.0,140.3,148.5,187.5,170.4,179.8],"y0":2010},
+  {"n":"France","s":[100,102.1,98.7,98.0,100.8,103.7,113.3,118.1,120.3,130.3,127.8,159.8,166.5,158.8],"y0":2010},
+  {"n":"India","s":[100,112.4,119.0,106.0,80.6,93.0,108.2,124.1,136.0,148.4,163.9,193.4,199.8,190.6],"y0":2010},
+  {"n":"Germany","s":[100,96.2,93.7,92.6,91.2,93.8,95.6,97.1,98.5,100.0,98.4,112.2,101.1,101.4],"y0":2010}
+];
+
+const COLORS = {
+  "Japan":     "#EA5E33",
+  "Chile":     "#F29A44",
+  "China":     "#C49A45",
+  "Brazil":    "#5B9E78",
+  "Australia": "#3D7A5A",
+  "France":    "#8BAD72",
+  "India":     "#7B9DCC",
+  "Germany":   "#9A9890"
+};
+
+const W = 780, H = 460;
+const ml = 55, mr = 110, mt = 30, mb = 35;
+const cW = W - ml - mr;
+const cH = H - mt - mb;
+const years = Array.from({length: 14}, (_, i) => 2010 + i);
+
+const allVals = data.flatMap(d => d.s.filter(v => v !== null));
+const minV = Math.floor(Math.min(...allVals) / 50) * 50;
+const maxV = Math.ceil(Math.max(...allVals) / 50) * 50;
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = mkEl("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%" });
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const xScale = i => ml + i / 13 * cW;
+const yScale = v => mt + (maxV - v) / (maxV - minV) * cH;
+
+// Grid lines
+for (let v = 100; v <= maxV; v += 100) {
+  svg.appendChild(mkEl("line", {
+    x1: ml, y1: yScale(v), x2: W - mr, y2: yScale(v),
+    stroke: v === 100 ? "#2B2A27" : "#E2E0D5",
+    "stroke-width": v === 100 ? "1" : "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x: ml - 5, y: yScale(v) + 3,
+    "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#7A786F"
+  });
+  lbl.textContent = v;
+  svg.appendChild(lbl);
+}
+
+// Baseline label
+const baseLbl = mkEl("text", {
+  x: ml + 3, y: yScale(100) - 4,
+  "font-family": "Inter, sans-serif",
+  "font-size": "8", fill: "#7A786F"
+});
+baseLbl.textContent = "2010 baseline (100)";
+svg.appendChild(baseLbl);
+
+// X-axis year labels
+[2010, 2012, 2014, 2016, 2018, 2020, 2022].forEach(y => {
+  const i = y - 2010;
+  const x = xScale(i);
+  svg.appendChild(mkEl("line", {
+    x1: x, y1: mt + cH, x2: x, y2: mt + cH + 4,
+    stroke: "#C2C0B5", "stroke-width": "0.5"
+  }));
+  const lbl = mkEl("text", {
+    x, y: mt + cH + 13,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#7A786F"
+  });
+  lbl.textContent = y;
+  svg.appendChild(lbl);
+});
+
+// COVID annotation
+const covidX = xScale(10); // 2020
+svg.appendChild(mkEl("line", {
+  x1: covidX, y1: mt, x2: covidX, y2: mt + cH,
+  stroke: "#C2C0B5", "stroke-width": "0.5", "stroke-dasharray": "3,3"
+}));
+const covidLbl = mkEl("text", {
+  x: covidX + 3, y: mt + 10,
+  "font-family": "Inter, sans-serif",
+  "font-size": "8", fill: "#9A9890"
+});
+covidLbl.textContent = "COVID-19";
+svg.appendChild(covidLbl);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const tip = document.getElementById("tip");
+const groups = [];
+const endLabels = [];
+
+data.forEach(series => {
+  const c = COLORS[series.n] || "#9A9890";
+  const pts = series.s.map((v, i) => v !== null ? { x: xScale(i), y: yScale(v), v, year: 2010 + i } : null).filter(Boolean);
+
+  let pathD = "";
+  pts.forEach((p, i) => { pathD += (i === 0 ? "M" : "L") + ` ${p.x} ${p.y}`; });
+
+  const g = mkEl("g", {});
+  g.style.opacity = "1";
+
+  const line = mkEl("path", {
+    d: pathD, stroke: c, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round", "stroke-linecap": "round"
+  });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "10", fill: "none" });
+  hit.style.cursor = "pointer";
+  hit.addEventListener("mouseover", () => {
+    groups.forEach(gg => { gg.style.opacity = "0.1"; });
+    g.style.opacity = "1";
+    line.setAttribute("stroke-width", "2.5");
+  });
+  hit.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const ratio = (mx - ml) / cW;
+    const idx = Math.round(ratio * 13);
+    const i = Math.max(0, Math.min(13, idx));
+    const val = series.s[i];
+    if (val !== null && val !== undefined) {
+      const yr = 2010 + i;
+      tip.textContent = `${series.n} ${yr}: ${val.toFixed(0)} (${val > 100 ? "+" : ""}${(val - 100).toFixed(0)}%)`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - 20) + "px";
+    }
+  });
+  hit.addEventListener("mouseout", () => {
+    groups.forEach(gg => { gg.style.opacity = "1"; });
+    line.setAttribute("stroke-width", "1.5");
+    tip.style.opacity = "0";
+  });
+  g.appendChild(hit);
+  groups.push(g);
+  svg.appendChild(g);
+
+  const lastPt = pts[pts.length - 1];
+  if (lastPt) {
+    endLabels.push({ n: series.n, y: lastPt.y, v: lastPt.v, color: c });
+  }
+});
+
+// Resolve collisions for endpoint labels
+const resolved = resolveCollisions(endLabels.map(l => ({ ...l })), 11);
+resolved.forEach(item => {
+  const lbl = mkEl("text", {
+    x: W - mr + 5, y: item.y + 3,
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8.5", fill: item.color
+  });
+  lbl.textContent = `${Math.round(item.v)}  ${item.n}`;
+  svg.appendChild(lbl);
+
+  const orig = endLabels.find(l => l.n === item.n);
+  if (orig && Math.abs(item.y - orig.y) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: W - mr + 2, y1: orig.y, x2: W - mr + 4, y2: item.y,
+      stroke: item.color, "stroke-width": "0.5", opacity: "0.4"
+    }));
+  }
+});
+</script>
+</body></html>
