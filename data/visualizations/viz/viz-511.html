@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; letter-spacing: 0.3px; }
+  .legend-swatch { width: 20px; height: 3px; border-radius: 1px; }
+</style></head><body>
+<h1>Global Logistics Performance, 2007 vs 2022</h1>
+<p class="subtitle">World Bank Logistics Performance Index scores (1 = low, 5 = high) for the top 25 economies. Covers customs, infrastructure, international shipments, logistics competence, tracking, and timeliness.</p>
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#3D7A5A"></div>+0.3 or more</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#8BAD72"></div>+0.1 to +0.3</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C49A45"></div>0 to +0.1</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#C4715A"></div>decline</div>
+</div>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank, Logistics Performance Index (LPI) · wb--LP-LPI-OVRL-XQ</p>
+<script>
+const data = [{"n":"Finland","a":3.82,"b":4.2},{"n":"Denmark","a":3.86,"b":4.1},{"n":"Germany","a":4.1,"b":4.1},{"n":"Austria","a":4.06,"b":4},{"n":"Belgium","a":3.89,"b":4},{"n":"Canada","a":3.92,"b":4},{"n":"Hong Kong","a":4,"b":4},{"n":"France","a":3.76,"b":3.9},{"n":"Japan","a":4.02,"b":3.9},{"n":"South Korea","a":3.52,"b":3.8},{"n":"Australia","a":3.79,"b":3.7},{"n":"China","a":3.32,"b":3.7},{"n":"Greece","a":3.36,"b":3.7},{"n":"Italy","a":3.58,"b":3.7},{"n":"Estonia","a":2.95,"b":3.6},{"n":"Ireland","a":3.91,"b":3.6},{"n":"Israel","a":3.21,"b":3.6},{"n":"Bahrain","a":3.15,"b":3.5},{"n":"India","a":3.07,"b":3.4},{"n":"Croatia","a":2.71,"b":3.3},{"n":"Czechia","a":3.13,"b":3.3},{"n":"Brazil","a":2.75,"b":3.2},{"n":"Bulgaria","a":2.87,"b":3.2},{"n":"Cyprus","a":2.92,"b":3.2},{"n":"Hungary","a":3.15,"b":3.2}];
+
+const W = 700, H = 580;
+const pad = { left: 110, right: 115, top: 40, bottom: 20 };
+
+function colorForChange(c) {
+  if (c >= 0.3) return "#3D7A5A";
+  if (c >= 0.1) return "#8BAD72";
+  if (c >= 0)   return "#C49A45";
+  return "#C4715A";
+}
+
+const minV = 2.6, maxV = 4.3;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i - 1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i - 1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+const lx = pad.left, rx = W - pad.right;
+
+// Axes
+svg.appendChild(mkEl("line", { x1: lx, y1: pad.top - 10, x2: lx, y2: H - pad.bottom, stroke: "#E2E0D5", "stroke-width": "1" }));
+svg.appendChild(mkEl("line", { x1: rx, y1: pad.top - 10, x2: rx, y2: H - pad.bottom, stroke: "#E2E0D5", "stroke-width": "1" }));
+
+// Year labels
+function mono(x, y, txt, anchor) {
+  const t = mkEl("text", { x, y, "font-family": "JetBrains Mono, monospace", "font-size": "10", fill: "#7A786F", "text-anchor": anchor });
+  t.textContent = txt;
+  return t;
+}
+svg.appendChild(mono(lx, pad.top - 15, "2007", "middle"));
+svg.appendChild(mono(rx, pad.top - 15, "2022", "middle"));
+
+// Grid lines
+[2.7, 3.0, 3.3, 3.6, 3.9, 4.2].forEach(v => {
+  const y = scale(v);
+  svg.appendChild(mkEl("line", { x1: lx, y1: y, x2: rx, y2: y, stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  svg.appendChild(mono(lx - 5, y + 3, v.toFixed(1), "end"));
+});
+
+// Prepare labels
+const leftLabels = data.map(d => ({ d, y: scale(d.a), orig: scale(d.a) }));
+const rightLabels = data.map(d => ({ d, y: scale(d.b), orig: scale(d.b) }));
+
+resolveCollisions(leftLabels, 13);
+resolveCollisions(rightLabels, 13);
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+
+data.forEach(d => {
+  const change = d.b - d.a;
+  const col = colorForChange(change);
+  const ya = scale(d.a), yb = scale(d.b);
+
+  const g = mkEl("g", {});
+  g.style.cursor = "pointer";
+
+  // Line
+  const line = mkEl("line", { x1: lx, y1: ya, x2: rx, y2: yb, stroke: col, "stroke-width": "1.5" });
+  g.appendChild(line);
+
+  // Hit area
+  const hit = mkEl("line", { x1: lx - 5, y1: ya, x2: rx + 5, y2: yb, stroke: "transparent", "stroke-width": "12" });
+  g.appendChild(hit);
+
+  // Dots
+  g.appendChild(mkEl("circle", { cx: lx, cy: ya, r: "2.5", fill: col }));
+  g.appendChild(mkEl("circle", { cx: rx, cy: yb, r: "2.5", fill: col }));
+
+  g.addEventListener("mouseover", e => {
+    groups.forEach(gg => gg.style.opacity = "0.12");
+    g.style.opacity = "1";
+    const sign = change >= 0 ? "+" : "";
+    showTip(`${d.n}: ${d.a.toFixed(2)} → ${d.b.toFixed(2)} (${sign}${change.toFixed(2)})`, e);
+  });
+  g.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; });
+  g.addEventListener("mouseout", () => { groups.forEach(gg => gg.style.opacity = "1"); hideTip(); });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Labels after all lines drawn
+leftLabels.forEach(({ d, y }) => {
+  const t = mkEl("text", { x: lx - 8, y: y + 3.5, "font-size": "9", fill: "#2B2A27", "text-anchor": "end" });
+  t.textContent = d.n;
+  svg.appendChild(t);
+});
+rightLabels.forEach(({ d, y }) => {
+  const change = d.b - d.a;
+  const col = colorForChange(change);
+  const t = mkEl("text", { x: rx + 8, y: y + 3.5, "font-size": "9", fill: col, "text-anchor": "start", "font-weight": Math.abs(change) >= 0.3 ? "600" : "400" });
+  t.textContent = d.n;
+  svg.appendChild(t);
+});
+</script>
+</body></html>

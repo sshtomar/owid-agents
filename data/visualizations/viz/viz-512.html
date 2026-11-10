@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>The Services Economy: Share of GDP, 1980–2024</h1>
+<p class="subtitle">Services value added as a percentage of GDP for 10 economies. All economies have shifted toward services over the past four decades, though at very different paces and from different starting points.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank National Accounts · wb--NV-SRV-TOTL-ZS</p>
+<script>
+const data = [{"n":"France","pts":[{"y":1980,"v":58},{"y":1981,"v":59},{"y":1982,"v":58.9},{"y":1983,"v":59.6},{"y":1984,"v":60.2},{"y":1985,"v":60.2},{"y":1986,"v":60.8},{"y":1987,"v":61.3},{"y":1988,"v":61.5},{"y":1989,"v":62.1},{"y":1990,"v":62.2},{"y":1991,"v":63},{"y":1992,"v":63.7},{"y":1993,"v":65},{"y":1994,"v":65.2},{"y":1995,"v":65},{"y":1996,"v":65.3},{"y":1997,"v":65.6},{"y":1998,"v":65.7},{"y":1999,"v":66},{"y":2000,"v":66.4},{"y":2001,"v":67},{"y":2002,"v":67.5},{"y":2003,"v":68.2},{"y":2004,"v":68.3},{"y":2005,"v":68.7},{"y":2006,"v":68.9},{"y":2007,"v":69.2},{"y":2008,"v":69.8},{"y":2009,"v":70.8},{"y":2010,"v":70.7},{"y":2011,"v":70.3},{"y":2012,"v":70.4},{"y":2013,"v":70.4},{"y":2014,"v":70.4},{"y":2015,"v":70.3},{"y":2016,"v":70.6},{"y":2017,"v":70.4},{"y":2018,"v":70.1},{"y":2019,"v":70.1},{"y":2020,"v":71},{"y":2021,"v":70.7},{"y":2022,"v":71.8},{"y":2023,"v":70.2},{"y":2024,"v":70.9}]},{"n":"Australia","pts":[{"y":1990,"v":59.5},{"y":1991,"v":61.3},{"y":1992,"v":61.9},{"y":1993,"v":62.6},{"y":1994,"v":62.6},{"y":1995,"v":62.4},{"y":1996,"v":62.5},{"y":1997,"v":63.5},{"y":1998,"v":63.6},{"y":1999,"v":64.4},{"y":2000,"v":64.4},{"y":2001,"v":64.2},{"y":2002,"v":64},{"y":2003,"v":64.3},{"y":2004,"v":64.3},{"y":2005,"v":64.4},{"y":2006,"v":63.8},{"y":2007,"v":64.4},{"y":2008,"v":64.5},{"y":2009,"v":64.1},{"y":2010,"v":65.7},{"y":2011,"v":64.6},{"y":2012,"v":65.2},{"y":2013,"v":66.2},{"y":2014,"v":65.6},{"y":2015,"v":67.2},{"y":2016,"v":68.2},{"y":2017,"v":66.9},{"y":2018,"v":66.6},{"y":2019,"v":66},{"y":2020,"v":66.3},{"y":2021,"v":65.7},{"y":2022,"v":63.4},{"y":2023,"v":63.6},{"y":2024,"v":66.1}]},{"n":"Brazil","pts":[{"y":1980,"v":44},{"y":1981,"v":45.8},{"y":1982,"v":45.2},{"y":1983,"v":42.7},{"y":1984,"v":43.5},{"y":1985,"v":41.4},{"y":1986,"v":40.7},{"y":1987,"v":41.2},{"y":1988,"v":44.8},{"y":1989,"v":48.4},{"y":1990,"v":60.5},{"y":1991,"v":60.5},{"y":1992,"v":68.4},{"y":1993,"v":73.3},{"y":1994,"v":56.9},{"y":1995,"v":58.1},{"y":1996,"v":60.3},{"y":1997,"v":60.6},{"y":1998,"v":61.1},{"y":1999,"v":60.2},{"y":2000,"v":58.3},{"y":2001,"v":57.7},{"y":2002,"v":57.3},{"y":2003,"v":56.4},{"y":2004,"v":54.9},{"y":2005,"v":56.1},{"y":2006,"v":57.1},{"y":2007,"v":57.7},{"y":2008,"v":56.8},{"y":2009,"v":59.1},{"y":2010,"v":57.6},{"y":2011,"v":57.6},{"y":2012,"v":58.7},{"y":2013,"v":59.7},{"y":2014,"v":61.3},{"y":2015,"v":62.3},{"y":2016,"v":63.2},{"y":2017,"v":63.3},{"y":2018,"v":62.7},{"y":2019,"v":63.1},{"y":2020,"v":61.4},{"y":2021,"v":56.9},{"y":2022,"v":58.1},{"y":2023,"v":59.2},{"y":2024,"v":59.2}]},{"n":"Argentina","pts":[{"y":1980,"v":52.4},{"y":1981,"v":53.2},{"y":1982,"v":49.3},{"y":1983,"v":49.8},{"y":1984,"v":51.9},{"y":1985,"v":53.1},{"y":1986,"v":54.8},{"y":1987,"v":54.1},{"y":1988,"v":52.5},{"y":1989,"v":48},{"y":1990,"v":55.9},{"y":1991,"v":60.6},{"y":1992,"v":63.3},{"y":1993,"v":61.1},{"y":1994,"v":61.6},{"y":1995,"v":62.3},{"y":1996,"v":61.4},{"y":1997,"v":60.8},{"y":1998,"v":61.5},{"y":1999,"v":63.5},{"y":2000,"v":63.5},{"y":2001,"v":65.1},{"y":2002,"v":54.8},{"y":2003,"v":51},{"y":2004,"v":47.8},{"y":2005,"v":48.5},{"y":2006,"v":48.7},{"y":2007,"v":49.5},{"y":2008,"v":50.3},{"y":2009,"v":53.3},{"y":2010,"v":51.5},{"y":2011,"v":51.8},{"y":2012,"v":53.7},{"y":2013,"v":53.9},{"y":2014,"v":52.9},{"y":2015,"v":55.8},{"y":2016,"v":56.1},{"y":2017,"v":57.3},{"y":2018,"v":56.4},{"y":2019,"v":55.4},{"y":2020,"v":54.9},{"y":2021,"v":52.8},{"y":2022,"v":53.5},{"y":2023,"v":53.2},{"y":2024,"v":53.7}]},{"n":"Chile","pts":[{"y":1980,"v":54.1},{"y":1981,"v":56.5},{"y":1982,"v":59.2},{"y":1983,"v":52.2},{"y":1984,"v":48.5},{"y":1985,"v":49.6},{"y":1986,"v":50.8},{"y":1987,"v":49.5},{"y":1988,"v":45.7},{"y":1989,"v":47.1},{"y":1990,"v":46.7},{"y":1991,"v":46.1},{"y":1992,"v":47.6},{"y":1993,"v":48.7},{"y":1994,"v":48.9},{"y":1995,"v":48.1},{"y":1996,"v":52.1},{"y":1997,"v":52.9},{"y":1998,"v":54.7},{"y":1999,"v":55.7},{"y":2000,"v":55.1},{"y":2001,"v":55.6},{"y":2002,"v":55.8},{"y":2003,"v":55.2},{"y":2004,"v":53.2},{"y":2005,"v":51.8},{"y":2006,"v":48.1},{"y":2007,"v":49.4},{"y":2008,"v":54.2},{"y":2009,"v":55.5},{"y":2010,"v":53.6},{"y":2011,"v":54},{"y":2012,"v":55.8},{"y":2013,"v":57.2},{"y":2014,"v":57.2},{"y":2015,"v":58.3},{"y":2016,"v":59},{"y":2017,"v":58.3},{"y":2018,"v":58},{"y":2019,"v":58.9},{"y":2020,"v":56.3},{"y":2021,"v":55},{"y":2022,"v":55.4},{"y":2023,"v":57.5},{"y":2024,"v":55.8}]},{"n":"South Korea","pts":[{"y":1980,"v":43.7},{"y":1981,"v":43.9},{"y":1982,"v":44.5},{"y":1983,"v":43.9},{"y":1984,"v":43.9},{"y":1985,"v":45},{"y":1986,"v":45.6},{"y":1987,"v":45.9},{"y":1988,"v":45.6},{"y":1989,"v":47},{"y":1990,"v":47.2},{"y":1991,"v":47.8},{"y":1992,"v":49.1},{"y":1993,"v":49.7},{"y":1994,"v":49.7},{"y":1995,"v":49.7},{"y":1996,"v":50.7},{"y":1997,"v":51.3},{"y":1998,"v":52.9},{"y":1999,"v":52.5},{"y":2000,"v":52.5},{"y":2001,"v":53.7},{"y":2002,"v":54.2},{"y":2003,"v":54.5},{"y":2004,"v":53.7},{"y":2005,"v":54.4},{"y":2006,"v":55.2},{"y":2007,"v":55.5},{"y":2008,"v":56.6},{"y":2009,"v":56.3},{"y":2010,"v":54.9},{"y":2011,"v":54.7},{"y":2012,"v":55},{"y":2013,"v":54.9},{"y":2014,"v":55.2},{"y":2015,"v":55.1},{"y":2016,"v":55},{"y":2017,"v":54.6},{"y":2018,"v":55.4},{"y":2019,"v":56.9},{"y":2020,"v":56.9},{"y":2021,"v":56.9},{"y":2022,"v":58.1},{"y":2023,"v":58.9},{"y":2024,"v":57.5}]},{"n":"China","pts":[{"y":1980,"v":22.4},{"y":1981,"v":22.9},{"y":1982,"v":22.7},{"y":1983,"v":23.4},{"y":1984,"v":25.7},{"y":1985,"v":29.5},{"y":1986,"v":30},{"y":1987,"v":30.5},{"y":1988,"v":31.4},{"y":1989,"v":33},{"y":1990,"v":32.5},{"y":1991,"v":34.7},{"y":1992,"v":35.8},{"y":1993,"v":34.8},{"y":1994,"v":34.7},{"y":1995,"v":34},{"y":1996,"v":33.9},{"y":1997,"v":35.4},{"y":1998,"v":37.5},{"y":1999,"v":39.1},{"y":2000,"v":40.4},{"y":2001,"v":41.9},{"y":2002,"v":43},{"y":2003,"v":42.8},{"y":2004,"v":42},{"y":2005,"v":42.1},{"y":2006,"v":42.6},{"y":2007,"v":43.7},{"y":2008,"v":43.8},{"y":2009,"v":45.3},{"y":2010,"v":45.1},{"y":2011,"v":45.2},{"y":2012,"v":46.4},{"y":2013,"v":47.8},{"y":2014,"v":49.2},{"y":2015,"v":51.7},{"y":2016,"v":53.3},{"y":2017,"v":53.5},{"y":2018,"v":54.1},{"y":2019,"v":55.2},{"y":2020,"v":55.5},{"y":2021,"v":54.8},{"y":2022,"v":55},{"y":2023,"v":56.3},{"y":2024,"v":56.8}]},{"n":"India","pts":[{"y":1980,"v":33.8},{"y":1981,"v":33.9},{"y":1982,"v":34.9},{"y":1983,"v":34.5},{"y":1984,"v":35.4},{"y":1985,"v":36.1},{"y":1986,"v":37},{"y":1987,"v":37.5},{"y":1988,"v":36.8},{"y":1989,"v":37.2},{"y":1990,"v":37},{"y":1991,"v":37.8},{"y":1992,"v":37.9},{"y":1993,"v":38.5},{"y":1994,"v":37.5},{"y":1995,"v":37.8},{"y":1996,"v":37.7},{"y":1997,"v":39.1},{"y":1998,"v":40.1},{"y":1999,"v":42},{"y":2000,"v":42.7},{"y":2001,"v":43.8},{"y":2002,"v":44.7},{"y":2003,"v":44.7},{"y":2004,"v":44.1},{"y":2005,"v":44.4},{"y":2006,"v":44},{"y":2007,"v":44},{"y":2008,"v":45.9},{"y":2009,"v":46},{"y":2010,"v":45},{"y":2011,"v":45.4},{"y":2012,"v":46.3},{"y":2013,"v":46.7},{"y":2014,"v":47.8},{"y":2015,"v":47.8},{"y":2016,"v":47.7},{"y":2017,"v":47.7},{"y":2018,"v":48.4},{"y":2019,"v":50.1},{"y":2020,"v":47.9},{"y":2021,"v":47.8},{"y":2022,"v":47.2},{"y":2023,"v":47.6},{"y":2024,"v":48}]},{"n":"Bangladesh","pts":[{"y":1980,"v":44.6},{"y":1981,"v":45.7},{"y":1982,"v":46.1},{"y":1983,"v":45.8},{"y":1984,"v":41.6},{"y":1985,"v":44.4},{"y":1986,"v":45.1},{"y":1987,"v":45.5},{"y":1988,"v":46.4},{"y":1989,"v":47.2},{"y":1990,"v":46.7},{"y":1991,"v":44.4},{"y":1992,"v":44.4},{"y":1993,"v":46},{"y":1994,"v":46.3},{"y":1995,"v":45.1},{"y":1996,"v":50.1},{"y":1997,"v":49.9},{"y":1998,"v":49.8},{"y":1999,"v":50.2},{"y":2000,"v":50.6},{"y":2001,"v":50.6},{"y":2002,"v":51.6},{"y":2003,"v":52.4},{"y":2004,"v":52.8},{"y":2005,"v":52.9},{"y":2006,"v":52.7},{"y":2007,"v":52.9},{"y":2008,"v":52.9},{"y":2009,"v":53.3},{"y":2010,"v":53.5},{"y":2011,"v":53},{"y":2012,"v":53.2},{"y":2013,"v":53.4},{"y":2014,"v":53.6},{"y":2015,"v":53.7},{"y":2016,"v":51.2},{"y":2017,"v":51.4},{"y":2018,"v":50.9},{"y":2019,"v":50.8},{"y":2020,"v":51.5},{"y":2021,"v":51.3},{"y":2022,"v":51},{"y":2023,"v":51.1},{"y":2024,"v":51.4}]},{"n":"Indonesia","pts":[{"y":1983,"v":39.3},{"y":1984,"v":39.4},{"y":1985,"v":41.9},{"y":1986,"v":42.1},{"y":1987,"v":40.4},{"y":1988,"v":39.7},{"y":1989,"v":39.5},{"y":1990,"v":39.1},{"y":1991,"v":39.1},{"y":1992,"v":40.5},{"y":1993,"v":42.4},{"y":1994,"v":42.1},{"y":1995,"v":41.1},{"y":1996,"v":39.9},{"y":1997,"v":39.6},{"y":1998,"v":36.7},{"y":1999,"v":37},{"y":2000,"v":33.4},{"y":2001,"v":38.4},{"y":2002,"v":40.1},{"y":2003,"v":41.1},{"y":2004,"v":41},{"y":2005,"v":40.3},{"y":2006,"v":40.1},{"y":2007,"v":39.5},{"y":2008,"v":37.5},{"y":2009,"v":37.1},{"y":2010,"v":40.7},{"y":2011,"v":40.6},{"y":2012,"v":40.9},{"y":2013,"v":41.5},{"y":2014,"v":42.2},{"y":2015,"v":43.3},{"y":2016,"v":43.6},{"y":2017,"v":43.6},{"y":2018,"v":43.4},{"y":2019,"v":44.2},{"y":2020,"v":44.4},{"y":2021,"v":42.8},{"y":2022,"v":41.8},{"y":2023,"v":42.9},{"y":2024,"v":43.8}]}];
+
+const W = 820, H = 460;
+const margin = { top: 30, right: 100, bottom: 30, left: 50 };
+
+// Color palette - assign by final 2024 value
+const palette = ["#EA5E33","#C4715A","#F29A44","#C49A45","#8BAD72","#5B9E78","#3D7A5A","#A0C4A2","#7B9BA6","#9A85B0"];
+const colorMap = {};
+const sorted = data.slice().sort((a, b) => b.pts[b.pts.length-1].v - a.pts[a.pts.length-1].v);
+sorted.forEach((d, i) => { colorMap[d.n] = palette[i % palette.length]; });
+
+const yearMin = 1980, yearMax = 2024;
+const valMin = 15, valMax = 80;
+
+const xS = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yS = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function resolveCollisions(items, minGap) {
+  const s = items.slice().sort((a, b) => a.y - b.y);
+  for (let p = 0; p < 30; p++) {
+    let mv = false;
+    for (let i = 1; i < s.length; i++) {
+      const gap = s[i].y - s[i-1].y;
+      if (gap < minGap) { const sh = (minGap - gap) / 2; s[i-1].y -= sh; s[i].y += sh; mv = true; }
+    }
+    if (!mv) break;
+  }
+  return s;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+svg.style.cursor = "crosshair";
+document.getElementById("chart").appendChild(svg);
+
+// Grid
+[20,30,40,50,60,70].forEach(v => {
+  svg.appendChild(mkEl("line", { x1: margin.left, y1: yS(v), x2: W - margin.right, y2: yS(v), stroke: "#E2E0D5", "stroke-width": "0.5" }));
+  const t = mkEl("text", { x: margin.left - 5, y: yS(v) + 3.5, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F", "text-anchor": "end" });
+  t.textContent = v + "%";
+  svg.appendChild(t);
+});
+
+// X-axis ticks
+[1980,1990,2000,2010,2020].forEach(y => {
+  const x = xS(y);
+  svg.appendChild(mkEl("line", { x1: x, y1: H - margin.bottom, x2: x, y2: H - margin.bottom + 4, stroke: "#C2C0B5", "stroke-width": "1" }));
+  const t = mkEl("text", { x, y: H - margin.bottom + 13, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F", "text-anchor": "middle" });
+  t.textContent = y;
+  svg.appendChild(t);
+});
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+const groups = [];
+
+data.forEach(d => {
+  const col = colorMap[d.n];
+  const pts = d.pts;
+  const g = mkEl("g", {});
+
+  const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const line = mkEl("path", { d: pathD, stroke: col, "stroke-width": "1.5", fill: "none", "stroke-linejoin": "round" });
+  g.appendChild(line);
+
+  const hit = mkEl("path", { d: pathD, stroke: "transparent", "stroke-width": "12", fill: "none" });
+  g.appendChild(hit);
+
+  hit.addEventListener("mouseover", e => {
+    groups.forEach(gg => gg.style.opacity = "0.1");
+    g.style.opacity = "1";
+  });
+  hit.addEventListener("mousemove", e => {
+    groups.forEach(gg => gg.style.opacity = "0.1");
+    g.style.opacity = "1";
+    const rect = svg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const ratio = (mx - margin.left) / (W - margin.left - margin.right);
+    const yr = Math.round(yearMin + ratio * (yearMax - yearMin));
+    const nearest = pts.reduce((best, p) => Math.abs(p.y - yr) < Math.abs(best.y - yr) ? p : best);
+    showTip(`${d.n} · ${nearest.y}: ${nearest.v.toFixed(1)}%`, e);
+    tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseout", () => { groups.forEach(gg => gg.style.opacity = "1"); hideTip(); });
+
+  svg.appendChild(g);
+  groups.push(g);
+});
+
+// Endpoint labels with collision resolution
+const endLabels = data.map(d => {
+  const last = d.pts[d.pts.length - 1];
+  return { n: d.n, y: yS(last.v), v: last.v, col: colorMap[d.n] };
+});
+resolveCollisions(endLabels, 11);
+endLabels.forEach(({ n, y, col }) => {
+  const t = mkEl("text", { x: W - margin.right + 6, y: y + 3.5, "font-size": "9", fill: col, "text-anchor": "start", "font-weight": "500" });
+  t.textContent = n;
+  svg.appendChild(t);
+});
+</script>
+</body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border-top: 1px solid #E2E0D5; border-left: 1px solid #E2E0D5; max-width: 900px; }
+  .cell { padding: 10px 10px 8px; border-bottom: 1px solid #E2E0D5; border-right: 1px solid #E2E0D5; cursor: crosshair; position: relative; min-height: 70px; }
+  .cell-name { font-size: 9px; font-weight: 500; color: #2B2A27; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell-vals { display: flex; justify-content: space-between; margin-top: 4px; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #7A786F; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>New Businesses Registered, 2006–2024</h1>
+<p class="subtitle">Annual count of newly registered private limited companies (or equivalent). Sorted by latest count. Brazil's entrepreneurship surge and Japan's late rise are among the most notable trends.</p>
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank, Doing Business indicators · wb--IC-BUS-NREG</p>
+<script>
+const data = [{"n":"Brazil","s":[286540,321002,370588,383337,404793,421434,397195,404299,375499,372370,365345,396932,447753,525931,609316,802127,825116,872849,979211],"y0":2006,"e":286540,"l":979211},{"n":"Australia","s":[133756,157438,141827,145963,159246,166740,184237,201855,222294,241023,243105,249048,235684,223389,236447,298665,271369,286290,316561],"y0":2006,"e":133756,"l":316561},{"n":"China","s":[71783,92901,108848,118469,119133,133960,206699,237341,271561,256457,259525,243657,262942,349849,289696,368965,286640],"y0":2008,"e":71783,"l":286640},{"n":"France","s":[157715,174126,172490,160061,172814,176441,170485,169299,174280,179279,195769,204009,207924,225217,220848,276181,287719,274417,286548],"y0":2006,"e":157715,"l":286548},{"n":"Indonesia","s":[23536,24966,39305,29608,38110,43905,47715,51151,57954,57194,58461,58337,61663,69615,70555,93426,152316,185765,182200],"y0":2006,"e":23536,"l":182200},{"n":"India","s":[49721,62919,70303,60813,86645,97405,103078,91841,69841,80546,93714,107492,117834,128565,142000,167606,173114,165120,173712],"y0":2006,"e":49721,"l":173712},{"n":"Hong Kong","s":[81974,100761,98645,109424,139530,148329,150165,174031,167280,139209,144883,160229,151739,124741,99405,110840,104120,132246,145053],"y0":2006,"e":81974,"l":145053},{"n":"South Korea","s":[65016,75767,75797,80288,83626,89283,97196,101349,111627,122696,125717,124787,130139,137591,153217,159606,144286,128455],"y0":2006,"e":65016,"l":128455},{"n":"Chile","s":[25994,27957,29016,31003,34359,41910,48835,57955,67862,71052,76138,97625,108160,108124,112588,153869,129615,123159],"y0":2006,"e":25994,"l":123159},{"n":"Italy","s":[89056,92887,89494,84084,88357,80797,76446,84146,92504,100624,102696,111241,114812,110017,93045,113217,106357,107066,115689],"y0":2006,"e":89056,"l":115689},{"n":"Colombia","s":[60739,69179,60456,67997,66412,67560,73665,68491,78400,81834,78022,82208],"y0":2013,"e":60739,"l":82208},{"n":"Germany","s":[65447,65292,65812,74055,73966,71190,69332,68526,67458,69384,70720,71801,72844,73991,72774,82991,74773,74997,75775],"y0":2006,"e":65447,"l":75775},{"n":"Kenya","s":[37733,44381,42085,49037,48386,52154,57016,58919],"y0":2017,"e":37733,"l":58919},{"n":"Ethiopia","s":[8944,8807,10354,11588,13212,9125,11265,10935,14211,17499,19649,34327,45688,46274],"y0":2011,"e":8944,"l":46274},{"n":"Kazakhstan","s":[12361,19739,13935,3240,707,14223,15404,19601,15072,10682,21583,39693,40945,38498,35923,44390,53908,47545,42707],"y0":2006,"e":12361,"l":42707},{"n":"Bulgaria","s":[37744,31723,29969,36440,41169,40090,39394,42634,46965,46746,46131,43093,35099,39544,39989,40779,42783],"y0":2008,"e":37744,"l":42783},{"n":"Japan","s":[3450,6187,5503,5884,7269,9246,11031,14729,19972,22387,23944,27442,29243,30733,33411,37275,37312,40946,41946],"y0":2006,"e":3450,"l":41946},{"n":"Belgium","s":[20989,23256,22910,20071,23161,24564,22016,18931,23643,21785,28273,24790,25344,29093,32355,36817,47144,39772],"y0":2006,"e":20989,"l":39772},{"n":"Angola","s":[417,1472,2131,3417,2351,2817,5527,6105,8554,12113,11053,16368,16077,14246,8667,14951,22987,28737,30956],"y0":2006,"e":417,"l":30956},{"n":"Czechia","s":[16395,20938,22633,21717,22456,21173,21571,22227,24366,26068,27881,31195,30336,28758,26024,28756,27121,28041,29877],"y0":2006,"e":16395,"l":29877},{"n":"Ghana","s":[7651,9624,14485,15324,13760,15649,13154,21596,22618,18535,19234,27453,26403,25170,24895,24259,25394,48634,28529],"y0":2006,"e":7651,"l":28529},{"n":"Algeria","s":[8868,7939,11111,10657,9573,12267,13989,14231,15583,14140,14816,16683,15708,14401,13981,16926,17867,21677,24482],"y0":2006,"e":8868,"l":24482},{"n":"Denmark","s":[26467,28949,25621,16593,18053,17878,16960,16880,25951,30373,33757,36480,37185,33103,29497,32960,27324,26006,25969],"y0":2006,"e":26467,"l":25969},{"n":"Hungary","s":[22300,27667,44105,42414,44690,52726,32706,28606,25040,21742,23040,23494,25018,26116,26363,31467,27944,25090,23691],"y0":2006,"e":22300,"l":23691}];
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + "M";
+  if (n >= 1000) return Math.round(n/1000) + "k";
+  return n.toString();
+}
+
+const grid = document.getElementById("grid");
+const tip = document.getElementById("tip");
+
+data.forEach(d => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+
+  const nameEl = document.createElement("div");
+  nameEl.className = "cell-name";
+  nameEl.textContent = d.n;
+  cell.appendChild(nameEl);
+
+  const canvas = document.createElement("canvas");
+  const DPR = window.devicePixelRatio || 1;
+  const CW = 120, CH = 32;
+  canvas.width = CW * DPR;
+  canvas.height = CH * DPR;
+  canvas.style.width = "100%";
+  canvas.style.height = CH + "px";
+  cell.appendChild(canvas);
+
+  const vals = document.createElement("div");
+  vals.className = "cell-vals";
+  vals.innerHTML = `<span>${d.y0}</span><span>${d.y0 + d.s.length - 1}</span>`;
+  cell.appendChild(vals);
+
+  grid.appendChild(cell);
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(DPR, DPR);
+  const mn = Math.min(...d.s), mx = Math.max(...d.s);
+  const range = mx - mn || 1;
+  const norm = v => CH - 2 - ((v - mn) / range) * (CH - 4);
+
+  ctx.strokeStyle = "#EA5E33";
+  ctx.lineWidth = 1.2;
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  d.s.forEach((v, i) => {
+    const x = (i / (d.s.length - 1)) * CW;
+    const y = norm(v);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  cell.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx2 = e.clientX - rect.left;
+    const ratio = Math.max(0, Math.min(1, mx2 / rect.width));
+    const idx = Math.round(ratio * (d.s.length - 1));
+    const year = d.y0 + idx;
+    const val = d.s[idx];
+    tip.textContent = `${d.n} · ${year}: ${fmt(val)}`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+
+    const w = rect.width;
+    const ctx2 = canvas.getContext("2d");
+    ctx2.clearRect(0, 0, CW, CH);
+    ctx2.strokeStyle = "#EA5E33";
+    ctx2.lineWidth = 1.2;
+    ctx2.lineJoin = "round";
+    ctx2.beginPath();
+    d.s.forEach((v, i) => {
+      const x = (i / (d.s.length - 1)) * CW;
+      const y = norm(v);
+      i === 0 ? ctx2.moveTo(x, y) : ctx2.lineTo(x, y);
+    });
+    ctx2.stroke();
+    const px = idx / (d.s.length - 1) * CW;
+    ctx2.strokeStyle = "#C2C0B5";
+    ctx2.lineWidth = 0.8;
+    ctx2.beginPath();
+    ctx2.moveTo(px, 0);
+    ctx2.lineTo(px, CH);
+    ctx2.stroke();
+  });
+  cell.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    const ctx2 = canvas.getContext("2d");
+    ctx2.clearRect(0, 0, CW, CH);
+    ctx2.strokeStyle = "#EA5E33";
+    ctx2.lineWidth = 1.2;
+    ctx2.lineJoin = "round";
+    ctx2.beginPath();
+    d.s.forEach((v, i) => {
+      const x = (i / (d.s.length - 1)) * CW;
+      const y = norm(v);
+      i === 0 ? ctx2.moveTo(x, y) : ctx2.lineTo(x, y);
+    });
+    ctx2.stroke();
+  });
+});
+</script>
+</body></html>
