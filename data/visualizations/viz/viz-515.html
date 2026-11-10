@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Living Below the Flood Line: Population in Low-Elevation Coastal Zones</h1>
+<p class="subtitle">Share of national population living in areas below 5 meters elevation (1990 baseline). These low-elevation coastal zones face the highest risk from sea-level rise, storm surges, and flooding — risks that have only grown as coastal populations have increased.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank / CIESIN Columbia University, 1990 · wb--EN-POP-EL5M-ZS</p>
+<script>
+const data = [{"n":"Guyana","v":79.84},{"n":"Bahrain","v":32.95},{"n":"Belize","v":31.29},{"n":"Brunei Darussalam","v":21.84},{"n":"Fiji","v":18.11},{"n":"Eritrea","v":16.35},{"n":"Denmark","v":12.70},{"n":"Japan","v":12.69},{"n":"Gabon","v":10.90},{"n":"Jamaica","v":10.55},{"n":"Bangladesh","v":10.27},{"n":"Djibouti","v":9.61},{"n":"Benin","v":8.87},{"n":"Indonesia","v":8.29},{"n":"Ecuador","v":7.41},{"n":"Hong Kong SAR, China","v":6.90},{"n":"Albania","v":6.52},{"n":"Belgium","v":5.25},{"n":"Greece","v":5.09},{"n":"Haiti","v":4.64},{"n":"Finland","v":4.50},{"n":"Croatia","v":4.14},{"n":"Italy","v":3.76},{"n":"China","v":3.68},{"n":"Iraq","v":3.63}];
+
+const W = 640, H = 580;
+const margin = { top: 20, right: 60, bottom: 20, left: 150 };
+
+function colorForVal(v) {
+  if (v >= 50) return "#EA5E33";
+  if (v >= 20) return "#F29A44";
+  if (v >= 10) return "#C49A45";
+  return "#A6C4A2";
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+const barH = 18, gap = 5;
+const totalH = data.length * (barH + gap);
+const chartW = W - margin.left - margin.right;
+const maxV = 80;
+const xS = v => margin.left + (v / maxV) * chartW;
+
+const tip = document.getElementById("tip");
+function showTip(text, e) { tip.textContent = text; tip.style.opacity = "1"; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; }
+function hideTip() { tip.style.opacity = "0"; }
+
+// X-axis grid
+[0, 20, 40, 60, 80].forEach(v => {
+  const x = xS(v);
+  svg.appendChild(mkEl("line", { x1: x, y1: margin.top, x2: x, y2: margin.top + totalH, stroke: "#E2E0D5", "stroke-width": v === 0 ? "1" : "0.5" }));
+  if (v > 0) {
+    const t = mkEl("text", { x, y: margin.top - 5, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F", "text-anchor": "middle" });
+    t.textContent = v + "%";
+    svg.appendChild(t);
+  }
+});
+
+data.forEach((d, i) => {
+  const y = margin.top + i * (barH + gap);
+  const col = colorForVal(d.v);
+  const bw = xS(d.v) - margin.left;
+
+  const g = mkEl("g", { cursor: "pointer" });
+
+  // Country label
+  const label = mkEl("text", { x: margin.left - 6, y: y + barH / 2 + 3.5, "font-size": "10", fill: "#2B2A27", "text-anchor": "end" });
+  label.textContent = d.n;
+  g.appendChild(label);
+
+  // Bar
+  const bar = mkEl("rect", { x: margin.left, y, width: bw, height: barH, fill: col, rx: "2" });
+  g.appendChild(bar);
+
+  // Value label
+  const vlab = mkEl("text", { x: margin.left + bw + 5, y: y + barH / 2 + 3.5, "font-size": "9", "font-family": "JetBrains Mono, monospace", fill: "#7A786F" });
+  vlab.textContent = d.v.toFixed(1) + "%";
+  g.appendChild(vlab);
+
+  g.addEventListener("mouseover", e => {
+    bar.setAttribute("fill", "#EA5E33");
+    showTip(`${d.n}: ${d.v.toFixed(1)}% of population below 5m (2015)`, e);
+  });
+  g.addEventListener("mousemove", e => { tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY - 20) + "px"; });
+  g.addEventListener("mouseout", () => { bar.setAttribute("fill", col); hideTip(); });
+
+  svg.appendChild(g);
+});
+
+// Fix SVG height
+svg.setAttribute("viewBox", `0 0 ${W} ${margin.top + totalH + margin.bottom}`);
+</script>
+</body></html>
