@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body{font-family:'Inter',sans-serif;margin:0;padding:32px 40px;background:#F6F5EE;color:#2B2A27;}
+  h1{font-size:15px;font-weight:600;letter-spacing:-0.3px;margin:0 0 4px;}
+  .subtitle{font-size:11px;color:#7A786F;margin:0 0 24px;max-width:520px;line-height:1.5;}
+  .source{font-family:'JetBrains Mono',monospace;font-size:9px;color:#7A786F;margin-top:20px;letter-spacing:0.3px;text-transform:uppercase;}
+  svg text{font-family:'Inter',sans-serif;}
+  .tooltip{position:fixed;pointer-events:none;background:#2B2A27;color:#F6F5EE;font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:2px;white-space:nowrap;opacity:0;transition:opacity 0.15s;z-index:10;}
+</style></head><body>
+<h1>Children Out of School (% of Primary School Age)</h1>
+<p class="subtitle">Share of primary-school-age children not enrolled in school, 1970–2024. Many Sub-Saharan African countries have made dramatic progress, though some have stalled or reversed in recent years.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Children out of school (SE.PRM.UNER.ZS)</p>
+<script>
+const data = [{"n":"Burkina Faso","pts":[{"y":1971,"v":89.7},{"y":1972,"v":89.3},{"y":1977,"v":87.4},{"y":1978,"v":86.9},{"y":1979,"v":86.4},{"y":1980,"v":85.6},{"y":1981,"v":84.7},{"y":1982,"v":83.3},{"y":1983,"v":82.1},{"y":1984,"v":80.8},{"y":1985,"v":78.8},{"y":1986,"v":77.0},{"y":1987,"v":75.5},{"y":1988,"v":75.2},{"y":1989,"v":74.9},{"y":1991,"v":74.0},{"y":1992,"v":73.6},{"y":1993,"v":72.7},{"y":1994,"v":71.6},{"y":1995,"v":70.1},{"y":1998,"v":67.0},{"y":1999,"v":66.4},{"y":2000,"v":65.0},{"y":2001,"v":63.9},{"y":2002,"v":64.8},{"y":2003,"v":62.4},{"y":2004,"v":60.1},{"y":2005,"v":55.3},{"y":2006,"v":51.7},{"y":2007,"v":46.5},{"y":2008,"v":40.5},{"y":2009,"v":37.6},{"y":2010,"v":41.0},{"y":2011,"v":36.5},{"y":2012,"v":35.6},{"y":2013,"v":34.7},{"y":2014,"v":33.8},{"y":2015,"v":32.5},{"y":2016,"v":27.2},{"y":2017,"v":26.4},{"y":2018,"v":24.4},{"y":2019,"v":25.8},{"y":2020,"v":28.5},{"y":2021,"v":29.1},{"y":2022,"v":32.2},{"y":2023,"v":42.0},{"y":2024,"v":34.3}]},{"n":"Chad","pts":[{"y":1975,"v":76.7},{"y":1977,"v":76.5},{"y":1988,"v":67.0},{"y":1996,"v":63.0},{"y":1997,"v":57.8},{"y":1998,"v":52.9},{"y":1999,"v":51.5},{"y":2000,"v":50.4},{"y":2001,"v":49.1},{"y":2002,"v":45.3},{"y":2003,"v":43.7},{"y":2011,"v":38.6},{"y":2013,"v":23.9},{"y":2015,"v":23.8},{"y":2016,"v":30.1},{"y":2017,"v":35.8},{"y":2018,"v":30.2},{"y":2019,"v":31.1},{"y":2021,"v":28.6},{"y":2022,"v":28.4},{"y":2023,"v":26.7},{"y":2024,"v":24.8}]},{"n":"Ethiopia","pts":[{"y":1987,"v":70.3},{"y":1988,"v":69.9},{"y":1989,"v":71.2},{"y":1994,"v":79.8},{"y":1995,"v":77.0},{"y":1996,"v":72.9},{"y":1998,"v":66.7},{"y":1999,"v":64.9},{"y":2000,"v":61.6},{"y":2001,"v":58.0},{"y":2002,"v":56.3},{"y":2003,"v":55.7},{"y":2004,"v":52.9},{"y":2005,"v":42.3},{"y":2006,"v":37.4},{"y":2007,"v":31.8},{"y":2008,"v":25.9},{"y":2009,"v":26.2},{"y":2010,"v":28.2},{"y":2011,"v":24.8},{"y":2012,"v":23.7},{"y":2014,"v":19.1},{"y":2015,"v":20.2},{"y":2021,"v":25.7},{"y":2022,"v":24.6},{"y":2023,"v":23.8},{"y":2024,"v":22.5}]},{"n":"Gambia, The","pts":[{"y":1971,"v":81.8},{"y":1972,"v":81.9},{"y":1973,"v":80.7},{"y":1974,"v":80.1},{"y":1975,"v":79.0},{"y":1976,"v":77.6},{"y":1977,"v":74.2},{"y":1978,"v":72.0},{"y":1979,"v":68.4},{"y":1980,"v":64.3},{"y":1981,"v":57.2},{"y":1982,"v":54.1},{"y":1983,"v":51.5},{"y":1984,"v":50.3},{"y":1985,"v":48.0},{"y":1986,"v":48.2},{"y":1990,"v":57.7},{"y":1992,"v":59.9},{"y":1993,"v":57.3},{"y":1996,"v":50.5},{"y":1998,"v":48.8},{"y":1999,"v":40.3},{"y":2000,"v":42.9},{"y":2001,"v":42.8},{"y":2002,"v":44.5},{"y":2003,"v":41.3},{"y":2004,"v":40.6},{"y":2005,"v":42.1},{"y":2006,"v":37.7},{"y":2007,"v":35.6},{"y":2008,"v":38.9},{"y":2010,"v":36.8},{"y":2011,"v":38.0},{"y":2012,"v":35.1},{"y":2013,"v":34.6},{"y":2014,"v":32.5},{"y":2015,"v":29.5},{"y":2016,"v":27.9},{"y":2017,"v":25.4},{"y":2018,"v":23.6},{"y":2019,"v":20.3},{"y":2020,"v":18.4},{"y":2021,"v":19.0},{"y":2022,"v":18.8},{"y":2023,"v":18.8},{"y":2024,"v":18.8}]},{"n":"Guinea-Bissau","pts":[{"y":1981,"v":61.2},{"y":1982,"v":53.7},{"y":1984,"v":55.6},{"y":1985,"v":55.3},{"y":1987,"v":61.7},{"y":1988,"v":62.2},{"y":2000,"v":50.8},{"y":2010,"v":30.5}]},{"n":"Burundi","pts":[{"y":1973,"v":81.3},{"y":1978,"v":84.1},{"y":1980,"v":83.1},{"y":1981,"v":81.7},{"y":1982,"v":78.8},{"y":1983,"v":73.4},{"y":1984,"v":69.0},{"y":1985,"v":64.9},{"y":1986,"v":62.3},{"y":1987,"v":57.6},{"y":1988,"v":54.9},{"y":1993,"v":54.5},{"y":2000,"v":57.7},{"y":2001,"v":48.8},{"y":2002,"v":48.2},{"y":2003,"v":44.8},{"y":2004,"v":43.2},{"y":2005,"v":39.6},{"y":2006,"v":22.1},{"y":2007,"v":14.6},{"y":2008,"v":6.9},{"y":2009,"v":9.3},{"y":2010,"v":5.8},{"y":2011,"v":5.3},{"y":2012,"v":6.5},{"y":2013,"v":11.9},{"y":2014,"v":8.9},{"y":2015,"v":11.1},{"y":2016,"v":12.7},{"y":2017,"v":16.9},{"y":2018,"v":19.6},{"y":2019,"v":21.1},{"y":2020,"v":20.6}]},{"n":"Kenya","pts":[{"y":1999,"v":37.2},{"y":2000,"v":35.0},{"y":2001,"v":27.2},{"y":2002,"v":29.4},{"y":2003,"v":15.0},{"y":2004,"v":15.9},{"y":2005,"v":14.7},{"y":2006,"v":15.2},{"y":2007,"v":5.0},{"y":2008,"v":9.4},{"y":2009,"v":7.6},{"y":2012,"v":17.3},{"y":2021,"v":36.3},{"y":2022,"v":32.9}]},{"n":"India","pts":[{"y":1971,"v":39.1},{"y":1990,"v":23.4},{"y":2000,"v":12.1},{"y":2001,"v":13.7},{"y":2002,"v":14.0},{"y":2003,"v":9.0},{"y":2007,"v":0.9},{"y":2008,"v":0.4},{"y":2009,"v":1.8},{"y":2010,"v":1.1},{"y":2011,"v":2.7},{"y":2012,"v":0.7},{"y":2013,"v":0.4},{"y":2016,"v":4.1},{"y":2017,"v":6.0},{"y":2018,"v":6.4},{"y":2019,"v":7.4},{"y":2020,"v":4.1},{"y":2021,"v":2.3},{"y":2022,"v":0.2},{"y":2023,"v":1.5},{"y":2024,"v":0.1}]},{"n":"Honduras","pts":[{"y":1978,"v":27.2},{"y":1979,"v":23.7},{"y":1980,"v":23.4},{"y":1982,"v":13.4},{"y":1983,"v":12.1},{"y":1984,"v":11.3},{"y":1986,"v":11.6},{"y":1991,"v":14.0},{"y":1993,"v":12.5},{"y":2000,"v":14.7},{"y":2003,"v":9.9},{"y":2004,"v":8.9},{"y":2005,"v":13.1},{"y":2006,"v":9.1},{"y":2007,"v":14.7},{"y":2008,"v":12.0},{"y":2009,"v":13.8},{"y":2010,"v":13.6},{"y":2011,"v":14.0},{"y":2012,"v":16.8},{"y":2013,"v":20.7},{"y":2014,"v":21.6},{"y":2015,"v":22.8},{"y":2016,"v":21.8},{"y":2017,"v":21.0},{"y":2019,"v":17.8},{"y":2020,"v":21.7},{"y":2021,"v":24.8},{"y":2022,"v":23.5},{"y":2023,"v":23.9},{"y":2024,"v":26.6}]},{"n":"Bangladesh","pts":[{"y":1970,"v":51.1},{"y":1973,"v":30.8},{"y":1976,"v":25.8},{"y":1977,"v":31.2},{"y":1978,"v":33.1},{"y":1981,"v":39.2},{"y":1983,"v":42.0},{"y":1984,"v":42.7},{"y":1985,"v":43.8},{"y":1986,"v":44.2},{"y":1987,"v":44.8},{"y":1988,"v":35.0},{"y":1989,"v":35.1},{"y":1990,"v":32.6},{"y":2005,"v":6.8},{"y":2006,"v":7.5},{"y":2008,"v":13.1},{"y":2009,"v":12.9},{"y":2010,"v":9.8},{"y":2017,"v":3.3},{"y":2018,"v":3.4},{"y":2022,"v":7.3},{"y":2023,"v":6.9},{"y":2024,"v":5.9}]}];
+const COLORS = ["#EA5E33", "#F29A44", "#C49A45", "#8BAD72", "#5B9E78", "#3D7A5A", "#A6C4A2", "#7B9EB5", "#C4715A", "#B34B3B"];
+
+const W = 760, H = 460;
+const margin = {top:30,right:130,bottom:36,left:48};
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag,attrs){
+  const el=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  return el;
+}
+
+const allPts = data.flatMap(s=>s.pts);
+const yearMin = Math.min(...allPts.map(p=>p.y));
+const yearMax = Math.max(...allPts.map(p=>p.y));
+const valMax = 95, valMin = 0;
+
+const xS = y => margin.left + (y-yearMin)/(yearMax-yearMin)*(W-margin.left-margin.right);
+const yS = v => margin.top + (valMax-v)/(valMax-valMin)*(H-margin.top-margin.bottom);
+
+// Grid lines
+[0,20,40,60,80].forEach(v=>{
+  svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(v),x2:W-margin.right,y2:yS(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x:margin.left-6,y:yS(v)+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F",})).textContent=v+"%";
+});
+
+// Year axis ticks
+[1970,1980,1990,2000,2010,2020,2024].forEach(yr=>{
+  if(yr>=yearMin && yr<=yearMax){
+    svg.appendChild(mkEl("line",{x1:xS(yr),y1:yS(0)+2,x2:xS(yr),y2:yS(0)+6,stroke:"#C2C0B5","stroke-width":"0.5"}));
+    svg.appendChild(mkEl("text",{x:xS(yr),y:yS(0)+16,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"})).textContent=yr;
+  }
+});
+
+// X axis line
+svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(0),x2:W-margin.right,y2:yS(0),stroke:"#C2C0B5","stroke-width":"0.75"}));
+
+const tip = document.getElementById("tip");
+let activeGroup = null;
+
+function resolveCollisions(items,minGap){
+  const sorted = items.slice().sort((a,b)=>a.y-b.y);
+  for(let pass=0;pass<30;pass++){
+    let moved=false;
+    for(let i=1;i<sorted.length;i++){
+      const gap=sorted[i].y-sorted[i-1].y;
+      if(gap<minGap){
+        const shift=(minGap-gap)/2;
+        sorted[i-1].y-=shift;
+        sorted[i].y+=shift;
+        moved=true;
+      }
+    }
+    if(!moved) break;
+  }
+  return sorted;
+}
+
+// Build endpoint labels for collision resolution
+const endLabels = data.map((s,i)=>{
+  const last = s.pts[s.pts.length-1];
+  return {y:yS(last.v), name:s.n, val:last.v, idx:i};
+});
+const resolved = resolveCollisions(endLabels, 11);
+
+data.forEach((s,i)=>{
+  const col = COLORS[i];
+  const g = mkEl("g",{});
+  
+  const pathD = s.pts.map((p,j)=>`${j===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  g.appendChild(mkEl("path",{d:pathD,stroke:col,"stroke-width":"1.5",fill:"none","stroke-linejoin":"round","stroke-linecap":"round"}));
+  
+  // Invisible hit area
+  const hitD = s.pts.map((p,j)=>`${j===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  const hit = mkEl("path",{d:hitD,stroke:"transparent","stroke-width":"12",fill:"none",cursor:"pointer"});
+  
+  hit.addEventListener("mousemove",e=>{
+    if(activeGroup && activeGroup!==g){
+      document.querySelectorAll(".lineGroup").forEach(gg=>gg.style.opacity="0.1");
+    }
+    g.style.opacity="1";
+    activeGroup=g;
+    // Find nearest year
+    const rect=svg.getBoundingClientRect();
+    const mx=e.clientX-rect.left;
+    const ratio=(mx-margin.left)/(W-margin.left-margin.right);
+    const yr=Math.round(yearMin+ratio*(yearMax-yearMin));
+    const nearest=s.pts.reduce((a,b)=>Math.abs(b.y-yr)<Math.abs(a.y-yr)?b:a);
+    tip.textContent=`${s.n} (${nearest.y}): ${nearest.v}%`;
+    tip.style.opacity="1";
+    tip.style.left=(e.clientX+12)+"px";
+    tip.style.top=(e.clientY-20)+"px";
+    // thicken
+    g.querySelector("path").setAttribute("stroke-width","2.5");
+  });
+  hit.addEventListener("mouseleave",()=>{
+    document.querySelectorAll(".lineGroup").forEach(gg=>gg.style.opacity="1");
+    activeGroup=null;
+    tip.style.opacity="0";
+    g.querySelector("path").setAttribute("stroke-width","1.5");
+  });
+  
+  g.appendChild(hit);
+  g.setAttribute("class","lineGroup");
+  svg.appendChild(g);
+  
+  // End label (use resolved position)
+  const rl = resolved.find(r=>r.idx===i);
+  const last = s.pts[s.pts.length-1];
+  const lx = xS(last.y);
+  const ly = rl ? rl.y : yS(last.v);
+  
+  // Leader line if shifted
+  if(rl && Math.abs(ly - yS(last.v)) > 2){
+    svg.appendChild(mkEl("line",{x1:lx+2,y1:yS(last.v),x2:lx+8,y2:ly,stroke:col,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  
+  const lbl = mkEl("text",{x:lx+10,y:ly+3,"font-size":"9","fill":col,"font-weight":"500"});
+  const dispName = s.n.replace("Gambia, The","Gambia").replace("Guinea-Bissau","Guin.-Biss.");
+  lbl.textContent = `${dispName}`;
+  svg.appendChild(lbl);
+});
+</script></body></html>

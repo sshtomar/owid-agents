@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body{font-family:'Inter',sans-serif;margin:0;padding:32px 40px;background:#F6F5EE;color:#2B2A27;}
+  h1{font-size:15px;font-weight:600;letter-spacing:-0.3px;margin:0 0 4px;}
+  .subtitle{font-size:11px;color:#7A786F;margin:0 0 24px;max-width:520px;line-height:1.5;}
+  .source{font-family:'JetBrains Mono',monospace;font-size:9px;color:#7A786F;margin-top:20px;letter-spacing:0.3px;text-transform:uppercase;}
+  svg text{font-family:'Inter',sans-serif;}
+  .tooltip{position:fixed;pointer-events:none;background:#2B2A27;color:#F6F5EE;font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:2px;white-space:nowrap;opacity:0;transition:opacity 0.15s;z-index:10;}
+</style></head><body>
+<h1>Tariff Rate on Manufactured Products, Weighted Mean (%)</h1>
+<p class="subtitle">Average tariff applied to imports of manufactured goods, 1988–2022. India's tariff fell from 71% to 8%; China's from 36% to 3% — reflecting three decades of global trade liberalization.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Tariff rate, manufactured products, weighted mean (TM.TAX.MANF.WM.FN.ZS)</p>
+<script>
+const data = [{"n":"India","pts":[{"y":1990,"v":71.1},{"y":1992,"v":42.7},{"y":1996,"v":27.2},{"y":1997,"v":20.5},{"y":1999,"v":31.4},{"y":2000,"v":29.2},{"y":2001,"v":28.3},{"y":2002,"v":24.9},{"y":2003,"v":22.3},{"y":2004,"v":25.4},{"y":2005,"v":12.8},{"y":2006,"v":9.1},{"y":2007,"v":11.0},{"y":2008,"v":5.7},{"y":2009,"v":7.3},{"y":2010,"v":5.4},{"y":2011,"v":5.9},{"y":2012,"v":7.3},{"y":2013,"v":7.3},{"y":2015,"v":7.1},{"y":2016,"v":7.4},{"y":2017,"v":7.3},{"y":2018,"v":7.4},{"y":2019,"v":8.5},{"y":2020,"v":8.5},{"y":2021,"v":8.6},{"y":2022,"v":8.4}]},{"n":"China","pts":[{"y":1992,"v":36.4},{"y":1993,"v":33.3},{"y":1994,"v":30.7},{"y":1996,"v":18.4},{"y":1997,"v":14.8},{"y":1998,"v":15.1},{"y":1999,"v":14.0},{"y":2000,"v":13.7},{"y":2001,"v":13.0},{"y":2002,"v":8.1},{"y":2003,"v":6.7},{"y":2004,"v":5.9},{"y":2005,"v":5.3},{"y":2006,"v":4.7},{"y":2007,"v":6.4},{"y":2008,"v":6.2},{"y":2009,"v":4.9},{"y":2010,"v":7.0},{"y":2011,"v":10.1},{"y":2014,"v":7.9},{"y":2015,"v":7},{"y":2016,"v":5.0},{"y":2017,"v":5.6},{"y":2018,"v":5.2},{"y":2019,"v":3.9},{"y":2020,"v":3.5},{"y":2021,"v":3.2},{"y":2022,"v":3.1}]},{"n":"Brazil","pts":[{"y":1989,"v":38.0},{"y":1990,"v":28.7},{"y":1991,"v":23.6},{"y":1992,"v":21.1},{"y":1993,"v":16.6},{"y":1994,"v":16.2},{"y":1995,"v":14.1},{"y":1996,"v":17.4},{"y":1997,"v":16.5},{"y":1998,"v":18.0},{"y":1999,"v":15.7},{"y":2000,"v":14.9},{"y":2001,"v":12.4},{"y":2002,"v":12.0},{"y":2003,"v":11.7},{"y":2004,"v":11.4},{"y":2005,"v":10.8},{"y":2006,"v":10.8},{"y":2007,"v":11.2},{"y":2008,"v":11.2},{"y":2009,"v":12},{"y":2010,"v":12.6},{"y":2011,"v":12.9},{"y":2012,"v":12.8},{"y":2013,"v":12.8},{"y":2014,"v":12.7},{"y":2015,"v":12.4},{"y":2016,"v":11.6},{"y":2017,"v":12.0},{"y":2018,"v":12.4},{"y":2019,"v":12.0},{"y":2020,"v":11.1},{"y":2021,"v":10.7},{"y":2022,"v":10.3}]},{"n":"Indonesia","pts":[{"y":1989,"v":17.7},{"y":1990,"v":18.1},{"y":1993,"v":14.5},{"y":1995,"v":13.2},{"y":1996,"v":9.4},{"y":1997,"v":18},{"y":1998,"v":6.9},{"y":1999,"v":8.1},{"y":2000,"v":6.7},{"y":2001,"v":5.5},{"y":2002,"v":5.7},{"y":2003,"v":6.0},{"y":2004,"v":6.4},{"y":2005,"v":6.6},{"y":2006,"v":5.8},{"y":2007,"v":5.1},{"y":2008,"v":5.4},{"y":2009,"v":4.1},{"y":2010,"v":6.0},{"y":2011,"v":6.3},{"y":2012,"v":6.3},{"y":2013,"v":6.3},{"y":2016,"v":6.5},{"y":2017,"v":6.6},{"y":2018,"v":6.8},{"y":2019,"v":6.9},{"y":2020,"v":6.5},{"y":2021,"v":6.4},{"y":2022,"v":6.6}]},{"n":"Korea, Rep.","pts":[{"y":1988,"v":17.1},{"y":1989,"v":13.7},{"y":1990,"v":11.5},{"y":1992,"v":9.9},{"y":1995,"v":7.4},{"y":1996,"v":7.7},{"y":1997,"v":7.2},{"y":1998,"v":6.6},{"y":1999,"v":6.3},{"y":2000,"v":5.0},{"y":2001,"v":5.2},{"y":2002,"v":5.1},{"y":2003,"v":4.9},{"y":2004,"v":4.6},{"y":2005,"v":4.5},{"y":2006,"v":4.5},{"y":2007,"v":4.3},{"y":2008,"v":4.2},{"y":2009,"v":4.5},{"y":2010,"v":4.5},{"y":2011,"v":4.6},{"y":2012,"v":4.8},{"y":2013,"v":4.9},{"y":2014,"v":4.9},{"y":2015,"v":4.8},{"y":2016,"v":4.9},{"y":2017,"v":6.2},{"y":2018,"v":6.2},{"y":2020,"v":6.4},{"y":2021,"v":4.1},{"y":2022,"v":4}]},{"n":"Japan","pts":[{"y":1988,"v":5.4},{"y":1989,"v":5.0},{"y":1990,"v":4.0},{"y":1991,"v":4.3},{"y":1992,"v":4.6},{"y":1993,"v":4.9},{"y":1994,"v":4.9},{"y":1995,"v":3.1},{"y":1996,"v":4.9},{"y":1997,"v":2.6},{"y":1998,"v":2.5},{"y":1999,"v":2.3},{"y":2000,"v":2.2},{"y":2001,"v":2.2},{"y":2002,"v":2.1},{"y":2003,"v":2},{"y":2004,"v":1.9},{"y":2005,"v":1.8},{"y":2006,"v":2.3},{"y":2007,"v":2.3},{"y":2008,"v":2.2},{"y":2009,"v":2.5},{"y":2010,"v":2.3},{"y":2011,"v":2.2},{"y":2012,"v":2.3},{"y":2013,"v":1.7},{"y":2014,"v":2.3},{"y":2015,"v":2.1},{"y":2016,"v":1.9},{"y":2017,"v":1.9},{"y":2018,"v":1.9},{"y":2019,"v":2.3},{"y":2020,"v":1.8},{"y":2021,"v":1.6},{"y":2022,"v":1.6}]},{"n":"Argentina","pts":[{"y":1992,"v":13.7},{"y":1993,"v":13.6},{"y":1995,"v":12.2},{"y":1996,"v":14.4},{"y":1997,"v":14.9},{"y":1998,"v":16.5},{"y":1999,"v":15.4},{"y":2000,"v":15.3},{"y":2001,"v":14.3},{"y":2002,"v":13.1},{"y":2003,"v":14.1},{"y":2004,"v":13.2},{"y":2005,"v":12.8},{"y":2006,"v":13.0},{"y":2007,"v":13.5},{"y":2008,"v":11.8},{"y":2009,"v":13.5},{"y":2010,"v":14.1},{"y":2011,"v":14.3},{"y":2012,"v":14.1},{"y":2013,"v":13.3},{"y":2014,"v":13.8},{"y":2015,"v":13.2},{"y":2016,"v":13.7},{"y":2017,"v":16.6},{"y":2018,"v":13.9},{"y":2019,"v":12.7},{"y":2020,"v":12.2},{"y":2021,"v":11.5},{"y":2022,"v":11.7}]}];
+const COLORS = ["#EA5E33", "#F29A44", "#C49A45", "#8BAD72", "#5B9E78", "#3D7A5A", "#A6C4A2"];
+
+const W=760,H=460;
+const margin={top:30,right:130,bottom:36,left:52};
+const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth=W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag,attrs,text){
+  const el=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if(text!==undefined) el.textContent=text;
+  return el;
+}
+
+const allPts=data.flatMap(s=>s.pts);
+const yearMin=Math.min(...allPts.map(p=>p.y));
+const yearMax=Math.max(...allPts.map(p=>p.y));
+const valMax=80,valMin=0;
+
+const xS=y=>margin.left+(y-yearMin)/(yearMax-yearMin)*(W-margin.left-margin.right);
+const yS=v=>margin.top+(valMax-v)/(valMax-valMin)*(H-margin.top-margin.bottom);
+
+// Grid
+[0,10,20,30,40,50,60,70,80].forEach(v=>{
+  if(v>0){
+    svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(v),x2:W-margin.right,y2:yS(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  }
+  svg.appendChild(mkEl("text",{x:margin.left-6,y:yS(v)+3,"text-anchor":"end","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},v+"%"));
+});
+
+[1988,1995,2000,2005,2010,2015,2020,2022].forEach(yr=>{
+  if(yr>=yearMin && yr<=yearMax){
+    svg.appendChild(mkEl("line",{x1:xS(yr),y1:yS(0)+2,x2:xS(yr),y2:yS(0)+6,stroke:"#C2C0B5","stroke-width":"0.5"}));
+    svg.appendChild(mkEl("text",{x:xS(yr),y:yS(0)+16,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"9","fill":"#7A786F"},yr));
+  }
+});
+svg.appendChild(mkEl("line",{x1:margin.left,y1:yS(0),x2:W-margin.right,y2:yS(0),stroke:"#C2C0B5","stroke-width":"0.75"}));
+
+const tip=document.getElementById("tip");
+
+function resolveCollisions(items,minGap){
+  const sorted=items.slice().sort((a,b)=>a.y-b.y);
+  for(let pass=0;pass<30;pass++){
+    let moved=false;
+    for(let i=1;i<sorted.length;i++){
+      const gap=sorted[i].y-sorted[i-1].y;
+      if(gap<minGap){
+        const shift=(minGap-gap)/2;
+        sorted[i-1].y-=shift;
+        sorted[i].y+=shift;
+        moved=true;
+      }
+    }
+    if(!moved) break;
+  }
+  return sorted;
+}
+
+const endLabels=data.map((s,i)=>{
+  const last=s.pts[s.pts.length-1];
+  return {y:yS(last.v),idx:i};
+});
+const resolved=resolveCollisions(endLabels,11);
+
+data.forEach((s,i)=>{
+  const col=COLORS[i];
+  const g=mkEl("g",{class:"lineGroup"});
+  
+  const pathD=s.pts.map((p,j)=>`${j===0?"M":"L"} ${xS(p.y)} ${yS(p.v)}`).join(" ");
+  g.appendChild(mkEl("path",{d:pathD,stroke:col,"stroke-width":"1.5",fill:"none","stroke-linejoin":"round"}));
+  
+  const hit=mkEl("path",{d:pathD,stroke:"transparent","stroke-width":"12",fill:"none",cursor:"pointer"});
+  hit.addEventListener("mousemove",e=>{
+    document.querySelectorAll(".lineGroup").forEach(gg=>gg.style.opacity="0.1");
+    g.style.opacity="1";
+    const rect=svg.getBoundingClientRect();
+    const mx=e.clientX-rect.left;
+    const ratio=(mx-margin.left)/(W-margin.left-margin.right);
+    const yr=Math.round(yearMin+ratio*(yearMax-yearMin));
+    const nearest=s.pts.reduce((a,b)=>Math.abs(b.y-yr)<Math.abs(a.y-yr)?b:a);
+    tip.textContent=`${s.n} (${nearest.y}): ${nearest.v}%`;
+    tip.style.opacity="1";
+    tip.style.left=(e.clientX+12)+"px";
+    tip.style.top=(e.clientY-20)+"px";
+    g.querySelector("path").setAttribute("stroke-width","2.5");
+  });
+  hit.addEventListener("mouseleave",()=>{
+    document.querySelectorAll(".lineGroup").forEach(gg=>gg.style.opacity="1");
+    tip.style.opacity="0";
+    g.querySelector("path").setAttribute("stroke-width","1.5");
+  });
+  g.appendChild(hit);
+  svg.appendChild(g);
+  
+  const rl=resolved.find(r=>r.idx===i);
+  const last=s.pts[s.pts.length-1];
+  const lx=xS(last.y);
+  const ly=rl?rl.y:yS(last.v);
+  
+  if(rl && Math.abs(ly-yS(last.v))>2){
+    svg.appendChild(mkEl("line",{x1:lx+2,y1:yS(last.v),x2:lx+8,y2:ly,stroke:col,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  
+  const lname=s.n.replace("Korea, Rep.","Korea");
+  const lbl=mkEl("text",{x:lx+10,y:ly+3,"font-size":"9","fill":col,"font-weight":"500"});
+  lbl.textContent=lname;
+  svg.appendChild(lbl);
+});
+</script></body></html>

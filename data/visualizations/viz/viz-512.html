@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body{font-family:'Inter',sans-serif;margin:0;padding:32px 40px;background:#F6F5EE;color:#2B2A27;}
+  h1{font-size:15px;font-weight:600;letter-spacing:-0.3px;margin:0 0 4px;}
+  .subtitle{font-size:11px;color:#7A786F;margin:0 0 24px;max-width:520px;line-height:1.5;}
+  .source{font-family:'JetBrains Mono',monospace;font-size:9px;color:#7A786F;margin-top:20px;letter-spacing:0.3px;text-transform:uppercase;}
+  svg text{font-family:'Inter',sans-serif;}
+  .tooltip{position:fixed;pointer-events:none;background:#2B2A27;color:#F6F5EE;font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:2px;white-space:nowrap;opacity:0;transition:opacity 0.15s;z-index:10;}
+</style></head><body>
+<h1>Low-Birthweight Babies: 2000 vs 2020</h1>
+<p class="subtitle">Percentage of newborns weighing under 2,500 grams at birth. South Asia remains the highest-burden region; Europe and Central Asia consistently report the lowest rates.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — Low-birthweight babies (SH.STA.BRTW.ZS)</p>
+<script>
+const data = [{"n":"India","a":32.5,"b":27.4},{"n":"Bangladesh","a":25.7,"b":23.0},{"n":"Comoros","a":25.5,"b":23.0},{"n":"Guinea-Bissau","a":24.4,"b":19.5},{"n":"Jordan","a":14.6,"b":18.9},{"n":"Burkina Faso","a":20.3,"b":18.5},{"n":"Cote d'Ivoire","a":19.4,"b":18.3},{"n":"Guyana","a":16.3,"b":17.2},{"n":"Botswana","a":18.1,"b":16.8},{"n":"Bahamas, The","a":14.6,"b":15.4},{"n":"Guatemala","a":13.9,"b":14.5},{"n":"Dominican Republic","a":10.2,"b":13.4},{"n":"Bahrain","a":10.1,"b":12.4},{"n":"Bulgaria","a":10.5,"b":11.4},{"n":"Azerbaijan","a":11.0,"b":11.0},{"n":"Congo, Dem. Rep.","a":12.4,"b":10.2},{"n":"Indonesia","a":10.9,"b":9.9},{"n":"Brazil","a":8.0,"b":8.7},{"n":"Bolivia","a":8.9,"b":7.9},{"n":"Belarus","a":5.3,"b":5.1},{"n":"China","a":5.7,"b":5.0},{"n":"Croatia","a":5.1,"b":5.0}];
+
+const W=700, H=580;
+const pad={left:140,right:150,top:50,bottom:20};
+const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth=W+"px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag,attrs,text){
+  const el=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if(text!==undefined) el.textContent=text;
+  return el;
+}
+
+const allVals = data.flatMap(d=>[d.a,d.b]);
+const minV=Math.floor(Math.min(...allVals))-1;
+const maxV=Math.ceil(Math.max(...allVals))+1;
+const scale=v=>pad.top+(maxV-v)/(maxV-minV)*(H-pad.top-pad.bottom);
+
+const lx=pad.left, rx=W-pad.right;
+
+function colorForChange(d){
+  const ch=d.b-d.a;
+  if(ch < -4) return "#3D7A5A";
+  if(ch < -2) return "#5B9E78";
+  if(ch < 0)  return "#8BAD72";
+  if(ch < 2)  return "#C49A45";
+  return "#EA5E33";
+}
+
+// Column headers
+svg.appendChild(mkEl("text",{x:lx,y:30,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F","font-weight":"500"},"2000"));
+svg.appendChild(mkEl("text",{x:rx,y:30,"text-anchor":"middle","font-family":"JetBrains Mono, monospace","font-size":"10","fill":"#7A786F","font-weight":"500"},"2020"));
+
+// Axis lines
+svg.appendChild(mkEl("line",{x1:lx,y1:pad.top-10,x2:lx,y2:H-pad.bottom,stroke:"#E2E0D5","stroke-width":"0.75"}));
+svg.appendChild(mkEl("line",{x1:rx,y1:pad.top-10,x2:rx,y2:H-pad.bottom,stroke:"#E2E0D5","stroke-width":"0.75"}));
+
+// Grid
+[5,10,15,20,25].forEach(v=>{
+  if(v>=minV && v<=maxV){
+    svg.appendChild(mkEl("line",{x1:lx,y1:scale(v),x2:rx,y2:scale(v),stroke:"#E2E0D5","stroke-dasharray":"3,3","stroke-width":"0.5"}));
+  }
+});
+
+function resolveCollisions(items,minGap){
+  const sorted=items.slice().sort((a,b)=>a.y-b.y);
+  for(let pass=0;pass<30;pass++){
+    let moved=false;
+    for(let i=1;i<sorted.length;i++){
+      const gap=sorted[i].y-sorted[i-1].y;
+      if(gap<minGap){
+        const shift=(minGap-gap)/2;
+        sorted[i-1].y-=shift;
+        sorted[i].y+=shift;
+        moved=true;
+      }
+    }
+    if(!moved) break;
+  }
+  return sorted;
+}
+
+// Build label arrays
+const leftLabels = data.map((d,i)=>({y:scale(d.a),idx:i}));
+const rightLabels = data.map((d,i)=>({y:scale(d.b),idx:i}));
+const lResolved = resolveCollisions(leftLabels,12);
+const rResolved = resolveCollisions(rightLabels,12);
+
+const tip=document.getElementById("tip");
+
+data.forEach((d,i)=>{
+  const col=colorForChange(d);
+  const ya=scale(d.a), yb=scale(d.b);
+  
+  const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  g.style.cursor="pointer";
+  
+  // Connecting line
+  g.appendChild(mkEl("line",{x1:lx,y1:ya,x2:rx,y2:yb,stroke:col,"stroke-width":"1.5",opacity:"0.85"}));
+  // Hit area
+  const hit=mkEl("line",{x1:lx,y1:ya,x2:rx,y2:yb,stroke:"transparent","stroke-width":"12"});
+  hit.addEventListener("mouseenter",e=>{
+    document.querySelectorAll(".slopeRow").forEach(gg=>gg.style.opacity="0.1");
+    g.style.opacity="1";
+    const ch=d.b-d.a;
+    tip.textContent=`${d.n}: ${d.a}% → ${d.b}% (${ch>0?"+":""}${ch.toFixed(1)}%)`;
+    tip.style.opacity="1";
+  });
+  hit.addEventListener("mousemove",e=>{
+    tip.style.left=(e.clientX+12)+"px";
+    tip.style.top=(e.clientY-20)+"px";
+  });
+  hit.addEventListener("mouseleave",()=>{
+    document.querySelectorAll(".slopeRow").forEach(gg=>gg.style.opacity="1");
+    tip.style.opacity="0";
+  });
+  g.appendChild(hit);
+  
+  // Dots
+  g.appendChild(mkEl("circle",{cx:lx,cy:ya,r:"3",fill:col}));
+  g.appendChild(mkEl("circle",{cx:rx,cy:yb,r:"3",fill:col}));
+  
+  g.setAttribute("class","slopeRow");
+  svg.appendChild(g);
+  
+  // Labels
+  const lr = lResolved.find(r=>r.idx===i);
+  const rr = rResolved.find(r=>r.idx===i);
+  const ly = lr ? lr.y : ya;
+  const ry = rr ? rr.y : yb;
+  
+  if(Math.abs(ly-ya)>2) svg.appendChild(mkEl("line",{x1:lx-2,y1:ya,x2:lx-8,y2:ly,stroke:col,"stroke-width":"0.4",opacity:"0.5"}));
+  if(Math.abs(ry-yb)>2) svg.appendChild(mkEl("line",{x1:rx+2,y1:yb,x2:rx+8,y2:ry,stroke:col,"stroke-width":"0.4",opacity:"0.5"}));
+  
+  const lname=d.n.length>18?d.n.substring(0,16)+"..":d.n;
+  const lbl_l=mkEl("text",{x:lx-12,y:ly+3,"text-anchor":"end","font-size":"9","fill":"#2B2A27"});
+  lbl_l.textContent=`${lname}  ${d.a}%`;
+  svg.appendChild(lbl_l);
+  
+  const lbl_r=mkEl("text",{x:rx+12,y:ry+3,"text-anchor":"start","font-size":"9","fill":"#2B2A27"});
+  lbl_r.textContent=`${d.b}%  ${lname}`;
+  svg.appendChild(lbl_r);
+});
+</script></body></html>
