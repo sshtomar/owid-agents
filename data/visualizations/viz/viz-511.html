@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 560px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Greenhouse Gas Emissions: Key Economies, 1990–2022</h1>
+<p class="subtitle">Total GHG emissions excluding land-use change (Mt CO₂e). China quadrupled output since 1990 while Germany and Japan cut emissions. Note: US and Russia absent from this World Bank series.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — EN.GHG.ALL.MT.CE.AR5</p>
+<script>
+// Data from catalog: wb--EN-GHG-ALL-MT-CE-AR5
+const data = [{"n":"China","pts":[{"y":1990,"v":3713},{"y":1995,"v":4762},{"y":2000,"v":5064},{"y":2005,"v":7974},{"y":2010,"v":11062},{"y":2015,"v":12931},{"y":2020,"v":14230},{"y":2022,"v":14857}]},{"n":"India","pts":[{"y":1990,"v":1354},{"y":1995,"v":1597},{"y":2000,"v":1836},{"y":2005,"v":2112},{"y":2010,"v":2723},{"y":2015,"v":3310},{"y":2020,"v":3461},{"y":2022,"v":3962}]},{"n":"Brazil","pts":[{"y":1990,"v":649},{"y":1995,"v":790},{"y":2000,"v":870},{"y":2005,"v":1001},{"y":2010,"v":1110},{"y":2015,"v":1233},{"y":2020,"v":1196},{"y":2022,"v":1279}]},{"n":"Indonesia","pts":[{"y":1990,"v":338},{"y":1995,"v":445},{"y":2000,"v":513},{"y":2005,"v":593},{"y":2010,"v":723},{"y":2015,"v":853},{"y":2020,"v":1007},{"y":2022,"v":1181}]},{"n":"Japan","pts":[{"y":1990,"v":1296},{"y":1995,"v":1399},{"y":2000,"v":1378},{"y":2005,"v":1390},{"y":2010,"v":1313},{"y":2015,"v":1324},{"y":2020,"v":1151},{"y":2022,"v":1142}]},{"n":"Iran","pts":[{"y":1990,"v":331},{"y":1995,"v":438},{"y":2000,"v":511},{"y":2005,"v":651},{"y":2010,"v":768},{"y":2015,"v":793},{"y":2020,"v":910},{"y":2022,"v":990}]},{"n":"Germany","pts":[{"y":1990,"v":1236},{"y":1995,"v":1110},{"y":2000,"v":1033},{"y":2005,"v":981},{"y":2010,"v":939},{"y":2015,"v":904},{"y":2020,"v":747},{"y":2022,"v":758}]},{"n":"South Korea","pts":[{"y":1990,"v":311},{"y":1995,"v":466},{"y":2000,"v":530},{"y":2005,"v":575},{"y":2010,"v":683},{"y":2015,"v":715},{"y":2020,"v":695},{"y":2022,"v":695}]},{"n":"Canada","pts":[{"y":1990,"v":591},{"y":1995,"v":650},{"y":2000,"v":724},{"y":2005,"v":767},{"y":2010,"v":741},{"y":2015,"v":769},{"y":2020,"v":729},{"y":2022,"v":761}]},{"n":"Australia","pts":[{"y":1990,"v":461},{"y":1995,"v":482},{"y":2000,"v":546},{"y":2005,"v":577},{"y":2010,"v":599},{"y":2015,"v":601},{"y":2020,"v":580},{"y":2022,"v":572}]},{"n":"France","pts":[{"y":1990,"v":531},{"y":1995,"v":529},{"y":2000,"v":538},{"y":2005,"v":542},{"y":2010,"v":511},{"y":2015,"v":462},{"y":2020,"v":402},{"y":2022,"v":417}]},{"n":"Argentina","pts":[{"y":1990,"v":253},{"y":1995,"v":269},{"y":2000,"v":288},{"y":2005,"v":329},{"y":2010,"v":337},{"y":2015,"v":366},{"y":2020,"v":354},{"y":2022,"v":384}]}];
+
+const W = 800, H = 480;
+const margin = { top: 36, right: 130, bottom: 36, left: 60 };
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("width", "100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+const allYears = [...new Set(data.flatMap(d => d.pts.map(p => p.y)))].sort((a,b) => a-b);
+const yearMin = allYears[0], yearMax = allYears[allYears.length-1];
+const allVals = data.flatMap(d => d.pts.map(p => p.v));
+const valMax = Math.max(...allVals), valMin = 0;
+
+const xScale = y => margin.left + (y - yearMin) / (yearMax - yearMin) * (W - margin.left - margin.right);
+const yScale = v => margin.top + (valMax - v) / (valMax - valMin) * (H - margin.top - margin.bottom);
+
+// Color by 2022 value
+function colorFor(val2022) {
+  if (val2022 > 10000) return "#B34B3B";
+  if (val2022 > 3000)  return "#C4715A";
+  if (val2022 > 1200)  return "#C49A45";
+  if (val2022 > 600)   return "#8BAD72";
+  return "#5B9E78";
+}
+
+// Grid lines
+[0, 2000, 4000, 6000, 8000, 10000, 12000, 14000].forEach(v => {
+  if (v > valMax) return;
+  svg.appendChild(mkEl("line", {
+    x1: margin.left, y1: yScale(v),
+    x2: W - margin.right, y2: yScale(v),
+    stroke: "#E2E0D5", "stroke-width": "0.5"
+  }));
+  svg.appendChild(mkEl("text", {
+    x: margin.left - 6, y: yScale(v) + 3,
+    "text-anchor": "end",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#7A786F"
+  })).textContent = v === 0 ? "0" : (v/1000) + "k";
+});
+
+// X-axis year labels
+allYears.forEach(y => {
+  svg.appendChild(mkEl("text", {
+    x: xScale(y), y: H - margin.bottom + 14,
+    "text-anchor": "middle",
+    "font-family": "JetBrains Mono, monospace",
+    "font-size": "8", fill: "#7A786F"
+  })).textContent = y;
+});
+
+// Y-axis label
+const yLabel = mkEl("text", {
+  transform: `translate(12,${(H)/2}) rotate(-90)`,
+  "text-anchor": "middle",
+  "font-family": "JetBrains Mono, monospace",
+  "font-size": "8", fill: "#7A786F"
+});
+yLabel.textContent = "Mt CO₂e";
+svg.appendChild(yLabel);
+
+// Endpoint labels (collision-resolved)
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 30; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return sorted;
+}
+
+const groups = [];
+data.forEach(series => {
+  const val2022 = series.pts[series.pts.length - 1].v;
+  const color = colorFor(val2022);
+  const g = mkEl("g", {});
+
+  // Line path
+  const pathD = series.pts.map((p, i) => `${i === 0 ? "M" : "L"} ${xScale(p.y)} ${yScale(p.v)}`).join(" ");
+  g.appendChild(mkEl("path", {
+    d: pathD, stroke: color, "stroke-width": "1.5",
+    fill: "none", "stroke-linejoin": "round"
+  }));
+
+  // Invisible hit area
+  const hitPath = mkEl("path", {
+    d: pathD, stroke: "transparent", "stroke-width": "12",
+    fill: "none", cursor: "pointer"
+  });
+  g.appendChild(hitPath);
+
+  groups.push({ g, series, color, val2022, endY: yScale(val2022) });
+  svg.appendChild(g);
+});
+
+// Resolve label collisions for right endpoint
+const labelItems = groups.map(({series, endY}) => ({
+  n: series.n,
+  v: series.pts[series.pts.length-1].v,
+  y: endY
+}));
+const resolved = resolveCollisions(labelItems, 11);
+
+// Draw endpoint labels with leader lines
+resolved.forEach(item => {
+  const orig = groups.find(g => g.series.n === item.n);
+  if (!orig) return;
+  const origY = orig.endY;
+  const lx = W - margin.right + 6;
+
+  // Leader line if label moved
+  if (Math.abs(item.y - origY) > 2) {
+    svg.appendChild(mkEl("line", {
+      x1: W - margin.right, y1: origY,
+      x2: lx + 2, y2: item.y,
+      stroke: orig.color, "stroke-width": "0.5", opacity: "0.5"
+    }));
+  }
+
+  // Dot at endpoint
+  svg.appendChild(mkEl("circle", {
+    cx: W - margin.right, cy: origY,
+    r: "2.5", fill: orig.color
+  }));
+
+  const lbl = mkEl("text", {
+    x: lx + 4, y: item.y + 3.5,
+    "font-size": "9",
+    "font-weight": "500",
+    fill: orig.color
+  });
+  lbl.textContent = item.n;
+  svg.appendChild(lbl);
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+groups.forEach(({g, series, color}) => {
+  const hitPath = g.children[1];
+  hitPath.addEventListener("mousemove", e => {
+    const rect = svg.getBoundingClientRect();
+    const svgW = rect.width;
+    const mx = (e.clientX - rect.left) / svgW * W;
+    const ratio = Math.max(0, Math.min(1, (mx - margin.left) / (W - margin.left - margin.right)));
+    const years = series.pts.map(p => p.y);
+    const idx = Math.min(series.pts.length - 1, Math.round(ratio * (series.pts.length - 1)));
+    const pt = series.pts[idx];
+    tip.textContent = `${series.n} (${pt.y}): ${pt.v.toLocaleString()} Mt CO₂e`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+    groups.forEach(other => {
+      other.g.style.opacity = other.series.n === series.n ? "1" : "0.1";
+      if (other.series.n === series.n) {
+        other.g.children[0].setAttribute("stroke-width", "2.5");
+      } else {
+        other.g.children[0].setAttribute("stroke-width", "1.5");
+      }
+    });
+  });
+  hitPath.addEventListener("mouseleave", () => {
+    tip.style.opacity = "0";
+    groups.forEach(other => {
+      other.g.style.opacity = "1";
+      other.g.children[0].setAttribute("stroke-width", "1.5");
+    });
+  });
+});
+</script>
+</body></html>
