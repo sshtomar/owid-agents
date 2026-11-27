@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 520px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Anemia in Pregnancy: 2000 vs. 2023</h1>
+<p class="subtitle">Prevalence of anemia among pregnant women (%). West African countries remain above 50% with little improvement; Cambodia has made the most progress. India still carries one of the world's largest absolute burdens.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: World Bank — SH.PRG.ANEM</p>
+<script>
+// {n: country name matching source, a: 2000 value, b: 2023 value}
+const data = [
+  {"n":"Benin","a":68.0,"b":60.2},
+  {"n":"Gambia, The","a":66.7,"b":54.1},
+  {"n":"Chad","a":61.2,"b":51.2},
+  {"n":"Guinea","a":60.8,"b":50.2},
+  {"n":"Gabon","a":59.6,"b":54.8},
+  {"n":"Cote d'Ivoire","a":57.9,"b":57.3},
+  {"n":"Burkina Faso","a":57.8,"b":49.5},
+  {"n":"Congo, Rep.","a":57.3,"b":46.8},
+  {"n":"Cambodia","a":56.6,"b":41.0},
+  {"n":"Guinea-Bissau","a":56.1,"b":51.1},
+  {"n":"Haiti","a":55.6,"b":45.5},
+  {"n":"Ghana","a":54.1,"b":45.3},
+  {"n":"Angola","a":52.3,"b":45.9},
+  {"n":"Central African Republic","a":52.1,"b":48.4},
+  {"n":"Equatorial Guinea","a":51.8,"b":42.9},
+  {"n":"India","a":51.6,"b":46.6},
+  {"n":"Congo, Dem. Rep.","a":50.7,"b":45.1},
+  {"n":"Cameroon","a":49.0,"b":41.0},
+  {"n":"Bangladesh","a":47.8,"b":38.6},
+  {"n":"Cabo Verde","a":51.2,"b":43.9}
+];
+
+const shortNames = {
+  "Gambia, The": "Gambia",
+  "Cote d'Ivoire": "Côte d'Ivoire",
+  "Congo, Rep.": "Congo",
+  "Central African Republic": "C. Afr. Rep.",
+  "Congo, Dem. Rep.": "D.R. Congo"
+};
+function dn(name) { return shortNames[name] || name; }
+
+// sort by 2000 value descending
+data.sort((a,b) => b.a - a.a);
+
+const W = 700, H = 580;
+const pad = { left: 155, right: 155, top: 50, bottom: 20 };
+
+const allVals = data.flatMap(d => [d.a, d.b]);
+const minV = 30, maxV = 72;
+const scale = v => pad.top + (maxV - v) / (maxV - minV) * (H - pad.top - pad.bottom);
+
+const xL = pad.left;
+const xR = W - pad.right;
+
+function colorForChange(a, b) {
+  const pct = (a - b) / a * 100;
+  if (pct > 20) return "#3D7A5A";
+  if (pct > 12) return "#5B9E78";
+  if (pct > 7) return "#8BAD72";
+  if (pct > 3) return "#C49A45";
+  if (pct > 0) return "#C4715A";
+  return "#B34B3B";
+}
+
+function resolveCollisions(items, minGap) {
+  const sorted = items.slice().sort((a,b) => a.y - b.y);
+  for (let pass = 0; pass < 40; pass++) {
+    let moved = false;
+    for (let i = 1; i < sorted.length; i++) {
+      const gap = sorted[i].y - sorted[i-1].y;
+      if (gap < minGap) {
+        const shift = (minGap - gap) / 2;
+        sorted[i-1].y -= shift;
+        sorted[i].y += shift;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  const chartTop = pad.top + 2;
+  const chartBottom = H - pad.bottom - 2;
+  for (const item of sorted) item.y = Math.max(chartTop, Math.min(chartBottom, item.y));
+  return sorted;
+}
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// Column headers
+["2000","2023"].forEach((yr, i) => {
+  const x = i === 0 ? xL : xR;
+  svg.appendChild(mkEl("text",{x,y:pad.top-16,"text-anchor":"middle","font-size":"10","font-family":"JetBrains Mono, monospace",fill:"#7A786F"})).textContent = yr;
+  svg.appendChild(mkEl("line",{x1:x,y1:pad.top-10,x2:x,y2:H-pad.bottom,stroke:"#C2C0B5","stroke-width":"0.5"}));
+});
+
+// Grid lines
+[35,40,45,50,55,60,65,70].forEach(v => {
+  if (v >= minV && v <= maxV) {
+    svg.appendChild(mkEl("line",{x1:xL,y1:scale(v),x2:xR,y2:scale(v),stroke:"#E2E0D5","stroke-width":"0.5"}));
+  }
+});
+
+// 50% threshold line
+svg.appendChild(mkEl("line",{x1:xL,y1:scale(50),x2:xR,y2:scale(50),stroke:"#EA5E33","stroke-dasharray":"4,3","stroke-width":"0.8",opacity:"0.4"}));
+svg.appendChild(mkEl("text",{x:xL + (xR-xL)/2,y:scale(50)-4,"text-anchor":"middle","font-size":"8","font-family":"JetBrains Mono, monospace",fill:"#EA5E33",opacity:"0.6"})).textContent = "50% threshold";
+
+const rows = [];
+data.forEach(d => {
+  const color = colorForChange(d.a, d.b);
+  const ya = scale(d.a), yb = scale(d.b);
+  const g = mkEl("g",{});
+
+  const line = mkEl("line",{x1:xL,y1:ya,x2:xR,y2:yb,stroke:color,"stroke-width":"1.5","stroke-linecap":"round"});
+  g.appendChild(line);
+  g.appendChild(mkEl("circle",{cx:xL,cy:ya,r:"3",fill:color}));
+  g.appendChild(mkEl("circle",{cx:xR,cy:yb,r:"3",fill:color}));
+  const hit = mkEl("line",{x1:xL,y1:ya,x2:xR,y2:yb,stroke:"transparent","stroke-width":"14","cursor":"pointer"});
+  g.appendChild(hit);
+
+  rows.push({g, line, hit, d, color, ya, yb});
+  svg.appendChild(g);
+});
+
+// Left labels
+const leftItems = rows.map(r => ({n:r.d.n, color:r.color, anchorY:r.ya, y:r.ya, v:r.d.a}));
+const leftResolved = resolveCollisions(leftItems, 13);
+leftResolved.forEach(item => {
+  if (Math.abs(item.y - item.anchorY) > 2) {
+    svg.appendChild(mkEl("line",{x1:xL-2,y1:item.anchorY,x2:xL-2,y2:item.y,stroke:item.color,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  const t = mkEl("text",{x:xL-8,y:item.y+3.5,"text-anchor":"end","font-size":"9","font-family":"Inter, sans-serif","font-weight":"500",fill:item.color});
+  t.textContent = `${dn(item.n)}  ${item.v.toFixed(0)}%`;
+  svg.appendChild(t);
+});
+
+// Right labels
+const rightItems = rows.map(r => ({n:r.d.n, color:r.color, anchorY:r.yb, y:r.yb, v:r.d.b}));
+const rightResolved = resolveCollisions(rightItems, 13);
+rightResolved.forEach(item => {
+  if (Math.abs(item.y - item.anchorY) > 2) {
+    svg.appendChild(mkEl("line",{x1:xR+2,y1:item.anchorY,x2:xR+2,y2:item.y,stroke:item.color,"stroke-width":"0.5",opacity:"0.5"}));
+  }
+  const t = mkEl("text",{x:xR+8,y:item.y+3.5,"text-anchor":"start","font-size":"9","font-family":"Inter, sans-serif","font-weight":"500",fill:item.color});
+  t.textContent = `${item.v.toFixed(0)}%  ${dn(item.n)}`;
+  svg.appendChild(t);
+});
+
+// Legend
+const legendData = [
+  {label:">20% reduction",color:"#3D7A5A"},
+  {label:"12–20%",color:"#5B9E78"},
+  {label:"7–12%",color:"#8BAD72"},
+  {label:"3–7%",color:"#C49A45"},
+  {label:"<3%",color:"#C4715A"}
+];
+legendData.forEach((item,i) => {
+  const lx = W - 150, ly = 10 + i * 14;
+  svg.appendChild(mkEl("rect",{x:lx,y:ly,width:10,height:10,fill:item.color,rx:"1"}));
+  svg.appendChild(mkEl("text",{x:lx+14,y:ly+8,"font-size":"8","font-family":"Inter, sans-serif",fill:"#7A786F"})).textContent = item.label;
+});
+
+// Interactivity
+const tip = document.getElementById("tip");
+rows.forEach(({hit, line, d}) => {
+  hit.addEventListener("mousemove", e => {
+    rows.forEach(({line:l}) => { l.setAttribute("opacity","0.1"); l.setAttribute("stroke-width","1.5"); });
+    line.setAttribute("opacity","1");
+    line.setAttribute("stroke-width","3");
+    const pct = ((d.a - d.b) / d.a * 100).toFixed(0);
+    tip.textContent = `${dn(d.n)}: ${d.a.toFixed(0)}% → ${d.b.toFixed(0)}% (−${pct}%)`;
+    tip.style.opacity = "1";
+    tip.style.left = (e.clientX + 12) + "px";
+    tip.style.top = (e.clientY - 20) + "px";
+  });
+  hit.addEventListener("mouseleave", () => {
+    rows.forEach(({line:l}) => { l.setAttribute("opacity","1"); l.setAttribute("stroke-width","1.5"); });
+    tip.style.opacity = "0";
+  });
+});
+</script>
+</body></html>

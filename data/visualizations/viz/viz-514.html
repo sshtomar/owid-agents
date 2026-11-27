@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  body { font-family: 'Inter', sans-serif; margin: 0; padding: 32px 40px; background: #F6F5EE; color: #2B2A27; }
+  h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin: 0 0 4px; color: #2B2A27; }
+  .subtitle { font-size: 11px; color: #7A786F; margin: 0 0 24px; max-width: 540px; line-height: 1.5; }
+  .source { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A786F; margin-top: 20px; letter-spacing: 0.3px; text-transform: uppercase; }
+  svg text { font-family: 'Inter', sans-serif; }
+  .tooltip { position: fixed; pointer-events: none; background: #2B2A27; color: #F6F5EE; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 2px; white-space: nowrap; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+</style></head><body>
+<h1>Pacific Islands Lead the World in Blood Sugar — Sub-Saharan Africa the Lowest</h1>
+<p class="subtitle">Mean fasting blood glucose (age-standardized, mmol/L) for selected countries. A reading above 5.6 mmol/L is pre-diabetic. Normal fasting glucose is 4.0–5.6. Data reflects most recent survey year available, 1980–2014.</p>
+<div id="chart" style="position:relative;"></div>
+<div class="tooltip" id="tip"></div>
+<p class="source">Source: WHO Global Health Observatory — NCD_GLUC_01</p>
+<script>
+// top 20 high and bottom 10 low
+const topData = [
+  {"n":"Palau","v":6.814,"r":"Pacific"},
+  {"n":"Marshall Is.","v":6.762,"r":"Pacific"},
+  {"n":"Cook Islands","v":6.725,"r":"Pacific"},
+  {"n":"Kiribati","v":6.703,"r":"Pacific"},
+  {"n":"Tonga","v":6.530,"r":"Pacific"},
+  {"n":"Saudi Arabia","v":6.473,"r":"Gulf"},
+  {"n":"Vanuatu","v":6.470,"r":"Pacific"},
+  {"n":"Samoa","v":6.455,"r":"Pacific"},
+  {"n":"Micronesia","v":6.410,"r":"Pacific"},
+  {"n":"Tuvalu","v":6.403,"r":"Pacific"},
+  {"n":"Dominica","v":6.381,"r":"Caribbean"},
+  {"n":"Niue","v":6.330,"r":"Pacific"},
+  {"n":"Fiji","v":6.308,"r":"Pacific"},
+  {"n":"Seychelles","v":6.197,"r":"Africa"},
+  {"n":"Papua N. Guinea","v":6.153,"r":"Pacific"},
+  {"n":"Georgia","v":6.116,"r":"Europe/C.Asia"},
+  {"n":"Qatar","v":6.027,"r":"Gulf"},
+  {"n":"Mauritius","v":6.020,"r":"Africa"},
+  {"n":"Bhutan","v":6.012,"r":"S.Asia"},
+  {"n":"Solomon Is.","v":5.964,"r":"Pacific"}
+];
+const botData = [
+  {"n":"Haiti","v":4.692,"r":"Caribbean"},
+  {"n":"Uganda","v":4.691,"r":"Africa"},
+  {"n":"Eritrea","v":4.652,"r":"Africa"},
+  {"n":"Togo","v":4.644,"r":"Africa"},
+  {"n":"Portugal","v":4.634,"r":"Europe"},
+  {"n":"Timor-Leste","v":4.604,"r":"Other"},
+  {"n":"Cambodia","v":4.603,"r":"SE.Asia"},
+  {"n":"Rwanda","v":4.437,"r":"Africa"},
+  {"n":"Burundi","v":4.376,"r":"Africa"},
+  {"n":"Mozambique","v":4.330,"r":"Africa"}
+];
+
+const regionColors = {
+  "Pacific": "#EA5E33",
+  "Gulf": "#F29A44",
+  "Caribbean": "#C4715A",
+  "Africa": "#A6C4A2",
+  "Europe/C.Asia": "#5B9E78",
+  "S.Asia": "#C49A45",
+  "SE.Asia": "#8BAD72",
+  "Europe": "#3D7A5A",
+  "Other": "#7A786F"
+};
+
+const W = 740, barH = 16, gap = 4, sectionGap = 24;
+const labelW = 110, leftPad = labelW + 10, rightPad = 60;
+const chartW = W - leftPad - rightPad;
+
+const minV = 4.0, maxV = 7.0;
+const xScale = v => leftPad + (v - minV) / (maxV - minV) * chartW;
+
+// layout: top20 rows + gap section + bottom10 rows
+const totalRows = topData.length + botData.length;
+const H = 40 + topData.length * (barH + gap) + sectionGap + botData.length * (barH + gap) + 40;
+
+const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+svg.setAttribute("width","100%");
+svg.style.maxWidth = W + "px";
+document.getElementById("chart").appendChild(svg);
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+// X axis ticks and gridlines
+const ticks = [4.0, 4.5, 5.0, 5.56, 5.6, 6.0, 6.5, 7.0];
+const topY = 30;
+const botStart = topY + topData.length * (barH + gap) + sectionGap;
+const totalChartH = H - 40;
+
+[4.5, 5.0, 5.5, 6.0, 6.5].forEach(v => {
+  const x = xScale(v);
+  svg.appendChild(mkEl("line",{x1:x,y1:topY-6,x2:x,y2:H-30,stroke:"#E2E0D5","stroke-width":"0.5"}));
+  svg.appendChild(mkEl("text",{x,y:H-18,"text-anchor":"middle","font-size":"8","font-family":"JetBrains Mono, monospace",fill:"#7A786F"})).textContent = v.toFixed(1);
+});
+
+// Pre-diabetes threshold line
+const threshX = xScale(5.6);
+svg.appendChild(mkEl("line",{x1:threshX,y1:topY-6,x2:threshX,y2:H-30,stroke:"#EA5E33","stroke-dasharray":"4,3","stroke-width":"0.8",opacity:"0.5"}));
+svg.appendChild(mkEl("text",{x:threshX+3,y:topY-10,"font-size":"8","font-family":"JetBrains Mono, monospace",fill:"#EA5E33",opacity:"0.7"})).textContent = "pre-diabetic ↑";
+
+// Section labels
+const secLabel1 = mkEl("text",{x:0,y:topY-14,"font-size":"9","font-family":"Inter, sans-serif","font-weight":"600",fill:"#2B2A27"});
+secLabel1.textContent = "HIGHEST BLOOD GLUCOSE (top 20)";
+svg.appendChild(secLabel1);
+
+const secLabel2 = mkEl("text",{x:0,y:botStart-10,"font-size":"9","font-family":"Inter, sans-serif","font-weight":"600",fill:"#2B2A27"});
+secLabel2.textContent = "LOWEST BLOOD GLUCOSE (bottom 10)";
+svg.appendChild(secLabel2);
+
+const tip = document.getElementById("tip");
+
+function drawBars(barData, startY) {
+  barData.forEach((d, i) => {
+    const y = startY + i * (barH + gap);
+    const color = regionColors[d.r] || "#7A786F";
+    const barWidth = xScale(d.v) - leftPad;
+
+    // label
+    const t = mkEl("text",{x:leftPad-6,y:y+barH*0.7,"text-anchor":"end","font-size":"9","font-family":"Inter, sans-serif",fill:"#2B2A27"});
+    t.textContent = d.n;
+    svg.appendChild(t);
+
+    // bar
+    const rect = mkEl("rect",{x:leftPad,y,width:Math.max(0, barWidth),height:barH,fill:color,rx:"2",cursor:"pointer"});
+    svg.appendChild(rect);
+
+    // value
+    const vt = mkEl("text",{x:leftPad + barWidth + 4,y:y+barH*0.75,"font-size":"8","font-family":"JetBrains Mono, monospace",fill:color});
+    vt.textContent = d.v.toFixed(2);
+    svg.appendChild(vt);
+
+    // hover
+    const hit = mkEl("rect",{x:0,y,width:W,height:barH,fill:"transparent",cursor:"pointer"});
+    svg.appendChild(hit);
+    hit.addEventListener("mousemove", e => {
+      svg.querySelectorAll("rect[fill]:not([fill='transparent'])").forEach(r => r.setAttribute("opacity","0.3"));
+      rect.setAttribute("opacity","1");
+      tip.textContent = `${d.n} (${d.r}): ${d.v.toFixed(3)} mmol/L`;
+      tip.style.opacity = "1";
+      tip.style.left = (e.clientX + 12) + "px";
+      tip.style.top = (e.clientY - 20) + "px";
+    });
+    hit.addEventListener("mouseleave", () => {
+      svg.querySelectorAll("rect[fill]:not([fill='transparent'])").forEach(r => r.setAttribute("opacity","1"));
+      tip.style.opacity = "0";
+    });
+  });
+}
+
+drawBars(topData, topY);
+drawBars(botData, botStart);
+
+// Legend
+const regions = [...new Set([...topData, ...botData].map(d => d.r))];
+let lx = leftPad;
+regions.forEach(r => {
+  svg.appendChild(mkEl("rect",{x:lx,y:H-12,width:8,height:8,fill:regionColors[r]||"#7A786F",rx:"1"}));
+  const lt = mkEl("text",{x:lx+11,y:H-5,"font-size":"8","font-family":"Inter, sans-serif",fill:"#7A786F"});
+  lt.textContent = r;
+  svg.appendChild(lt);
+  lx += lt.textContent.length * 5.5 + 20;
+});
+</script>
+</body></html>
